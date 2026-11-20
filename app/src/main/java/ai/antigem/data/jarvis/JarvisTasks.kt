@@ -32,7 +32,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object JarvisTasks {
     private const val TAG = "JarvisTasks"
-    private const val KEEP = 30
+    // Keep running tasks regardless of count; retain recent terminal tasks separately.
+    private const val KEEP_FINISHED = 30
     /** How much of a finished task's reply goes into its news (its end; the whole reply can be read with jarvis_read_chat). */
     const val RESULT_MAX = 3500
     /** A task that never showed as running within this time after a message is taken as finished. */
@@ -601,10 +602,13 @@ object JarvisTasks {
 
     // ------------------------------------------------------------------ list and storage
 
+    @Synchronized
     private fun put(task: Task) {
         val list = _tasks.value
         val changed = list.firstOrNull { it.id == task.id } != task
-        _tasks.value = (listOf(task) + list.filter { it.id != task.id }).sortedByDescending { it.createdAt }.take(KEEP)
+        val ordered = (listOf(task) + list.filter { it.id != task.id }).sortedByDescending { it.createdAt }
+        val retainedFinished = ordered.filterNot { it.active }.take(KEEP_FINISHED).mapTo(HashSet()) { it.id }
+        _tasks.value = ordered.filter { it.active || it.id in retainedFinished }
         _anyActive.value = _tasks.value.any { it.active }
         if (changed) save()
     }
