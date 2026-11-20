@@ -50,6 +50,13 @@ object JarvisMcp {
         "jarvis_set_model"
     )
 
+    // Delegated managers get only orchestration tools, never global app-control tools.
+    private val DELEGATED_TOOLS = setOf(
+        "jarvis_team_list", "jarvis_task_start", "jarvis_task_list", "jarvis_task_get",
+        "jarvis_task_reply", "jarvis_task_answer", "jarvis_task_stop", "jarvis_task_close",
+        "jarvis_mission_set", "jarvis_mission_update", "jarvis_mission_get", "jarvis_read_chat"
+    )
+
     private const val NO_WAIT_NOTE = "Do not wait, sleep or poll. Start any other independent tasks now, tell the user briefly, then END YOUR TURN: " +
         "results come back to you as a <jarvis_events> message."
 
@@ -68,7 +75,13 @@ object JarvisMcp {
         put("description", description)
         put("inputSchema", JSONObject().apply {
             put("type", "object")
-            put("properties", JSONObject().apply { props.forEach { (k, v) -> put(k, v) } })
+            put("properties", JSONObject().apply {
+                props.forEach { (k, v) -> put(k, v) }
+                if (name in DELEGATED_TOOLS) {
+                    if (!has("manager_id")) put("manager_id", prop("string", "Exact manager ID from your manager note"))
+                    put("manager_token", prop("string", "Required for delegated managers; use the private capability from your manager note"))
+                }
+            })
             if (required.isNotEmpty()) put("required", JSONArray(required))
         })
     }
@@ -170,6 +183,7 @@ object JarvisMcp {
             "model" to prop("string", "Model id or part of its name (default: the agent's default)"),
             "role" to prop("string", "What this team does and how it should work and report (sent with each of its tasks)"),
             "effort" to prop("string", "Provider-native reasoning effort for this role (default uses the model default)"),
+            "child_roles" to prop("array", "Existing role names this role may delegate to. Empty means a worker; a nonempty list makes it a manager.").put("items", prop("string", "Existing role name")),
             "project" to prop("string", "Project name or path the team works in (default: the active project at the time)"),
             managerId))
         put(tool("jarvis_team_list", "Your teams with their agent, model, project and role, and how many of their tasks are running.", emptyList(), managerId))
@@ -375,7 +389,19 @@ object JarvisMcp {
         // which Jarvis chat is calling: the voice chat, or one of the Jarvis text chats (their status shows on their own strip)
         val session = args.optString("_mcp_session").ifBlank { null }
         args.remove("_mcp_session")
-        var who = JarvisManagers.resolveCaller(args.optString("manager_id").ifBlank { null }, session)
+        val claimedManager = args.optString("manager_id").trim()
+        val capability = args.optString("manager_token")
+        args.remove("manager_token")
+        val claimed = JarvisManagers.get(claimedManager)
+        val delegatedClaim = claimed?.parentKey?.isNotBlank() == true
+        if (capability.isNotBlank() || delegatedClaim) {
+            if (!delegatedClaim || capability.isBlank() || claimed?.delegationToken != capability) return error("Invalid delegated manager capability.")
+            if (name !in DELEGATED_TOOLS) return error("This tool is outside your delegated manager scope.")
+            if (JarvisTasks.find(claimedManager)?.active != true) return error("This manager task is not active.")
+        }
+        var who = if (delegatedClaim) JarvisManagers.Caller(claimedManager, true)
+            else JarvisManagers.resolveCaller(claimedManager.ifBlank { null }, session)
+        if (JarvisManagers.isDelegated(who.key) && !delegatedClaim) return error("A delegated manager must send its exact ID and capability.")
         // never act for the wrong Jarvis chat: when it is not certain who calls, ask for the manager_id
         if (!who.sure && name in ACTING) return error(NEED_ID)
         if (!who.sure && (name == "jarvis_speak" || name == "jarvis_ask")) {
@@ -457,7 +483,7 @@ object JarvisMcp {
                 "jarvis_task_close" -> {
                     val (t, err) = owned(args.optString("id"), caller)
                     if (t == null) return err!!
-                    JarvisTasks.close(t.id)
+                    if (!JarvisTasks.close(t.id)) return error("Cannot close a manager while it or its children are active.")
                     text("No longer watching ${t.title}.")
                 }
                 "jarvis_set_timer" -> {
@@ -498,7 +524,14 @@ object JarvisMcp {
                 "jarvis_get_usage" -> getUsage(args)
                 "jarvis_list_chats" -> listChats(args)
                 "jarvis_get_chat" -> getChat(args)
-                "jarvis_read_chat" -> readChat(args)
+                "jarvis_read_chat" -> {
+                    if (JarvisManagers.isDelegated(caller)) {
+                        val (task, err) = owned(args.optString("id"), caller)
+                        if (task == null) return err!!
+                        args.put("id", task.id).put("include_tools", false)
+                    }
+                    readChat(args)
+                }
                 "jarvis_search_chats" -> searchChats(args)
                 "jarvis_new_chat" -> newChat(args, caller)
                 "jarvis_send_to_chat" -> {
@@ -803,7 +836,8 @@ object JarvisMcp {
         append("completely done: do not stop halfway to ask for confirmation, and ask a question only when you are truly blocked (it reaches Jarvis). ")
         append("Verify your work (build, tests, or running it) where that makes sense. Finish with a short report: what you did, the files you changed, ")
         append("how you verified it, and anything left open, risky or needing a decision. ")
-        append("The jarvis_mcp tools (jarvis_*) belong to Jarvis, not to you: do not call them.")
+        if (team?.childRoles.isNullOrEmpty()) append("The jarvis_mcp tools (jarvis_*) belong to Jarvis, not to you: do not call them.")
+        else append("You are a team manager. Delegate only to the permitted roles; verify and synthesize their work rather than doing all of it yourself.")
         if (team != null) {
             append("\n\nYour team: ${team.name}.")
             if (team.role.isNotBlank()) append(" Your role: ${team.role}")
@@ -814,23 +848,31 @@ object JarvisMcp {
         val goal = args.optString("goal").trim()
         if (goal.isEmpty()) return error("goal is required")
         val teamArg = args.optString("team").trim()
+        val delegated = JarvisManagers.isDelegated(caller)
+        if (delegated && teamArg.isEmpty()) return error("Select a permitted role with team (see jarvis_team_list).")
+        if (delegated && listOf("agent", "model", "project", "effort").any { args.has(it) && !args.isNull(it) && args.optString(it).isNotBlank() }) {
+            return error("Delegated managers must use the role settings configured by their parent.")
+        }
         val team = JarvisManagers.team(caller, teamArg)
         if (teamArg.isNotEmpty() && team == null) {
-            val have = JarvisManagers.of(caller).teams.joinToString(", ") { it.name }
+            val have = JarvisManagers.profiles(caller).joinToString(", ") { it.name }
             return error("No team \"$teamArg\". " + if (have.isBlank()) "Create it first with jarvis_team_create." else "Your teams: $have.")
         }
         val agent = agentArg(args.optString("agent").ifBlank { team?.agent?.name?.lowercase().orEmpty() })
         if (agent !in vm.enabledAgents.value) return error("${agentName(agent)} is turned off (Settings → Agents).")
         val projectArg = args.optString("project").trim().ifBlank { team?.project.orEmpty() }
+            .ifBlank { if (delegated) JarvisTasks.find(caller)?.project.orEmpty() else "" }
         val project = if (projectArg.isBlank()) null else findProject(projectArg) ?: return error("No project matches \"$projectArg\". Use jarvis_ide_list_projects.")
         val modelArg = args.optString("model").trim().ifBlank { if (team != null && team.agent == agent) team.model else "" }
         val model = modelArg.takeIf { it.isNotEmpty() }?.let { findModel(it, modelsFor(agent))?.id ?: return error("No ${agent.name.lowercase()} model matches \"$it\".") }
         val launchArgs = JSONObject(args.toString())
         if (!launchArgs.has("effort") && team?.agent == agent && team.effort.isNotBlank()) launchArgs.put("effort", team.effort)
         val effort = effortArg(launchArgs, agent, model).getOrElse { return error(it.message ?: "Unknown effort") }
+        val childProfiles = if (team == null) emptyList() else JarvisManagers.childProfiles(caller, team)
         val t = JarvisTasks.start(
             agent, goal, args.optString("title").ifBlank { null }, model, project?.path,
-            owner = caller, team = team?.name.orEmpty(), brief = subAgentBrief(team), effort = effort
+            owner = caller, team = team?.name.orEmpty(), brief = subAgentBrief(team), effort = effort,
+            childProfiles = childProfiles
         )
         // work started: the autopilot's patience starts over
         JarvisManagers.resetNudges(caller)
@@ -881,6 +923,9 @@ object JarvisMcp {
         val step = if (args.has("step") && !args.isNull("step")) args.optInt("step") else null
         val stepStatus = args.optString("step_status").trim().lowercase().takeIf { it in setOf("todo", "doing", "done", "blocked") }
         val status = args.optString("status").trim().lowercase().ifBlank { null }
+        if (status == "done" && JarvisManagers.isDelegated(caller) && (JarvisTasks.ownedBy(caller).any { it.active } || JarvisEvents.hasPendingWork(caller))) {
+            return error("Your children or their result events are still pending. Finish processing them before marking the mission done.")
+        }
         val autopilot = if (args.has("autopilot") && !args.isNull("autopilot")) args.optBoolean("autopilot") else null
         val changed = JarvisManagers.updateMission(
             caller, step, stepStatus, args.optString("note").ifBlank { null }, linesArg(args, "add_steps"),
@@ -892,7 +937,7 @@ object JarvisMcp {
     }
 
     private suspend fun teamCreate(args: JSONObject, caller: String): JSONObject {
-        val name = args.optString("name").trim().take(30)
+        val name = args.optString("name").trim()
         if (name.isEmpty()) return error("name is required")
         val existing = JarvisManagers.team(caller, name)
         val agent = if (args.optString("agent").isBlank() && existing != null) existing.agent else agentArg(args.optString("agent"))
@@ -906,19 +951,39 @@ object JarvisMcp {
         val profileArgs = JSONObject(args.toString())
         if (!profileArgs.has("effort") && existing?.agent == agent && existing.effort.isNotBlank()) profileArgs.put("effort", existing.effort)
         val effort = effortArg(profileArgs, agent, model.takeIf { it.isNotBlank() }).getOrElse { return error(it.message ?: "Unknown effort") }
-        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project, effort.orEmpty())
+        val childRoles = if (args.has("child_roles")) {
+            val a = args.optJSONArray("child_roles") ?: return error("child_roles must be an array of existing role names.")
+            if ((0 until a.length()).any { a.opt(it) !is String || a.optString(it).isBlank() }) return error("child_roles must contain nonempty strings.")
+            (0 until a.length()).map { a.optString(it).trim() }.distinctBy { it.lowercase() }
+        } else existing?.childRoles.orEmpty()
+        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project, effort.orEmpty(), childRoles)
+        val all = JarvisManagers.profiles(caller).filterNot { it.name.equals(name, true) } + team
+        val graph = all.associateBy { it.name.lowercase() }
+        val visiting = HashSet<String>()
+        val visited = HashSet<String>()
+        fun validate(key: String): Boolean {
+            if (key in visiting) return false
+            if (key in visited) return true
+            val profile = graph[key] ?: return false
+            visiting += key
+            if (!profile.childRoles.all { validate(it.lowercase()) }) return false
+            visiting -= key
+            visited += key
+            return true
+        }
+        if (!graph.keys.all { validate(it) }) return error("Child roles must exist and the role hierarchy must be acyclic.")
         JarvisManagers.upsertTeam(caller, team)
         return text("${if (existing != null) "Updated" else "Created"} team $name (${agent.name.lowercase()}${if (model.isNotBlank()) ", $model" else ""}). " +
             "Give it work with jarvis_task_start(team=\"$name\", goal=…).")
     }
 
     private fun teamList(caller: String): JSONObject {
-        val m = JarvisManagers.of(caller)
         val tasks = JarvisTasks.ownedBy(caller)
         return json(JSONObject().put("teams", JSONArray().apply {
-            m.teams.forEach { t ->
+            JarvisManagers.profiles(caller).forEach { t ->
                 put(JSONObject().put("name", t.name).put("agent", t.agent.name.lowercase()).put("model", t.model.ifBlank { "default" })
                      .put("effort", t.effort.ifBlank { "default" }).put("role", t.role).put("project", t.project.substringAfterLast('/').ifBlank { "active project" })
+                    .put("child_roles", JSONArray(t.childRoles)).put("can_delegate", t.childRoles.isNotEmpty())
                     .put("running_tasks", tasks.count { it.team.equals(t.name, true) && it.active }))
             }
         }))
@@ -927,6 +992,7 @@ object JarvisMcp {
     private fun taskJson(t: JarvisTasks.Task) = JSONObject().apply {
         put("id", t.id); put("title", t.title); put("agent", t.agent.name.lowercase()); put("state", t.state.label)
         if (t.team.isNotBlank()) put("team", t.team)
+        put("parent_manager_id", t.owner); put("is_manager", JarvisManagers.isDelegated(t.id))
         put("started", ago(t.createdAt)); put("last_change", ago(t.updatedAt))
         if (t.note.isNotBlank()) put("note", t.note)
         if (t.project.isNotBlank()) put("project", t.project.substringAfterLast('/'))
@@ -935,7 +1001,7 @@ object JarvisMcp {
     }
 
     private fun taskList(args: JSONObject, caller: String): JSONObject {
-        val mine = args.optString("scope", "mine") != "all"
+        val mine = JarvisManagers.isDelegated(caller) || args.optString("scope", "mine") != "all"
         val all = if (mine) JarvisTasks.ownedBy(caller) else JarvisTasks.tasks.value
         if (all.any { it.active } && polling("list:$caller", 3, 120_000)) return error(POLL_STOP)
         val list = if (args.optBoolean("include_finished", true)) all else all.filter { it.active }
@@ -947,6 +1013,7 @@ object JarvisMcp {
 
     private suspend fun taskGet(args: JSONObject, caller: String): JSONObject {
         val t = JarvisTasks.find(args.optString("id").trim()) ?: return error("No task with that id. Use jarvis_task_list.")
+        if (JarvisManagers.isDelegated(caller) && JarvisManagers.ownerOrVoice(t.owner) != caller) return error("This task is outside your scope.")
         if (t.active && !t.state.needsUser && polling("get:$caller:${t.id}", 2, 90_000)) return error(POLL_STOP)
         val n = args.optInt("messages", 3).coerceIn(0, 10)
         val max = args.optInt("max_chars", 600).coerceIn(100, 30_000)
