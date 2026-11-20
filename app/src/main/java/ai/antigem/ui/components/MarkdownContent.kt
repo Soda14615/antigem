@@ -3198,7 +3198,7 @@ fun parseMarkdownBlocks(
                     MarkdownBlock.YouTubeVideo(
                         videoId = ytId,
                         originalUrl = if (linkUrl.isNotBlank()) linkUrl else "https://www.youtube.com/watch?v=$ytId",
-                        title = alt.ifBlank { stringResource(R.string.markdown_content_youtube_video) },
+                        title = alt.takeIf { it.isNotBlank() },
                         customThumbnailUrl = imgUrl.takeIf { it.isNotBlank() }
                     )
                 )
@@ -3229,7 +3229,7 @@ fun parseMarkdownBlocks(
                     MarkdownBlock.YouTubeVideo(
                         videoId = ytId,
                         originalUrl = if (url.contains("youtube.com/watch") || url.contains("youtu.be")) url else "https://www.youtube.com/watch?v=$ytId",
-                        title = alt.ifBlank { stringResource(R.string.markdown_content_youtube_video) },
+                        title = alt.takeIf { it.isNotBlank() },
                         customThumbnailUrl = if (url.contains("img.youtube.com")) url else null
                     )
                 )
