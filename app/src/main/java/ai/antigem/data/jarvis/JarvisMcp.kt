@@ -462,6 +462,8 @@ object JarvisMcp {
                 "jarvis_team_delete" -> {
                     val n = args.optString("name").trim()
                     if (n.isEmpty()) return error("name is required")
+                    val dependents = JarvisManagers.profiles(caller).filter { profile -> profile.childRoles.any { it.equals(n, true) } }
+                    if (dependents.isNotEmpty()) return error("Role $n is still referenced by: ${dependents.joinToString { it.name }}. Update those roles first.")
                     text(if (JarvisManagers.removeTeam(caller, n)) "Team $n removed." else "No team $n.")
                 }
                 "jarvis_task_answer" -> {
@@ -923,7 +925,7 @@ object JarvisMcp {
         val step = if (args.has("step") && !args.isNull("step")) args.optInt("step") else null
         val stepStatus = args.optString("step_status").trim().lowercase().takeIf { it in setOf("todo", "doing", "done", "blocked") }
         val status = args.optString("status").trim().lowercase().ifBlank { null }
-        if (status == "done" && JarvisManagers.isDelegated(caller) && (JarvisTasks.ownedBy(caller).any { it.active } || JarvisEvents.hasPendingWork(caller))) {
+        if (status == "done" && JarvisManagers.isDelegated(caller) && (JarvisTasks.ownedBy(caller).any { it.active } || JarvisEvents.pending(caller) > 0)) {
             return error("Your children or their result events are still pending. Finish processing them before marking the mission done.")
         }
         val autopilot = if (args.has("autopilot") && !args.isNull("autopilot")) args.optBoolean("autopilot") else null
@@ -932,7 +934,9 @@ object JarvisMcp {
             status, autopilot, if (args.has("notes")) args.optString("notes") else null
         )
         val m = JarvisManagers.of(caller).mission
-        val tail = if (m.status == "done") " The mission is done: report the result to the user." else ""
+        val tail = if (m.status == "done") {
+            if (JarvisManagers.isDelegated(caller)) " The mission is done: write the verified final report for your parent." else " The mission is done: report the result to the user."
+        } else ""
         return text("Updated: $changed. ${m.doneCount}/${m.steps.size} steps done.$tail")
     }
 
