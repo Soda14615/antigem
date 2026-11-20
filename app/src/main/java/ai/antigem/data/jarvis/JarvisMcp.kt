@@ -169,6 +169,7 @@ object JarvisMcp {
             "agent" to prop("string", "claude, agy, opencode or codex (default: the app's new-chat agent)", listOf("claude", "agy", "opencode", "codex")),
             "model" to prop("string", "Model id or part of its name (default: the agent's default)"),
             "role" to prop("string", "What this team does and how it should work and report (sent with each of its tasks)"),
+            "effort" to prop("string", "Provider-native reasoning effort for this role (default uses the model default)"),
             "project" to prop("string", "Project name or path the team works in (default: the active project at the time)"),
             managerId))
         put(tool("jarvis_team_list", "Your teams with their agent, model, project and role, and how many of their tasks are running.", emptyList(), managerId))
@@ -824,7 +825,9 @@ object JarvisMcp {
         val project = if (projectArg.isBlank()) null else findProject(projectArg) ?: return error("No project matches \"$projectArg\". Use jarvis_ide_list_projects.")
         val modelArg = args.optString("model").trim().ifBlank { if (team != null && team.agent == agent) team.model else "" }
         val model = modelArg.takeIf { it.isNotEmpty() }?.let { findModel(it, modelsFor(agent))?.id ?: return error("No ${agent.name.lowercase()} model matches \"$it\".") }
-        val effort = effortArg(args, agent, model).getOrElse { return error(it.message ?: "Unknown effort") }
+        val launchArgs = JSONObject(args.toString())
+        if (!launchArgs.has("effort") && team?.agent == agent && team.effort.isNotBlank()) launchArgs.put("effort", team.effort)
+        val effort = effortArg(launchArgs, agent, model).getOrElse { return error(it.message ?: "Unknown effort") }
         val t = JarvisTasks.start(
             agent, goal, args.optString("title").ifBlank { null }, model, project?.path,
             owner = caller, team = team?.name.orEmpty(), brief = subAgentBrief(team), effort = effort
@@ -900,7 +903,10 @@ object JarvisMcp {
         val projectArg = args.optString("project").trim()
         val project = if (projectArg.isEmpty()) existing?.project.orEmpty()
         else (findProject(projectArg) ?: return error("No project matches \"$projectArg\".")).path
-        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project)
+        val profileArgs = JSONObject(args.toString())
+        if (!profileArgs.has("effort") && existing?.agent == agent && existing.effort.isNotBlank()) profileArgs.put("effort", existing.effort)
+        val effort = effortArg(profileArgs, agent, model.takeIf { it.isNotBlank() }).getOrElse { return error(it.message ?: "Unknown effort") }
+        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project, effort.orEmpty())
         JarvisManagers.upsertTeam(caller, team)
         return text("${if (existing != null) "Updated" else "Created"} team $name (${agent.name.lowercase()}${if (model.isNotBlank()) ", $model" else ""}). " +
             "Give it work with jarvis_task_start(team=\"$name\", goal=…).")
@@ -912,7 +918,7 @@ object JarvisMcp {
         return json(JSONObject().put("teams", JSONArray().apply {
             m.teams.forEach { t ->
                 put(JSONObject().put("name", t.name).put("agent", t.agent.name.lowercase()).put("model", t.model.ifBlank { "default" })
-                    .put("role", t.role).put("project", t.project.substringAfterLast('/').ifBlank { "active project" })
+                     .put("effort", t.effort.ifBlank { "default" }).put("role", t.role).put("project", t.project.substringAfterLast('/').ifBlank { "active project" })
                     .put("running_tasks", tasks.count { it.team.equals(t.name, true) && it.active }))
             }
         }))
