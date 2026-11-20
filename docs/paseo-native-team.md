@@ -6,7 +6,7 @@
 
 - npm 独立安装前缀：~/.local/share/antigem-paseo-team/runtime
 - Paseo 独立数据目录：~/.local/share/antigem-paseo-team/state
-- 本地监听：127.0.0.1:6799；Relay 默认关闭
+- 本地监听：127.0.0.1:6799；Relay 默认关闭；正常启动入口要求先通过原版 CLI 设置访问密码
 - 初次启动启用原版编排工具注入与原版 Web UI；已有配置不覆盖
 - 只有用户执行 install 才联网安装依赖；APK 只打包轻量 Bash 启动器
 - 试验目标版本：0.17.0-beta.1（与审核时上游源码一致）；npm 发布可用性尚未核验
@@ -19,6 +19,7 @@
 
 ```bash
 paseo-team install
+paseo-team password
 paseo-team start
 paseo-team status
 paseo-team url
@@ -32,7 +33,7 @@ paseo-team stop
 
 两者拥有不同的编排状态、会话管理权、命令入口和服务端口。Paseo 应创建自己的会话，Jarvis 创建自己的会话；不要把同一个现有会话同时交给两者管理。不需要禁用 Jarvis。
 
-这不等于进程、安全或资源隔离。它们运行在同一 Android 应用环境，可能使用相同 CLI、认证文件、全局 MCP 配置、项目文件及模型额度。不要同时让两个编排器修改同一工作树。若 CLI 争用或全局 MCP 互相影响，优先复用独立工作区、使用提供方支持的独立配置，或串行运行。仅绑定 loopback 也不是认证：在正式使用前检查 Paseo 的密码设置及 Android 本地网络可访问性，不能把端口转发或公开。
+这不等于进程、安全或资源隔离。它们运行在同一 Android 应用环境，可能使用相同 CLI、认证文件、全局 MCP 配置、项目文件及模型额度。不要同时让两个编排器修改同一工作树。若 CLI 争用或全局 MCP 互相影响，优先复用独立工作区、使用提供方支持的独立配置，或串行运行。仅绑定 loopback 也不是认证：启动器要求先用原版 set-password 设置 bcrypt 密码哈希，交互式连接命令会提示输入密码。仍需在真机验证 HTTP/WebSocket 认证及其他 Android 本地应用的可访问性，不要将端口转发或公开。原版 CLI 透传不是安全沙箱。
 
 ## 验收
 
@@ -42,4 +43,4 @@ paseo-team stop
 4. 验证 Jarvis 独立启动任务，双方不能互相接管会话；检查并发 CLI、MCP、工作目录、手机休眠与额度。
 5. 用用户原有岗位配置做导入兼容测试。未通过以上步骤前，不宣称具备完整手机团队运行能力。
 
-本分支提供原版运行入口、APK 打包接线及侧栏入口。尚未进行 Android 编译、npm 实际安装或 Agent 调用。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
+本分支提供原版运行入口、APK 打包接线及侧栏入口。启动器的远程 Git Blob 已核对并通过 Bash 语法、缺失安装、密码前置条件、独立配置保留、命令转发和非本地监听拒绝测试（测试使用 CLI 桩，不代表 Paseo 本体运行）。npm registry DNS 返回 EAI_AGAIN，尚未进行 Android 编译、npm 实际安装或 Agent 调用。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
