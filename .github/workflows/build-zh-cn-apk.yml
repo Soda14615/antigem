@@ -5,6 +5,7 @@ on:
     branches:
       - zh-cn
       - zh-cn-v2.0.1
+      - chatgpt/paseo-native-team
   pull_request:
     branches:
       - zh-cn-v2.0.1
@@ -31,6 +32,22 @@ jobs:
           repository: ${{ matrix.repository }}
           ref: ${{ matrix.ref || github.sha }}
           fetch-depth: 0
+
+      - name: Require persistent release identity for installable builds
+        if: matrix.target == 'candidate' && github.event_name != 'pull_request'
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          EXPECTED_CERT: ${{ vars.ANTIGEM_RELEASE_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_KEYSTORE_BASE64" ]]; then
+            echo "::error::Configure the ORIGINAL kept release keystore as RELEASE_KEYSTORE_BASE64. Refusing temporary signing."
+            exit 1
+          fi
+          if [[ ! "$EXPECTED_CERT" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            echo "::error::Set ANTIGEM_RELEASE_CERT_SHA256 to the existing release signing certificate SHA-256 (64 hex digits)."
+            exit 1
+          fi
 
       - name: Fetch termux-am submodule
         run: git submodule update --init --depth 1 termux-am
@@ -61,35 +78,61 @@ jobs:
       - name: Build ARM64 APK
         if: matrix.target == 'candidate'
         env:
-          RELEASE_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && github.ref != 'refs/heads/chatgpt/paseo-native-team' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
+          RELEASE_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
+          EXPECTED_CERT: ${{ vars.ANTIGEM_RELEASE_CERT_SHA256 }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
+          set -euo pipefail
           chmod +x gradlew
           mkdir -p dist
-          VERSION_NAME=$(python3 -c "import json; print(json.load(open('version.json')).get('version_name', '2.0.0'))")
-          if [ -n "$RELEASE_KEYSTORE_BASE64" ]; then
-            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.jks
-            ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
-            APK_SRC=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
-            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
-            cp "$APK_SRC" "$APK_OUT"
-          else
-            echo "RELEASE_KEYSTORE_BASE64 not set; building ARM64 debug APK for testing."
+          trap 'rm -f app/release.jks' EXIT
+          VERSION_NAME=$(python3 -c "import json; print(json.load(open('version.json'))['version_name'])")
+          if [[ "$EVENT_NAME" == pull_request ]]; then
+            # CI-only: debug identity is ephemeral and must never be offered as an upgrade.
             ./gradlew :app:assembleDebug -Pantigem.arm64Only=true
-            APK_SRC=$(ls app/build/outputs/apk/debug/*.apk | head -n 1)
-            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64-debug.apk"
-            cp "$APK_SRC" "$APK_OUT"
+            APK_SRC=$(find app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)
+            APK_OUT="dist/AntiGem-v${VERSION_NAME}-CI-ONLY-debug.apk"
+            EXPECTED_PACKAGE=ai.antidev
+          else
+            [[ -n "$RELEASE_KEYSTORE_BASE64" ]] || exit 1
+            umask 077
+            printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.jks
+            ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
+            APK_SRC=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
+            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
+            EXPECTED_PACKAGE=ai.antigem
           fi
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT"
-          "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK_OUT" | grep -E "package:|native-code:|locales:"
+          test -f "$APK_SRC"
+          cp "$APK_SRC" "$APK_OUT"
+          CERT_INFO=$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT")
+          printf '%s\n' "$CERT_INFO"
+          ACTUAL_CERT=$(printf '%s\n' "$CERT_INFO" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          test -n "$ACTUAL_CERT"
+          if [[ "$EVENT_NAME" != pull_request && "${ACTUAL_CERT,,}" != "${EXPECTED_CERT,,}" ]]; then
+            echo "::error::Release signing certificate does not match the pinned existing identity. No APK will be uploaded."
+            exit 1
+          fi
+          BADGING=$("$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK_OUT")
+          printf '%s\n' "$BADGING" | grep -E "package:|native-code:|locales:"
+          grep -Fq "package: name='$EXPECTED_PACKAGE'" <<< "$BADGING"
           sha256sum "$APK_OUT"
 
-      - name: Upload APK Artifact
-        if: matrix.target == 'candidate'
+      - name: Upload fixed-signature installable APK
+        if: matrix.target == 'candidate' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: antigem-zh-cn-arm64-apk
           path: dist/*.apk
           retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload CI-only debug APK (not an upgrade)
+        if: matrix.target == 'candidate' && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: antigem-ci-only-debug-do-not-install
+          path: dist/*-CI-ONLY-debug.apk
+          retention-days: 3
           if-no-files-found: error
 
       # Do not mask failures: the APK is a build artifact, not proof of regression-test success.
