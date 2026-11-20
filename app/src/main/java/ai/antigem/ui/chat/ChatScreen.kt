@@ -148,6 +148,35 @@ fun ChatScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
+    var showPaseoTeam by remember { mutableStateOf(false) }
+    if (showPaseoTeam) {
+        AlertDialog(
+            onDismissRequest = { showPaseoTeam = false },
+            title = { Text(stringResource(R.string.paseo_team_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.paseo_team_setup))
+                    SelectionContainer {
+                        Text("paseo-team install\npaseo-team start\npaseo-team status", fontFamily = FontFamily.Monospace)
+                    }
+                    Text(stringResource(R.string.paseo_team_stop_hint))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPaseoTeam = false
+                    ai.antigem.ui.browser.BrowserSessionManager.instance.openUrl("http://127.0.0.1:6799", newTab = true)
+                    onNavigateToBrowser()
+                }) { Text(stringResource(R.string.paseo_team_open)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPaseoTeam = false
+                    onNavigateToTerminal()
+                }) { Text(stringResource(R.string.paseo_team_terminal)) }
+            }
+        )
+    }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // The sidebar is 82% of the screen width, so turning the phone (e.g. a landscape full-screen video)
     // changes its width; the drawer then moves to whichever position is nearest and can open by itself.
@@ -1436,6 +1465,7 @@ fun ChatScreen(
                 onCancelLogin = {
                     viewModel.cancelAgyLogin()
                 },
+                onOpenPaseoTeam = if (!isInFloatingWindow) ({ showPaseoTeam = true }) else null,
                 onOpenSettings = {
                     showSettingsDialog = true
                     scope.launch { drawerState.close() }
