@@ -5,7 +5,7 @@ umask 077
 root="$HOME/.local/share/antigem-paseo-team"
 team_home="$root/state"
 runtime="$root/runtime-arm64-v2"
-paseo="$runtime/node_modules/.bin/paseo"
+paseo="$runtime/node_modules/@getpaseo/cli/bin/paseo"
 export PATH="$runtime/node_modules/.bin:$PATH"
 unset PASEO_HOST
 export PASEO_HOME="$team_home"
@@ -21,21 +21,25 @@ Paseo 团队（独立运行，不接管 Jarvis 会话）
   paseo-team start          启动本地独立团队服务
   paseo-team status         查看团队服务状态
   paseo-team check          检查真实 CLI 和 PTY 运行能力
+  paseo-team verify         检查已启动服务、Web UI 和认证连接
   paseo-team stop           停止团队服务
   paseo-team cli <args>     使用原版 Paseo 命令
   paseo-team url            显示 Web 团队管理地址
 EOF
 }
 require_node() {
-  command -v node >/dev/null && command -v npm >/dev/null || fail "缺少 Node.js/npm；请先在 AntiGem 终端安装 nodejs。"
+  command -v node >/dev/null && command -v npm >/dev/null || fail "缺少 Node.js/npm；请先在 AntiGem 终端执行 pkg install nodejs。"
 }
 require_paseo() {
-  [[ -x "$paseo" && -f "$runtime/.verified-install" ]] || fail "尚未通过安装检查：请运行 paseo-team install。"
+  [[ -f "$paseo" && -f "$runtime/.verified-install" ]] || fail "尚未通过安装检查：请运行 paseo-team install。"
 }
+run_paseo() { node --disable-warning=DEP0040 "$paseo" "$@"; }
 check_runtime() {
   node - "$runtime" <<\JS
 const { createRequire } = require("node:module");
 const path = require("node:path");
+const fs = require("node:fs");
+const os = require("node:os");
 const cli = path.join(process.argv[2], "node_modules", "@getpaseo", "cli", "package.json");
 const cliRequire = createRequire(cli);
 const server = cliRequire.resolve("@getpaseo/server");
@@ -43,14 +47,39 @@ const load = createRequire(server);
 const metadata = load("node-pty/package.json");
 if (process.platform === "android" && metadata.name !== "@mmmbuto/node-pty-android-arm64") throw Error("Android PTY override not resolved: " + metadata.name);
 const pty = load("node-pty");
-let output = "";
+const source = path.dirname(load.resolve("node-pty/package.json"));
+// Match the subset copied by upstream terminal-worker-runtime.ts.
+const temp = fs.mkdtempSync(path.join(os.tmpdir(), "paseo-pty-"));
+process.on("exit", () => fs.rmSync(temp, { recursive: true, force: true }));
+const dest = path.join(temp, "node_modules", "node-pty");
+fs.mkdirSync(dest, { recursive: true });
+for (const part of ["package.json", "lib"]) fs.cpSync(path.join(source, part), path.join(dest, part), { recursive: true });
+const native = ["build/Release", "prebuilds/" + process.platform + "-" + process.arch].filter(part => fs.existsSync(path.join(source, part)));
+if (!native.length) throw Error("Native build missing from Paseo worker copy paths: " + source);
+for (const part of native) {
+  fs.mkdirSync(path.dirname(path.join(dest, part)), { recursive: true });
+  fs.cpSync(path.join(source, part), path.join(dest, part), { recursive: true });
+}
+const copied = createRequire(path.join(temp, "worker.cjs"))("node-pty");
+function probe(module, label) {
+  return new Promise((resolve, reject) => {
+    let output = "";
 const shell = path.join(process.env.PREFIX || "/usr", "bin", "bash");
-const child = pty.spawn(shell, ["-c", "printf PASEO_PTY_OK"], { name: "xterm", cols: 80, rows: 24, cwd: process.env.HOME, env: process.env });
-const timer = setTimeout(() => { child.kill(); console.error("Native PTY timed out"); process.exit(1); }, 10000);
-child.onData(data => { output += data; });
-child.onExit(({ exitCode }) => { clearTimeout(timer); if (exitCode !== 0 || !output.includes("PASEO_PTY_OK")) { console.error("Native PTY failed", exitCode, output); process.exit(1); } console.log("Native PTY passed:", metadata.name, metadata.version); });
+const child = module.spawn(shell, ["-c", "printf PASEO_PTY_OK"], { name: "xterm", cols: 80, rows: 24, cwd: process.env.HOME, env: process.env });
+    const timer = setTimeout(() => { child.kill(); reject(Error(label + " PTY timed out")); }, 10000);
+    child.onData(data => { output += data; });
+    child.onExit(({ exitCode }) => {
+      clearTimeout(timer);
+      if (exitCode !== 0 || !output.includes("PASEO_PTY_OK")) { reject(Error(label + " PTY failed: " + exitCode + " " + output)); return; }
+      console.log(label + " PTY passed:", metadata.name, metadata.version); resolve();
+    });
+  });
+}
+(async () => { await probe(pty, "Installed"); await probe(copied, "Worker copy"); })().catch(error => { console.error(error); process.exitCode = 1; });
 JS
-  "$paseo" --version
+  local rc=$?
+  (( rc == 0 )) || return "$rc"
+  run_paseo --version
 }
 connection_password() {
   if [[ -z "${PASEO_PASSWORD:-}" && -t 0 ]]; then
@@ -79,7 +108,10 @@ case "${1:-help}" in
   install)
     [[ $# -eq 1 ]] || fail "用法：paseo-team install"
     require_node
-    if [[ -f "$runtime/.verified-install" ]]; then check_runtime; exit 0; fi
+    if [[ -f "$runtime/.verified-install" ]]; then
+      if check_runtime; then exit 0; fi
+      rm -f "$runtime/.verified-install"
+    fi
     mkdir -p "$runtime"
     node - "$runtime/package.json" "$version" "$pty_version" <<\JS
 const fs = require("node:fs");
@@ -102,7 +134,7 @@ JS
   password)
     [[ $# -eq 1 ]] || fail "用法：paseo-team password"
     require_node; require_paseo; init_config
-    "$paseo" daemon set-password --home "$team_home"
+    run_paseo daemon set-password --home "$team_home"
     ;;
   start)
     [[ $# -eq 1 ]] || fail "用法：paseo-team start"
@@ -115,20 +147,38 @@ if (!/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(config.daemon?.auth?.password ?
   process.exit(1);
 }
 JS
-    connection_password
-    "$paseo" daemon start --home "$team_home"
+    run_paseo daemon start --home "$team_home" --timeout 90
+    ;;
+  verify)
+    [[ $# -eq 1 ]] || fail "用法：paseo-team verify"
+    require_node; require_paseo; init_config; connection_password
+    node - "$port" <<\JS
+const base = "http://127.0.0.1:" + process.argv[2];
+(async () => {
+  const health = await fetch(base + "/api/health", { redirect: "error", signal: AbortSignal.timeout(5000) });
+  if (!health.ok || (await health.json()).status !== "ok") throw Error("Paseo health check failed");
+  const web = await fetch(base + "/", { signal: AbortSignal.timeout(5000) });
+  if (!web.ok || !(web.headers.get("content-type") || "").includes("text/html") || !/<html[\s>]/i.test(await web.text())) throw Error("Paseo Web UI is not available");
+  const anonymous = await fetch(base + "/api/status", { redirect: "error", signal: AbortSignal.timeout(5000) });
+  if (anonymous.status !== 401) throw Error("Paseo status endpoint did not require authentication: " + anonymous.status);
+  console.log("HTTP health, Web UI and unauthenticated rejection passed");
+})().catch(error => { console.error(error); process.exitCode = 1; });
+JS
+    current="$(run_paseo daemon status --home "$team_home")"
+    printf '%s\n' "$current"
+    grep -Fxq 'connectedDaemon: reachable' <<< "$current" || fail "Paseo 认证连接未通过。"
     ;;
   status|stop)
     [[ $# -eq 1 ]] || fail "用法：paseo-team $1"
     require_paseo
     if [[ "$1" == status ]]; then connection_password; fi
-    "$paseo" daemon "$1" --home "$team_home"
+    run_paseo daemon "$1" --home "$team_home"
     ;;
   cli)
     shift; require_paseo
     [[ $# -gt 0 ]] || fail "用法：paseo-team cli <args>"
     if [[ "$1" != --help && "$1" != -h && "$1" != --version ]]; then connection_password; fi
-    exec "$paseo" --home "$team_home" "$@"
+    exec node --disable-warning=DEP0040 "$paseo" --home "$team_home" "$@"
     ;;
   url) printf "http://127.0.0.1:%s\n" "$port" ;;
   help|-h|--help) usage ;;
