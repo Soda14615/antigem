@@ -744,7 +744,7 @@
     <string name="settings_dialog_could_not_retrieve_daemon_permissions_and_security">"无法获取守护进程的权限和安全状态。\n%1$s\n\n请确认 AGY 正在运行（例如 agy --hub），并检查服务器设置。"</string>
     <string name="settings_dialog_artifact_review_policy">"产物审查政策"</string>
     <string name="settings_dialog_controls_whether_the_assistant_asks_you_to">"控制助手是否要求你查看和批准它创建的文档。"</string>
-    <string name="settings_dialog_auto_turbo">"⚡ 汽车（涡轮）"</string>
+    <string name="settings_dialog_auto_turbo">"⚡ 自动（涡轮）"</string>
     <string name="settings_dialog_edits_and_creates_documents_immediately_without_asking">"无需询问即可立即编辑和创建文档。"</string>
     <string name="settings_dialog_always_ask">"✋ 总是问"</string>
     <string name="settings_dialog_suspends_and_requests_your_approval_before_saving">"在保存文档编辑之前暂停并请求你的批准。"</string>
@@ -779,7 +779,7 @@
     <string name="settings_dialog_set_project_override">"设置项目覆盖："</string>
     <string name="settings_dialog_default">"🛡️默认"</string>
     <string name="settings_dialog_machine">"💻 机器"</string>
-    <string name="settings_dialog_turbo">"⚡ 涡轮增压"</string>
+    <string name="settings_dialog_turbo">"⚡ 涡轮"</string>
     <string name="settings_dialog_default_approval_scope">"默认审批范围"</string>
     <string name="settings_dialog_when_you_click_approve_on_a_tool">"当你在工具提示上单击批准时，权限应保持授予状态多长时间？"</string>
     <string name="settings_dialog_live_synced_with_agy_hub_via_jetbox">"通过 Jetbox 和项目 API 与 AGY Hub 实时同步，零本地存储不同步。"</string>

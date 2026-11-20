@@ -161,8 +161,8 @@ fun StemRenderingScreen() {
                     if (i > 0) HorizontalDivider(Modifier.padding(horizontal = 14.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
                     Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(c.title, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(c.summary, fontSize = 12.sp, lineHeight = 16.sp, color = muted)
+                            Text(c.zhTitle, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                            Text(c.zhSummary, fontSize = 12.sp, lineHeight = 16.sp, color = muted)
                             val note = when {
                                 !c.fromBundle -> "${c.library} · 内置，无需下载"
                                 !installed -> "${c.library} ${c.version} · 需要离线包"
@@ -273,3 +273,29 @@ private fun StemGuideDialog(onDismiss: () -> Unit) {
         }
     }
 }
+
+/**
+ * Labels shown in Settings → STEM & diagrams. [RenderComponent.title] and [RenderComponent.summary] stay untouched
+ * on the enum: the ```lang markers, library names and versions are what the parser and the bundle key off.
+ */
+private val RenderComponent.zhTitle: String
+    get() = when (this) {
+        RenderComponent.CHEM -> "化学方程式"
+        RenderComponent.SMILES -> "分子结构"
+        RenderComponent.FUNCTION_PLOT -> "函数图像"
+        RenderComponent.JSXGRAPH -> "交互几何"
+        RenderComponent.MATTER -> "物理模拟"
+        RenderComponent.TIKZ -> "TikZ、电路与插图"
+        RenderComponent.MERMAID -> "离线 Mermaid"
+    }
+
+private val RenderComponent.zhSummary: String
+    get() = when (this) {
+        RenderComponent.CHEM -> "\\ce{…} 反应式与化学式，写在 \$…\$ 内，原生绘制"
+        RenderComponent.SMILES -> "```smiles 块：由 SMILES 字符串绘制二维结构"
+        RenderComponent.FUNCTION_PLOT -> "```functionplot 块：函数曲线、导数、切线、面积"
+        RenderComponent.JSXGRAPH -> "```jsxgraph 块：可拖拽的几何图形、轨迹、图像"
+        RenderComponent.MATTER -> "```matter 块：可交互的二维刚体模拟"
+        RenderComponent.TIKZ -> "```tikz 块：TikZ、circuitikz、pgfplots、chemfig、tikz-cd（TeX 编译，缓存一次）"
+        RenderComponent.MERMAID -> "Mermaid 图表使用内置副本，不再联网加载"
+    }
