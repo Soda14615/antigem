@@ -16,6 +16,7 @@ usage() {
   cat <<EOF
 Paseo 团队（独立运行，不接管 Jarvis 会话）
   paseo-team install        安装固定版本的原版 Paseo（需要联网）
+  paseo-team password       设置团队服务访问密码
   paseo-team start          启动本地独立团队服务
   paseo-team status         查看团队服务状态
   paseo-team stop           停止团队服务
@@ -54,9 +55,22 @@ case "${1:-help}" in
     npm install --global --prefix "$runtime" "@getpaseo/cli@$version" || fail "Paseo 安装失败；请保留 npm 原始错误（可能是 Android 原生模块不兼容），不要跳过安装脚本。"
     "$paseo" --version
     ;;
+  password)
+    [[ $# -eq 1 ]] || fail "用法：paseo-team password"
+    require_node; require_paseo; init_config
+    "$paseo" daemon set-password --home "$team_home"
+    ;;
   start)
     [[ $# -eq 1 ]] || fail "用法：paseo-team start"
     require_node; require_paseo; init_config
+    node - "$team_home/config.json" <<\JS
+const fs = require("node:fs");
+const config = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+if (!/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(config.daemon?.auth?.password ?? "")) {
+  console.error("请先执行 paseo-team password 设置团队服务访问密码。");
+  process.exit(1);
+}
+JS
     "$paseo" daemon start --home "$team_home"
     ;;
   status|stop)
