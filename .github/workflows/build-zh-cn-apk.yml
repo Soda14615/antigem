@@ -5,7 +5,10 @@ on:
     branches:
       - zh-cn
       - zh-cn-v2.0.1
-      - chatgpt/paseo-native-team
+  pull_request:
+    branches:
+      - zh-cn-v2.0.1
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -13,6 +16,7 @@ permissions:
 
 jobs:
   build-zh-cn:
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team')
     runs-on: ubuntu-latest
 
     steps:
@@ -44,12 +48,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Check Paseo team launcher
-        if: github.ref == 'refs/heads/chatgpt/paseo-native-team'
+        if: github.head_ref == 'chatgpt/paseo-native-team' || github.ref == 'refs/heads/chatgpt/paseo-native-team'
         run: bash -n scripts/paseo-team.sh
 
       - name: Build ARM64 APK
         env:
-          RELEASE_KEYSTORE_BASE64: ${{ github.ref != 'refs/heads/chatgpt/paseo-native-team' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
+          RELEASE_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && github.ref != 'refs/heads/chatgpt/paseo-native-team' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
         run: |
           chmod +x gradlew
           mkdir -p dist
