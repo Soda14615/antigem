@@ -79,4 +79,9 @@
     <string name="profile_detail_dialog_subscription">"订阅"</string>
     <string name="profile_detail_dialog_manage_upgrade_plan">"管理/升级计划"</string>
     <string name="profile_detail_dialog_sign_out">"退出登录"</string>
+    <string name="paseo_team_title">Paseo 团队</string>
+    <string name="paseo_team_setup">首次使用请在 AntiGem 本地终端执行以下命令。Paseo 使用独立的服务和会话，Jarvis 保持原样。</string>
+    <string name="paseo_team_stop_hint">如需停止团队服务而不影响 Jarvis，请执行 paseo-team stop。服务启动成功后再打开团队。</string>
+    <string name="paseo_team_open">打开团队</string>
+    <string name="paseo_team_terminal">本地终端</string>
 </resources>
