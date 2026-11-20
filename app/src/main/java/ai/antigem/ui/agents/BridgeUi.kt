@@ -185,7 +185,8 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.height(6.dp))
             Text(
-                stringResource(R.string.main_ui_installed_with_google_s_official_installer_antigravity, if (remote) stringResource(R.string.main_ui_the_server) else stringResource(R.string.main_ui_this_device)),
+                if (!remote && ai.antigem.BuildConfig.TARGET_ABI == "x86_64") stringResource(R.string.upgrade_201_agy_x64_install_note)
+                else stringResource(R.string.main_ui_installed_with_google_s_official_installer_antigravity, if (remote) stringResource(R.string.main_ui_the_server) else stringResource(R.string.main_ui_this_device)),
                 fontSize = 11.sp, color = subtle
             )
         }

@@ -97,7 +97,7 @@ enum class SettingsSection(
 ) {
     MAIN("Settings & Preferences", "Configure your AntiGem experience", R.string.settings_section_main_title, R.string.settings_section_main_subtitle),
     THEMES("Themes", "Light and dark mode, and the theme gallery", R.string.settings_section_themes_title, R.string.settings_section_themes_subtitle),
-    APPEARANCE("Appearance", "Chat text size, chat list, header icons and the app switcher", R.string.settings_section_appearance_title, R.string.settings_section_appearance_subtitle),
+    APPEARANCE("Appearance", "Chat text size, chat list, header icons, the app switcher and Gemmy", R.string.settings_section_appearance_title, R.string.settings_section_appearance_subtitle),
     STEM_RENDERING("STEM & diagrams", "Chemistry, graphs, geometry, simulations, circuits and offline Mermaid in chats", R.string.settings_section_stem_rendering_title, R.string.settings_section_stem_rendering_subtitle),
     SERVERS("Servers & Connectivity", "Configure AGY Hub and IDE Bridge endpoints", R.string.settings_section_servers_title, R.string.settings_section_servers_subtitle),
     CONNECT_PC("Connect to PC", "Use the agents on your PC (AntiGem in VS Code) from this phone", R.string.settings_section_connect_pc_title, R.string.settings_section_connect_pc_subtitle),
@@ -110,22 +110,23 @@ enum class SettingsSection(
     DATA_PROTECTION("Data Loss Protection", "Uninstall shield & App Info clear data protection", R.string.settings_section_data_protection_title, R.string.settings_section_data_protection_subtitle),
     PROJECT_CHECKPOINTS("Project checkpoints", "Go back to before any chat message: files restored with a preview", R.string.settings_section_project_checkpoints_title, R.string.settings_section_project_checkpoints_subtitle),
     COMMANDS("Commands & Permissions", "Auto-run policy, sandbox mode, and tool approvals", R.string.settings_section_commands_title, R.string.settings_section_commands_subtitle),
-    ANTIGRAVITY("Antigravity", "CLI, MCP servers, skills & plugins, commands & permissions", R.string.settings_section_antigravity_title, R.string.settings_section_antigravity_subtitle),
-    AGY_CLI("Antigravity CLI", "agy version and install, on this device or the server", R.string.settings_section_agy_cli_title, R.string.settings_section_agy_cli_subtitle),
+    ANTIGRAVITY("Antigravity", "Account & CLI, MCP servers, skills & plugins, commands & permissions", R.string.settings_section_antigravity_title, R.string.settings_section_antigravity_subtitle),
+    AGY_CLI("Account & CLI", "Google sign-in, agy version and install, on this device or the server", R.string.settings_section_agy_cli_title, R.string.settings_section_agy_cli_subtitle),
     AGY_CLOUD("Cloud agents", "Antigravity chats on a Google cloud machine (Remote Agents)", R.string.settings_section_agy_cloud_title, R.string.settings_section_agy_cloud_subtitle),
     CLAUDE("Claude Code", "Account, models, permissions, MCP, plugins & memory", R.string.settings_section_claude_title, R.string.settings_section_claude_subtitle),
     /** One Claude Code page (which one: the dialog's claudePage); not a page of its own for Jarvis. */
     CLAUDE_PAGE("Claude Code", "Account, models, permissions, MCP, plugins & memory", R.string.settings_section_claude_title, R.string.settings_section_claude_subtitle),
-    OPENCODE("OpenCode", "Server, providers, custom OpenAI-compatible endpoints & approvals", R.string.settings_section_opencode_title, R.string.settings_section_opencode_subtitle),
+    OPENCODE("OpenCode", "CLI, providers, custom OpenAI-compatible endpoints & approvals", R.string.settings_section_opencode_title, R.string.settings_section_opencode_subtitle),
     /** One OpenCode page (which one: the dialog's openCodePage). */
-    OPENCODE_PAGE("OpenCode", "Server, providers, endpoints, MCP & approvals", R.string.settings_section_opencode_title, R.string.settings_section_opencode_page_subtitle),
-    CODEX("Codex", "Account, usage limits, permissions, MCP, server & install", R.string.settings_section_codex_title, R.string.settings_section_codex_subtitle),
+    OPENCODE_PAGE("OpenCode", "CLI, providers, endpoints, MCP & approvals", R.string.settings_section_opencode_title, R.string.settings_section_opencode_page_subtitle),
+    CODEX("Codex", "Account & CLI, usage limits, permissions, MCP", R.string.settings_section_codex_title, R.string.settings_section_codex_subtitle),
     /** One Codex page (which one: the dialog's codexPage). */
-    CODEX_PAGE("Codex", "Account, usage limits, permissions, MCP, server & install", R.string.settings_section_codex_title, R.string.settings_section_codex_subtitle),
+    CODEX_PAGE("Codex", "Account & CLI, usage limits, permissions, MCP", R.string.settings_section_codex_title, R.string.settings_section_codex_subtitle),
     AGENTS("Agents", "Run Antigravity, Claude Code, OpenCode, Codex or several", R.string.settings_section_agents_title, R.string.settings_section_agents_subtitle),
     GLOBAL_CONTEXT("Global context", "What every chat is told about this app, and your own instructions", R.string.settings_section_global_context_title, R.string.settings_section_global_context_subtitle),
     AGENT_MEMORY("Agent memory & history", "Memories every agent keeps across chats, and past chats they can look up", R.string.settings_section_agent_memory_title, R.string.settings_section_agent_memory_subtitle),
     AGENT_HISTORY("Saved chats", "The chat history the agents can look up: read, edit or remove it", R.string.settings_section_agent_history_title, R.string.settings_section_agent_history_subtitle),
+    EGM("EGM · Elephant-Goldfish", "Plan a design and have fresh reviewers attack it before any code (/egm)", R.string.settings_section_egm_title, R.string.settings_section_egm_subtitle),
     JARVIS("Jarvis", "Hands-free voice control of the whole app", R.string.settings_section_jarvis_title, R.string.settings_section_jarvis_subtitle),
     JARVIS_AGENT("Jarvis · Agent", "Which agent and model Jarvis talks to", R.string.settings_section_jarvis_agent_title, R.string.settings_section_jarvis_agent_subtitle),
     JARVIS_PERSONALITY("Jarvis · Personality & you", "How Jarvis speaks, and what it should know about you", R.string.settings_section_jarvis_personality_title, R.string.settings_section_jarvis_personality_subtitle),
@@ -174,7 +175,7 @@ enum class SettingsSection(
         CODEX_PAGE -> CODEX
         TERMUX_API, X11_DESKTOP -> TERMUX_SUPPORT
         REA_GROUPS -> REA
-        GLOBAL_CONTEXT, AGENT_MEMORY -> AGENTS
+        GLOBAL_CONTEXT, AGENT_MEMORY, EGM -> AGENTS
         AGENT_HISTORY -> AGENT_MEMORY
         CHANGELOG -> ABOUT
         else -> if (jarvisPage != null) JARVIS else MAIN
@@ -307,11 +308,16 @@ fun SettingsDialog(
     claude: ai.antigem.ui.claude.ClaudeSettingsDeps? = null,
     initialClaudePage: ai.antigem.ui.claude.ClaudeSettingsPage? = null,
     openCode: ai.antigem.data.agent.opencode.OpenCodeChatBackend? = null,
-    /** Opens on this OpenCode page (e.g. Server & install from an Install button). */
+    /** Opens on this OpenCode page (e.g. OpenCode CLI from an Install button). */
     initialOpenCodePage: ai.antigem.ui.opencode.OpenCodeSettingsPage? = null,
     codex: ai.antigem.data.agent.codex.CodexChatBackend? = null,
-    /** Opens on this Codex page (e.g. Server & install from an Install button). */
+    /** Opens on this Codex page (e.g. Account & CLI from an Install button). */
     initialCodexPage: ai.antigem.ui.codex.CodexSettingsPage? = null,
+    /** Antigravity's status and Google account, for its Account & CLI page (null: Antigravity is off). */
+    agyStatus: ai.antigem.ui.agents.AgentStatusEntry? = null,
+    agyAuth: ai.antigem.data.remote.AgyHubClient.AgyAuthInfo = ai.antigem.data.remote.AgyHubClient.AgyAuthInfo(),
+    onAgySignOut: () -> Unit = {},
+    onAgyCancelSignIn: () -> Unit = {},
     /** Opens on this page (e.g. Jarvis asked to show it); also switches to it while the dialog is open. */
     initialSection: SettingsSection? = null,
     enabledAgents: Set<ai.antigem.domain.model.AgentKind> = setOf(ai.antigem.domain.model.AgentKind.AGY),
@@ -646,9 +652,11 @@ fun SettingsDialog(
                         isApplying = isApplyingAgents,
                         onApply = onApplyAgents,
                         onOpenGlobalContext = { currentSection = SettingsSection.GLOBAL_CONTEXT },
-                        onOpenAgentMemory = { currentSection = SettingsSection.AGENT_MEMORY }
+                        onOpenAgentMemory = { currentSection = SettingsSection.AGENT_MEMORY },
+                        onOpenEgm = { currentSection = SettingsSection.EGM }
                     )
                     SettingsSection.GLOBAL_CONTEXT -> GlobalContextScreen()
+                    SettingsSection.EGM -> EgmScreen(cardBg = cardBg, cardBorder = cardBorder)
                     SettingsSection.AGENT_MEMORY -> AgentMemoryScreen(onOpenHistory = { currentSection = SettingsSection.AGENT_HISTORY })
                     SettingsSection.AGENT_HISTORY -> AgentHistoryScreen()
                     SettingsSection.STEM_RENDERING -> StemRenderingScreen()
@@ -674,9 +682,12 @@ fun SettingsDialog(
                         onNavigate = { currentSection = it }
                     )
                     SettingsSection.AGY_CLI -> Column(
-                        Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)
+                        Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         ai.antigem.ui.agents.AgyCliCard()
+                        ai.antigem.ui.agents.AgyAccountCard(agyStatus, agyAuth, onAgySignOut, onAgyCancelSignIn)
+                        ai.antigem.ui.agents.AgyAccountsCard(agyStatus, agyAuth)
                     }
                     SettingsSection.AGY_CLOUD -> Column(
                         Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)
@@ -1087,6 +1098,8 @@ private fun rememberReaRow(onNavigate: (SettingsSection) -> Unit): SettingsRowIt
 /** The Android Development row of the main settings page, with the setup state. */
 @Composable
 private fun rememberAndroidDevRow(onNavigate: (SettingsSection) -> Unit): SettingsRowItem? {
+    // its setup (arm64 aapt2, rebuilt NDK, qemu for x86-only tools) is for arm64 phones only: hidden in the x86_64 build
+    if (ai.antigem.BuildConfig.TARGET_ABI == "x86_64") return null
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         ai.antigem.data.androiddev.AndroidDevManager.init(context)
@@ -1897,6 +1910,58 @@ private fun AppearanceSubScreen(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(stringResource(R.string.settings_dialog_reset_screen_position_to_right_center), fontSize = 12.sp)
                 }
+            }
+        }
+
+        // Gemmy: the floating cartoon buddy (on by default; first offered by the one-time "Meet Gemmy" dialog)
+        val gemmyContext = LocalContext.current
+        val gemmyPrefs = remember(gemmyContext) { ai.antigem.data.preferences.AuthPreferences(gemmyContext) }
+        val isGemmyEnabled by gemmyPrefs.isGemmyEnabled.collectAsState(initial = true)
+        val gemmyScope = rememberCoroutineScope()
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = cardBg,
+            border = cardBorder,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ai.antigem.ui.components.GemmyPreview(
+                    zoom = 0.85f,
+                    modifier = Modifier.alpha(if (isGemmyEnabled) 1f else 0.4f)
+                )
+                Column(modifier = Modifier.weight(1f).padding(start = 4.dp, end = 12.dp)) {
+                    Text(
+                        text = "Gemmy",
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "A floating cartoon buddy across the app: drag or fling it, tap, double-tap or long-press it. " +
+                            "It reacts while the agent works and rests (almost no battery) when left alone.",
+                        fontSize = 11.5.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+                Switch(
+                    checked = isGemmyEnabled,
+                    onCheckedChange = { enable ->
+                        gemmyScope.launch {
+                            gemmyPrefs.setGemmyEnabled(enable)
+                            gemmyPrefs.setHasSeenGemmyIntro(true) // decided here: no need for the intro dialog anymore
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = ClaudeTerracotta
+                    )
+                )
             }
         }
 

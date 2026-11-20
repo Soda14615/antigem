@@ -1,20 +1,20 @@
 # 构建 AntiGem 简体中文版
 
 使用 JDK 21、Go 1.26.5（见 `agy_ide_bridge/go.mod`）、`xz` 和 Android SDK。
-安装 SDK Platform 36 和 Build Tools 36.0.0，并通过 `ANDROID_HOME` 指定 SDK 路径。
+安装 SDK Platform 37.1、Termux:AM 所需的 SDK Platform 36 和 Build Tools 36.0.0，并通过 `ANDROID_HOME` 指定 SDK 路径。
 Gradle 版本由仓库中的 Wrapper 固定。
 
 ```sh
 git clone https://github.com/Soda14615/antigem.git
 cd antigem
-git switch zh-cn
+git switch zh-cn-v2.0.1
 git submodule update --init --depth 1 termux-am
-sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+sdkmanager 'platforms;android-36' 'platforms;android-37.1' 'build-tools;36.0.0'
 ```
 
 请完整克隆主仓库。构建会读取 `version.json` 的提交历史来生成应用内的更新记录。
 复现某次发布时，请在初始化子模块前检出该 Release 对应的标签。
-`v2.0.0` 汉化版使用上游官方 APK 的构建提交 `10ab2d9` 作为基线。
+`v2.0.1` 使用上游官方 APK 的构建提交 `bbb2619` 作为基线。
 
 同步上游时，在第一次克隆后设置 `upstream` 远程。选定新版 Release 对应的构建提交后，更新 `zh-cn` 分支并检查新增的英文资源是否已有对应的 `values-b+zh+Hans` 条目。
 

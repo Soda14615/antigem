@@ -75,7 +75,8 @@ fun FullScreenLocalToolsInstaller(
         }
     }
 
-    var selectedSourceType by remember { mutableStateOf(0) } // 0: Auto GitHub, 1: Base minimum, 2: Local ZIP File
+    // 0: Auto GitHub, 1: Base minimum, 2: Local ZIP File
+    var selectedSourceType by remember { mutableStateOf(0) }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var showLogs by remember { mutableStateOf(false) }
     var selectedMirror by remember { mutableStateOf(RootfsMirror.GITHUB) }
@@ -253,7 +254,7 @@ fun FullScreenLocalToolsInstaller(
                     is LocalInstallerState.Idle -> {
                         PrimaryButton(
                             text = when (selectedSourceType) {
-                                0 -> stringResource(R.string.settings_install_full)
+                                0 -> stringResource(R.string.settings_install_full, LocalEnvironmentManager.ROOTFS_SIZE_LABEL)
                                 1 -> stringResource(R.string.settings_install_minimal)
                                 else -> if (selectedFileUri != null) stringResource(R.string.settings_install_zip) else stringResource(R.string.settings_choose_zip)
                             },
@@ -425,10 +426,13 @@ private fun InstallerHero(state: LocalInstallerState, mirrorChoice: Boolean = fa
     Text(
         text = when (state) {
             is LocalInstallerState.Success -> stringResource(R.string.full_screen_local_tools_installer_the_shell_core_tools_and_agy_tools)
-            is LocalInstallerState.Error -> if (mirrorChoice) {
-                "Try again, switch to the other download site, or open its page (↗), download the zip and install it with \"From a ZIP file\"."
+            is LocalInstallerState.Error -> if (mirrorChoice && LocalEnvironmentManager.ROOTFS_MIRRORS.size > 1) {
+                stringResource(R.string.settings_full_environment_error_multiple_mirrors)
+            } else if (mirrorChoice) {
+                // one download site for this CPU (x86_64: GitHub)
+                stringResource(R.string.settings_full_environment_error_single_mirror)
             } else {
-                "You can try again, or install from a ZIP file instead."
+                stringResource(R.string.settings_full_environment_error_zip)
             }
             is LocalInstallerState.Idle -> stringResource(R.string.full_screen_local_tools_installer_antigem_runs_its_terminal_ide_and_agents)
             is LocalInstallerState.Discovering -> stringResource(R.string.full_screen_local_tools_installer_checking_for_the_latest_verified_archive)
@@ -456,7 +460,7 @@ private fun SourcePicker(
         SourceOption(
             icon = Icons.Outlined.CloudDownload,
             title = stringResource(R.string.settings_full_environment),
-            tag = stringResource(R.string.settings_full_environment_size),
+            tag = stringResource(R.string.settings_full_environment_size, LocalEnvironmentManager.ROOTFS_SIZE_LABEL),
             description = stringResource(R.string.settings_full_environment_desc),
             selected = selected == 0,
             onClick = { onSelect(0) }
@@ -517,7 +521,7 @@ private fun SourcePicker(
 private fun MirrorChooser(selected: RootfsMirror, onSelect: (RootfsMirror) -> Unit) {
     val uriHandler = LocalUriHandler.current
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        RootfsMirror.values().forEach { mirror ->
+        LocalEnvironmentManager.ROOTFS_MIRRORS.forEach { mirror ->
             val isSelected = mirror == selected
             Surface(
                 onClick = { onSelect(mirror) },

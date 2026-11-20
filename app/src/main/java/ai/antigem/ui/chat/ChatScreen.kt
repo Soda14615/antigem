@@ -207,10 +207,8 @@ fun ChatScreen(
     val openCodeState by openCodeBackend.state.collectAsState()
     val openCodeStatus by openCodeBackend.status.collectAsState()
     val openCodeModelsError by openCodeBackend.modelsError.collectAsState()
-    val openCodeConnected by openCodeBackend.connectedProviders.collectAsState()
-    val openCodeModelCount = openCodeBackend.availableModels.collectAsState().value.size
     var openOpenCodeSettings by remember { mutableStateOf(false) }
-    // the OpenCode page Settings opens on (Server & install for the Install button, Providers from the model picker)
+    // the OpenCode page Settings opens on (OpenCode CLI for the Install button, Providers from the model picker)
     var openCodeSettingsPage by remember { mutableStateOf<ai.antigem.ui.opencode.OpenCodeSettingsPage?>(null) }
     LaunchedEffect(Unit) {
         openCodeBackend.toasts.collect {
@@ -223,9 +221,8 @@ fun ChatScreen(
     val codexStatus by codexBackend.status.collectAsState()
     val codexAccount by codexBackend.account.collectAsState()
     val codexModelsError by codexBackend.modelsError.collectAsState()
-    val codexLimits by codexBackend.rateLimits.collectAsState()
     var openCodexSettings by remember { mutableStateOf(false) }
-    // the Codex page Settings opens on (Server & install for the Install button, Account for Sign in, MCP for /mcp)
+    // the Codex page Settings opens on (Account & CLI for the Install button and Sign in, MCP for /mcp)
     var codexSettingsPage by remember { mutableStateOf<ai.antigem.ui.codex.CodexSettingsPage?>(null) }
     LaunchedEffect(Unit) {
         codexBackend.toasts.collect {
@@ -330,6 +327,7 @@ fun ChatScreen(
     val isFloatingNetworkInspectorEnabled by viewModel.isFloatingNetworkInspectorEnabled.collectAsState()
     var showNetworkInspectorDialog by remember { mutableStateOf(false) }
     val hasSeenTerminalLauncherOnboarding by viewModel.authPreferences.hasSeenTerminalLauncherOnboarding.collectAsState(initial = true)
+    val hasSeenGemmyIntro by viewModel.authPreferences.hasSeenGemmyIntro.collectAsState(initial = true)
     val isTranscribingAudio by viewModel.isTranscribingAudio.collectAsState()
     val pendingLoginUrl by viewModel.pendingLoginUrl.collectAsState()
     val agyLoginIssue by viewModel.agyLoginIssue.collectAsState()
@@ -532,6 +530,12 @@ fun ChatScreen(
         (claudeState == ai.antigem.data.agent.claude.ClaudeStatus.SIGNED_OUT || claudeState == ai.antigem.data.agent.claude.ClaudeStatus.SIGNING_IN)
     ) ai.antigem.data.agent.claude.ClaudeStatus.READY else claudeState
     val claudeStatusError by viewModel.claudeAccount.statusError.collectAsState()
+    // a reply failed because the Claude sign-in expired while the app stayed open: once the re-check confirms the
+    // sign-out, show the sign-in (as after a fresh start) instead of only the error; custom-provider chats need no login
+    val claudeNeedsLogin by claudeBackend.needsLogin.collectAsState()
+    LaunchedEffect(claudeNeedsLogin, claudeChatState) {
+        if (claudeNeedsLogin && isClaudeChat && claudeChatState == ai.antigem.data.agent.claude.ClaudeStatus.SIGNED_OUT) showClaudeLogin = true
+    }
     val openClaudeSetup = {
         claudeSettingsPage = ai.antigem.ui.claude.ClaudeSettingsPage.ACCOUNT
         showSettingsDialog = true
@@ -546,6 +550,15 @@ fun ChatScreen(
         ai.antigem.ui.components.AppToastHelper.showToast(context.getString(R.string.main_ui_checking_claude_code), ai.antigem.ui.components.ChatToastType.INFO)
         viewModel.claudeAccount.refreshStatus()
     }
+    val agyCliInfo by ai.antigem.data.remote.BridgeInfo.agyCli.collectAsState()
+    val agyNotInstalled = ai.antigem.domain.model.AgentKind.AGY in enabledAgents &&
+        ai.antigem.ui.agents.agyNotInstalled(systemConnectionState, agyCliInfo)
+    // installs right away; Settings → Antigravity → Account & CLI shows the progress (the hub starts when it is done)
+    val installAgy = {
+        ai.antigem.data.remote.BridgeInfo.installAgy()
+        requestedSettingsSection = ai.antigem.ui.settings.SettingsSection.AGY_CLI
+        showSettingsDialog = true
+    }
     val agyEntry = if (ai.antigem.domain.model.AgentKind.AGY in enabledAgents) {
         ai.antigem.ui.agents.agyStatusEntry(
             state = systemConnectionState,
@@ -559,7 +572,9 @@ fun ChatScreen(
                 ai.antigem.ui.components.AppToastHelper.showToast(context.getString(R.string.main_ui_reconnecting_to_antigravity), ai.antigem.ui.components.ChatToastType.INFO)
                 viewModel.retryConnections()
             },
-            onRestartServer = restartLocalServer
+            onRestartServer = restartLocalServer,
+            notInstalled = agyNotInstalled,
+            onInstall = installAgy
         )
     } else null
     val claudeEntry = if (ai.antigem.domain.model.AgentKind.CLAUDE in enabledAgents) {
@@ -598,7 +613,7 @@ fun ChatScreen(
             // installs right away; Settings → Codex shows the progress
             onSetup = {
                 codexBackend.startCliJob("install")
-                codexSettingsPage = ai.antigem.ui.codex.CodexSettingsPage.SERVER
+                codexSettingsPage = ai.antigem.ui.codex.CodexSettingsPage.ACCOUNT
                 showSettingsDialog = true
             },
             // starts the sign-in; Settings → Codex shows the code or the browser link
@@ -1976,7 +1991,10 @@ fun ChatScreen(
                     // existing chats too: while one loads, show the loading skeleton like for any other chat
                     val isExistingConversation = currentConv != null && currentConv?.title != "New Chat" &&
                         (conversations.any { it.id == currentConv?.id } || jarvisConversations.any { it.id == currentConv?.id })
-                    val isExistingChat = messages.isEmpty() && isExistingConversation && isLoadingConversation
+                    // agy missing: the hub's "agy is not installed" error is also this chat's error, and an existing chat
+                    // never finishes loading. Both step aside for the empty view's "not installed" card with Install.
+                    val agyMissingHere = isAgyChat && agyNotInstalled
+                    val isExistingChat = messages.isEmpty() && isExistingConversation && isLoadingConversation && !agyMissingHere
                     Log.d("CHAT_OPEN_DEBUG", "🖥️ [ChatScreen Render] convId=${currentConv?.id}, title='${currentConv?.title}', isLoading=$isLoadingConversation, isExisting=$isExistingChat, msgCount=${messages.size}, error=$conversationError, isServerStopped=$isServerStopped")
 
                     if (isAgyChat && isServerStopped && messages.isEmpty()) {
@@ -2035,7 +2053,7 @@ fun ChatScreen(
                         } else {
                             ai.antigem.ui.components.EngineWarmingUpView()
                         }
-                    } else if (!conversationError.isNullOrBlank() && messages.isEmpty() && (isExistingConversation || currentConv != null)) {
+                    } else if (!conversationError.isNullOrBlank() && messages.isEmpty() && (isExistingConversation || currentConv != null) && !agyMissingHere) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -2163,6 +2181,17 @@ fun ChatScreen(
                                         actionLabel = codexEntry?.action?.label,
                                         onAction = { codexEntry?.action?.onClick?.invoke() },
                                         secondaryLabel = if (codexState == ai.antigem.data.agent.codex.CodexState.CHECKING) null else stringResource(R.string.agent_status_ui_server_logs),
+                                        onSecondary = { showLocalServerOutputDialog = true }
+                                    )
+                                } else if (isAgyChat && agyNotInstalled) {
+                                    ai.antigem.ui.agents.AgentSetupPrompt(
+                                        agent = ai.antigem.domain.model.AgentKind.AGY,
+                                        title = stringResource(R.string.upgrade_201_chat_antigravity_not_installed_title),
+                                        message = agyEntry?.detail ?: stringResource(R.string.upgrade_201_chat_antigravity_not_installed_yet),
+                                        statusColor = agyEntry?.color,
+                                        actionLabel = agyEntry?.action?.label,
+                                        onAction = { agyEntry?.action?.onClick?.invoke() },
+                                        secondaryLabel = stringResource(R.string.agent_status_ui_server_logs),
                                         onSecondary = { showLocalServerOutputDialog = true }
                                     )
                                 } else when (if (isClaudeChat || isOpenCodeChat || isCodexChat) null else systemConnectionState.status) {
@@ -2881,7 +2910,8 @@ fun ChatScreen(
                         ai.antigem.data.agent.claude.ClaudeStatus.NOT_INSTALLED -> stringResource(R.string.chat_screen_claude_code_is_not_installed_set_it)
                         ai.antigem.data.agent.claude.ClaudeStatus.BRIDGE_OUTDATED -> stringResource(R.string.chat_screen_restart_the_local_server_to_use_claude)
                         else -> stringResource(R.string.chat_screen_the_local_server_is_offline_start_it)
-                    } else stringResource(R.string.chat_screen_server_is_offline_start_the_server_to),
+                    } else if (agyNotInstalled) stringResource(R.string.upgrade_201_chat_antigravity_not_installed)
+                    else stringResource(R.string.chat_screen_server_is_offline_start_the_server_to),
                     selectedModel = currentModel,
                     quota = currentQuota,
                     thinkingPreference = thinkingPref,
@@ -3095,6 +3125,10 @@ fun ChatScreen(
             onLogout = {
                 viewModel.logout()
             },
+            agyStatus = agyEntry,
+            agyAuth = agyAuthInfo,
+            onAgySignOut = { viewModel.logoutFromAgyHub() },
+            onAgyCancelSignIn = { viewModel.cancelAgyLogin() },
             onToggleModelEnabled = { modelId, isEnabled ->
                 viewModel.setModelEnabled(modelId, isEnabled)
             },
@@ -3262,10 +3296,16 @@ fun ChatScreen(
             claudeStatus = claudeStatus,
             onAgySignOut = { viewModel.logoutFromAgyHub() },
             onAgyCancelSignIn = { viewModel.cancelAgyLogin() },
+            onAgySettings = {
+                scope.launch { drawerState.close() }
+                requestedSettingsSection = ai.antigem.ui.settings.SettingsSection.ANTIGRAVITY
+                showSettingsDialog = true
+            },
             onClaudeSignOut = { viewModel.claudeAccount.logout() },
             onClaudeSettings = {
                 scope.launch { drawerState.close() }
-                openClaudeSetup()
+                requestedSettingsSection = ai.antigem.ui.settings.SettingsSection.CLAUDE
+                showSettingsDialog = true
             },
             onDismiss = { showAccountsDialog = false },
             openCode = openCodeEntry,
@@ -3634,6 +3674,27 @@ fun ChatScreen(
             onDismiss = {
                 scope.launch {
                     viewModel.authPreferences.setHasSeenTerminalLauncherOnboarding(true)
+                }
+            }
+        )
+    }
+
+    // "Meet Gemmy": once the whole first-launch setup is done and the user is in chat, ask once whether to show the
+    // floating buddy (on by default, can be turned off right there). Gemmy itself only appears after this is answered.
+    val gemmyIntroDue = !hasSeenGemmyIntro && hasChosenAgents && !agentStepPending && !launcherStepPending &&
+        !isApplyingAgents && !isInFloatingWindow
+    var showGemmyIntro by remember { mutableStateOf(false) }
+    LaunchedEffect(gemmyIntroDue) {
+        if (gemmyIntroDue) delay(700) // let the chat settle after the setup steps
+        showGemmyIntro = gemmyIntroDue
+    }
+    if (showGemmyIntro && gemmyIntroDue) {
+        ai.antigem.ui.onboarding.GemmyIntroDialog(
+            onConfirm = { enabled ->
+                showGemmyIntro = false
+                scope.launch {
+                    viewModel.authPreferences.setGemmyEnabled(enabled)
+                    viewModel.authPreferences.setHasSeenGemmyIntro(true)
                 }
             }
         )

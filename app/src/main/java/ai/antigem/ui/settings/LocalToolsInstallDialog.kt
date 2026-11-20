@@ -67,7 +67,8 @@ fun LocalToolsInstallDialog(
         }
     }
 
-    var selectedSourceType by remember { mutableStateOf(0) } // 0: Auto GitHub, 1: Direct URL, 2: Local ZIP File
+    // 0: Auto GitHub, 1: Direct URL, 2: Local ZIP File
+    var selectedSourceType by remember { mutableStateOf(0) }
     var directUrlText by remember { mutableStateOf("") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -343,7 +344,10 @@ fun LocalToolsInstallDialog(
                                             }
                                         }
                                         Text(
-                                            text = stringResource(R.string.local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with),
+                                            text = stringResource(
+                                                R.string.local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with,
+                                                LocalEnvironmentManager.ROOTFS_SIZE_LABEL
+                                            ),
                                             fontSize = 11.5.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )

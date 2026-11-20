@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_201_chat_antigravity_not_installed">Antigravity (agy) is not installed. Install it in Settings → Antigravity → Account &amp; CLI.</string>
+    <string name="upgrade_201_chat_antigravity_not_installed_title">Antigravity is not installed</string>
+    <string name="upgrade_201_chat_antigravity_not_installed_yet">Antigravity (agy) is not installed yet.</string>
+    <string name="upgrade_201_chat_pinned">Pinned</string>
+    <string name="upgrade_201_chat_pin_to_top">Pin to top</string>
+    <string name="upgrade_201_chat_unpin">Unpin</string>
+    <string name="upgrade_201_chat_chat_pinned">Chat pinned</string>
+    <string name="upgrade_201_chat_chat_unpinned">Chat unpinned</string>
+</resources>

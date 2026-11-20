@@ -300,7 +300,7 @@
     <string name="local_tools_install_dialog_atomics">"Atomics"</string>
     <string name="local_tools_install_dialog_supported">"Supported"</string>
     <string name="local_tools_install_dialog_auto_download_github">"Auto Download (GitHub)"</string>
-    <string name="local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with">"Auto-downloads verified AntiGem rootfs (~350MB) with preconfigured tools and environment"</string>
+    <string name="local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with">"Auto-downloads verified AntiGem rootfs (%1$s) with preconfigured tools and environment"</string>
     <string name="local_tools_install_dialog_local_zip_archive">"Local ZIP Archive"</string>
     <string name="local_tools_install_dialog_pick_an_existing_bootstrap_zip_file_from">"Pick an existing bootstrap .zip file from device (Offline)"</string>
     <string name="local_tools_install_dialog_change_selected_zip">"Change Selected ZIP"</string>

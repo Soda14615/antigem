@@ -1,0 +1,37 @@
+<resources>
+    <string name="upgrade_201_agy_not_installed">Not installed</string>
+    <string name="upgrade_201_agy_install_detail">Antigravity (agy) is not installed yet. The app can install it for you.</string>
+    <string name="upgrade_201_agy_x64_install_note">Google has no Android build of agy for x86_64, so its Linux x64 build is installed into ~/.local/bin and runs through the app's glibc. Its own updater is off; Check for updates installs Google's newest Linux x64 release and, when it is newer, restarts the server so it is used (voice calls need agy 1.5 or newer).</string>
+    <string name="upgrade_201_saved_accounts">Saved accounts</string>
+    <string name="upgrade_201_loading">Loading…</string>
+    <string name="upgrade_201_keychain_accounts_unavailable">Agy on this computer keeps its login in the system keychain, so accounts can't be switched here.</string>
+    <string name="upgrade_201_accounts_explanation">Keep several Google accounts and switch between them. Antigravity uses the new one right away.</string>
+    <string name="upgrade_201_signed_in_account">Signed-in account</string>
+    <string name="upgrade_201_signed_in_not_saved">Signed in now, not saved</string>
+    <string name="upgrade_201_save">Save</string>
+    <string name="upgrade_201_active">Active</string>
+    <string name="upgrade_201_switch">Switch</string>
+    <string name="upgrade_201_no_saved_accounts">No saved accounts yet.</string>
+    <string name="upgrade_201_add_account">Add account</string>
+    <string name="upgrade_201_this_account">this account</string>
+    <string name="upgrade_201_saved_account">Saved %1$s</string>
+    <string name="upgrade_201_operation_failed">That didn't work</string>
+    <string name="upgrade_201_account_not_saved">%1$s isn't saved</string>
+    <string name="upgrade_201_save_first_explanation">Save it first to switch back to it later. Without saving, you will have to sign in again to use it.</string>
+    <string name="upgrade_201_save_and_action">Save and %1$s</string>
+    <string name="upgrade_201_action_without_saving">%1$s without saving</string>
+    <string name="upgrade_201_switched_to">Switched to %1$s</string>
+    <string name="upgrade_201_reply_running">A reply is running</string>
+    <string name="upgrade_201_switch_may_stop">Switching the account now may stop it.</string>
+    <string name="upgrade_201_switch_anyway">Switch anyway</string>
+    <string name="upgrade_201_sign_in_other_google">Sign in with the other Google account</string>
+    <string name="upgrade_201_sign_out_may_stop">Signing out to add an account now may stop it.</string>
+    <string name="upgrade_201_go_on">Go on</string>
+    <string name="upgrade_201_delete_saved_copy">Delete the saved copy of %1$s?</string>
+    <string name="upgrade_201_delete_copy_stays_signed_in">It stays signed in; only the saved copy is deleted.</string>
+    <string name="upgrade_201_sign_in_again_after_delete">To use this account again you will have to sign in again.</string>
+    <string name="upgrade_201_signed_in_now">Signed in now</string>
+    <string name="upgrade_201_last_used">Last used %1$s</string>
+    <string name="upgrade_201_delete_saved_copy_label">Delete saved copy</string>
+    <string name="accounts_ui_agy_settings">Antigravity settings</string>
+</resources>

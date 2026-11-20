@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_201_controls_codex_too_old_to_manage_plugins">此 Codex 版本过旧，无法管理插件。请前往“设置 → Codex → 帐户和 CLI”更新。</string>
+</resources>

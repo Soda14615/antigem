@@ -118,10 +118,10 @@ private fun parsePluginList(result: JsonElement): CxPluginData {
 }
 
 /** "method not found" from an older Codex: the plugin commands came with newer versions. */
-private fun friendly(e: Throwable): String {
+private fun friendly(e: Throwable, oldCodexMessage: String): String {
     val msg = e.message ?: "Codex did not answer"
     return if (msg.contains("method not found", ignoreCase = true) || msg.contains("unknown variant", ignoreCase = true))
-        "This Codex is too old to manage plugins. Update it in Server & install." else msg
+        oldCodexMessage else msg
 }
 
 /**
@@ -131,6 +131,7 @@ private fun friendly(e: Throwable): String {
  */
 @Composable
 fun CodexPluginsPage(backend: CodexChatBackend) {
+    val oldCodexMessage = stringResource(R.string.upgrade_201_controls_codex_too_old_to_manage_plugins)
     val scope = rememberCoroutineScope()
     var data by remember { mutableStateOf<CxPluginData?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -152,7 +153,7 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
         loading = true
         backend.client.rpc("plugin/list", buildJsonObject { }, timeoutMs = 90_000)
             .onSuccess { data = parsePluginList(it); error = null }
-            .onFailure { error = friendly(it) }
+            .onFailure { error = friendly(it, oldCodexMessage) }
         loading = false
     }
     LaunchedEffect(Unit) { reload() }
@@ -167,7 +168,7 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                     // a plugin brings skills: the "/" menu reads them again
                     backend.refreshSkills()
                 }
-                .onFailure { toast(friendly(it), ok = false) }
+                .onFailure { toast(friendly(it, oldCodexMessage), ok = false) }
             ops.remove(key)
         }
     }
@@ -277,8 +278,8 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                                                 lastFailed = null
                                             }
                                             .onFailure {
-                                                toast(friendly(it), ok = false)
-                                                aiSetup = marketSource to friendly(it)
+                                                toast(friendly(it, oldCodexMessage), ok = false)
+                                                aiSetup = marketSource to friendly(it, oldCodexMessage)
                                                 lastFailed = aiSetup
                                             }
                                         addingMarket = false

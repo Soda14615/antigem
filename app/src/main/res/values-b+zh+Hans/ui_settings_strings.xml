@@ -300,7 +300,7 @@
     <string name="local_tools_install_dialog_atomics">"原子学"</string>
     <string name="local_tools_install_dialog_supported">"支持"</string>
     <string name="local_tools_install_dialog_auto_download_github">"自动下载（GitHub）"</string>
-    <string name="local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with">"自动下载经验证的 AntiGem rootfs（约 350 MB），其中已预先配置好工具和环境。"</string>
+    <string name="local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with">"自动下载经验证的 AntiGem rootfs（%1$s），其中已预先配置好工具和环境。"</string>
     <string name="local_tools_install_dialog_local_zip_archive">"本地 ZIP 存档"</string>
     <string name="local_tools_install_dialog_pick_an_existing_bootstrap_zip_file_from">"从设备选择已有的引导环境 ZIP 文件（离线）"</string>
     <string name="local_tools_install_dialog_change_selected_zip">"更换 ZIP 文件"</string>

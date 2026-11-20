@@ -270,8 +270,10 @@ class AgyChatBackend(
         checkAgyAuthStatus(userInitiated = false)
     }
 
-    fun checkAgyAuthStatus(userInitiated: Boolean = false) {
+    /** [accountChanged]: the agy login was swapped; quotas and models are reloaded for the new account. */
+    fun checkAgyAuthStatus(userInitiated: Boolean = false, accountChanged: Boolean = false) {
         backendScope.launch {
+            val emailBefore = _agyAuthInfo.value.email.takeIf { _agyAuthInfo.value.isLoggedIn }
             // "Checking sign-in…" only while the sign-in state is unknown (or the user asked). A background re-check of
             // a confirmed sign-in stays silent: the status only changes if the answer differs (signed out).
             val alreadySignedIn = _agyAuthInfo.value.isLoggedIn && !_agyAuthInfo.value.isOffline
@@ -285,7 +287,7 @@ class AgyChatBackend(
                 _isAuthBusy.value = false
                 agyBridgeService.updateAuthChecking(false)
                 if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("无法检查状态：设备离线。")
+                    _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_check_offline))
                 }
                 return@launch
             }
@@ -316,11 +318,15 @@ class AgyChatBackend(
                     _pendingLoginUrl.value = null
                     loginPollJob?.cancel()
                     if (userInitiated) {
-                        _authFeedbackMessage.tryEmit("已登录：${info.displayName.ifBlank { info.email }}")
+                        _authFeedbackMessage.tryEmit(
+                            application.getString(R.string.agy_auth_signed_in_as, info.displayName.ifBlank { info.email })
+                        )
+                    } else if (accountChanged && info.email.isNotBlank() && !info.email.equals(emailBefore, ignoreCase = true)) {
+                        _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_account_switched, info.email))
                     }
-                    refreshQuotas(force = false)
+                    refreshQuotas(force = accountChanged)
                 } else if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("未登录。")
+                    _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_not_signed_in))
                 }
             } else {
                 _agyAuthInfo.value = _agyAuthInfo.value.copy(
@@ -330,7 +336,7 @@ class AgyChatBackend(
                 // Retain current auth state; only clear the isChecking flag on network/RPC failure
                 agyBridgeService.updateAuthChecking(false)
                 if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("无法连接服务器。")
+                    _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_server_unreachable))
                 }
             }
         }
@@ -357,7 +363,7 @@ class AgyChatBackend(
                             lastAuthCheckTimeMs = System.currentTimeMillis()
                             _isAuthBusy.value = false
                             _pendingLoginUrl.value = null
-                            _authFeedbackMessage.tryEmit("登录成功！")
+                            _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_login_success))
                             refreshQuotas(force = true)
                             break
                         }
@@ -376,7 +382,7 @@ class AgyChatBackend(
     fun loginToAgyHub(force: Boolean = false) {
         if (_isAuthBusy.value && !force) return
         if (!isNetworkConnected()) {
-            _authFeedbackMessage.tryEmit("无法登录：没有网络连接。")
+            _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_login_offline))
             return
         }
         _isAuthBusy.value = true
@@ -394,12 +400,12 @@ class AgyChatBackend(
                 agyBridgeService.updateAuthState(isAuth = true, isChecking = false)
                 lastAuthCheckTimeMs = System.currentTimeMillis()
                 _isAuthBusy.value = false
-                _authFeedbackMessage.tryEmit("已登录为 ${authed.displayName}！")
+                _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_login_success_as, authed.displayName))
                 refreshQuotas(force = true)
                 return@launch
             }
 
-            _authFeedbackMessage.tryEmit("正在启动 Antigravity 登录…")
+            _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_login_starting))
 
             // 1. Poll for successful auth completion concurrently every 800ms
             startLoginPoll(hubUrl)
@@ -444,10 +450,10 @@ class AgyChatBackend(
                     isLoggedIn = false
                 )
                 agyBridgeService.updateAuthState(isAuth = false, isChecking = false)
-                _authFeedbackMessage.tryEmit("已退出登录。")
+                _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_signed_out))
                 refreshQuotas(force = true)
             } catch (e: Exception) {
-                _authFeedbackMessage.tryEmit("退出失败：${e.message}")
+                _authFeedbackMessage.tryEmit(application.getString(R.string.agy_auth_sign_out_failed, e.message.orEmpty()))
             } finally {
                 _isAuthBusy.value = false
             }
@@ -634,6 +640,18 @@ class AgyChatBackend(
                     if (!_isAuthBusy.value && !_agyAuthInfo.value.isLoggedIn) startLoginPoll(AuthPreferences.currentHubUrl)
                 }
             }
+        }
+
+        // The agy account changed (switched in Settings, the Agy Accounts mini app or a terminal): agy already uses the
+        // new login, so ask it now instead of waiting for the next check. collectLatest: a burst becomes one check.
+        backendScope.launch {
+            agyBridgeService.agyAccountEvents.collectLatest {
+                delay(300)
+                checkAgyAuthStatus(userInitiated = false, accountChanged = true)
+            }
+        }
+        ai.antigem.data.remote.AgyAccounts.replyRunning = {
+            _activeInstances.value.isNotEmpty() || _conversations.value.any { it.isRunning }
         }
 
         backendScope.launch {
@@ -2746,5 +2764,7 @@ class AgyChatBackend(
     fun dispose() {
         persistentStreamJob?.cancel()
         streamingJob?.cancel()
+        // the singleton must not keep this backend (and its ViewModel) alive
+        ai.antigem.data.remote.AgyAccounts.replyRunning = { false }
     }
 }

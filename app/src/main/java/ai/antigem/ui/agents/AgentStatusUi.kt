@@ -86,7 +86,9 @@ fun agyStatusEntry(
     onSignIn: () -> Unit,
     onCheckAuth: () -> Unit,
     onRetry: () -> Unit,
-    onRestartServer: () -> Unit
+    onRestartServer: () -> Unit,
+    notInstalled: Boolean = false,
+    onInstall: () -> Unit = {}
 ): AgentStatusEntry {
     val status = state.status
     fun entry(label: String, color: Color = status.dotColor, detail: String? = null, action: AgentStatusAction? = null, pending: Boolean = false) =
@@ -95,6 +97,7 @@ fun agyStatusEntry(
         serverRestarting -> entry(stringResource(R.string.main_ui_restarting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_the_local_server_is_restarting), pending = true)
         isAuthBusy -> entry(stringResource(R.string.claude_settings_screen_signing_in), SystemStatus.ACQUIRING_CSRF.dotColor, stringResource(R.string.main_ui_finish_signing_in_with_google_in_your), AgentStatusAction(stringResource(R.string.android_dev_screen_check), onCheckAuth), pending = true)
         status == SystemStatus.OFFLINE && inStartupGrace -> entry(stringResource(R.string.main_ui_starting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_starting_the_local_server), pending = true)
+        notInstalled -> entry(stringResource(R.string.upgrade_201_agy_not_installed), detail = stringResource(R.string.upgrade_201_agy_install_detail), action = AgentStatusAction(stringResource(R.string.claude_settings_screen_install), onInstall))
         status == SystemStatus.OFFLINE && state is SystemConnectionState.Connected -> entry(
             stringResource(R.string.settings_offline),
             detail = stringResource(R.string.main_ui_the_antigravity_hub_is_stopped),
@@ -125,6 +128,11 @@ fun agyStatusEntry(
         )
     }
 }
+
+/** True when the hub reports that its agy CLI is missing. */
+fun agyNotInstalled(state: SystemConnectionState, cli: ai.antigem.data.remote.BridgeInfo.AgyCli?): Boolean =
+    state.status == SystemStatus.ERROR &&
+        ((state as? SystemConnectionState.Connected)?.error?.startsWith("agy is not installed") == true || cli?.installed == false)
 
 @Composable
 fun claudeStatusEntry(

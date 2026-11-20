@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Unarchive
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -88,6 +89,9 @@ import ai.antigem.ui.components.SidebarChatListSkeleton
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+
+/** Group key of the pinned chats when grouping by workspace (can't clash with a folder name). */
+private const val PINNED_GROUP = "\u0000pinned"
 
 @Composable
 fun ChatHistoryDrawer(
@@ -155,6 +159,9 @@ fun ChatHistoryDrawer(
         isInitialGracePeriod = false
     }
     val context = LocalContext.current
+    // pinned chats (app level, by conversation id) sit at the top of the list
+    remember { ai.antigem.data.preferences.PinnedChats.init(context) }
+    val pinnedIds by ai.antigem.data.preferences.PinnedChats.ids.collectAsState()
 
     var agentFilter by remember { mutableStateOf<ai.antigem.domain.model.AgentKind?>(null) }
     val visibleAgents = remember(enabledAgents, conversations) {
@@ -206,11 +213,12 @@ fun ChatHistoryDrawer(
     }
 
     // Top-level conversations (conversations without a valid parent in the list)
-    val topLevelChats = remember(filtered, allFilteredIds) {
+    // pinned ones first (a stable sort: both parts keep their usual newest-first order)
+    val topLevelChats = remember(filtered, allFilteredIds, pinnedIds) {
         filtered.filter { conv ->
             val pId = conv.parentConversationId
             pId == null || pId == conv.id || !allFilteredIds.contains(pId)
-        }
+        }.sortedByDescending { it.id in pinnedIds }
     }
 
     var expandedParentIds by remember { mutableStateOf(setOf<String>()) }
@@ -243,9 +251,12 @@ fun ChatHistoryDrawer(
         }
     }
 
-    val grouped = remember(topLevelChats) {
+    // grouped by workspace: pinned chats get their own "Pinned" group above the workspaces
+    val grouped = remember(topLevelChats, pinnedIds) {
         topLevelChats.groupBy { conv ->
-            if (conv.workspaceUri.isNotBlank()) {
+            if (conv.id in pinnedIds) {
+                PINNED_GROUP
+            } else if (conv.workspaceUri.isNotBlank()) {
                 val clean = conv.workspaceUri.removePrefix("file://").trimEnd('/')
                 java.io.File(clean).name.ifBlank { "Workspace" }
             } else {
@@ -585,6 +596,7 @@ fun ChatHistoryDrawer(
                     onClick = {
                         val id = targetConv.id
                         conversationToDelete = null
+                        ai.antigem.data.preferences.PinnedChats.setPinned(id, false)
                         onDeleteConversation(id)
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -623,7 +635,9 @@ fun ChatHistoryDrawer(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                // top 6dp (+2dp on the row, +18dp half the 36dp row) centers the header 26dp under the status bar,
+                // the same line as the chat's 52dp top bar title and icons
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 6.dp)
         ) {
             // ---------------- header: brand on the left, power + new chat on the right ----------------
             Row(
@@ -1056,6 +1070,10 @@ fun ChatHistoryDrawer(
                                         },
                                         onForkConversation = onForkConversation,
                                         onRequestDelete = { conversationToDelete = it },
+                                        isPinned = item.depth == 0 && conv.id in pinnedIds,
+                                        onTogglePin = if (item.depth == 0) {
+                                            { ai.antigem.data.preferences.PinnedChats.setPinned(conv.id, conv.id !in pinnedIds) }
+                                        } else null,
                                         claudeActions = claudeActions,
                                         onTerminateInstance = { inst, title ->
                                             instanceToTerminate = inst to title
@@ -1085,14 +1103,18 @@ fun ChatHistoryDrawer(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Icon(
-                                                imageVector = if (groupName == "General") Icons.Outlined.Public else Icons.Default.Folder,
+                                                imageVector = when (groupName) {
+                                                    PINNED_GROUP -> Icons.Outlined.PushPin
+                                                    "General" -> Icons.Outlined.Public
+                                                    else -> Icons.Default.Folder
+                                                },
                                                 contentDescription = null,
                                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 modifier = Modifier.size(15.dp)
                                             )
                                             Spacer(modifier = Modifier.width(7.dp))
                                             Text(
-                                                text = groupName,
+                                                text = if (groupName == PINNED_GROUP) stringResource(R.string.upgrade_201_chat_pinned) else groupName,
                                                 fontSize = 13.sp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
@@ -1166,6 +1188,10 @@ fun ChatHistoryDrawer(
                                             },
                                             onForkConversation = onForkConversation,
                                             onRequestDelete = { conversationToDelete = it },
+                                            isPinned = item.depth == 0 && conv.id in pinnedIds,
+                                            onTogglePin = if (item.depth == 0) {
+                                                { ai.antigem.data.preferences.PinnedChats.setPinned(conv.id, conv.id !in pinnedIds) }
+                                            } else null,
                                             claudeActions = claudeActions,
                                             onTerminateInstance = { inst, title ->
                                                 instanceToTerminate = inst to title
@@ -1539,6 +1565,10 @@ private fun ChatHistoryItemRow(
     onForkConversation: (String) -> Unit,
     onRequestDelete: (Conversation) -> Unit,
     onTerminateInstance: (ai.antigem.data.remote.AgyActiveInstance, String) -> Unit,
+    /** Pinned to the top of the list: a small pin shows next to the time. */
+    isPinned: Boolean = false,
+    /** Pins / unpins from the ⋮ menu; null (sub-agent rows) hides the item. */
+    onTogglePin: (() -> Unit)? = null,
     claudeActions: ClaudeDrawerActions? = null
 ) {
     val isSubagent = depth > 0
@@ -1680,6 +1710,14 @@ private fun ChatHistoryItemRow(
                     }
                 }
 
+                if (isPinned) {
+                    Icon(
+                        imageVector = Icons.Outlined.PushPin,
+                        contentDescription = stringResource(R.string.upgrade_201_chat_pinned),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
                 val timeStr = formatRelativeTime(conv.updatedAt)
                 if (timeStr.isNotBlank()) {
                     Text(
@@ -1784,6 +1822,24 @@ private fun ChatHistoryItemRow(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)),
                 modifier = Modifier.widthIn(min = 210.dp)
             ) {
+                if (onTogglePin != null) {
+                    DropdownMenuItem(
+                        text = { Text(if (isPinned) stringResource(R.string.upgrade_201_chat_unpin) else stringResource(R.string.upgrade_201_chat_pin_to_top), fontSize = 13.5.sp) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.PushPin,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onTogglePin()
+                            AppToastHelper.showToast(context.getString(if (isPinned) R.string.upgrade_201_chat_chat_unpinned else R.string.upgrade_201_chat_chat_pinned), ChatToastType.SUCCESS)
+                        }
+                    )
+                }
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.chat_history_drawer_copy_conversation_id), fontSize = 13.5.sp) },
                     leadingIcon = {

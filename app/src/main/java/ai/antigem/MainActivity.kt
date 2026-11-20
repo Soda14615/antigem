@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
         ai.antigem.data.jarvis.JarvisPreferences.init(this)
         ai.antigem.data.context.GlobalContext.init(this)
         ai.antigem.data.memory.AgentMemory.init(this)
+        ai.antigem.data.egm.EgmManager.init(this)
         ai.antigem.data.remote.inspector.NetworkInspectorManager.isEnabled =
             chatViewModel.authPreferences.getNetworkInspectorEnabledSync()
         ai.antigem.data.remote.inspector.NetworkInspectorManager.isFloatingBubbleEnabled =
@@ -657,6 +658,13 @@ class MainActivity : ComponentActivity() {
                                         onClick = { showNetworkInspectorDialog = true }
                                     )
                                 }
+
+                                // Gemmy: floating cartoon buddy (drag/fling, tap, double-tap, long-press menu; reacts to the agent working).
+                                // Shown after its one-time intro was answered and while on in Settings → Appearance.
+                                ai.antigem.ui.components.GemmyOverlay(
+                                    prefs = chatViewModel.authPreferences,
+                                    agentWorking = chatViewModel.isCurrentChatActivelyRunning
+                                )
 
                                 // Global Network Inspector Dialog
                                 if (showNetworkInspectorDialog) {

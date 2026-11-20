@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_201_controls_codex_too_old_to_manage_plugins">This Codex is too old to manage plugins. Update it in Settings → Codex → Account &amp; CLI.</string>
+</resources>

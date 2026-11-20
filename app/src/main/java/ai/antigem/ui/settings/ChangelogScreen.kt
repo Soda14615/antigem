@@ -1,6 +1,7 @@
 package ai.antigem.ui.settings
 
 import ai.antigem.R
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ai.antigem.BuildConfig
 import ai.antigem.data.changelog.ChangeKind
+import ai.antigem.data.changelog.ChangeLine
 import ai.antigem.data.changelog.Changelog
 import ai.antigem.data.changelog.ChangelogVersion
 import ai.antigem.theme.AppColors
@@ -290,7 +292,7 @@ private fun VersionCard(
             ) {
                 Column(Modifier.padding(top = 12.dp, end = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07f))
-                    version.lines.forEach { line -> ChangeRow(line.text, line.kind) }
+                    localizedChanges(version).forEach { line -> ChangeRow(line.text, line.kind) }
                 }
             }
         }
@@ -388,11 +390,19 @@ internal fun WhatsNewCard(cardBg: Color, cardBorder: BorderStroke, onClick: () -
                 }
                 Icon(Icons.Outlined.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            current.lines.take(2).forEach { line -> ChangeRow(line.text, line.kind) }
+            localizedChanges(current).take(2).forEach { line -> ChangeRow(line.text, line.kind) }
             Text(
                 stringResource(R.string.changelog_screen_see_all_versions, versions.size.toString()),
                 fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = primary
             )
         }
     }
+}
+
+@Composable
+private fun localizedChanges(version: ChangelogVersion): List<ChangeLine> {
+    if (version.versionCode != 132) return version.lines
+    val translated = stringArrayResource(R.array.changelog_v201)
+    if (translated.size != version.lines.size) return version.lines
+    return version.lines.mapIndexed { index, line -> ChangeLine(translated[index], line.kind) }
 }

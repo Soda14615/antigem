@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - zh-cn
+      - zh-cn-v2.0.1
   workflow_dispatch:
 
 permissions:
@@ -33,10 +34,10 @@ jobs:
         with:
           go-version-file: 'agy_ide_bridge/go.mod'
 
-      - name: Install Android SDK 36
+      - name: Install Android SDK platforms
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "platforms;android-37.1" "build-tools;36.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -54,7 +55,6 @@ jobs:
             APK_SRC=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
             APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
             cp "$APK_SRC" "$APK_OUT"
-            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT"
           else
             echo "RELEASE_KEYSTORE_BASE64 not set; building ARM64 debug APK for testing."
             ./gradlew :app:assembleDebug -Pantigem.arm64Only=true
@@ -62,6 +62,7 @@ jobs:
             APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64-debug.apk"
             cp "$APK_SRC" "$APK_OUT"
           fi
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT"
           "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK_OUT" | grep -E "package:|native-code:|locales:"
           sha256sum "$APK_OUT"
 
@@ -77,4 +78,4 @@ jobs:
       # repo and two legacy assertions fail on dash, so a red test task must not swallow the build.
       - name: Run Debug Unit Tests
         continue-on-error: true
-        run: ./gradlew :app:testDebugUnitTest
+        run: ./gradlew :app:testDebugUnitTest -Pantigem.arm64Only=true

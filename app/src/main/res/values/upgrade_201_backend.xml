@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agy_auth_signed_in_as">Signed in as %1$s</string>
+    <string name="agy_auth_account_switched">Antigravity now uses %1$s</string>
+    <string name="agy_auth_check_offline">Cannot check status: the device is offline.</string>
+    <string name="agy_auth_not_signed_in">Not signed in.</string>
+    <string name="agy_auth_server_unreachable">Could not reach the server.</string>
+    <string name="agy_auth_login_success">Signed in successfully.</string>
+    <string name="agy_auth_login_offline">Cannot sign in: there is no network connection.</string>
+    <string name="agy_auth_login_success_as">Signed in as %1$s.</string>
+    <string name="agy_auth_login_starting">Starting Antigravity sign-in…</string>
+    <string name="agy_auth_signed_out">Signed out.</string>
+    <string name="agy_auth_sign_out_failed">Sign-out failed: %1$s</string>
+</resources>

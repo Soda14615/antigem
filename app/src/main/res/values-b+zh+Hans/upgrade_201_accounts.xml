@@ -1,0 +1,37 @@
+<resources>
+    <string name="upgrade_201_agy_not_installed">未安装</string>
+    <string name="upgrade_201_agy_install_detail">尚未安装 Antigravity（agy）。应用可以为你安装。</string>
+    <string name="upgrade_201_agy_x64_install_note">Google 尚未提供适用于 x86_64 的 agy Android 版本，因此会将 Linux x64 版本安装到 ~/.local/bin，并通过应用自带的 glibc 运行。该版本已关闭自身更新程序；点击“检查更新”会安装 Google 最新的 Linux x64 版本，并在有更新时重启服务器以启用新版本。（语音通话需要 agy 1.5 或更高版本。）</string>
+    <string name="upgrade_201_saved_accounts">已保存的账号</string>
+    <string name="upgrade_201_loading">正在加载…</string>
+    <string name="upgrade_201_keychain_accounts_unavailable">这台电脑上的 Agy 将登录信息保存在系统钥匙串中，因此无法在此切换账号。</string>
+    <string name="upgrade_201_accounts_explanation">保存多个 Google 账号并在它们之间切换。Antigravity 会立即使用新账号。</string>
+    <string name="upgrade_201_signed_in_account">已登录账号</string>
+    <string name="upgrade_201_signed_in_not_saved">当前已登录，尚未保存</string>
+    <string name="upgrade_201_save">保存</string>
+    <string name="upgrade_201_active">当前使用</string>
+    <string name="upgrade_201_switch">切换</string>
+    <string name="upgrade_201_no_saved_accounts">还没有已保存的账号。</string>
+    <string name="upgrade_201_add_account">添加账号</string>
+    <string name="upgrade_201_this_account">此账号</string>
+    <string name="upgrade_201_saved_account">已保存 %1$s</string>
+    <string name="upgrade_201_operation_failed">操作失败</string>
+    <string name="upgrade_201_account_not_saved">%1$s尚未保存</string>
+    <string name="upgrade_201_save_first_explanation">先保存账号，以便稍后切换回来。如果不保存，以后需要重新登录才能使用。</string>
+    <string name="upgrade_201_save_and_action">保存并%1$s</string>
+    <string name="upgrade_201_action_without_saving">不保存并%1$s</string>
+    <string name="upgrade_201_switched_to">已切换到 %1$s</string>
+    <string name="upgrade_201_reply_running">正在生成回复</string>
+    <string name="upgrade_201_switch_may_stop">现在切换账号可能会中断回复。</string>
+    <string name="upgrade_201_switch_anyway">仍要切换</string>
+    <string name="upgrade_201_sign_in_other_google">使用另一个 Google 账号登录</string>
+    <string name="upgrade_201_sign_out_may_stop">现在退出登录以添加账号可能会中断回复。</string>
+    <string name="upgrade_201_go_on">继续</string>
+    <string name="upgrade_201_delete_saved_copy">删除 %1$s 的已保存副本？</string>
+    <string name="upgrade_201_delete_copy_stays_signed_in">仍会保持登录状态；这里只会删除已保存的副本。</string>
+    <string name="upgrade_201_sign_in_again_after_delete">之后要使用此账号，需要重新登录。</string>
+    <string name="upgrade_201_signed_in_now">当前已登录</string>
+    <string name="upgrade_201_last_used">上次使用：%1$s</string>
+    <string name="upgrade_201_delete_saved_copy_label">删除已保存副本</string>
+    <string name="accounts_ui_agy_settings">Antigravity 设置</string>
+</resources>

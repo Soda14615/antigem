@@ -359,6 +359,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             claudeBackend.onAppForegrounded()
             // the CLI may have been installed or signed in from a terminal meanwhile
             if (claudeAccount.state.value != ai.antigem.data.agent.claude.ClaudeStatus.READY) claudeAccount.refreshStatus()
+            // back after a while: the login may have expired meanwhile, which `auth status` alone does not notice
+            else if (System.currentTimeMillis() - claudeAccount.usageUpdatedAt.value > 30 * 60_000L)
+                claudeAccount.refreshUsage(force = true, recheckSignIn = true)
         }
         if (isOpenCodeEnabled) openCodeBackend.onAppForegrounded()
         if (isCodexEnabled) codexBackend.onAppForegrounded()
@@ -488,12 +491,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun sendNow(content: String) {
         val refs = ai.antigem.data.files.AttachedFiles.refsOf(_attachments.value)
-        val typed = PromptExpansion.expand(content)
+        val jarvis = ai.antigem.data.jarvis.JarvisController
+        val chatId = currentConversation.value?.id
+        // (EGM's commands tell a Jarvis chat to run the reviewers as task chats)
+        val typed = PromptExpansion.expand(content, jarvis = jarvis.isAttached && jarvis.isJarvisTarget(chatId))
         val expanded = if (refs.isEmpty()) typed
             else listOf(typed, ai.antigem.data.files.AttachedFiles.block(refs)).filter { it.isNotBlank() }.joinToString("\n\n")
         // a Jarvis chat on screen: its message carries Jarvis' hidden note (or goes to the voice Jarvis chat as a typed turn)
-        val jarvis = ai.antigem.data.jarvis.JarvisController
-        val chatId = currentConversation.value?.id
         val intercepted = (if (jarvis.isAttached) jarvis.interceptScreenMessage(chatId, expanded) else expanded) ?: return
         rememberCopies(chatId, refs)
         // a normal chat (a Jarvis chat carries its own guide instead): the app's global context goes in front

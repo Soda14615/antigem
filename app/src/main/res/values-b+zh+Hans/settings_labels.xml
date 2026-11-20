@@ -5,7 +5,7 @@
     <string name="settings_section_themes_title">"主题"</string>
     <string name="settings_section_themes_subtitle">"浅色与深色模式及主题库"</string>
     <string name="settings_section_appearance_title">"外观"</string>
-    <string name="settings_section_appearance_subtitle">"聊天字号、聊天列表、顶部图标和应用切换器"</string>
+    <string name="settings_section_appearance_subtitle">"聊天字号、聊天列表、顶部图标、应用切换器和 Gemmy"</string>
     <string name="settings_section_stem_rendering_title">"STEM 与图表"</string>
     <string name="settings_section_stem_rendering_subtitle">"在聊天中显示化学式、图表、几何图形、仿真、电路和离线 Mermaid 图"</string>
     <string name="settings_section_servers_title">"服务器与连接"</string>
@@ -31,9 +31,9 @@
     <string name="settings_section_commands_title">"命令与权限"</string>
     <string name="settings_section_commands_subtitle">"自动运行策略、沙箱模式和工具审批"</string>
     <string name="settings_section_antigravity_title">"Antigravity"</string>
-    <string name="settings_section_antigravity_subtitle">"CLI、MCP 服务器、技能与插件、命令与权限"</string>
-    <string name="settings_section_agy_cli_title">"Antigravity CLI"</string>
-    <string name="settings_section_agy_cli_subtitle">"查看本机或服务器上的 agy 版本并安装"</string>
+    <string name="settings_section_antigravity_subtitle">"账号与 CLI、MCP 服务器、技能与插件、命令与权限"</string>
+    <string name="settings_section_agy_cli_title">"账号与 CLI"</string>
+    <string name="settings_section_agy_cli_subtitle">"Google 登录，以及在本机或服务器上查看并安装 agy"</string>
     <string name="settings_section_agy_cloud_title">"云端智能体"</string>
     <string name="settings_section_agy_cloud_subtitle">"在 Google 云主机上运行 Antigravity 聊天（Remote Agents）"</string>
     <string name="settings_section_claude_title">"Claude Code"</string>
@@ -51,6 +51,8 @@
     <string name="settings_section_agent_memory_subtitle">"智能体跨聊天保留的记忆及可查阅的聊天记录"</string>
     <string name="settings_section_agent_history_title">"已保存的聊天"</string>
     <string name="settings_section_agent_history_subtitle">"查看、编辑或移除智能体可查阅的聊天记录"</string>
+    <string name="settings_section_egm_title">"EGM · Elephant-Goldfish"</string>
+    <string name="settings_section_egm_subtitle">"先规划设计，再让新一轮评审者在编写代码前提出质疑（/egm）"</string>
     <string name="settings_section_jarvis_title">"Jarvis"</string>
     <string name="settings_section_jarvis_subtitle">"通过语音免手操作整个应用"</string>
     <string name="settings_section_jarvis_agent_title">"Jarvis · 智能体"</string>
@@ -123,7 +125,7 @@
     <string name="settings_termux_package_desc">"终端中的 termux-* 命令"</string>
     <string name="settings_termux_external_status">"位置、相机、传感器、短信及其他命令（%1$s）"</string>
     <string name="settings_termux_install_title">"安装 termux-api"</string>
-    <string name="settings_install_full">"安装（约 350 MB）"</string>
+    <string name="settings_install_full">"安装（%1$s）"</string>
     <string name="settings_install_minimal">"安装精简版（约 33 MB）"</string>
     <string name="settings_install_zip">"从 ZIP 文件安装"</string>
     <string name="settings_choose_zip">"选择 ZIP 文件"</string>
@@ -135,8 +137,11 @@
     <string name="settings_retry_mirror">"重试（%1$s）"</string>
     <string name="settings_download_mirror">"从 %1$s 下载"</string>
     <string name="settings_full_environment">"完整环境"</string>
-    <string name="settings_full_environment_size">"推荐 · 约 350 MB"</string>
+    <string name="settings_full_environment_size">"推荐 · %1$s"</string>
     <string name="settings_full_environment_desc">"已验证的 rootfs，预先配置了工具和环境。"</string>
+    <string name="settings_full_environment_error_multiple_mirrors">"请重试、切换到另一个下载站点，或打开其页面（↗）下载 zip，再通过“从 ZIP 文件安装”进行安装。"</string>
+    <string name="settings_full_environment_error_single_mirror">"请重试，或打开下载页面（↗）下载 zip，再通过“从 ZIP 文件安装”进行安装。"</string>
+    <string name="settings_full_environment_error_zip">"请重试，或改为从 ZIP 文件安装。"</string>
     <string name="settings_minimal_environment">"精简环境"</string>
     <string name="settings_minimal_environment_desc">"适用于 %1$s 的纯净 Termux 基础环境，包含核心工具和软件包管理器。"</string>
     <string name="settings_zip_environment">"从 ZIP 文件安装"</string>

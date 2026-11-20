@@ -5,7 +5,7 @@
     <string name="settings_section_themes_title">"Themes"</string>
     <string name="settings_section_themes_subtitle">"Light and dark mode, and the theme gallery"</string>
     <string name="settings_section_appearance_title">"Appearance"</string>
-    <string name="settings_section_appearance_subtitle">"Chat text size, chat list, header icons and the app switcher"</string>
+    <string name="settings_section_appearance_subtitle">"Chat text size, chat list, header icons, the app switcher and Gemmy"</string>
     <string name="settings_section_stem_rendering_title">"STEM &amp; diagrams"</string>
     <string name="settings_section_stem_rendering_subtitle">"Chemistry, graphs, geometry, simulations, circuits and offline Mermaid in chats"</string>
     <string name="settings_section_servers_title">"Servers &amp; Connectivity"</string>
@@ -31,9 +31,9 @@
     <string name="settings_section_commands_title">"Commands &amp; Permissions"</string>
     <string name="settings_section_commands_subtitle">"Auto-run policy, sandbox mode, and tool approvals"</string>
     <string name="settings_section_antigravity_title">"Antigravity"</string>
-    <string name="settings_section_antigravity_subtitle">"CLI, MCP servers, skills &amp; plugins, commands &amp; permissions"</string>
-    <string name="settings_section_agy_cli_title">"Antigravity CLI"</string>
-    <string name="settings_section_agy_cli_subtitle">"agy version and install, on this device or the server"</string>
+    <string name="settings_section_antigravity_subtitle">"Account &amp; CLI, MCP servers, skills &amp; plugins, commands &amp; permissions"</string>
+    <string name="settings_section_agy_cli_title">"Account &amp; CLI"</string>
+    <string name="settings_section_agy_cli_subtitle">"Google sign-in, agy version and install, on this device or the server"</string>
     <string name="settings_section_agy_cloud_title">"Cloud agents"</string>
     <string name="settings_section_agy_cloud_subtitle">"Antigravity chats on a Google cloud machine (Remote Agents)"</string>
     <string name="settings_section_claude_title">"Claude Code"</string>
@@ -51,6 +51,8 @@
     <string name="settings_section_agent_memory_subtitle">"Memories every agent keeps across chats, and past chats they can look up"</string>
     <string name="settings_section_agent_history_title">"Saved chats"</string>
     <string name="settings_section_agent_history_subtitle">"The chat history the agents can look up: read, edit or remove it"</string>
+    <string name="settings_section_egm_title">"EGM · Elephant-Goldfish"</string>
+    <string name="settings_section_egm_subtitle">"Plan a design and have fresh reviewers attack it before any code (/egm)"</string>
     <string name="settings_section_jarvis_title">"Jarvis"</string>
     <string name="settings_section_jarvis_subtitle">"Hands-free voice control of the whole app"</string>
     <string name="settings_section_jarvis_agent_title">"Jarvis · Agent"</string>
@@ -123,7 +125,7 @@
     <string name="settings_termux_package_desc">"The termux-* commands, in the terminal"</string>
     <string name="settings_termux_external_status">"Location, camera, sensors, SMS and the other commands (%1$s)"</string>
     <string name="settings_termux_install_title">"Install termux-api"</string>
-    <string name="settings_install_full">"Install (~350 MB)"</string>
+    <string name="settings_install_full">"Install (%1$s)"</string>
     <string name="settings_install_minimal">"Install minimal (~33 MB)"</string>
     <string name="settings_install_zip">"Install from ZIP"</string>
     <string name="settings_choose_zip">"Choose a ZIP file"</string>
@@ -135,8 +137,11 @@
     <string name="settings_retry_mirror">"Try again (%1$s)"</string>
     <string name="settings_download_mirror">"Download from %1$s"</string>
     <string name="settings_full_environment">"Full environment"</string>
-    <string name="settings_full_environment_size">"Recommended · ~350 MB"</string>
+    <string name="settings_full_environment_size">"Recommended · %1$s"</string>
     <string name="settings_full_environment_desc">"Verified rootfs with the tools and environment preconfigured."</string>
+    <string name="settings_full_environment_error_multiple_mirrors">"Try again, switch to the other download site, or open its page (↗), download the zip and install it with \"From a ZIP file\"."</string>
+    <string name="settings_full_environment_error_single_mirror">"Try again, or open the download page (↗), download the zip and install it with \"From a ZIP file\"."</string>
+    <string name="settings_full_environment_error_zip">"You can try again, or install from a ZIP file instead."</string>
     <string name="settings_minimal_environment">"Minimal"</string>
     <string name="settings_minimal_environment_desc">"Clean Termux base for %1$s: core utilities and the package manager."</string>
     <string name="settings_zip_environment">"From a ZIP file"</string>

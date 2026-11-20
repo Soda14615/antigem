@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="changelog_v201" translatable="true">
+        <item>新增 x86_64 版本，支持模拟器和搭载 Intel 或 AMD 处理器的 Chromebook，可从 GitHub 下载配套的完整 Linux 环境</item>
+        <item>Antigravity 支持保存多个 Google 账号，可在「设置 → Antigravity → 账号与 CLI」切换</item>
+        <item>所有智能体的会话均可置顶</item>
+        <item>新增悬浮伙伴 Gemmy，能随智能体工作状态变化，可在「设置 → 外观」关闭</item>
+        <item>新增 EGM（Elephant-Goldfish）设计评审功能，可在设置中安装并管理 /egm 命令</item>
+        <item>Antigravity 和 Codex 新增「账号与 CLI」页面，可在同一处登录、安装、更新和重启</item>
+        <item>修复使用部分键盘输入时应用崩溃的问题</item>
+        <item>修复 SSH 终端首次连接失败时应用崩溃的问题</item>
+        <item>修复模拟器上终端无法接收键盘输入的问题</item>
+        <item>修复 Claude Code 登录过期后发送消息失败的问题，应用现在会提示重新登录</item>
+        <item>修复 Codex 和 OpenCode 安装后仍显示「未找到」的问题</item>
+        <item>修复 Antigravity 每次重启服务时显示错误，以及设备负载高时短暂离线的问题</item>
+        <item>简化账号对话框，为每个智能体提供设置按钮</item>
+    </string-array>
+</resources>

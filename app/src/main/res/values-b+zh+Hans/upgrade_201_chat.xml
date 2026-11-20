@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_201_chat_antigravity_not_installed">尚未安装 Antigravity (agy)。请前往“设置 → Antigravity → 账户与 CLI”进行安装。</string>
+    <string name="upgrade_201_chat_antigravity_not_installed_title">尚未安装 Antigravity</string>
+    <string name="upgrade_201_chat_antigravity_not_installed_yet">尚未安装 Antigravity (agy)。</string>
+    <string name="upgrade_201_chat_pinned">已固定</string>
+    <string name="upgrade_201_chat_pin_to_top">置顶</string>
+    <string name="upgrade_201_chat_unpin">取消置顶</string>
+    <string name="upgrade_201_chat_chat_pinned">对话已置顶</string>
+    <string name="upgrade_201_chat_chat_unpinned">已取消对话置顶</string>
+</resources>

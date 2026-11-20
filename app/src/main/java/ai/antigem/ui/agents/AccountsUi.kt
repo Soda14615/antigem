@@ -182,6 +182,7 @@ fun AccountsDialog(
     claudeStatus: ClaudeCliStatus?,
     onAgySignOut: () -> Unit,
     onAgyCancelSignIn: () -> Unit,
+    onAgySettings: () -> Unit = {},
     onClaudeSignOut: () -> Unit,
     onClaudeSettings: () -> Unit,
     onDismiss: () -> Unit,
@@ -258,6 +259,10 @@ fun AccountsDialog(
                                 }
                             }
                         }
+                        SectionButton(stringResource(R.string.accounts_ui_agy_settings), Icons.Outlined.Settings) {
+                            onAgySettings()
+                            onDismiss()
+                        }
                     }
                 }
 
@@ -277,10 +282,6 @@ fun AccountsDialog(
                         ) else listOfNotNull(claudeStatus?.version?.substringBefore(" ")?.let { "CLI $it" })
                     ) {
                         if (entry.isReady) {
-                            SectionButton(stringResource(R.string.accounts_ui_claude_settings), Icons.Outlined.Settings) {
-                                onClaudeSettings()
-                                onDismiss()
-                            }
                             SectionButton(stringResource(R.string.accounts_ui_sign_out), Icons.AutoMirrored.Outlined.Logout, danger = true) { onClaudeSignOut() }
                         } else {
                             entry.action?.let {
@@ -289,10 +290,10 @@ fun AccountsDialog(
                                     onDismiss()
                                 }
                             }
-                            if (!entry.pending) SectionButton(stringResource(R.string.accounts_ui_claude_settings), Icons.Outlined.Settings) {
-                                onClaudeSettings()
-                                onDismiss()
-                            }
+                        }
+                        SectionButton(stringResource(R.string.accounts_ui_claude_settings), Icons.Outlined.Settings) {
+                            onClaudeSettings()
+                            onDismiss()
                         }
                     }
                 }
@@ -328,10 +329,6 @@ private fun CodexAccountSection(
         facts = facts
     ) {
         if (entry.isReady) {
-            SectionButton(stringResource(R.string.accounts_ui_codex_settings), Icons.Outlined.Settings) {
-                onSettings()
-                onDismiss()
-            }
             SectionButton(stringResource(R.string.accounts_ui_sign_out), Icons.AutoMirrored.Outlined.Logout, danger = true) { onSignOut() }
         } else {
             entry.action?.let {
@@ -340,10 +337,10 @@ private fun CodexAccountSection(
                     onDismiss()
                 }
             }
-            if (!entry.pending) SectionButton(stringResource(R.string.accounts_ui_codex_settings), Icons.Outlined.Settings) {
-                onSettings()
-                onDismiss()
-            }
+        }
+        SectionButton(stringResource(R.string.accounts_ui_codex_settings), Icons.Outlined.Settings) {
+            onSettings()
+            onDismiss()
         }
     }
 }

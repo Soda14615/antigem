@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_egm_not_installed">Not installed · Review a design before any code</string>
+    <string name="upgrade_egm_commands_off">Commands off</string>
+    <string name="upgrade_egm_what_does">What EGM does</string>
+    <string name="upgrade_egm_overview">Google\'s Elephant-Goldfish Model (open source, Apache 2.0). The agent (the Elephant) works out a design with you and writes it down. Then fresh reviewers (the Goldfish), who never saw your conversation, read only the document and try to break it. The design is fixed until it passes and you approve it; only then is code written.</string>
+    <string name="upgrade_egm_token_note">It uses more tokens than a plain chat: every reviewer reads the document, its persona and project files. On a phone, Quick or Standard reviewers are usually enough.</string>
+    <string name="upgrade_egm_remove_note">Deletes EGM and its rules files from the phone. Design documents and reports in your projects stay.</string>
+    <string name="upgrade_egm_dismiss">Dismiss</string>
+    <string name="upgrade_egm_install">Install</string>
+    <string name="upgrade_egm_update">Update</string>
+    <string name="upgrade_egm_install_button">Install EGM</string>
+    <string name="upgrade_egm_install_dev">Install the development version</string>
+    <string name="upgrade_egm_install_release">Install the newest release</string>
+    <string name="upgrade_egm_reinstall">Reinstall</string>
+    <string name="upgrade_egm_check_update">Check for update</string>
+    <string name="upgrade_egm_working">Working…</string>
+    <string name="upgrade_egm_slash_commands">Slash commands</string>
+    <string name="upgrade_egm_on">On</string>
+    <string name="upgrade_egm_off">Off</string>
+    <string name="upgrade_egm_use_commands">Use the EGM commands</string>
+    <string name="upgrade_egm_commands_hint">Type one at the start of a message in any chat; the rest of the message is the task.</string>
+    <string name="upgrade_egm_reviewers">Goldfish reviewers</string>
+    <string name="upgrade_egm_review">Review</string>
+    <string name="upgrade_egm_stop_each_stage">Stop after each review stage</string>
+    <string name="upgrade_egm_stop_each_stage_hint">On: you see every stage\'s report before the next stage runs. Off: all stages run, then one combined report.</string>
+    <string name="upgrade_egm_rereviews">Re-reviews after fixes</string>
+    <string name="upgrade_egm_rereviews_hint">How often a review stage may run again once the document is fixed. 0 = never.</string>
+    <string name="upgrade_egm_reviewers_parallel">Reviewers at the same time</string>
+    <string name="upgrade_egm_reviewers_parallel_hint">Each running reviewer is a full agent: more at once is faster but needs more memory.</string>
+    <string name="upgrade_egm_jarvis">Jarvis</string>
+    <string name="upgrade_egm_instructions">Instructions</string>
+    <string name="upgrade_egm_normal_chats">Normal chats</string>
+    <string name="upgrade_egm_jarvis_chats">Jarvis chats</string>
+    <string name="upgrade_egm_remove">Remove</string>
+    <string name="upgrade_egm_remove_button">Remove EGM</string>
+    <string name="upgrade_egm_remove_title">Remove EGM?</string>
+    <string name="upgrade_egm_remove_confirm">The /egm commands stop working. Your design documents and reports stay in your projects.</string>
+    <string name="upgrade_egm_cancel">Cancel</string>
+    <string name="upgrade_egm_guide">How to use EGM</string>
+    <string name="upgrade_egm_hide_guide">Hide the guide</string>
+    <string name="upgrade_egm_show_guide">Show the guide</string>
+    <string name="upgrade_egm_less">Less</string>
+    <string name="upgrade_egm_more">More</string>
+    <string name="upgrade_egm_folder_label">Folder for designs and reports</string>
+    <string name="upgrade_egm_save">Save</string>
+    <string name="upgrade_egm_changed">Changed</string>
+    <string name="upgrade_egm_default">Default</string>
+    <string name="upgrade_egm_instructions_jarvis">Instructions for Jarvis chats</string>
+    <string name="upgrade_egm_instructions_normal">Instructions for normal chats</string>
+    <string name="upgrade_egm_reset_default">Reset to default</string>
+
+    <string name="upgrade_gemmy_psst">psst… tap it!</string>
+    <string name="upgrade_gemmy_meet">Meet Gemmy 👋</string>
+    <string name="upgrade_gemmy_intro">A little buddy that floats over the app. Drag it around or fling it, tap or double-tap it, long-press it for its menu. It thinks while your agent works and cheers when it\'s done.</string>
+    <string name="upgrade_gemmy_show">Show Gemmy</string>
+    <string name="upgrade_gemmy_float">It will float on your screens</string>
+    <string name="upgrade_gemmy_hidden">It stays hidden</string>
+    <string name="upgrade_gemmy_lets_go">Let\'s go!</string>
+    <string name="upgrade_gemmy_continue_without">Continue without Gemmy</string>
+    <string name="upgrade_gemmy_settings_hint">You can change this anytime in Settings → Appearance.</string>
+    <string name="upgrade_gemmy_dance">Dance</string>
+    <string name="upgrade_gemmy_nap">Nap</string>
+    <string name="upgrade_gemmy_hide">Hide</string>
+    <string name="upgrade_egm_guide_collapsed">Which command to use when, with examples, and what happens in a normal chat and in a Jarvis chat.</string>
+    <string name="upgrade_egm_guide_which_command">Which command?</string>
+    <string name="upgrade_egm_guide_full_when">For a new feature or a big change, where a wrong design costs a lot: several files, data formats, APIs. Uses the most tokens.</string>
+    <string name="upgrade_egm_guide_full_steps">1. The agent asks you questions until the idea is clear (brainstorm).
+2. It writes the design document, section by section, and asks for your OK on each.
+3. The reviewers attack the document; the agent fixes it or explains why a finding is wrong.
+4. You approve the design.
+5. Only then does it write the code.</string>
+    <string name="upgrade_egm_guide_full_example">/egm add offline sync for notes, with conflict handling</string>
+    <string name="upgrade_egm_guide_lite_when">For small changes: a bug fix, a refactor, a small feature, a change to a spec. Much cheaper than /egm.</string>
+    <string name="upgrade_egm_guide_lite_steps">1. The agent first points out risks and gaps in the task, then waits.
+2. Type checklist: it writes a short plan (egm_lite_checklist.md).
+3. Type goldfish: one fresh reviewer checks the plan (you can skip this).
+4. Type exec: it makes the change.
+5. Type review: one fresh reviewer checks the changes.</string>
+    <string name="upgrade_egm_guide_lite_example">/egm-lite fix the crash when the chat list is empty</string>
+    <string name="upgrade_egm_guide_review_when">When a plan or design document already exists (yours, or written in another chat) and you want it checked before anyone builds it.</string>
+    <string name="upgrade_egm_guide_review_steps">The reviewers check the document and the agent writes their findings into a report. Then you choose: the agent fixes the findings, you fix them yourself, or you stop there.</string>
+    <string name="upgrade_egm_guide_review_example">/egm-review docs/sync-design.md</string>
+    <string name="upgrade_egm_guide_normal_or_jarvis">Normal chat or Jarvis chat?</string>
+    <string name="upgrade_egm_guide_normal_chat">Normal chat (Claude Code, Codex, …): the agent does everything in that chat and runs the reviewers as its own hidden sub-agents. The simplest and lightest way. If the agent has no sub-agent tool, it stops and tells you to use a Jarvis chat.</string>
+    <string name="upgrade_egm_guide_jarvis_chat">Jarvis chat (Jarvis tab → a Jarvis chat, then type the command): Jarvis manages the run. It starts a planner chat (or plans itself, see Jarvis below) and one chat per reviewer, which you can open from the chat list. The phases show as Jarvis\' mission steps, and Jarvis asks you to approve the design. Use it to watch the reviewers, or when the agent has no sub-agent tool. Every reviewer chat is a full agent, so it needs more memory.</string>
+    <string name="upgrade_egm_guide_during">During a run</string>
+    <string name="upgrade_egm_guide_during_steps">• Answer the agent\'s questions: it asks one at a time.
+• Everything is saved as files in your project, in %1$s/&lt;topic&gt;/: the design document and every review report. Open them in Files.
+• Nothing is coded before you approve. To approve, just say so; or ask for changes, or for one more review round.
+• You can stop at any time. The files stay, and later you can check the document again with /egm-review.</string>
+    <string name="upgrade_egm_guide_tips">Tips</string>
+    <string name="upgrade_egm_guide_tip_list">• Start with Quick or Standard reviewers; Full runs eight reviewers in every round.
+• If the phone gets slow, set Reviewers at the same time to 1.
+• Write the task as you would explain it to a colleague: what, why, and any limits ("no new libraries").
+• For a change of a few lines, a plain chat is cheaper than EGM.</string>
+    <string name="upgrade_egm_guide_example">Example</string>
+    <string name="upgrade_egm_source_release_desc">EGM\'s published release, checked against its checksum. The stable choice.</string>
+    <string name="upgrade_egm_source_main_desc">EGM\'s main branch as it is now, with skills not released yet (egm-lite, as of release 0.1.1). It changes almost daily and has no checksum to check it against.</string>
+    <string name="upgrade_egm_cmd_full_desc">EGM: brainstorm → design doc → Goldfish review → your approval → code</string>
+    <string name="upgrade_egm_cmd_lite_desc">EGM lite: checklist → one Goldfish review → code → diff review</string>
+    <string name="upgrade_egm_cmd_review_desc">EGM: Goldfish review of an existing design document</string>
+    <string name="upgrade_egm_persona_zoom_out_desc">Skeptical architect: a simpler design, no extras, reuse of existing code</string>
+    <string name="upgrade_egm_persona_inventive_desc">Looks for a different approach that removes the core trade-off</string>
+    <string name="upgrade_egm_persona_comprehension_desc">Naive reader: explains the design back, flags undefined terms and gaps</string>
+    <string name="upgrade_egm_persona_design_desc">Hostile critic: architecture, failure cases, scaling and cost</string>
+    <string name="upgrade_egm_persona_structural_desc">The document\'s layout: sections, headings, missing parts</string>
+    <string name="upgrade_egm_persona_style_desc">Copy editor: clear, precise, no filler</string>
+    <string name="upgrade_egm_persona_readiness_desc">Tech lead: can the plan be built step by step without guessing</string>
+    <string name="upgrade_egm_persona_codebase_desc">Checks the plan against the real code: files, APIs, names</string>
+    <string name="upgrade_egm_elephant_planner_desc">Jarvis starts a planner chat that brainstorms, writes and fixes the design; Jarvis relays and runs the reviewers. Keeps Jarvis\' own chat light.</string>
+    <string name="upgrade_egm_elephant_jarvis_desc">Jarvis brainstorms and writes the design in its own chat and runs the reviewers. One chat less, but Jarvis\' context fills up.</string>
+    <string name="upgrade_egm_reviewers_hint">Which of EGM\'s reviewer personas look at a design (/egm and /egm-review). Each is a separate reviewer run that costs tokens. /egm-lite always uses one reviewer.</string>
+    <string name="upgrade_egm_jarvis_hint">Who is the Elephant (writes and fixes the design) when you type an EGM command in a Jarvis chat. The reviewers are always separate chats that Jarvis starts.</string>
+    <string name="upgrade_egm_lite_missing_version">Not available: EGM %1$s has no egm-lite. Install the development version (step 1) to get it now; a later EGM release will include it too.</string>
+    <string name="upgrade_egm_lite_missing">Not available: this EGM copy has no egm-lite. Install the development version (step 1) to get it now; a later EGM release will include it too.</string>
+    <string name="upgrade_egm_install_hint">Downloads EGM from GitHub (the skills, the reviewer personas and the review standards) into a folder every agent on this phone can read. Pick where it comes from:</string>
+    <string name="upgrade_egm_execution_hint">In a normal chat the agent runs the reviewers with its own subagent tool. In a Jarvis chat (Jarvis tab), Jarvis manages the run: it starts every reviewer as a separate chat, shows the phases as its mission steps and asks you to approve the design.</string>
+    <string name="upgrade_egm_instructions_hint">What each command tells the agent after the facts from this page (where EGM is, the reviewers, the limits). Edit it to change how the agent or Jarvis runs EGM.</string>
+    <string name="upgrade_egm_rules_hint">Rules for the planner and the reviewers of Jarvis runs, written by the app from this page:</string>
+    <string name="upgrade_egm_artifact_folder_hint">In the project folder; each topic gets its own folder inside. You may want to add it to .gitignore.</string>
+    <string name="upgrade_egm_source_release_label">Newest release</string>
+    <string name="upgrade_egm_source_main_label">Development version (main)</string>
+    <string name="upgrade_egm_elephant_planner_label">A separate planner chat</string>
+    <string name="upgrade_egm_elephant_jarvis_label">Jarvis itself</string>
+</resources>
