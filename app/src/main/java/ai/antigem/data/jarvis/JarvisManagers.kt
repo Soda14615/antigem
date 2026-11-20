@@ -266,7 +266,7 @@ object JarvisManagers {
     // ---- teams
 
     fun upsertTeam(key: String, team: Team) = update(key) { m ->
-        m.copy(teams = (m.teams.filter { !it.name.equals(team.name, ignoreCase = true) } + team).take(12))
+        m.copy(teams = m.teams.filter { !it.name.equals(team.name, ignoreCase = true) } + team)
     }
 
     fun removeTeam(key: String, name: String): Boolean {
