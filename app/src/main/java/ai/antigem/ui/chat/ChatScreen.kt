@@ -150,6 +150,40 @@ fun ChatScreen(
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var showPaseoTeam by remember { mutableStateOf(false) }
+    var paseoOpening by remember { mutableStateOf(false) }
+    var paseoTabId by remember { mutableStateOf<String?>(null) }
+    val openPaseoTeam: () -> Unit = {
+        if (!paseoOpening) {
+            paseoOpening = true
+            scope.launch {
+                try {
+                    val ready = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        val marker = File(LocalEnvironmentManager.getHomeDir(context), ".local/share/antigem-paseo-team/runtime-arm64-v2/.verified-install")
+                        if (!marker.isFile) false else runCatching {
+                            val connection = java.net.URL("http://127.0.0.1:6799/api/health").openConnection() as java.net.HttpURLConnection
+                            try {
+                                connection.connectTimeout = 1500
+                                connection.readTimeout = 1500
+                                connection.instanceFollowRedirects = false
+                                connection.responseCode == 200 &&
+                                    org.json.JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).optString("status") == "ok"
+                            } finally { connection.disconnect() }
+                        }.getOrDefault(false)
+                    }
+                    if (ready) {
+                        showPaseoTeam = false
+                        drawerState.close()
+                        val browser = ai.antigem.ui.browser.BrowserSessionManager.instance
+                        val existingTab = paseoTabId
+                        if (existingTab == null || !browser.switchTab(existingTab)) {
+                            paseoTabId = browser.openUrl("http://127.0.0.1:6799", newTab = true).id
+                        }
+                        onNavigateToBrowser()
+                    } else showPaseoTeam = true
+                } finally { paseoOpening = false }
+            }
+        }
+    }
     if (showPaseoTeam) {
         AlertDialog(
             onDismissRequest = { showPaseoTeam = false },
@@ -164,12 +198,7 @@ fun ChatScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    showPaseoTeam = false
-                    scope.launch { drawerState.close() }
-                    ai.antigem.ui.browser.BrowserSessionManager.instance.openUrl("http://127.0.0.1:6799", newTab = true)
-                    onNavigateToBrowser()
-                }) { Text(stringResource(R.string.paseo_team_open)) }
+                TextButton(onClick = openPaseoTeam, enabled = !paseoOpening) { Text(stringResource(R.string.paseo_team_open)) }
             },
             dismissButton = {
                 TextButton(onClick = {
@@ -1467,7 +1496,7 @@ fun ChatScreen(
                 onCancelLogin = {
                     viewModel.cancelAgyLogin()
                 },
-                onOpenPaseoTeam = if (!isInFloatingWindow) ({ showPaseoTeam = true }) else null,
+                onOpenPaseoTeam = if (!isInFloatingWindow) openPaseoTeam else null,
                 onOpenSettings = {
                     showSettingsDialog = true
                     scope.launch { drawerState.close() }
@@ -1971,6 +2000,11 @@ fun ChatScreen(
                         }
                     },
                     actions = {
+                        if (!isInFloatingWindow) {
+                            IconButton(onClick = openPaseoTeam, enabled = !paseoOpening) {
+                                Icon(Icons.Outlined.Apps, contentDescription = stringResource(R.string.paseo_team_title))
+                            }
+                        }
                         // Browser, Terminal and the IDE are in the floating switcher (always on)
                         if (isInFloatingWindow) {
                             IconButton(onClick = onMinimizeWindow) {
