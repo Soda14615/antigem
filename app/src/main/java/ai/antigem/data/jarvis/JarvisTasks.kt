@@ -590,24 +590,37 @@ object JarvisTasks {
         val graceFrom = maxOf(t.turnAt, attachedAt[t.id] ?: 0L)
         val stallMs = JarvisPreferences.stallMinutes.value * 60_000L
         val delegated = JarvisManagers.isDelegated(t.id)
-        val waitingForChildren = delegated && (ownedBy(t.id).any { it.active } || JarvisEvents.hasPendingWork(t.id))
+        val waitingForChildren = delegated && JarvisOrchestrationRules.childWorkPending(ownedBy(t.id).any { it.active }, JarvisEvents.hasPendingWork(t.id))
         val missionDone = delegated && JarvisManagers.of(t.id).mission.status == "done"
+        // Very fast turns can finish between polls. Verify a real current-turn assistant message instead of treating silence as success.
+        val timedOut = now - graceFrom > START_GRACE_MS
+        val freshReply = if (!running && !t.seenRunning && timedOut && (t.state != State.STALLED || tick % 10 == 0)) {
+            val messages = delegatedMessages(t.id) ?: runCatching { JarvisController.readChat(t.id) }.getOrDefault(emptyList())
+            val lastUser = messages.indexOfLast { it.role == MessageRole.USER }
+            val lastAssistant = messages.indexOfLast { it.role == MessageRole.ASSISTANT && it.content.isNotBlank() }
+            lastUser >= 0 && lastAssistant > lastUser && messages[lastAssistant].createdAt >= t.turnAt
+        } else false
         val next = when {
             needsApproval -> State.NEEDS_APPROVAL
             asking -> State.NEEDS_ANSWER
             running && stallMs > 0 && now - t.progressAt > stallMs -> State.STALLED
             running -> State.RUNNING
             waitingForChildren -> State.RUNNING
-            delegated && error != null -> State.FAILED
-            delegated && !missionDone -> if (t.seenRunning || now - graceFrom > START_GRACE_MS) State.STALLED else State.STARTING
-            t.seenRunning || now - graceFrom > START_GRACE_MS -> if (error != null) State.FAILED else State.DONE
+            error != null -> State.FAILED
+            JarvisOrchestrationRules.canCompleteIdle(t.seenRunning, freshReply, delegated, missionDone, waitingForChildren) -> State.DONE
+            delegated && !missionDone && t.seenRunning -> State.STALLED
+            timedOut -> State.STALLED
             else -> State.STARTING
         }
         if (next != t.state) {
             t = t.copy(state = next, updatedAt = now, reported = false, note = when (next) {
                 State.NEEDS_APPROVAL -> "Waiting for an approval"
                 State.NEEDS_ANSWER -> "Asking a question"
-                State.STALLED -> if (delegated && !running) "Manager is idle with an unfinished mission" else "No progress for ${(now - t.progressAt) / 60_000} min"
+                State.STALLED -> when {
+                    delegated && !running && !missionDone -> "Manager is idle with an unfinished mission"
+                    !running && !t.seenRunning -> "No confirmed execution or current-turn result"
+                    else -> "No progress for ${(now - t.progressAt) / 60_000} min"
+                }
                 State.RUNNING -> "Working"
                 State.DONE -> "Finished"
                 State.FAILED -> "Failed: ${error.orEmpty().take(80)}"
@@ -652,8 +665,8 @@ object JarvisTasks {
         val list = _tasks.value
         val changed = list.firstOrNull { it.id == task.id } != task
         val ordered = (listOf(task) + list.filter { it.id != task.id }).sortedByDescending { it.createdAt }
-        val retainedFinished = ordered.filterNot { it.active }.take(KEEP_FINISHED).mapTo(HashSet()) { it.id }
-        _tasks.value = ordered.filter { it.active || it.id in retainedFinished || JarvisManagers.isDelegated(it.id) || JarvisManagers.isDelegated(it.owner) }
+        _tasks.value = JarvisOrchestrationRules.retain(ordered, KEEP_FINISHED, { it.active },
+            { JarvisManagers.isDelegated(it.id) || JarvisManagers.isDelegated(it.owner) })
         _anyActive.value = _tasks.value.any { it.active }
         if (changed) save()
     }
