@@ -153,6 +153,12 @@ class LocalPtySession(
             LocalEnvironmentManager.ensureClaudeWrapper(context)
             LocalEnvironmentManager.ensureTermuxApiDispatcher(context)
             TermuxRelocation.ensurePackageHooks(context)
+            // Install only the lightweight launcher; users explicitly opt in to npm installation.
+            runCatching {
+                val script = context.assets.open("bin/paseo-team").bufferedReader(Charsets.UTF_8).use { it.readText() }
+                TermuxRelocation.writeIfChanged(File(bin, "paseo-team"),
+                    script.replaceFirst("#!/usr/bin/env bash", "#!${File(bin, "bash").absolutePath}"), executable = true)
+            }.onFailure { Log.w("LocalTerminalManager", "Could not install optional Paseo team launcher", it) }
 
             val loginShellBinaries = arrayOf("login", "bash", "zsh", "fish", "sh")
 
