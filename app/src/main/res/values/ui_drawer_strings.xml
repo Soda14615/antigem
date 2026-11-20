@@ -79,4 +79,9 @@
     <string name="profile_detail_dialog_subscription">"Subscription"</string>
     <string name="profile_detail_dialog_manage_upgrade_plan">"Manage / Upgrade Plan"</string>
     <string name="profile_detail_dialog_sign_out">"Sign Out"</string>
+    <string name="paseo_team_title">Paseo Team</string>
+    <string name="paseo_team_setup">For first-time setup, run these commands in the local AntiGem terminal. Paseo uses its own service and sessions; Jarvis is unchanged.</string>
+    <string name="paseo_team_stop_hint">To stop the service without stopping Jarvis, run paseo-team stop. Open the team only after its service is ready.</string>
+    <string name="paseo_team_open">Open team</string>
+    <string name="paseo_team_terminal">Local terminal</string>
 </resources>
