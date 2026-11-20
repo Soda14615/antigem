@@ -158,7 +158,7 @@ fun ChatScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(stringResource(R.string.paseo_team_setup))
                     SelectionContainer {
-                        Text("paseo-team install\npaseo-team start\npaseo-team status", fontFamily = FontFamily.Monospace)
+                        Text("paseo-team install\npaseo-team password\npaseo-team start", fontFamily = FontFamily.Monospace)
                     }
                     Text(stringResource(R.string.paseo_team_stop_hint))
                 }
