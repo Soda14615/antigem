@@ -148,6 +148,7 @@ fun ChatScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var showPaseoTeam by remember { mutableStateOf(false) }
     if (showPaseoTeam) {
         AlertDialog(
@@ -165,6 +166,7 @@ fun ChatScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showPaseoTeam = false
+                    scope.launch { drawerState.close() }
                     ai.antigem.ui.browser.BrowserSessionManager.instance.openUrl("http://127.0.0.1:6799", newTab = true)
                     onNavigateToBrowser()
                 }) { Text(stringResource(R.string.paseo_team_open)) }
@@ -172,12 +174,12 @@ fun ChatScreen(
             dismissButton = {
                 TextButton(onClick = {
                     showPaseoTeam = false
+                    scope.launch { drawerState.close() }
                     onNavigateToTerminal()
                 }) { Text(stringResource(R.string.paseo_team_terminal)) }
             }
         )
     }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // The sidebar is 82% of the screen width, so turning the phone (e.g. a landscape full-screen video)
     // changes its width; the drawer then moves to whichever position is nearest and can open by itself.
     // Remember where it was before the width changed and put it back once the new layout is in.
