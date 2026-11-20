@@ -64,8 +64,8 @@ const copied = createRequire(path.join(temp, "worker.cjs"))("node-pty");
 function probe(module, label) {
   return new Promise((resolve, reject) => {
     let output = "";
-const shell = path.join(process.env.PREFIX || "/usr", "bin", "bash");
-const child = module.spawn(shell, ["-c", "printf PASEO_PTY_OK"], { name: "xterm", cols: 80, rows: 24, cwd: process.env.HOME, env: process.env });
+    const shell = path.join(process.env.PREFIX || "/usr", "bin", "bash");
+    const child = module.spawn(shell, ["-c", "printf PASEO_PTY_OK"], { name: "xterm", cols: 80, rows: 24, cwd: process.env.HOME, env: process.env });
     const timer = setTimeout(() => { child.kill(); reject(Error(label + " PTY timed out")); }, 10000);
     child.onData(data => { output += data; });
     child.onExit(({ exitCode }) => {
@@ -161,7 +161,10 @@ const base = "http://127.0.0.1:" + process.argv[2];
   if (!web.ok || !(web.headers.get("content-type") || "").includes("text/html") || !/<html[\s>]/i.test(await web.text())) throw Error("Paseo Web UI is not available");
   const anonymous = await fetch(base + "/api/status", { redirect: "error", signal: AbortSignal.timeout(5000) });
   if (anonymous.status !== 401) throw Error("Paseo status endpoint did not require authentication: " + anonymous.status);
-  console.log("HTTP health, Web UI and unauthenticated rejection passed");
+  if (!process.env.PASEO_PASSWORD) throw Error("Paseo password required for verification");
+ const authenticated = await fetch(base + "/api/status", { headers:{Authorization:"Bearer "+process.env.PASEO_PASSWORD}, redirect:"error", signal:AbortSignal.timeout(5000) });
+ if (!authenticated.ok) throw Error("Paseo HTTP authentication failed: " + authenticated.status);
+ console.log("HTTP health, Web UI and authentication passed");
 })().catch(error => { console.error(error); process.exitCode = 1; });
 JS
     current="$(run_paseo daemon status --home "$team_home")"

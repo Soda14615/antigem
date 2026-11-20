@@ -106,3 +106,51 @@ jobs:
             app/build/reports/tests/testDebugUnitTest/
           if-no-files-found: warn
           retention-days: 7
+
+  paseo-runtime:
+    name: Paseo upstream runtime (Linux)
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check scripts
+        run: |
+          bash -n scripts/paseo-team.sh
+          bash -n scripts/paseo-runtime-smoke.sh
+      - name: Install and run real Paseo daemon and terminal worker
+        run: bash scripts/paseo-runtime-smoke.sh
+
+  paseo-android-package:
+    name: Android ARM64 npm package audit (not device execution)
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Inspect actual Android PTY package and resolve Android npm dependency graph
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          paseo_version="$(sed -n 's/^version=//p' scripts/paseo-team.sh)"
+          pty_version="$(sed -n 's/^pty_version=//p' scripts/paseo-team.sh)"
+          cd "$work"
+          npm view "@getpaseo/cli@$paseo_version" version
+          pkg="$(npm pack "@mmmbuto/node-pty-android-arm64@$pty_version" --silent)"
+          tar -xzf "$pkg"
+          node -e 'const p=require("./package/package.json"); console.log(JSON.stringify({name:p.name,version:p.version,os:p.os,cpu:p.cpu,main:p.main,dependencies:p.dependencies,scripts:p.scripts},null,2))'
+          test -d package/lib
+          test -d package/build/Release || test -d package/prebuilds/android-arm64
+          find package -name '*.node' -exec file {} \; | tee native.txt
+          grep -E 'ARM aarch64|ARM64|AArch64' native.txt
+          node -e 'const fs=require("fs"); fs.writeFileSync("package.json",JSON.stringify({name:"paseo-android-audit",private:true,dependencies:{"@getpaseo/cli":process.argv[1]},overrides:{"node-pty":"npm:@mmmbuto/node-pty-android-arm64@"+process.argv[2]}}))' "$paseo_version" "$pty_version"
+          # Metadata resolution only: this Linux runner cannot execute Android Bionic addons.
+          npm install --package-lock-only --ignore-scripts --os=android --cpu=arm64 --no-audit --no-fund
+          node -e 'const p=require("./package-lock.json").packages; const nodes=Object.entries(p).filter(([k])=>k.endsWith("/node-pty")); if(!nodes.length||nodes.some(([k,v])=>v.name!=="@mmmbuto/node-pty-android-arm64")) throw Error("Android override not resolved: "+JSON.stringify(nodes)); console.log(nodes.map(([k,v])=>[k,v.name,v.version]))'

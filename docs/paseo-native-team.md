@@ -9,7 +9,7 @@
 - 本地监听：127.0.0.1:6799；Relay 默认关闭；正常启动入口要求先通过原版 CLI 设置访问密码
 - 初次启动启用原版编排工具注入与原版 Web UI，关闭口述和语音模式（不替换语音依赖、不跳过 npm 安装脚本）；已有配置不覆盖
 - 只有用户执行 install 才联网安装依赖；APK 只打包轻量 Bash 启动器
-- 试验目标版本：0.17.0-beta.1（与审核时上游源码一致）；npm 发布可用性尚未核验
+- 试验目标版本：0.17.0-beta.1（与审核时上游源码一致）；npm 发布可用性由独立 CI 实际检查
 
 ## 使用
 
@@ -22,6 +22,7 @@ paseo-team install
 paseo-team password
 paseo-team start
 paseo-team status
+paseo-team verify
 paseo-team check
 paseo-team url
 paseo-team cli --help
@@ -48,6 +49,6 @@ paseo-team stop
 4. 验证 Jarvis 独立启动任务，双方不能互相接管会话；检查并发 CLI、MCP、工作目录、手机休眠与额度。
 5. 用用户原有岗位配置做导入兼容测试。未通过以上步骤前，不宣称具备完整手机团队运行能力。
 
-本分支提供原版运行入口、APK 打包接线及侧栏入口。最新脚本 Git Blob 841563c6ed9d640f3abde53c82fa0c7208e8a3fc 已在本地逐字核验。Bash 语法、4 个内嵌 JS 语法、help/url、缺失安装拒绝启动，以及真实 npm 安装失败不生成 .verified-install 检查通过。npm registry 实际返回 EAI_AGAIN，尚未取得 Paseo 安装、Android PTY、APK 编译、认证 UI 或真 Agent 运行成功证据。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
+本分支提供独立原版运行入口、APK 打包接线及侧栏入口。ARM64 调试 APK 已成功构建；对照测试证明原有 11 项失败中的两项已修正，九项缺失 Codex 记录仍需恢复。新增独立 CI：真实 Linux 安装、认证、Web UI、实际 terminal worker 回显；Android ARM64 npm 包和依赖图审计只检查发布文件与解析，不等同于 Android 执行。install 检查原模块与模拟上游 worker 复制后的模块；真机运行 install/check/verify 才能确认手机运行层。验证状态以真实 CI 和设备日志为准。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
 
 聊天入口只复用原版完整 Web UI，并非把 Paseo 会话混入 Jarvis/AntiGem 原生对话列表。需验证在 WebView 内创建和编辑 profile、创建总控、选择模型、发送和追问、查看真实子 Agent 结果、修改运行配置及停止任务。上游 Agent 配置文档与实现支持这些操作，但 Android 端尚未验收。不要以页面成功加载当作功能通过。
