@@ -46,7 +46,9 @@ object JarvisManagers {
         val model: String = "",
         /** What this team does and how (sent hidden with every task the team gets). */
         val role: String = "",
-        val project: String = ""
+        val project: String = "",
+        /** Provider-native thinking level; blank uses the model default. */
+        val effort: String = ""
     )
 
     data class Manager(
@@ -364,7 +366,7 @@ object JarvisManagers {
                 })
                 put("teams", JSONArray().apply {
                     m.teams.forEach { t ->
-                        put(JSONObject().put("name", t.name).put("agent", t.agent.name).put("model", t.model).put("role", t.role).put("project", t.project))
+                        put(JSONObject().put("name", t.name).put("agent", t.agent.name).put("model", t.model).put("role", t.role).put("project", t.project).put("effort", t.effort))
                     }
                 })
             })
@@ -388,7 +390,7 @@ object JarvisManagers {
                 (0 until a.length()).mapNotNull { j ->
                     val t = a.getJSONObject(j)
                     val agent = runCatching { AgentKind.valueOf(t.optString("agent")) }.getOrNull() ?: return@mapNotNull null
-                    Team(t.optString("name"), agent, t.optString("model"), t.optString("role"), t.optString("project"))
+                    Team(t.optString("name"), agent, t.optString("model"), t.optString("role"), t.optString("project"), t.optString("effort"))
                 }
             }.orEmpty()
             out[key] = Manager(
