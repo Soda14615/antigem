@@ -297,7 +297,7 @@ class ClaudeChatBackend(
         if (content.isBlank() && atts.isEmpty()) return
         val conv = store.currentConversation.value ?: return
         if (conv.agent != AgentKind.CLAUDE) return
-        if (ClaudeTranscript.isSubagentId(conv.id)) { _controlMessages.tryEmit("A subagent chat can only be read"); return }
+        if (ClaudeTranscript.isSubagentId(conv.id)) { _controlMessages.tryEmit("子智能体聊天只能查看"); return }
         store.attachments.value = emptyList()
         sendPrompt(conv, content.trim(), atts)
     }
@@ -433,7 +433,7 @@ class ClaudeChatBackend(
                     withContext(Dispatchers.Main) { selectConversation(newId) }
                     refreshSessions()
                 }
-                .onFailure { _controlMessages.tryEmit("Cannot fork this chat: ${it.message}") }
+                .onFailure { _controlMessages.tryEmit("无法分叉此聊天：${it.message}") }
         }
     }
 
@@ -569,7 +569,7 @@ class ClaudeChatBackend(
             // provider with other limits needs a new process (the chat is resumed, nothing is lost)
             val p = _providers.value.find { it.id == sameProvider }
             if (p != null && p.limitsOf(rawModel(modelId)) != p.limitsOf(rawModel(previous))) {
-                _controlMessages.tryEmit("${modelLabel(modelId)} has other limits: the chat restarts to apply them")
+                _controlMessages.tryEmit("${modelLabel(modelId)} 有不同的限制：聊天将重新启动以应用这些限制")
                 switchProvider(modelId)
                 return
             }
@@ -583,7 +583,7 @@ class ClaudeChatBackend(
             // a provider's process knows its models by their own id
             live = ClaudeControlRequestBody(subtype = "set_model", model = rawModel(modelId)),
             spawn = BridgeConfigFrame(model = modelId),
-            what = "model",
+            what = "模型",
             revert = { setSelectedModel(previous) },
             // the bridge remembers the chat's model for its next start (a reopened chat stays on the provider)
             configureLive = true
@@ -624,7 +624,7 @@ class ClaudeChatBackend(
         if (providerOf(modelId).isNotEmpty()) _effort.value = null
         if (_isTurnActive.value) {
             queuedRestart = modelId
-            _controlMessages.tryEmit("Switches to ${modelLabel(modelId)} after this reply")
+            _controlMessages.tryEmit("本条回复后切换到 ${modelLabel(modelId)}")
             return
         }
         restartOn(modelId)
@@ -654,7 +654,7 @@ class ClaudeChatBackend(
                 settings = buildJsonObject { put("effortLevel", level?.let { JsonPrimitive(it) } ?: kotlinx.serialization.json.JsonNull) }
             ),
             spawn = BridgeConfigFrame(effort = level ?: "default"),
-            what = "effort",
+            what = "推理强度",
             revert = { _effort.value = previous }
         )
     }
@@ -674,7 +674,7 @@ class ClaudeChatBackend(
                 thinking_display = if (enabled) "summarized" else null
             ),
             spawn = BridgeConfigFrame(thinking = if (enabled) "on" else "off"),
-            what = "thinking",
+            what = "思考",
             revert = { _thinkingEnabled.value = previous }
         )
     }
@@ -687,7 +687,7 @@ class ClaudeChatBackend(
         applyControl(
             live = ClaudeControlRequestBody(subtype = "set_permission_mode", mode = mode),
             spawn = BridgeConfigFrame(permission_mode = mode),
-            what = "mode",
+            what = "模式",
             revert = { _permissionMode.value = previous }
         )
     }
@@ -710,10 +710,10 @@ class ClaudeChatBackend(
             if (!processLive || live == null) return@launch
             val reply = request(live, timeoutMs = 15_000)
             when {
-                reply == null -> _controlMessages.tryEmit("Claude Code did not confirm the $what change")
+                reply == null -> _controlMessages.tryEmit("Claude Code 未确认${what}变更")
                 reply.subtype == "error" -> {
                     revert()
-                    _controlMessages.tryEmit("Claude Code refused the $what change: ${reply.error ?: "unknown error"}")
+                    _controlMessages.tryEmit("Claude Code 拒绝了${what}变更：${reply.error ?: "未知错误"}")
                 }
                 else -> syncApplied()
             }
@@ -821,7 +821,7 @@ class ClaudeChatBackend(
         val res = client.rewind(id, userUuid).mapCatching { if (!it.success) error(it.error ?: "the bridge refused") }
         if (res.isFailure) {
             _isLoadingConversation.value = false
-            _controlMessages.tryEmit("Cannot edit this message: ${res.exceptionOrNull()?.message}")
+            _controlMessages.tryEmit("无法编辑此消息：${res.exceptionOrNull()?.message}")
             return false
         }
         if (store.currentConversation.value?.id != id) return false
@@ -1058,7 +1058,7 @@ class ClaudeChatBackend(
 
     fun deleteProvider(id: String) {
         backendScope.launch {
-            client.deleteProvider(id).onFailure { _controlMessages.tryEmit("Cannot remove the provider: ${it.message}") }
+            client.deleteProvider(id).onFailure { _controlMessages.tryEmit("无法移除此提供商：${it.message}") }
             refreshProviders()
         }
     }
@@ -1292,7 +1292,7 @@ class ClaudeChatBackend(
         if (attachedId != id) return
         if (ClaudeTranscript.isSubagentId(id)) {
             res.onSuccess { h -> showSubagent(id, h) }
-                .onFailure { _isLoadingConversation.value = false; _conversationError.value = "Cannot load the subagent: ${it.message}" }
+                .onFailure { _isLoadingConversation.value = false; _conversationError.value = "无法加载子智能体：${it.message}" }
             return
         }
         res.onSuccess { h ->
@@ -1333,7 +1333,7 @@ class ClaudeChatBackend(
                 return
             }
             _isLoadingConversation.value = false
-            _conversationError.value = "Cannot load Claude chat: ${it.message}"
+            _conversationError.value = "无法加载 Claude 聊天：${it.message}"
         }
     }
 

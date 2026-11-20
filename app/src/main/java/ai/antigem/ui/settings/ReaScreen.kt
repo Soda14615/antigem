@@ -103,7 +103,7 @@ fun ReaScreen(
             return@Column
         }
         if (!state.bootstrapInstalled) {
-            InfoCard("Install the terminal first", cardBg, cardBorder) {
+            InfoCard("先安装终端", cardBg, cardBorder) {
                 Hint(stringResource(R.string.rea_screen_rea_installs_into_antigem_s_terminal_install))
             }
             return@Column
@@ -191,10 +191,10 @@ fun ReaScreen(
         SkillPluginCard(state, busy, cardBg, cardBorder, onOpenPlugins)
 
         // Optional: adb to this phone, for REA's device tools
-        InfoCard("Phone access (optional)", cardBg, cardBorder, pill = if (adb.connectedDevice != null) "Connected" to QuotaGreen else "Optional" to MaterialTheme.colorScheme.primary) {
+        InfoCard("手机访问（可选）", cardBg, cardBorder, pill = if (adb.connectedDevice != null) "已连接" to QuotaGreen else "可选" to MaterialTheme.colorScheme.primary) {
             Hint(stringResource(R.string.rea_screen_rea_s_phone_tools_installed_apps_pulling))
             val device = adb.connectedDevice
-            if (device != null) Mono("adb connected: ${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_dev_screen_set_up_adb_connect)) }
+            if (device != null) Mono("adb 已连接：${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_dev_screen_set_up_adb_connect)) }
         }
 
         WebsitesCard(state, cardBg, cardBorder)
@@ -438,12 +438,12 @@ private fun ConnectGuide(state: ReaManager.State) {
     if (!state.usable) Hint(stringResource(R.string.rea_screen_install_rea_and_the_mcp_launcher_above))
     Text(stringResource(R.string.rea_screen_the_preset_asks_how_the_agent_should), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     Text(
-        "On demand (recommended): the agent gets 4 small tools. It lists REA's tools by name, reads the ones it needs and runs them; tools that change things run through their own tool. " +
-            "≈${formatTokens(onDemand ?: 700)} tokens per request, however many tools you allow.",
+        "按需（推荐）：智能体获得 4 个小工具。它会按名称列出 REA 的工具，读取需要的那些再运行；会改动内容的工具通过各自的专用工具执行。" +
+            "无论你允许多少工具，每个请求约 ${formatTokens(onDemand ?: 700)} 个 token。",
         fontSize = 12.sp
     )
     Text(
-        "Directly: every allowed tool is a normal MCP tool, so there is no lookup step, but each is sent with every request: " +
+        "直接：每个允许的工具都是普通 MCP 工具，无需查找步骤，但每个请求都会携带全部工具：" +
             (directDefault?.let { "≈${formatTokens(it)} tokens for the default groups" } ?: "≈24k tokens for the default groups") +
             (directAll?.let { ", ≈${formatTokens(it)} for all of REA." } ?: ", ≈75k for all of REA."),
         fontSize = 12.sp
@@ -464,8 +464,8 @@ private fun SkillPluginCard(
     onOpenPlugins: () -> Unit
 ) {
     InfoCard(
-        "REA skill for agents (optional)", cardBg, cardBorder,
-        pill = if (state.pluginInstalled) "v${state.pluginVersion ?: "?"}" to QuotaGreen else "Optional" to MaterialTheme.colorScheme.primary
+        "供智能体使用的 REA 技能（可选）", cardBg, cardBorder,
+        pill = if (state.pluginInstalled) "v${state.pluginVersion ?: "?"}" to QuotaGreen else "可选" to MaterialTheme.colorScheme.primary
     ) {
         Hint(stringResource(R.string.rea_screen_a_skills_only_plugin_from_the_antigem))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -728,19 +728,19 @@ internal fun ReaServerDialog(
                 ModeCard(
                     selected = mode == ReaManager.Mode.ON_DEMAND,
                     title = stringResource(R.string.rea_screen_on_demand),
-                    badge = "Recommended",
+                    badge = "推荐",
                     cost = tk(onDemandTokens),
-                    text = "The agent gets 4 small tools: it lists REA's tools by name, reads the details of the ones it needs, then runs them. " +
-                        "The context stays small however many tools you allow. The first time it uses a tool takes 1–2 extra steps. " +
-                        "Tools that change things (installing apps, debuggers, Frida…) run through their own tool, so you can approve them separately."
+                    text = "智能体获得 4 个小工具：按名称列出 REA 的工具，读取需要的详情，然后运行。" +
+                        "无论允许多少工具，上下文都很小。首次使用某个工具会多花 1–2 步。" +
+                        "会改动内容的工具（安装应用、调试器、Frida……）通过各自的专用工具执行，因此可以单独审批。"
                 ) { mode = ReaManager.Mode.ON_DEMAND }
                 ModeCard(
                     selected = mode == ReaManager.Mode.DIRECT,
                     title = stringResource(R.string.rea_screen_directly),
                     badge = null,
                     cost = tk(directTokens),
-                    text = "Every allowed tool is a normal MCP tool, so the agent uses it straight away. But every tool's description is sent with every request: " +
-                        "allow only a few groups (the default five cost about 24k tokens; all of REA about 75k)."
+                    text = "每个允许的工具都是普通 MCP 工具，智能体可直接使用。但每个请求都会携带所有工具的描述：" +
+                        "建议只允许少数几个组（默认五组约 24k token；REA 全部约 75k）。"
                 ) { mode = ReaManager.Mode.DIRECT }
 
                 Text(stringResource(R.string.rea_screen_tools_the_agent_may_use), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)

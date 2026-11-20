@@ -242,7 +242,7 @@ fun CodexControlsStrip(backend: CodexChatBackend) {
                 onClick = { backend.setPlanMode(!plan) }
             )
             if (efforts.isNotEmpty()) ControlChip(
-                text = "Reasoning: " + codexEffortLabel(effort),
+                text = "推理：" + codexEffortLabel(effort),
                 icon = Icons.Outlined.Psychology,
                 color = CodexAccent,
                 highlighted = effort == "high" || effort == "xhigh" || effort == "max" || effort == "ultra",

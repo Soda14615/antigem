@@ -12,7 +12,7 @@
     <string name="agy_voice_call_ui_browse_voices">"浏览声音"</string>
     <string name="agy_voice_call_ui_tap_a_voice_to_hear_it_then">"点击一个语音即可听到它，然后将呼叫切换到该语音。"</string>
     <string name="agy_voice_call_ui_tap_a_voice_to_hear_it">"点击一个声音即可听到它。"</string>
-    <string name="agy_voice_call_ui_playing">"演奏"</string>
+    <string name="agy_voice_call_ui_playing">"正在播放"</string>
     <string name="agy_voice_call_ui_in_use_now">"现已使用中"</string>
     <string name="agy_voice_call_ui_language">"语言"</string>
     <string name="agy_voice_call_ui_the_language_the_voice_talks_in_phone">"语音通话所用的语言。电话语言使用你电话的语言列表。"</string>
@@ -22,7 +22,7 @@
     <string name="agy_voice_call_ui_use">"使用 %1$s"</string>
     <string name="agy_voice_picker_choose_a_voice">"选择声音"</string>
     <string name="agy_voice_picker_playing">"正在播放…"</string>
-    <string name="agy_voice_picker_play_again">"再玩一次"</string>
+    <string name="agy_voice_picker_play_again">"再次播放"</string>
     <string name="agy_voice_picker_previous_voice">"上一个声音"</string>
     <string name="agy_voice_picker_next_voice">"下一个声音"</string>
     <string name="agy_voice_transcript_voice_transcript">"语音转录"</string>

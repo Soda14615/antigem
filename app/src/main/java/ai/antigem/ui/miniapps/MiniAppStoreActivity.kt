@@ -193,8 +193,8 @@ private fun StoreScreen(catalogUrl: String, onBack: () -> Unit) {
             onDismissRequest = { replace = null },
             title = { Text(stringResource(R.string.mini_app_store_activity_replace_the_development_copy)) },
             text = {
-                Text("~/mini-apps/$folder has the same id (${e.id}), so the published ${e.name} can't be installed next to it. " +
-                    "Delete that folder and its data, then install the published app?")
+                Text("~/mini-apps/$folder 具有相同的 ID（${e.id}），因此已发布的 ${e.name} 无法与它并存安装。" +
+                    "要删除该文件夹及其数据，然后安装已发布的应用吗？")
             },
             confirmButton = {
                 TextButton(onClick = {

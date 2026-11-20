@@ -289,8 +289,8 @@ fun TypedConfirmDialog(app: MiniApp, name: String, onResult: (Boolean) -> Unit) 
         text = {
             Column {
                 Text(
-                    "${app.name} could $access $scope: $what, and could send them anywhere it can reach. " +
-                        "A mistake or a bad app can delete or leak them. Only continue if you trust this app completely.",
+                    "${app.name} 可以 $access $scope：$what，并可将它们发送到它能访问的任何地方。" +
+                        "一次失误或恶意应用都可能删除或泄露这些数据。只有完全信任此应用时才继续。",
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(stringResource(R.string.mini_app_ui_type_to_confirm, MiniAppPermissions.DANGER_PHRASE.toString()), style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
@@ -448,13 +448,13 @@ fun AppInfoSheet(app: MiniApp, onDismiss: () -> Unit, onClearData: () -> Unit) {
             BackgroundSection(app, tick) { tick++ }
 
             Text(stringResource(R.string.mini_app_ui_storage), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 20.dp, bottom = 4.dp))
-            Text((if (app.signed) "Code: installed by AntiGem (read-only, checked against its signature)" else "Code: ~/mini-apps/${app.folder.name}") + "\nData: ~/.antigem/mini-apps/${app.id}",
+            Text((if (app.signed) "代码：由 AntiGem 安装（只读，已按签名校验）" else "代码：~/mini-apps/${app.folder.name}") + "\n数据：~/.antigem/mini-apps/${app.id}",
                 style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
             app.sharedId?.let { sid ->
                 val group = remember(app) { MiniApps.sharedGroup(context, app, fresh = true) }
                 Text(
-                    "Shared data (\"$sid\"): " + if (group.isEmpty()) "no other app in this group yet" else
-                        group.joinToString { it.name } + if (app.signed) ", same developer: each can read and change the other's files" else ", development apps",
+                    "共享数据（“$sid”）：" + if (group.isEmpty()) "此组中还没有其他应用" else
+                        group.joinToString { it.name } + if (app.signed) "，同一开发者：彼此可以读取和修改对方的文件" else "，开发版应用",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 6.dp),
                 )
             }
@@ -617,9 +617,9 @@ private fun McpTypedConfirmDialog(app: MiniApp, name: String, onResult: (Boolean
         text = {
             Column {
                 Text(
-                    "Through $server an app can run commands, tap and type on your phone, or read and act in the browser, depending on the tool. " +
-                        "A mistake or a bad app can delete things, send messages or leak what's on screen. Only continue if you trust this app completely. " +
-                        "By default AntiGem still asks you before each call (App info → Ask before each call).",
+                    "通过 $server，应用可以执行命令、在你的手机上点击和输入，或在浏览器中读取和操作，具体取决于所用工具。" +
+                        "一次失误或恶意应用都可能删除内容、发送消息或泄露屏幕上的信息。只有完全信任此应用时才继续。" +
+                        "默认情况下，AntiGem 每次调用前仍会询问你（应用信息 → 每次调用前询问）。",
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(stringResource(R.string.mini_app_ui_type_to_confirm, MiniAppPermissions.DANGER_PHRASE.toString()), style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))

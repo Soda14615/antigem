@@ -263,7 +263,7 @@ object JarvisController {
     fun setEnabled(on: Boolean) {
         JarvisPreferences.enabled.set(on)
         if (on && JarvisPreferences.voiceAssistant.value && JarvisPreferences.agentKind == null) {
-            showNotice("Pick the agent Jarvis talks to (Claude Code, Antigravity, OpenCode or Codex): tap here.", "agent")
+            showNotice("选择 Jarvis 对话的智能体（Claude Code、Antigravity、OpenCode 或 Codex）：点按此处。", "agent")
         }
         if (!on) {
             setHandsFree(false)
@@ -280,7 +280,7 @@ object JarvisController {
         JarvisPreferences.voiceAssistant.set(on)
         if (on) {
             if (JarvisPreferences.enabled.value && JarvisPreferences.agentKind == null) {
-                showNotice("Pick the agent the voice Jarvis talks to (Claude Code, Antigravity, OpenCode or Codex): tap here.", "agent")
+                showNotice("选择语音 Jarvis 对话的智能体（Claude Code、Antigravity、OpenCode 或 Codex）：点按此处。", "agent")
             }
             return
         }
@@ -297,7 +297,7 @@ object JarvisController {
         val target = on && JarvisPreferences.enabled.value && JarvisPreferences.voiceAssistant.value
         JarvisPreferences.handsFree.set(target)
         if (target) {
-            if (!hasMic()) { showNotice("Allow the microphone first.", "mic"); JarvisPreferences.handsFree.set(false); return }
+            if (!hasMic()) { showNotice("请先允许使用麦克风。", "mic"); JarvisPreferences.handsFree.set(false); return }
             JarvisService.start(app)
         } else {
             stopWake()
@@ -472,14 +472,14 @@ object JarvisController {
         val n = call.name.lowercase()
         return when {
             n.contains("jarvis") -> null
-            n == "toolsearch" -> "Loading my tools"
-            n.startsWith("mcp__") -> "Using ${n.removePrefix("mcp__").substringBefore("__").replace('_', ' ')}"
-            n == "bash" || n == "shell" || n.contains("terminal") || n.contains("command") -> "Running ${call.command.trim().take(32).ifBlank { "a command" }}"
-            n.contains("read") || n.contains("view") -> "Reading a file"
-            n.contains("write") || n.contains("edit") -> "Editing a file"
-            n.contains("grep") || n.contains("glob") || n.contains("find") || n.contains("search") && !n.contains("web") -> "Searching the code"
-            n.contains("web") -> "Looking it up online"
-            else -> "Working on it"
+            n == "toolsearch" -> "正在加载我的工具"
+            n.startsWith("mcp__") -> "正在使用 ${n.removePrefix("mcp__").substringBefore("__").replace('_', ' ')}"
+            n == "bash" || n == "shell" || n.contains("terminal") || n.contains("command") -> "正在运行 ${call.command.trim().take(32).ifBlank { "一条命令" }}"
+            n.contains("read") || n.contains("view") -> "正在读取文件"
+            n.contains("write") || n.contains("edit") -> "正在编辑文件"
+            n.contains("grep") || n.contains("glob") || n.contains("find") || n.contains("search") && !n.contains("web") -> "正在搜索代码"
+            n.contains("web") -> "正在网上查找"
+            else -> "正在处理"
         }
     }
 
@@ -537,9 +537,9 @@ object JarvisController {
             if (text.isBlank()) {
                 // the turn ended with an error and no words: one plain sentence, never the error card itself
                 val err = reply.error ?: return@launch
-                showNotice("Jarvis' agent stopped with an error: ${err.take(160)}")
+                showNotice("Jarvis 的智能体因错误停止：${err.take(160)}")
                 addLog("Jarvis", "Error: ${err.take(160)}")
-                speakOut("Sorry, I ran into a problem. " + firstSentence(err, 120))
+                speakOut("抱歉，我遇到了一个问题。" + firstSentence(err, 120))
                 return@launch
             }
             // only the words it wrote for the user: never its thinking, tool markers or markdown
@@ -558,12 +558,12 @@ object JarvisController {
         AgentKind.AGY -> "Antigravity"
         AgentKind.OPENCODE -> "OpenCode"
         AgentKind.CODEX -> "Codex"
-        null -> "the agent"
+        null -> "该智能体"
     }
 
     private suspend fun onMcpMissing() {
         _mcpProblem.value = true
-        showNotice("Jarvis' app tools (jarvis_mcp) are not connected to ${agentLabel()}. Tap to open the setup and add the Jarvis MCP server.", "setup")
+        showNotice("Jarvis 的应用工具（jarvis_mcp）未连接到${agentLabel()}。点按打开初始设置并添加 Jarvis MCP 服务器。", "setup")
         addLog("Jarvis", "My app tools aren't connected.")
         speakOut("My app tools aren't connected yet, so I can't do that. Open Settings, then Jarvis, and add the Jarvis MCP server.")
     }
@@ -823,8 +823,8 @@ object JarvisController {
             if (_timers.value.any { it.id == item.id }) {
                 _timers.value = _timers.value.filter { it.id != item.id }
                 cue(1)
-                postStatus("Timer done${if (item.label.isNotBlank()) ": ${item.label}" else ""}", explicit = false)
-                speakOut("Your ${item.label.ifBlank { "timer" }} is done.")
+                postStatus("计时结束${if (item.label.isNotBlank()) "：${item.label}" else ""}", explicit = false)
+                speakOut("你的${item.label.ifBlank { "计时器" }}已完成。")
             }
         }
         return item
@@ -869,7 +869,7 @@ object JarvisController {
             return false
         }
         if (listening.value) return true
-        if (!hasMic()) { showNotice("Allow the microphone first.", "mic"); return false }
+        if (!hasMic()) { showNotice("请先允许使用麦克风。", "mic"); return false }
         JarvisVoice.stop()
         quietUntil = 0L
         stopWake()
@@ -1418,7 +1418,7 @@ object JarvisController {
                     // "smart": only the user's own interrupt phrases ("wait…", "actually…") cut in
                     val interrupt = mode == "interrupt" || (mode == "smart" && JarvisPhrases.startsWithAny(m.text.trim(), JarvisPreferences.interruptPhrases.value))
                     if (interrupt) {
-                        postStatus("Switching to your new request", explicit = false)
+                        postStatus("正在切换到你的新请求", explicit = false)
                         stopChat(JarvisPreferences.currentChatId.value)
                         var w = 0
                         while (computeBusy() && w < 20) { delay(400); w++ }
@@ -1841,9 +1841,9 @@ object JarvisController {
                 }
                 "Stopped."
             }
-            AgentKind.AGY -> hub.cancelCascadeInvocation(id).fold({ "Stopped." }, { "Could not stop: ${it.message}" })
-            AgentKind.OPENCODE -> vm.openCodeBackend.interrupt(id).fold({ "Stopped." }, { "Could not stop: ${it.message}" })
-            AgentKind.CODEX -> vm.codexBackend.interrupt(id).fold({ "Stopped." }, { "Could not stop: ${it.message}" })
+            AgentKind.AGY -> hub.cancelCascadeInvocation(id).fold({ "已停止。" }, { "无法停止：${it.message}" })
+            AgentKind.OPENCODE -> vm.openCodeBackend.interrupt(id).fold({ "已停止。" }, { "无法停止：${it.message}" })
+            AgentKind.CODEX -> vm.codexBackend.interrupt(id).fold({ "已停止。" }, { "无法停止：${it.message}" })
         }
     }
 

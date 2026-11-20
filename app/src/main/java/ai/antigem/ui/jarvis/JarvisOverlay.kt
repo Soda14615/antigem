@@ -130,7 +130,7 @@ fun JarvisOverlay() {
     val orbSize by JarvisPreferences.orbSize.state.collectAsState()
     val autoNow by JarvisController.autoSendNow.collectAsState()
     val quiet by JarvisPreferences.quietMode.state.collectAsState()
-    // "chat only": no floating button; it shows up only to carry a notice (a Jarvis chat waits for an approval…)
+    // "仅聊天": no floating button; it shows up only to carry a notice (a Jarvis chat waits for an approval…)
     val voiceOn by JarvisPreferences.voiceAssistant.state.collectAsState()
 
     var level by remember { mutableFloatStateOf(0f) }
@@ -366,9 +366,9 @@ private fun SendMeter(progress: Float, holding: Boolean, auto: Boolean) {
     val phrase = remember { ai.antigem.data.jarvis.JarvisPhrases.exampleSend() }
     val hint = when {
         holding -> if (phrase != null) "Waiting · say “$phrase” or tap Send" else "Waiting for you · tap Send"
-        auto -> if (phrase != null) "Pause to send · or say “$phrase”" else "Pause to send"
+        auto -> if (phrase != null) "Pause to send · or say “$phrase”" else "停顿后发送"
         phrase != null -> "Say “$phrase” or tap Send"
-        else -> "Tap Send when you're done"
+        else -> "说完后点按“发送”"
     }
     Column {
         if (!holding && auto) {

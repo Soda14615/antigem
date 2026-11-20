@@ -550,8 +550,8 @@ internal fun ServersSubScreen(
             title = { Text(stringResource(R.string.servers_settings_screen_update_profile), fontWeight = FontWeight.Bold, fontSize = 17.sp) },
             text = {
                 Text(
-                    "\"$uName\" will be overwritten with the values currently in the form" +
-                        (if (uRemote) (if (hadSecrets) ", including the SSH password and key (it had them before)." else ", without the SSH password and key (it had none before).") else "."),
+                    "“$uName”将被表单中当前的值覆盖" +
+                        (if (uRemote) (if (hadSecrets) "，包括 SSH 密码和密钥（之前就有）。" else "，不含 SSH 密码和密钥（之前也没有）。") else "。"),
                     fontSize = 13.5.sp
                 )
             },
@@ -682,9 +682,8 @@ internal fun ServersSubScreen(
                     Spacer(Modifier.height(14.dp))
                     Text(stringResource(R.string.servers_settings_screen_ports_on_the_server), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                     Text(
-                        "The addresses above are what the phone connects to (the reverse proxy). These are the ports the bridge and the hub " +
-                            "really listen on, on the server. Behind nginx or Apache use ${BuildConfig.BRIDGE_PORT} and ${BuildConfig.HUB_PORT} " +
-                            "(blank = automatic).",
+                        "上面的地址是手机连接的目标（反向代理）。下面这些是桥接服务和 hub 在服务器上实际监听的端口。" +
+                            "若使用 nginx 或 Apache，请填 ${BuildConfig.BRIDGE_PORT} 和 ${BuildConfig.HUB_PORT}（留空 = 自动）。",
                         fontSize = 11.sp, color = subtle
                     )
                     Spacer(Modifier.height(8.dp))
@@ -759,8 +758,8 @@ internal fun ServersSubScreen(
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.servers_settings_screen_proxy_access_header_second_layer), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                             Text(
-                                "Optional. The app adds this header to every request to the bridge and the hub. Make nginx / Apache / Caddy refuse " +
-                                    "requests without exactly this value, so strangers never reach the bridge or agy. Leave the value empty if your proxy does not check it.",
+                                "可选。应用会给发往桥接服务和 hub 的每个请求加上此请求头。让 nginx / Apache / Caddy 拒绝" +
+                                    "不带该值的请求，陌生人就无法访问桥接服务或 agy。如果你的代理不校验此项，请留空。",
                                 fontSize = 11.5.sp, color = subtle
                             )
                         }
@@ -800,8 +799,8 @@ internal fun ServersSubScreen(
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "If you set a value, the proxy MUST check the same one, or every request is refused. Test Hub and Test Bridge use it too. " +
-                            "It only protects traffic that goes through the proxy, and only over https://.",
+                        "若设置了值，代理必须校验同一个值，否则所有请求都会被拒绝。“测试 Hub”和“测试桥接”也会用到它。" +
+                            "它只保护经过代理的流量，且仅限 https://。",
                         fontSize = 11.sp, color = subtle
                     )
                 }
@@ -937,8 +936,8 @@ internal fun ServersSubScreen(
                     }
                     if (showAdvanced) {
                         Text(
-                            "These are the paths on the server (~ is the SSH user's home). The app never uploads the bridge: copy agy_ide_bridge " +
-                                "(linux amd64 / arm64 build) to the bridge path yourself and run chmod +x on it.",
+                            "这些是服务器上的路径（~ 表示 SSH 用户的主目录）。应用不会上传桥接程序：请自行把 agy_ide_bridge" +
+                                "（linux amd64 / arm64 版本）复制到桥接路径，并对其执行 chmod +x。",
                             fontSize = 11.sp, color = subtle
                         )
                         Spacer(Modifier.height(8.dp))
@@ -1234,8 +1233,8 @@ private fun PortForwardsCard(cardBg: Color, cardBorder: BorderStroke, subtle: Co
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.servers_settings_screen_port_forwards_server_this_phone), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Text(
-                        "Reach a port of the server on this phone, e.g. a dev server started with npm run dev on port 5173: " +
-                            "then open http://127.0.0.1:5173 here. Runs over the SSH connection; changes apply right away.",
+                        "在本机访问服务器上的端口，例如用 npm run dev 在 5173 端口启动的开发服务器：" +
+                            "然后在这里打开 http://127.0.0.1:5173。经由 SSH 连接转发，修改立即生效。",
                         fontSize = 11.5.sp, color = subtle
                     )
                 }
@@ -1317,8 +1316,8 @@ private fun PortForwardsCard(cardBg: Color, cardBorder: BorderStroke, subtle: Co
             error?.let { Text(it, fontSize = 11.5.sp, color = Color.Red, modifier = Modifier.padding(top = 6.dp)) }
             Spacer(Modifier.height(6.dp))
             Text(
-                "The program on the server has to listen on 127.0.0.1 or 0.0.0.0 (for Vite: npm run dev -- --host 127.0.0.1 if it picks another address). " +
-                    "Only this phone can use the forwarded port; nothing is opened on the server.",
+                "服务器上的程序必须监听 127.0.0.1 或 0.0.0.0（以 Vite 为例：若它选了别的地址，用 npm run dev -- --host 127.0.0.1）。" +
+                    "只有本机可以使用转发端口；服务器上不会对外开放任何端口。",
                 fontSize = 11.sp, color = subtle
             )
         }

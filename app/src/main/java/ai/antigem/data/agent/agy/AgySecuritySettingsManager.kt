@@ -119,7 +119,7 @@ class AgySecuritySettingsManager(
                 hubUrl = hubUrl
             )
             if (res.isFailure) {
-                _conversationError.value = "Failed to save permission grant: ${res.exceptionOrNull()?.message}"
+                _conversationError.value = "保存权限授权失败：${res.exceptionOrNull()?.message}"
                 loadSecurityAndProjectSettings()
             }
         }
@@ -147,7 +147,7 @@ class AgySecuritySettingsManager(
                 hubUrl = hubUrl
             )
             if (res.isFailure) {
-                _conversationError.value = "Failed to remove permission grant: ${res.exceptionOrNull()?.message}"
+                _conversationError.value = "移除权限授权失败：${res.exceptionOrNull()?.message}"
                 loadSecurityAndProjectSettings()
             }
         }
@@ -181,7 +181,7 @@ class AgySecuritySettingsManager(
                 hubUrl = hubUrl
             )
             if (res.isFailure) {
-                _conversationError.value = "Failed to update permission grant: ${res.exceptionOrNull()?.message}"
+                _conversationError.value = "更新权限授权失败：${res.exceptionOrNull()?.message}"
                 loadSecurityAndProjectSettings()
             }
         }

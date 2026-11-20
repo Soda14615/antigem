@@ -77,7 +77,7 @@ class MiniAppShareActivity : ComponentActivity() {
     private fun showTargets(type: String, text: String?, subject: String?, stream: Uri?) {
         val targets = MiniAppIntents.targets(this, "share", type)
         if (targets.isEmpty()) {
-            Toast.makeText(this, "No mini app accepts $type", Toast.LENGTH_LONG).show(); finish(); return
+            Toast.makeText(this, "没有可处理 $type 的小应用", Toast.LENGTH_LONG).show(); finish(); return
         }
         val dark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
         setContent {

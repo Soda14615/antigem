@@ -419,7 +419,7 @@ fun AppUpdateDialog(
                                             downloadState = DownloadState.Completed(apkFile)
                                             updateManager.installApk(apkFile)
                                         }.onFailure { err ->
-                                            downloadState = DownloadState.Error(err.message ?: "Unknown error")
+                                            downloadState = DownloadState.Error(err.message ?: "未知错误")
                                         }
                                     }
                                 }

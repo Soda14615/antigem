@@ -125,7 +125,7 @@ fun JarvisPanel(onTalk: () -> Unit, onNoticeAction: (String) -> Unit) {
                     }
                     Text(sub, color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                RoundIcon(Icons.Filled.Tune, "Quick settings", Cyan) { JarvisController.quickSettingsOpen.value = true }
+                RoundIcon(Icons.Filled.Tune, "快捷设置", Cyan) { JarvisController.quickSettingsOpen.value = true }
                 RoundIcon(Icons.Filled.Close, "Close", Color.White.copy(alpha = 0.7f)) { close() }
             }
             Spacer(Modifier.height(12.dp))
@@ -221,13 +221,13 @@ fun JarvisPanel(onTalk: () -> Unit, onNoticeAction: (String) -> Unit) {
 
             // ---- shortcuts
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                FooterButton("New Jarvis chat") {
+                FooterButton("新建 Jarvis 聊天") {
                     close()
                     JarvisController.startTextChat()?.let { JarvisController.showProblem(it) }
                 }
-                FooterButton("Jarvis settings") { JarvisController.requestSettings("JARVIS") }
-                FooterButton("New session") { JarvisController.newSession(carry = true) }
-                FooterButton("Stop all", Danger) { JarvisController.stopEverything() }
+                FooterButton("Jarvis 设置") { JarvisController.requestSettings("JARVIS") }
+                FooterButton("新会话") { JarvisController.newSession(carry = true) }
+                FooterButton("全部停止", Danger) { JarvisController.stopEverything() }
             }
         }
     }
@@ -256,7 +256,7 @@ private fun TaskRow(t: JarvisTasks.Task, onOpen: () -> Unit, onStop: () -> Unit,
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text(t.title, color = Color.White, fontSize = 13.5.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            val age = ((System.currentTimeMillis() - t.createdAt) / 60_000).let { if (it < 1) "just now" else if (it < 60) "${it}m" else "${it / 60}h ${it % 60}m" }
+            val age = ((System.currentTimeMillis() - t.createdAt) / 60_000).let { if (it < 1) "刚刚" else if (it < 60) "${it}m" else "${it / 60}h ${it % 60}m" }
             Text(
                 listOf(t.team.takeIf { it.isNotBlank() }, when (t.agent.name) { "AGY" -> "Antigravity"; "OPENCODE" -> "OpenCode"; "CODEX" -> "Codex"; else -> "Claude" }, t.state.label, age, t.note.takeIf { it.isNotBlank() && it != "Working" }).filterNotNull().joinToString(" · "),
                 color = c.copy(alpha = 0.85f), fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis

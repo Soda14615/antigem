@@ -104,7 +104,7 @@ fun StemBlockView(kind: StemKind, code: String, modifier: Modifier = Modifier) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText(kind.label, code))
         isCopied = true
-        Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "代码已复制", Toast.LENGTH_SHORT).show()
     }
     // TikZ: the compiled SVG once known (fullscreen shows it without compiling again)
     var tikzSvg by remember(code) { mutableStateOf<String?>(null) }

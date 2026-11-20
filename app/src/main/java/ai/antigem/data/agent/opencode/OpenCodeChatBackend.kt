@@ -336,7 +336,7 @@ class OpenCodeChatBackend(
                         _cliJob.value = j
                         if (!j.running) {
                             val ok = j.exit_code == 0
-                            _toasts.tryEmit(if (ok) "OpenCode ${if (action == "install") "installed" else "is up to date"}" else "OpenCode $action failed")
+                            _toasts.tryEmit(if (ok) "OpenCode ${if (action == "install") "已安装" else "已是最新版本"}" else "OpenCode ${if (action == "install") "安装" else "更新"}失败")
                             refreshStatus()
                             if (ok) {
                                 refreshModels()
@@ -347,7 +347,7 @@ class OpenCodeChatBackend(
                         }
                     }
                 }
-                .onFailure { _toasts.tryEmit("Could not start the $action: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法启动${if (action == "install") "安装" else "更新"}：${it.message}") }
         }
     }
 
@@ -587,7 +587,7 @@ class OpenCodeChatBackend(
         var pages = 0
         while (true) {
             val body = res.getOrElse { e ->
-                if (attachedId == id) _conversationError.value = "Could not load this chat: ${e.message}"
+                if (attachedId == id) _conversationError.value = "无法加载此聊天：${e.message}"
                 return
             }.obj()
             val page = body.a("data").orEmpty().mapNotNull { it.obj() }
@@ -652,7 +652,7 @@ class OpenCodeChatBackend(
         val conv = store.currentConversation.value ?: return
         if (conv.agent != AgentKind.OPENCODE) return
         if (_state.value.isBlocking) {
-            _toasts.tryEmit("OpenCode is not available: ${_state.value.label}. Check Settings → OpenCode.")
+            _toasts.tryEmit("OpenCode 不可用：${_state.value.label}。请检查设置 → OpenCode。")
             return
         }
         store.attachments.value = emptyList()
@@ -760,7 +760,7 @@ class OpenCodeChatBackend(
     private fun fail(msgId: String, title: String, e: Throwable?) {
         Log.w(TAG, "$title: ${e?.message}")
         transcript.removeLocalPrompt(msgId)
-        transcript.addError(title, e?.message ?: "Unknown error")
+        transcript.addError(title, e?.message ?: "未知错误")
         attachedId?.let { running.remove(it) }
         publishConversations()
         emitNow()
@@ -773,7 +773,7 @@ class OpenCodeChatBackend(
     override fun stopStreaming() {
         val id = store.currentConversation.value?.takeIf { it.agent == AgentKind.OPENCODE }?.id ?: return
         backendScope.launch {
-            client.post("/session/$id/interrupt").onFailure { _toasts.tryEmit("Could not stop: ${it.message}") }
+            client.post("/session/$id/interrupt").onFailure { _toasts.tryEmit("无法停止：${it.message}") }
         }
     }
 
@@ -782,7 +782,7 @@ class OpenCodeChatBackend(
             val existed = id in createdSnapshot()
             val r = if (existed) client.api("DELETE", "/session/$id") else Result.success(JsonNull)
             if (r.isFailure) {
-                _toasts.tryEmit("Could not delete the chat: ${r.exceptionOrNull()?.message}")
+                _toasts.tryEmit("无法删除聊天：${r.exceptionOrNull()?.message}")
                 return@launch
             }
             backendScope.launch(worker) {
@@ -803,7 +803,7 @@ class OpenCodeChatBackend(
                     refreshSessions()
                     if (newId != null) selectConversation(newId)
                 }
-                .onFailure { _toasts.tryEmit("Could not copy the chat: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法复制聊天：${it.message}") }
         }
     }
 
@@ -860,7 +860,7 @@ class OpenCodeChatBackend(
         backendScope.launch {
             client.api("PATCH", "/session/$id", buildJsonObject { put("title", title) })
                 .onSuccess { refreshSessions() }
-                .onFailure { _toasts.tryEmit("Could not rename: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法重命名：${it.message}") }
         }
     }
 
@@ -870,7 +870,7 @@ class OpenCodeChatBackend(
             if (id !in createdSnapshot()) return@launch
             client.api("PATCH", "/session/$id", buildJsonObject { put("archived", archived) })
                 .onSuccess { refreshSessions() }
-                .onFailure { _toasts.tryEmit("Could not ${if (archived) "archive" else "unarchive"} the chat: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法${if (archived) "归档" else "取消归档"}聊天：${it.message}") }
         }
     }
 
@@ -893,7 +893,7 @@ class OpenCodeChatBackend(
         val ref = modelRefJson(modelId) ?: return
         backendScope.launch {
             client.post("/session/${conv.id}/model", buildJsonObject { put("model", ref) })
-                .onFailure { _toasts.tryEmit("Could not switch the model: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法切换模型：${it.message}") }
         }
     }
 
@@ -915,7 +915,7 @@ class OpenCodeChatBackend(
         if (conv.id !in createdSnapshot()) return
         backendScope.launch {
             client.post("/session/${conv.id}/agent", buildJsonObject { put("agent", agentId) })
-                .onFailure { _toasts.tryEmit("Could not switch to $agentId: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法切换到 $agentId：${it.message}") }
             client.api("PATCH", "/session/${conv.id}", buildJsonObject { put("permissions", sessionRules(prefs.permissionMode.value, agentId) ?: JsonArray(emptyList())) })
         }
     }
@@ -926,7 +926,7 @@ class OpenCodeChatBackend(
         if (conv.id !in createdSnapshot()) return
         backendScope.launch {
             client.api("PATCH", "/session/${conv.id}", buildJsonObject { put("permissions", sessionRules(mode, _agent.value) ?: JsonArray(emptyList())) })
-                .onFailure { _toasts.tryEmit("Could not change approvals: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法更改审批设置：${it.message}") }
         }
     }
 
@@ -943,7 +943,7 @@ class OpenCodeChatBackend(
                 put("decision", decision)
                 if (!message.isNullOrBlank()) put("message", message)
             }).onFailure { e ->
-                _toasts.tryEmit("Could not answer the request: ${e.message}")
+                _toasts.tryEmit("无法回复请求：${e.message}")
                 reload(sid)
             }
         }
@@ -992,7 +992,7 @@ class OpenCodeChatBackend(
             emitNow()
             client.post("/session/${form.sessionId}/form/${form.id}/reply", buildJsonObject { put("answer", answer) })
                 .onFailure { e ->
-                    _toasts.tryEmit("Could not send the answer: ${e.message}")
+                    _toasts.tryEmit("无法发送答复：${e.message}")
                     reload(form.sessionId)
                 }
         }
@@ -1055,9 +1055,9 @@ class OpenCodeChatBackend(
     fun regenerate(assistantMessageId: String) {
         backendScope.launch(worker) {
             val sid = attachedId ?: return@launch
-            if (transcript.isTurnActive) { _toasts.tryEmit("Stop the reply first"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先停止回复"); return@launch }
             val prompt = transcript.promptBefore(assistantMessageId)
-            if (prompt == null || prompt.local) { _toasts.tryEmit("Nothing to retry here"); return@launch }
+            if (prompt == null || prompt.local) { _toasts.tryEmit("此处没有可重试的内容"); return@launch }
             if (!revertTo(sid, prompt.id, restoreFiles = false)) return@launch
             reload(sid)
             withContextMain { sendMessage(prompt.text) }
@@ -1068,9 +1068,9 @@ class OpenCodeChatBackend(
     fun editMessage(userMessageId: String, restoreFiles: Boolean, onRestored: (String) -> Unit) {
         backendScope.launch(worker) {
             val sid = attachedId ?: return@launch
-            if (transcript.isTurnActive) { _toasts.tryEmit("Stop the reply first"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先停止回复"); return@launch }
             val prompt = transcript.userMessage(userMessageId)
-            if (prompt == null || prompt.local) { _toasts.tryEmit("This message can't be edited yet"); return@launch }
+            if (prompt == null || prompt.local) { _toasts.tryEmit("此消息暂时无法编辑"); return@launch }
             if (!revertTo(sid, prompt.id, restoreFiles)) return@launch
             reload(sid)
             withContextMain { onRestored(prompt.text) }
@@ -1085,7 +1085,7 @@ class OpenCodeChatBackend(
         val committed = if (staged.isSuccess) client.post("/session/$sid/revert/commit") else staged
         committed.onFailure {
             client.api("DELETE", "/session/$sid/revert")
-            _toasts.tryEmit("Could not go back in the chat: ${it.message}")
+            _toasts.tryEmit("无法在聊天中回退：${it.message}")
         }
         return committed.isSuccess
     }

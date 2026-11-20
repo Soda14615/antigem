@@ -113,24 +113,24 @@ fun ProjectCheckpointsScreen() {
                 fontSize = 11.5.sp, lineHeight = 15.sp, color = muted)
 
             if (s != null) {
-                SectionLabel("Keep")
+                SectionLabel("保留")
                 Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceContainerLow, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                        ChoiceRow("Delete checkpoints older than", s.retentionDays, listOf(7 to "7 days", 30 to "30 days", 90 to "90 days", 0 to "Never")) {
+                        ChoiceRow("删除早于此时长的检查点", s.retentionDays, listOf(7 to "7 天", 30 to "30 天", 90 to "90 天", 0 to "从不")) {
                             scope.launch { ProjectCheckpoints.updateSettings(retentionDays = it).onFailure(::toastError) }
                         }
-                        ChoiceRow("At most per chat", s.maxPerChat, listOf(50 to "50", 100 to "100", 200 to "200", 0 to "No limit")) {
+                        ChoiceRow("每个聊天最多保留", s.maxPerChat, listOf(50 to "50", 100 to "100", 200 to "200", 0 to "不限制")) {
                             scope.launch { ProjectCheckpoints.updateSettings(maxPerChat = it).onFailure(::toastError) }
                         }
-                        ChoiceRow("Space per project", s.maxProjectMb, listOf(200 to "200 MB", 500 to "500 MB", 1024 to "1 GB", 2048 to "2 GB", 0 to "No limit")) {
+                        ChoiceRow("每个项目占用空间", s.maxProjectMb, listOf(200 to "200 MB", 500 to "500 MB", 1024 to "1 GB", 2048 to "2 GB", 0 to "不限制")) {
                             scope.launch { ProjectCheckpoints.updateSettings(maxProjectMb = it).onFailure(::toastError) }
                         }
-                        ChoiceRow("Skip files larger than", s.maxFileMb, listOf(5 to "5 MB", 20 to "20 MB", 50 to "50 MB", 100 to "100 MB")) {
+                        ChoiceRow("跳过大于此大小的文件", s.maxFileMb, listOf(5 to "5 MB", 20 to "20 MB", 50 to "50 MB", 100 to "100 MB")) {
                             scope.launch { ProjectCheckpoints.updateSettings(maxFileMb = it).onFailure(::toastError) }
                         }
                         Text(
-                            "Old checkpoints are removed automatically (the oldest first when a project uses too much space). " +
-                                "Deleting old ones never breaks newer ones: each checkpoint is complete on its own.",
+                            "旧检查点会自动清理（项目占用空间过多时从最旧的开始删）。" +
+                                "删除旧检查点不会影响较新的检查点：每个检查点都是完整独立的。",
                             fontSize = 11.5.sp, lineHeight = 15.sp, color = muted
                         )
                     }
@@ -206,8 +206,8 @@ fun ProjectCheckpointsScreen() {
             title = { Text(stringResource(R.string.project_checkpoints_screen_delete_all_checkpoints), fontWeight = FontWeight.Bold, fontSize = 18.sp) },
             text = {
                 Column {
-                    Text("Every checkpoint of ${p.name} is deleted (${formatBytes(p.sizeBytes)} freed). The project's own files and git are not touched. " +
-                        "New checkpoints start again with the next message when the project is still on.", fontSize = 14.sp, lineHeight = 20.sp)
+                    Text("将删除 ${p.name} 的所有检查点（释放 ${formatBytes(p.sizeBytes)}）。项目自身的文件和 git 不受影响。" +
+                        "若项目仍处于开启状态，下一条消息会重新开始创建检查点。", fontSize = 14.sp, lineHeight = 20.sp)
                     Row(Modifier.padding(top = 10.dp).clickable { forget = !forget }, verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = forget, onCheckedChange = { forget = it })
                         Text(stringResource(R.string.project_checkpoints_screen_also_forget_my_answer_for_this_project), fontSize = 13.5.sp)
@@ -437,13 +437,13 @@ fun TrackProjectDialog(state: CheckpointProjectState, onAnswer: (String?) -> Uni
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Before each message, AntiGem saves a hidden copy of this project's files. Every message then gets a restore " +
-                        "point: go back to before it, with a preview of each file that changes. Your git history, branches and staging stay untouched.",
+                    "每条消息发送前，AntiGem 都会保存一份该项目文件的隐藏副本。这样每条消息都有一个还原" +
+                        "点：可以回到它之前的状态，并预览每个发生变化的文件。你的 git 历史、分支和暂存区不受影响。",
                     fontSize = 14.sp, lineHeight = 20.sp
                 )
                 if (!state.isGit) {
                     Notice(Icons.Outlined.WarningAmber, AppColors.warning,
-                        "This folder is not a git repository. Checkpoints only work in git projects: they start once you run git init here.")
+                        "此文件夹不是 git 仓库。检查点仅适用于 git 项目：在此运行 git init 后才会开始工作。")
                 }
                 Text(stringResource(R.string.project_checkpoints_screen_you_can_change_this_any_time_in), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

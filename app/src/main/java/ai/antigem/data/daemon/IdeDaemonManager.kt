@@ -113,13 +113,13 @@ object IdeDaemonManager {
                     is ai.antigem.data.remote.SystemConnectionState.Connected -> {
                         _status.value = DaemonStatus.RUNNING
                         val ep = AuthPreferences.currentBridgeHttpUrl.removePrefix("http://").removePrefix("https://")
-                        _statusMessage.value = "Running on $ep"
+                        _statusMessage.value = "运行于 $ep"
                     }
                     is ai.antigem.data.remote.SystemConnectionState.Offline,
                     is ai.antigem.data.remote.SystemConnectionState.Error -> {
                         _status.value = DaemonStatus.ERROR
                         val ep = AuthPreferences.currentBridgeHttpUrl.removePrefix("http://").removePrefix("https://")
-                        _statusMessage.value = "Server Offline ($ep)"
+                        _statusMessage.value = "服务器离线（$ep）"
                     }
                 }
             }
@@ -316,7 +316,7 @@ object IdeDaemonManager {
         if (isHealthy) {
             _status.value = DaemonStatus.RUNNING
             val ep = AuthPreferences.currentBridgeHttpUrl.removePrefix("http://").removePrefix("https://")
-            _statusMessage.value = "Running on $ep"
+            _statusMessage.value = "运行于 $ep"
             if (previousStatus != DaemonStatus.RUNNING) {
                 log("✅ Unified Bridge & IDE Daemon is online on ${AuthPreferences.currentBridgeHttpUrl}!")
                 _serverReconnectedEvent.tryEmit(Unit)
@@ -325,7 +325,7 @@ object IdeDaemonManager {
         } else {
             _status.value = DaemonStatus.ERROR
             val ep = AuthPreferences.currentBridgeHttpUrl.removePrefix("http://").removePrefix("https://")
-            _statusMessage.value = "Server Offline ($ep)"
+            _statusMessage.value = "服务器离线（$ep）"
             if (!isSilent || previousStatus == DaemonStatus.RUNNING) {
                 log("❌ Server is offline on ${AuthPreferences.currentBridgeHttpUrl}/api/health")
             }

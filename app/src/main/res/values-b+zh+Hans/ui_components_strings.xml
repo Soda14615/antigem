@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="agent_tool_call_card_collapse">"崩溃"</string>
+    <string name="agent_tool_call_card_collapse">"折叠"</string>
     <string name="agent_tool_call_card_expand">"展开"</string>
-    <string name="agent_tool_call_card_pending_approval">"待批准"</string>
-    <string name="agent_tool_call_card_running">"跑步"</string>
+    <string name="agent_tool_call_card_pending_approval">"待审批"</string>
+    <string name="agent_tool_call_card_running">"运行中"</string>
     <string name="agent_tool_call_card_terminated">"终止"</string>
     <string name="agent_tool_call_card_rejected">"被拒绝"</string>
     <string name="agent_tool_call_card_failed">"失败"</string>
@@ -12,7 +12,7 @@
     <string name="agent_tool_call_card_exit">"退出 %1$s"</string>
     <string name="agent_tool_call_card_loading_image">"加载图片…"</string>
     <string name="agent_tool_call_card_tap_image_to_enlarge_double_tap_zoom">"点击图像放大 • 双击缩放"</string>
-    <string name="agent_tool_call_card_full_view">"全视图"</string>
+    <string name="agent_tool_call_card_full_view">"全屏查看"</string>
     <string name="agent_tool_call_card_download_image">"下载图片"</string>
     <string name="agent_tool_call_card_copy_output">"复制输出"</string>
     <string name="app_permissions_dialog_welcome_to_antigem">"欢迎来到 AntiGem"</string>
@@ -28,35 +28,35 @@
     <string name="attachment_selector_bottom_sheet_add_to_chat">"添加到聊天"</string>
     <string name="chat_audio_player_pause">"暂停"</string>
     <string name="chat_audio_player_play">"播放"</string>
-    <string name="chat_audio_player_voice_note">"语音留言"</string>
+    <string name="chat_audio_player_voice_note">"语音消息"</string>
     <string name="chat_command_run_dialog_run_in_terminal">"在终端中运行"</string>
     <string name="chat_command_run_dialog_opens_a_new_terminal_session_edit_the">"打开一个新的终端会话。如果需要，编辑命令。"</string>
     <string name="chat_command_run_dialog_press_enter_to_run_closing_the_terminal">"按 Enter 运行 · 关闭终端会停止其中的所有内容"</string>
     <string name="chat_command_run_dialog_shift_enter_or_run_to_start_closing">"Shift+Enter 或 Run 开始 · 关闭终端会停止其中的所有内容"</string>
     <string name="chat_input_bar_transcribe">"转录"</string>
-    <string name="chat_input_bar_resume">"简历"</string>
+    <string name="chat_input_bar_resume">"继续"</string>
     <string name="chat_input_bar_cancel_recording">"取消录音"</string>
     <string name="chat_input_bar_stop_attach">"停止并连接"</string>
-    <string name="chat_input_bar_send_voice_note">"发送语音留言"</string>
+    <string name="chat_input_bar_send_voice_note">"发送语音消息"</string>
     <string name="chat_input_bar_dictation_paused_tap_resume_to_speak">"听写暂停（点击继续说话）"</string>
     <string name="chat_input_bar_listening_speak_now">"正在听……现在说话"</string>
     <string name="chat_input_bar_stop">"停止"</string>
     <string name="chat_input_bar_transcribing_audio_via_agy_hub">"正在通过 AGY Hub 转录音频…"</string>
     <string name="chat_input_bar_reply_to">"回复 %1$s …"</string>
     <string name="chat_input_bar_preparing_attachment">"正在准备附件…"</string>
-    <string name="chat_input_bar_copying">"复制 %1$s %%"</string>
+    <string name="chat_input_bar_copying">"复制 %1$s%%"</string>
     <string name="chat_input_bar_add_attachments">"添加附件"</string>
-    <string name="chat_input_bar_switch_model">"开关型号"</string>
+    <string name="chat_input_bar_switch_model">"切换模型"</string>
     <string name="chat_input_bar_open_voice_call">"打开语音通话"</string>
     <string name="chat_input_bar_start_voice_call">"开始语音通话"</string>
     <string name="chat_input_bar_stop_dictation">"停止听写"</string>
-    <string name="chat_input_bar_live_dictation">"现场听写"</string>
+    <string name="chat_input_bar_live_dictation">"实时听写"</string>
     <string name="chat_input_bar_send">"发送"</string>
     <string name="chat_input_bar_record_and_transcribe">"记录和转录"</string>
-    <string name="chat_input_bar_record_voice_note">"录制语音笔记"</string>
-    <string name="chat_telemetry_dialog_aggregated_usage_telemetry_for">"“ %1$s ”的聚合使用遥测："</string>
+    <string name="chat_input_bar_record_voice_note">"录制语音消息"</string>
+    <string name="chat_telemetry_dialog_aggregated_usage_telemetry_for">"“%1$s”的聚合使用遥测："</string>
     <string name="chat_telemetry_dialog_conversation_stats">"对话统计"</string>
-    <string name="chat_telemetry_dialog_chat_system_prompt">"聊天系统提示"</string>
+    <string name="chat_telemetry_dialog_chat_system_prompt">"系统提示词"</string>
     <string name="chat_telemetry_dialog_custom_instructions_active">"自定义指令激活"</string>
     <string name="chat_telemetry_dialog_using_default_system_instruction">"使用默认系统指令"</string>
     <string name="choice_questionnaire_card_questionnaire">"问卷调查"</string>
@@ -77,16 +77,16 @@
     <string name="code_block_copy_code">"复制代码"</string>
     <string name="code_block_collapse_code_block_2">"折叠代码块▲"</string>
     <string name="code_block_show_all_lines_more">"显示所有 %1$s 线（%2$s 更多）▼"</string>
-    <string name="code_block_preview">"预览： %1$s"</string>
+    <string name="code_block_preview">"预览：%1$s"</string>
     <string name="code_block_interactive_artifact">"互动神器"</string>
     <string name="code_block_lines_2">"%1$s 线"</string>
     <string name="connection_status_badge_bridge_status">"桥接服务状态"</string>
-    <string name="connection_status_badge_status">"状态： %1$s"</string>
-    <string name="connection_status_badge_endpoint">"端点： %1$s"</string>
-    <string name="connection_status_badge_active_worker_instances">"活动工作线程实例 ( %1$s )："</string>
+    <string name="connection_status_badge_status">"状态：%1$s"</string>
+    <string name="connection_status_badge_endpoint">"端点：%1$s"</string>
+    <string name="connection_status_badge_active_worker_instances">"活动工作线程实例（%1$s）："</string>
     <string name="connection_status_badge_no_active_warm_processes_in_ram">"RAM 中没有活动的热进程。"</string>
-    <string name="connection_status_badge_pid">"PID： %1$s"</string>
-    <string name="connection_status_badge_chat_uptime_s">"聊天： %1$s … |正常运行时间： %2$s 秒"</string>
+    <string name="connection_status_badge_pid">"PID：%1$s"</string>
+    <string name="connection_status_badge_chat_uptime_s">"聊天：%1$s … |正常运行时间：%2$s 秒"</string>
     <string name="context_summary_card_context_memory">"上下文记忆"</string>
     <string name="context_summary_card_active_summary">"主动总结"</string>
     <string name="context_summary_card_tap_to_collapse">"点击折叠"</string>
@@ -102,9 +102,9 @@
     <string name="context_summary_card_never_for_this_session">"从来没有参加过这次会议"</string>
     <string name="context_summary_card_summarize">"总结"</string>
     <string name="context_summary_card_summarizing_context_with">"用 %1$s 总结上下文…"</string>
-    <string name="context_summary_card_queued_will_send_immediately_after_summary">"⏳ 已排队：“ %1$s ” %2$s （摘要后立即发送）"</string>
-    <string name="context_summary_card_edit_context_memory">"编辑上下文内存"</string>
-    <string name="context_summary_card_modify_or_add_custom_notes_to_this">"在此执行摘要中修改或添加自定义注释。 AI 将使用它作为其永久上下文。"</string>
+    <string name="context_summary_card_queued_will_send_immediately_after_summary">"⏳ 已排队：“%1$s” %2$s （摘要后立即发送）"</string>
+    <string name="context_summary_card_edit_context_memory">"编辑上下文记忆"</string>
+    <string name="context_summary_card_modify_or_add_custom_notes_to_this">"在此执行摘要中修改或添加自定义备注。AI 将使用它作为其永久上下文。"</string>
     <string name="context_summary_card_save_summary">"保存摘要"</string>
     <string name="conversation_loading_skeleton_waking_up_antigravity">"醒来 Antigravity …"</string>
     <string name="conversation_loading_skeleton_the_background_ai_engine_is_starting_up">"后台 AI 引擎正在启动。你的聊天和工作区很快就会准备就绪。"</string>
@@ -129,7 +129,7 @@
     <string name="file_details_dialog_parent_directory">"家长目录"</string>
     <string name="file_details_dialog_size">"大小"</string>
     <string name="file_details_dialog_last_modified">"最后修改时间"</string>
-    <string name="file_link_handler_file">"。 %1$s 文件"</string>
+    <string name="file_link_handler_file">"。%1$s 文件"</string>
     <string name="file_link_handler_file_reference">"文件参考"</string>
     <string name="file_link_handler_full_path">"完整路径："</string>
     <string name="file_link_handler_lines">"线路"</string>
@@ -141,10 +141,10 @@
     <string name="file_link_handler_copy_content">"复制内容"</string>
     <string name="file_link_handler_edit_in_ide">"在 IDE 中编辑"</string>
     <string name="floating_diagnostics_overlay_ms">"%1$s 毫秒"</string>
-    <string name="floating_diagnostics_overlay_thread_groups">"螺纹组： %1$s"</string>
+    <string name="floating_diagnostics_overlay_thread_groups">"线程组：%1$s"</string>
     <string name="floating_diagnostics_overlay_agygrpc_hub">"AgyGrpc Hub："</string>
     <string name="floating_diagnostics_overlay_run_q_pool_idle">"运行= %1$s | Q = %2$s |池= %3$s （%4$s 空闲）"</string>
-    <string name="floating_diagnostics_overlay_ide_bridge">"IDE桥："</string>
+    <string name="floating_diagnostics_overlay_ide_bridge">"IDE 桥："</string>
     <string name="floating_diagnostics_overlay_blocked_socket_reads">"阻塞的套接字读取："</string>
     <string name="floating_diagnostics_overlay_hide_hud">"隐藏悬浮信息"</string>
     <string name="floating_network_inspector_bubble_network_inspector">"网络巡检员"</string>
@@ -175,7 +175,7 @@
     <string name="git_clone_dialog_public_repositories_only_cloned_into_your_home">"仅限公共仓库，克隆到你的主文件夹中"</string>
     <string name="git_clone_dialog_cloning">"克隆…"</string>
     <string name="git_clone_dialog_cloned_in_s_opening_project">"克隆用时 %1$s 秒，正在打开项目…"</string>
-    <string name="git_clone_dialog_clone_failed_exit">"克隆失败（退出： %1$s）"</string>
+    <string name="git_clone_dialog_clone_failed_exit">"克隆失败（退出：%1$s）"</string>
     <string name="git_clone_dialog_repository_url">"仓库 URL"</string>
     <string name="git_clone_dialog_paste_an_https_repository_url">"粘贴 https:// 仓库 URL"</string>
     <string name="git_clone_dialog_paste_a_public_https_repository_url">"粘贴公共 https:// 仓库 URL"</string>
@@ -187,7 +187,7 @@
     <string name="git_clone_dialog_search_repositories">"搜索仓库"</string>
     <string name="git_clone_dialog_loading_your_repositories">"正在加载你的仓库…"</string>
     <string name="git_clone_dialog_no_repositories">"没有仓库。"</string>
-    <string name="git_clone_dialog_no_repository_matches">"没有仓库匹配“ %1$s ”。"</string>
+    <string name="git_clone_dialog_no_repository_matches">"没有仓库匹配“%1$s”。"</string>
     <string name="interactive_ui_view_app">"应用程序"</string>
     <string name="interactive_ui_view_restart_app">"重新启动应用程序"</string>
     <string name="interactive_ui_view_open_fullscreen">"打开全屏"</string>
@@ -204,7 +204,7 @@
     <string name="local_terminal_dialog_switch_tab">"切换标签页"</string>
     <string name="local_terminal_dialog_long_press_to_force_bash_shell">"长按强制 Bash shell"</string>
     <string name="local_terminal_dialog_close_tab">"关闭标签页？"</string>
-    <string name="local_terminal_dialog_are_you_sure_you_want_to_close">"你确定要关闭“ %1$s ”吗？\n在此会话中运行的任何进程都将被终止。"</string>
+    <string name="local_terminal_dialog_are_you_sure_you_want_to_close">"你确定要关闭“%1$s”吗？\n在此会话中运行的任何进程都将被终止。"</string>
     <string name="markdown_content_completed">"已完成"</string>
     <string name="markdown_content_incomplete">"不完整"</string>
     <string name="markdown_content_mermaid_diagram">"Mermaid 图表"</string>
@@ -213,12 +213,12 @@
     <string name="markdown_content_zoom_out">"缩小"</string>
     <string name="markdown_content_zoom_in">"放大"</string>
     <string name="markdown_content_error">"错误"</string>
-    <string name="markdown_content_code">"代码： %1$s"</string>
+    <string name="markdown_content_code">"代码：%1$s"</string>
     <string name="markdown_content_copy_error_details">"复制错误详细信息"</string>
     <string name="markdown_content_reconnect_in_settings">"在设置中重新连接"</string>
     <string name="markdown_content_hide_error_details_stack_trace">"隐藏错误详细信息和堆栈跟踪"</string>
     <string name="markdown_content_view_error_details_stack_trace">"查看错误详细信息和堆栈跟踪"</string>
-    <string name="markdown_content_error_id">"错误ID： %1$s"</string>
+    <string name="markdown_content_error_id">"错误 ID：%1$s"</string>
     <string name="markdown_content_failed_to_load_image">"加载图像失败"</string>
     <string name="markdown_content_youtube_video">"YouTube 视频"</string>
     <string name="markdown_content_close_player">"关闭玩家"</string>
@@ -226,23 +226,23 @@
     <string name="markdown_content_play_video">"播放视频"</string>
     <string name="memory_chip_hide_what_was_written">"隐藏所写内容"</string>
     <string name="memory_chip_show_what_was_written">"显示所写内容"</string>
-    <string name="memory_chip_undo_this_memory_change">"撤消此内存更改吗？"</string>
+    <string name="memory_chip_undo_this_memory_change">"撤销此记忆更改吗？"</string>
     <string name="message_bubble_edit_prompt">"编辑提示"</string>
     <string name="message_bubble_retry_prompt">"重试提示"</string>
     <string name="message_bubble_view_raw_request_payload">"查看原始请求负载"</string>
     <string name="message_bubble_copy_message">"复制消息"</string>
     <string name="message_bubble_regenerate_response">"重新产生反应"</string>
-    <string name="message_bubble_view_artifacts">"查看文物 ( %1$s )"</string>
+    <string name="message_bubble_view_artifacts">"查看产物（%1$s）"</string>
     <string name="message_bubble_voice">"语音"</string>
     <string name="message_bubble_show_less">"显示较少 ▲"</string>
     <string name="message_bubble_show_more_lines">"显示更多（%1$s 线）▼"</string>
     <string name="message_bubble_restore_point">"还原点"</string>
     <string name="message_bubble_view_full_prompt">"查看完整提示"</string>
-    <string name="message_bubble_undo_and_edit_prompt">"撤消和编辑提示"</string>
+    <string name="message_bubble_undo_and_edit_prompt">"撤销和编辑提示"</string>
     <string name="message_bubble_restore_to_before_this_message">"恢复到这条消息之前"</string>
     <string name="message_bubble_select_text">"选择文本"</string>
     <string name="message_bubble_regenerate_response_2">"重新产生响应？"</string>
-    <string name="message_bubble_the_same_message_is_sent_again_and">"再次发送相同的消息，并且该回复被新的回复所取代。"</string>
+    <string name="message_bubble_the_same_message_is_sent_again_and">再次发送相同的消息，这条回复将被新回复替换。</string>
     <string name="message_bubble_est">"（预计）"</string>
     <string name="message_bubble_context_compacted_history_summarized">"🧠 上下文压缩（历史总结）"</string>
     <string name="message_bubble_hide">"隐藏▲"</string>
@@ -267,7 +267,7 @@
     <string name="network_inspector_dialog_error_message">"错误信息"</string>
     <string name="network_inspector_dialog_request_headers">"请求标头（%1$s）"</string>
     <string name="network_inspector_dialog_no_request_headers_recorded">"没有记录请求头。"</string>
-    <string name="network_inspector_dialog_response_headers">"响应标头 ( %1$s )"</string>
+    <string name="network_inspector_dialog_response_headers">"响应标头（%1$s）"</string>
     <string name="network_inspector_dialog_no_response_headers_recorded">"没有记录响应标头。"</string>
     <string name="project_picker_bottom_sheet_select_workspace">"选择工作区"</string>
     <string name="project_picker_bottom_sheet_available_workspace">"%1$s 可用工作区 %2$s"</string>
@@ -280,8 +280,8 @@
     <string name="queued_messages_card_1_queued_message">"1 条排队消息"</string>
     <string name="queued_messages_card_queued_messages">"%1$s 排队消息"</string>
     <string name="queued_messages_card_sends_when_the_agent_is_done">"智能体完成时发送"</string>
-    <string name="queued_messages_card_send_now">"立即发送： %1$s"</string>
-    <string name="queued_messages_card_delete">"删除： %1$s"</string>
+    <string name="queued_messages_card_send_now">"立即发送：%1$s"</string>
+    <string name="queued_messages_card_delete">"删除：%1$s"</string>
     <string name="raw_payload_dialog_raw_request_payload">"原始请求负载"</string>
     <string name="raw_payload_dialog_wrap_on">"环绕：开"</string>
     <string name="raw_payload_dialog_wrap_off">"环绕：关闭"</string>
@@ -299,7 +299,7 @@
     <string name="stem_blocks_the_picture_is_still_compiling">"图片仍在编译中。"</string>
     <string name="summary_model_picker_dialog_summarize_conversation">"总结对话"</string>
     <string name="summary_model_picker_dialog_select_model_for_summarization">"选择模型进行汇总："</string>
-    <string name="summary_model_picker_dialog_failed">"失败： %1$s"</string>
+    <string name="summary_model_picker_dialog_failed">"失败：%1$s"</string>
     <string name="summary_model_picker_dialog_start_summarize">"开始总结"</string>
     <string name="thinking_accordion_thinking">"想着……"</string>
     <string name="thinking_accordion_thought_for">"⏱️对 %1$s 的思考"</string>
@@ -307,8 +307,8 @@
     <string name="token_usage_details_sheet_token_counts_are_estimates">"令牌数量为估计值"</string>
     <string name="token_usage_details_sheet_what_this_reply_used">"这个回复用了什么"</string>
     <string name="token_usage_details_sheet_model">"模型"</string>
-    <string name="token_usage_details_sheet_provider">"提供者： %1$s"</string>
-    <string name="token_usage_details_sheet_copy_model_name">"复制型号名称"</string>
+    <string name="token_usage_details_sheet_provider">"提供者：%1$s"</string>
+    <string name="token_usage_details_sheet_copy_model_name">"复制模型名称"</string>
     <string name="token_usage_details_sheet_view_raw_payload">"查看原始有效负载"</string>
     <string name="video_player_ui_playing_full_screen">"全屏播放"</string>
     <string name="video_player_ui_video_could_not_be_loaded">"视频无法加载"</string>
@@ -361,7 +361,54 @@
         <item>"展开中"</item>
         <item>"理顺中"</item>
         <item>"运转中"</item>
-        <item>"处理中"</item>
+        <item>"冥思中"</item>
+        <item>"发酵中"</item>
+        <item>"搅拌中"</item>
+        <item>"翻炒中"</item>
+        <item>"推演中"</item>
+        <item>"校验中"</item>
+        <item>"测绘中"</item>
+        <item>"勘探中"</item>
+        <item>"溯源中"</item>
+        <item>"归纳中"</item>
+        <item>"演绎中"</item>
+        <item>"拆解中"</item>
+        <item>"组装中"</item>
+        <item>"焊接中"</item>
+        <item>"铸模中"</item>
+        <item>"雕版中"</item>
+        <item>"拓印中"</item>
+        <item>"修补中"</item>
+        <item>"缝合中"</item>
+        <item>"织造中"</item>
+        <item>"淬火中"</item>
+        <item>"熔炼中"</item>
+        <item>"提纯中"</item>
+        <item>"萃取中"</item>
+        <item>"蒸馏中"</item>
+        <item>"结晶中"</item>
+        <item>"凝固中"</item>
+        <item>"解构中"</item>
+        <item>"重组中"</item>
+        <item>"校准中"</item>
+        <item>"对标中"</item>
+        <item>"建模中"</item>
+        <item>"仿真中"</item>
+        <item>"试算中"</item>
+        <item>"比选中"</item>
+        <item>"遴选中"</item>
+        <item>"排布中"</item>
+        <item>"编排中"</item>
+        <item>"串联中"</item>
+        <item>"并联中"</item>
+        <item>"分流中"</item>
+        <item>"归并中"</item>
+        <item>"摘录中"</item>
+        <item>"标注中"</item>
+        <item>"注解中"</item>
+        <item>"校订中"</item>
+        <item>"排版中"</item>
+        <item>"印制中"</item>
     </string-array>
     <string name="artifact_download_no_file">"没有可下载的产物文件"</string>
     <string name="artifact_download_saved">"已将 %1$s 保存到 Downloads/AntiGem"</string>

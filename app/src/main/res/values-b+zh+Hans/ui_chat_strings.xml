@@ -12,7 +12,7 @@
     <string name="chat_screen_the_screen_won_t_turn_off_by">"在以下情况下屏幕不会自行关闭："</string>
     <string name="chat_screen_it_turns_off_normally_again_once_this">"完成此操作后，它会再次正常关闭。"</string>
     <string name="chat_screen_choose_project">"选择项目"</string>
-    <string name="chat_screen_open_ide">"打开IDE"</string>
+    <string name="chat_screen_open_ide">"打开 IDE"</string>
     <string name="chat_screen_open_terminal">"打开终端"</string>
     <string name="chat_screen_open_notes">"打开笔记"</string>
     <string name="chat_screen_open_files">"打开文件"</string>
@@ -22,7 +22,7 @@
     <string name="chat_screen_open_drawer">"打开抽屉"</string>
     <string name="chat_screen_minimize_to_bubble">"最小化为气泡"</string>
     <string name="chat_screen_open_full_screen">"打开全屏"</string>
-    <string name="chat_screen_chat_telemetry_tokens">"聊天遥测和令牌"</string>
+    <string name="chat_screen_chat_telemetry_tokens">"聊天遥测与 Token 用量"</string>
     <string name="chat_screen_unable_to_load_chat">"无法加载聊天"</string>
     <string name="chat_screen_failed_to_load_conversation_messages">"无法加载对话消息。"</string>
     <string name="chat_screen_retry">"重试"</string>
@@ -45,7 +45,7 @@
     <string name="chat_screen_edit_message">"编辑消息？"</string>
     <string name="chat_screen_regenerate_response">"重新生成响应？"</string>
     <string name="chat_screen_this_chat_goes_back_to_right_before">"此聊天会回到此消息之前，因此你可以更改它并再次发送。之后的所有内容都会从聊天中删除。文件保持原样。"</string>
-    <string name="chat_screen_this_chat_goes_back_to_right_before_2">"该聊天回到此回复之前， %1$s 再次回复相同的消息。当前回复已从聊天中删除。"</string>
+    <string name="chat_screen_this_chat_goes_back_to_right_before_2">"该聊天回到此回复之前，%1$s 再次回复相同的消息。当前回复已从聊天中删除。"</string>
     <string name="chat_screen_editing_this_message_will_delete_the_subsequent">"编辑此消息将删除后续响应，以便你可以编辑并发送新的查询。你想继续吗？"</string>
     <string name="chat_screen_retrying_will_delete_the_current_response_and">"重试将删除当前响应并重新生成新答案。你想继续吗？"</string>
     <string name="chat_screen_put_files_back_too_use_this_message">"文件也放回去吗？使用此消息的还原点"</string>

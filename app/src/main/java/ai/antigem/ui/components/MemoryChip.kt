@@ -231,19 +231,19 @@ fun MemoryChipView(body: String, complete: Boolean, modifier: Modifier = Modifie
     }
 
     if (confirmUndo) {
-        val name = info.file.ifBlank { "this memory" }
+        val name = info.file.ifBlank { "此记忆" }
         val what = when (s?.action) {
-            "deleted" -> "The memory \"$name\" comes back as it was."
-            "updated" -> "The memory \"$name\" goes back to its earlier text."
-            else -> "The memory \"$name\" is removed."
+            "deleted" -> "记忆“$name”将恢复到原来的样子。"
+            "updated" -> "记忆“$name”将恢复为之前的文本。"
+            else -> "记忆“$name”已移除。"
         }
         AlertDialog(
             onDismissRequest = { confirmUndo = false },
             title = { Text(stringResource(R.string.memory_chip_undo_this_memory_change)) },
             text = {
                 Text(
-                    "$what This cannot be undone: to save it again, ask the agent or add it in " +
-                        "Settings → Agents → Agent memory & history."
+                    "$what 此操作无法撤销：若要重新保存，请让智能体添加，或在" +
+                        "“设置 → 智能体 → 智能体记忆与历史”中添加。"
                 )
             },
             confirmButton = {

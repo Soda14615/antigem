@@ -112,7 +112,7 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
                         Column(Modifier.weight(1f)) {
                             Text(extension.folderName, style = MaterialTheme.typography.titleMedium)
                             Text("${extension.name} · ${PluginVersions.label(extension.version)} · ${extension.toolCount} MCP tools" + (if (extension.skillCount > 0) " · ${extension.skillCount} skills" else ""), style = MaterialTheme.typography.bodySmall)
-                            extension.source?.let { Text("From ${it.repo}" + (if (it.ref.isNotBlank()) "@${it.ref}" else ""), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            extension.source?.let { Text("来自 ${it.repo}" + (if (it.ref.isNotBlank()) "@${it.ref}" else ""), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                         if (exporting == extension.id) Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp) }
                         else IconButton(enabled = exporting == null, onClick = {
@@ -121,7 +121,7 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
                                 runCatching {
                                     val zip = manager.exportZip(extension.id)
                                     try { saveToDownloads(context, zip, "application/zip") } finally { zip.parentFile?.deleteRecursively() }
-                                }.onFailure { error = "Could not zip ${extension.folderName}: ${it.message}" }
+                                }.onFailure { error = "无法打包 ${extension.folderName}：${it.message}" }
                                 exporting = null
                             }
                         }) { Icon(Icons.Outlined.Download, stringResource(R.string.web_view_extensions_screen_download_as_zip)) }

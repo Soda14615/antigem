@@ -8,7 +8,7 @@
     <string name="mini_app_install_ui_can_t_install">"无法安装"</string>
     <string name="mini_app_install_ui_app_installed">"应用程序已安装。"</string>
     <string name="mini_app_install_ui_app_updated">"应用程序已更新。"</string>
-    <string name="mini_app_install_ui_signed_by">"  签名： %1$s"</string>
+    <string name="mini_app_install_ui_signed_by">"  签名：%1$s"</string>
     <string name="mini_app_install_ui_a_new_app_from_this_developer_only">"该开发者推出的新应用程序。只有使用相同密钥签名的包才能更新它。"</string>
     <string name="mini_app_install_ui_this_is_an_older_version_than_the">"这是比安装的版本旧的版本。旧版本可能存在已修复的错误。其数据被保留。"</string>
     <string name="mini_app_install_ui_same_developer_as_the_installed_version_its">"与安装版本相同的开发人员。其数据和权限均被保留。"</string>
@@ -43,7 +43,7 @@
     <string name="mini_app_ui_deny_all">"全部拒绝"</string>
     <string name="mini_app_ui_don_t_allow">"不允许"</string>
     <string name="mini_app_ui_wants_to_use">"%1$s 想要使用 %2$s"</string>
-    <string name="mini_app_ui_antigem_tools">"AntiGem 工具： %1$s"</string>
+    <string name="mini_app_ui_antigem_tools">"AntiGem 工具：%1$s"</string>
     <string name="mini_app_ui_with">"与"</string>
     <string name="mini_app_ui_always_allow">"始终允许"</string>
     <string name="mini_app_ui_deny">"拒绝"</string>
@@ -53,11 +53,11 @@
     <string name="mini_app_ui_console">"控制台"</string>
     <string name="mini_app_ui_run_javascript">"运行 JavaScript …"</string>
     <string name="mini_app_ui_installed_signed_by">"已安装 · 由 %1$s 签名 · %2$s"</string>
-    <string name="mini_app_ui_development_app_unsigned_mini_apps">"开发应用程序（未签名）· ~/mini-apps/ %1$s"</string>
+    <string name="mini_app_ui_development_app_unsigned_mini_apps">开发应用（未签名）· ~/mini-apps/%1$s</string>
     <string name="mini_app_ui_this_app_asks_for_no_permissions_it">"这个应用程序不需要任何权限。它只能使用自己的存储。"</string>
     <string name="mini_app_ui_folders_you_picked">"你选择的文件夹"</string>
     <string name="mini_app_ui_antigem_tools_2">"AntiGem 工具"</string>
-    <string name="mini_app_ui_ask_before_each_call">"每次打电话前询问： %1$s"</string>
+    <string name="mini_app_ui_ask_before_each_call">"每次调用前询问：%1$s"</string>
     <string name="mini_app_ui_recommended_these_tools_can_act_on_your">"推荐：这些工具可以作用在你的手机上"</string>
     <string name="mini_app_ui_you_see_each_call_and_its_details">"你首先会看到每个呼叫及其详细信息"</string>
     <string name="mini_app_ui_storage">"存储"</string>
@@ -68,7 +68,7 @@
     <string name="mini_app_ui_export_signed_package">"导出签名包"</string>
     <string name="mini_app_ui_share_app">"分享应用程序"</string>
     <string name="mini_app_ui_needs_this">"%1$s 需要这个"</string>
-    <string name="mini_app_ui_is_required_without_it_won_t_open">"“ %1$s ”是必需的：没有它 %2$s 将无法打开。还是关掉它吧？"</string>
+    <string name="mini_app_ui_is_required_without_it_won_t_open">"“%1$s”是必需的：没有它 %2$s 将无法打开。还是关掉它吧？"</string>
     <string name="mini_app_ui_turn_off">"关闭"</string>
     <string name="mini_app_ui_keep">"保留"</string>
     <string name="mini_app_ui_uninstall">"卸载 %1$s？"</string>
@@ -78,9 +78,9 @@
     <string name="mini_app_ui_background">"背景"</string>
     <string name="mini_app_ui_reminder_scheduled_next">"%1$s 提醒 %2$s 预定·下一个 %3$s"</string>
     <string name="mini_app_ui_run_now">"立即运行"</string>
-    <string name="mini_app_ui_reminders_may_come_late_antigem_has_no">"提醒可能会迟到： AntiGem 没有“闹钟和提醒”访问权限。"</string>
+    <string name="mini_app_ui_reminders_may_come_late_antigem_has_no">"提醒可能会延迟：AntiGem 没有“闹钟和提醒”访问权限。"</string>
     <string name="mini_app_ui_fix">"修复"</string>
-    <string name="mini_app_ui_of_background_runs_used_in_the_last">"最近 24 小时使用的 %2$s 后台运行的 %1$s"</string>
+    <string name="mini_app_ui_of_background_runs_used_in_the_last">最近 24 小时已使用 %1$s / %2$s 次后台运行</string>
     <string name="mini_app_ui_android_may_delay_or_skip_background_tasks">"Android 可能会延迟或跳过后台任务，而 AntiGem 的电池使用则得到优化。"</string>
     <string name="mini_app_ui_let_use">"让 %1$s 使用 %2$s 吗？"</string>
     <string name="mini_apps_activity_get_apps">"获取应用程序"</string>

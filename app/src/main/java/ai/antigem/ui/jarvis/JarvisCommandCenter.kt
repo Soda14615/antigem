@@ -96,17 +96,17 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
     val title = when {
         !mission.isEmpty -> mission.goal
         voice -> "Jarvis · voice chat"
-        else -> "Jarvis command center"
+        else -> "Jarvis 指挥中心"
     }
     val subtitle = when {
         status != null -> status
-        active.any { it.state.needsUser } -> "A task needs a decision"
+        active.any { it.state.needsUser } -> "有任务需要决定"
         active.isNotEmpty() -> "${active.size} task${if (active.size == 1) "" else "s"} working · news comes in by itself"
-        mission.status == "done" -> "Mission complete"
-        mission.status == "paused" -> "Mission paused"
-        mission.isEmpty -> "Give me a big job: I plan it, run it with teams and keep going."
+        mission.status == "done" -> "任务完成"
+        mission.status == "paused" -> "任务已暂停"
+        mission.isEmpty -> "交给我一个大任务：我来规划、带团队执行并持续推进。"
         mission.autopilot -> "Autopilot on · keeps going until done"
-        else -> "Waiting for you"
+        else -> "等待你"
     }
 
     Column(
@@ -148,12 +148,12 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
         ) {
             // "chat only" (Settings → Jarvis): nothing is ever said, so no Voice switch
             if (!voice && voiceSide) {
-                ToggleChip(if (m.speak) "Voice on" else "Voice off", if (m.speak) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff, m.speak) {
+                ToggleChip(if (m.speak) "语音开" else "语音关", if (m.speak) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff, m.speak) {
                     JarvisManagers.setSpeak(key, !m.speak)
                 }
             }
             if (!mission.isEmpty) {
-                ToggleChip(if (mission.autopilot) "Autopilot on" else "Autopilot", Icons.Filled.Autorenew, mission.autopilot) {
+                ToggleChip(if (mission.autopilot) "自动驾驶开启" else "Autopilot", Icons.Filled.Autorenew, mission.autopilot) {
                     JarvisManagers.setAutopilot(key, !mission.autopilot)
                 }
             }
@@ -254,7 +254,7 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
             }
             if (mi.notes.isNotBlank()) Text(stringResource(R.string.jarvis_command_center_notes, mi.notes.toString()), fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SmallAction("Clear mission", Danger) { JarvisManagers.clearMission(key) }
+                SmallAction("清除任务书", Danger) { JarvisManagers.clearMission(key) }
                 if (mi.status != "active") SmallAction("Resume", Cyan) { JarvisManagers.updateMission(key, null, null, null, emptyList(), "active", null, null) }
                 else SmallAction("Pause", Amber) { JarvisManagers.updateMission(key, null, null, null, emptyList(), "paused", null, null) }
             }
@@ -272,7 +272,7 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
                         if (t.role.isNotBlank()) Text(t.role, fontSize = 11.sp, color = onSurface.copy(alpha = 0.55f), maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                     if (running > 0) Text(stringResource(R.string.jarvis_command_center_working, running.toString()), fontSize = 11.sp, color = Violet)
-                    IconMini(Icons.Filled.Close, "Remove team", onSurface.copy(alpha = 0.45f)) { JarvisManagers.removeTeam(key, t.name) }
+                    IconMini(Icons.Filled.Close, "移除团队", onSurface.copy(alpha = 0.45f)) { JarvisManagers.removeTeam(key, t.name) }
                 }
             }
         }
@@ -338,11 +338,11 @@ private fun eventColor(kind: String): Color = when (kind) {
 private fun eventWord(kind: String): String = when (kind) {
     "task_done" -> "Finished"
     "task_failed" -> "Failed"
-    "task_stalled" -> "No progress"
-    "task_approval" -> "Needs approval"
+    "task_stalled" -> "无进展"
+    "task_approval" -> "需要审批"
     "task_question" -> "Asks a question"
-    "nudge" -> "Autopilot: keep going"
-    "autopilot_paused" -> "Autopilot paused"
+    "nudge" -> "自动驾驶：继续"
+    "autopilot_paused" -> "自动驾驶已暂停"
     else -> kind
 }
 
@@ -399,7 +399,7 @@ fun JarvisEventCard(raw: String, onOpenChat: (String) -> Unit) {
                     }
                 }
                 if (e.taskId.isNotBlank() && JarvisTasks.find(e.taskId) != null) {
-                    IconMini(Icons.AutoMirrored.Filled.OpenInNew, "Open the task's chat", onSurface.copy(alpha = 0.55f)) { onOpenChat(e.taskId) }
+                    IconMini(Icons.AutoMirrored.Filled.OpenInNew, "打开任务的聊天", onSurface.copy(alpha = 0.55f)) { onOpenChat(e.taskId) }
                 }
             }
         }
@@ -424,9 +424,9 @@ fun JarvisChatWelcome(onExample: (String) -> Unit) {
         )
         Spacer(Modifier.height(16.dp))
         listOf(
-            "Build a dark-mode toggle in the settings screen of my active project, have a reviewer team check it and run the tests. Don't stop until it works.",
-            "Create two teams: builders (Claude) to implement and reviewers (Antigravity) to review and test. Then fix all failing tests in this project.",
-            "Investigate why the app is slow to start, try the three most promising fixes in parallel and tell me which one wins."
+            "在我当前项目的设置页里加一个深色模式开关，让审查团队检查并运行测试。不跑通就别停。",
+            "组建两个团队：构建者（Claude）负责实现，审查者（Antigravity）负责审查和测试。然后修复此项目中所有失败的测试。",
+            "排查应用启动慢的原因，并行尝试三个最有希望的修复方案，并告诉我哪个效果最好。"
         ).forEach { ex ->
             Text(
                 ex, fontSize = 12.5.sp, lineHeight = 17.sp, color = onSurface.copy(alpha = 0.85f),

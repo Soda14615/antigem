@@ -5,11 +5,11 @@
     <string name="checkpoint_restore_sheet_restore_chat_files">"恢复聊天和文件"</string>
     <string name="checkpoint_restore_sheet_restore_files">"恢复文件"</string>
     <string name="checkpoint_restore_sheet_restore_chat">"恢复聊天"</string>
-    <string name="checkpoint_restore_sheet_undo_that_restore">"撤消该恢复"</string>
+    <string name="checkpoint_restore_sheet_undo_that_restore">"撤销该恢复"</string>
     <string name="checkpoint_restore_sheet_go_back_to_before_this_message">"回到这条消息之前"</string>
     <string name="checkpoint_restore_sheet_restore_this_checkpoint">"恢复这个检查点"</string>
     <string name="checkpoint_restore_sheet_tap_a_file_to_see_exactly_what">"点击一个文件即可准确查看其中发生的变化。"</string>
-    <string name="checkpoint_restore_sheet_message">"• %1$s：“ %2$s ”（%3$s 消息 %4$s、 %5$s）"</string>
+    <string name="checkpoint_restore_sheet_message">"• %1$s：“%2$s”（%3$s 消息 %4$s、%5$s）"</string>
     <string name="checkpoint_restore_sheet_binary">"二进制文件"</string>
     <string name="checkpoint_restore_sheet_a_binary_file_it_is_put_back">"二进制文件：按原样放回。"</string>
     <string name="checkpoint_restore_sheet_more_lines">"… %1$s 更多行"</string>
@@ -17,9 +17,9 @@
     <string name="checkpoint_restore_sheet_files_restored_with_problems">"文件已恢复，但有问题"</string>
     <string name="checkpoint_restore_sheet_nothing_had_to_change">"没有什么需要改变的。"</string>
     <string name="checkpoint_restore_sheet_the_chat_went_back_too_the_message">"聊天也回去了：消息出现在输入框中。"</string>
-    <string name="checkpoint_restore_sheet_undo_files">"撤消文件"</string>
-    <string name="checkpoint_restore_sheet_undo_restore">"撤消恢复"</string>
-    <string name="checkpoint_restore_sheet_undo_brings_the_files_back_the_chat">"撤消将文件恢复；聊天部分无法撤消。"</string>
+    <string name="checkpoint_restore_sheet_undo_files">"撤销文件"</string>
+    <string name="checkpoint_restore_sheet_undo_restore">"撤销恢复"</string>
+    <string name="checkpoint_restore_sheet_undo_brings_the_files_back_the_chat">"撤销将文件恢复；聊天部分无法撤销。"</string>
     <string name="project_checkpoints_screen_checkpoints_work_in_git_projects_only_a">"检查点仅在 git 项目中工作（已完成 git init 的文件夹）。项目内的嵌套仓库也会被保存。"</string>
     <string name="project_checkpoints_screen_loading">"加载中…"</string>
     <string name="project_checkpoints_screen_turn_checkpoints_on_above_then_start_a">"打开上面的检查点，然后在项目中开始聊天。"</string>

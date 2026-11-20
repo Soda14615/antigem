@@ -378,7 +378,7 @@ class CodexChatBackend(
                         _cliJob.value = j
                         if (!j.running) {
                             val ok = j.exit_code == 0
-                            _toasts.tryEmit(if (ok) "Codex ${if (action == "install") "installed" else "is up to date"}" else "Codex $action failed")
+                            _toasts.tryEmit(if (ok) "Codex ${if (action == "install") "已安装" else "已是最新版本"}" else "Codex ${if (action == "install") "安装" else "更新"}失败")
                             refreshStatus()
                             if (ok) {
                                 refreshModels()
@@ -388,7 +388,7 @@ class CodexChatBackend(
                         }
                     }
                 }
-                .onFailure { _toasts.tryEmit("Could not start the $action: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法启动${if (action == "install") "安装" else "更新"}：${it.message}") }
         }
     }
 
@@ -422,7 +422,7 @@ class CodexChatBackend(
                     val url = o.str("verificationUrl") ?: o.str("authUrl") ?: return@onSuccess
                     _login.value = CodexLogin(id, url, o.str("userCode"))
                 }
-                .onFailure { _toasts.tryEmit("Could not start the sign-in: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法启动登录：${it.message}") }
         }
     }
 
@@ -436,7 +436,7 @@ class CodexChatBackend(
         backendScope.launch {
             client.rpc("account/logout")
                 .onSuccess { refreshAccount() }
-                .onFailure { _toasts.tryEmit("Could not sign out: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法退出登录：${it.message}") }
         }
     }
 
@@ -632,7 +632,7 @@ class CodexChatBackend(
     private suspend fun reload(id: String, restoreChoices: Boolean = false) {
         val reloadStartedAt = System.nanoTime()
         val read = client.rpc("thread/read", buildJsonObject { put("threadId", id) }).getOrElse { e ->
-            if (attachedId == id) _conversationError.value = "Could not load this chat: ${e.message}"
+            if (attachedId == id) _conversationError.value = "无法加载此聊天：${e.message}"
             return
         }.obj().o("thread")
         val turns = mutableListOf<JsonObject>()
@@ -643,7 +643,7 @@ class CodexChatBackend(
                 put("threadId", id); put("limit", 30); put("itemsView", "full"); put("sortDirection", "desc")
                 cursor?.let { put("cursor", it) }
             }).getOrElse { e ->
-                if (attachedId == id) _conversationError.value = "Could not load this chat: ${e.message}"
+                if (attachedId == id) _conversationError.value = "无法加载此聊天：${e.message}"
                 return
             }.obj()
             turns.addAll(page.a("data").orEmpty().mapNotNull { it.obj() })
@@ -681,7 +681,7 @@ class CodexChatBackend(
         // commands are read without the app's hidden notes (its global context goes in front of messages)
         if (atts.isEmpty() && runCommand(conv, ai.antigem.data.remote.PromptExpansion.collapse(content).trim())) return
         if (_state.value.isBlocking) {
-            _toasts.tryEmit("Codex is not available: ${_state.value.label}. Check Settings → Codex.")
+            _toasts.tryEmit("Codex 不可用：${_state.value.label}。请检查设置 → Codex。")
             return
         }
         store.attachments.value = emptyList()
@@ -716,7 +716,7 @@ class CodexChatBackend(
                 }).onSuccess {
                     if (!transcript.isTurnActive) client.rpc("thread/queue/start", buildJsonObject { put("threadId", conv.id) })
                     refreshQueue(conv.id)
-                }.onFailure { _toasts.tryEmit("Could not queue the message: ${it.message}") }
+                }.onFailure { _toasts.tryEmit("无法将消息加入队列：${it.message}") }
                 return@launch
             }
             // images show as previews, other files sent by the app by name; files by path come from the text's list
@@ -834,7 +834,7 @@ class CodexChatBackend(
     private fun fail(clientId: String, title: String, e: Throwable?) {
         Log.w(TAG, "$title: ${e?.message}")
         transcript.removeLocalPrompt(clientId)
-        transcript.addError(title, e?.message ?: "Unknown error")
+        transcript.addError(title, e?.message ?: "未知错误")
         attachedId?.let { running.remove(it) }
         publishConversations()
         emitNow()
@@ -852,7 +852,7 @@ class CodexChatBackend(
     override fun stopStreaming() {
         val id = store.currentConversation.value?.takeIf { it.agent == AgentKind.CODEX }?.id ?: return
         backendScope.launch(worker) {
-            interrupt(id).onFailure { _toasts.tryEmit("Could not stop: ${it.message}") }
+            interrupt(id).onFailure { _toasts.tryEmit("无法停止：${it.message}") }
         }
     }
 
@@ -861,7 +861,7 @@ class CodexChatBackend(
             if (id in createdSnapshot()) {
                 val r = client.rpc("thread/delete", buildJsonObject { put("threadId", id) })
                 if (r.isFailure) {
-                    _toasts.tryEmit("Could not delete the chat: ${r.exceptionOrNull()?.message}")
+                    _toasts.tryEmit("无法删除聊天：${r.exceptionOrNull()?.message}")
                     return@launch
                 }
             }
@@ -884,7 +884,7 @@ class CodexChatBackend(
                     refreshThreads()
                     if (newId != null) selectConversation(newId)
                 }
-                .onFailure { _toasts.tryEmit("Could not copy the chat: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法复制聊天：${it.message}") }
         }
     }
 
@@ -900,7 +900,7 @@ class CodexChatBackend(
             }
             client.rpc("thread/name/set", buildJsonObject { put("threadId", id); put("name", title) })
                 .onSuccess { backendScope.launch(worker) { applyTitle(id, title) } }
-                .onFailure { _toasts.tryEmit("Could not rename: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法重命名：${it.message}") }
         }
     }
 
@@ -910,7 +910,7 @@ class CodexChatBackend(
             if (id !in createdSnapshot()) return@launch
             client.rpc(if (archived) "thread/archive" else "thread/unarchive", buildJsonObject { put("threadId", id) })
                 .onSuccess { refreshThreads() }
-                .onFailure { _toasts.tryEmit("Could not ${if (archived) "archive" else "unarchive"} the chat: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法${if (archived) "归档" else "取消归档"}聊天：${it.message}") }
         }
     }
 
@@ -1025,11 +1025,11 @@ class CodexChatBackend(
             "/review" -> startReview(arg.ifBlank { null })
             "/plan" -> {
                 setPlanMode(true)
-                if (arg.isBlank()) _toasts.tryEmit("Plan mode is on: Codex plans before changing anything.")
+                if (arg.isBlank()) _toasts.tryEmit("计划模式已开启：Codex 会先制定计划，再动手修改。")
                 // the task itself goes out as a normal message, now in plan mode
                 else backendScope.launch(Dispatchers.Main) { sendMessage(arg) }
             }
-            "/fork" -> if (conv.id in createdSnapshot()) forkConversation(conv.id) else _toasts.tryEmit("Send a message first: there is nothing to copy yet.")
+            "/fork" -> if (conv.id in createdSnapshot()) forkConversation(conv.id) else _toasts.tryEmit("请先发送消息：目前还没有内容可复制。")
             "/stop" -> stopStreaming()
             else -> return false
         }
@@ -1040,11 +1040,11 @@ class CodexChatBackend(
     fun compact() {
         val id = store.currentConversation.value?.takeIf { it.agent == AgentKind.CODEX }?.id ?: return
         backendScope.launch(worker) {
-            if (id !in createdSnapshot()) { _toasts.tryEmit("Nothing to compact yet."); return@launch }
-            if (transcript.isTurnActive) { _toasts.tryEmit("Wait for the reply to finish first"); return@launch }
+            if (id !in createdSnapshot()) { _toasts.tryEmit("暂无可压缩的内容。"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先等待回复完成"); return@launch }
             _isStreaming.value = true
             client.rpc("thread/compact/start", buildJsonObject { put("threadId", id) })
-                .onFailure { _isStreaming.value = false; _toasts.tryEmit("Could not compact: ${it.message}") }
+                .onFailure { _isStreaming.value = false; _toasts.tryEmit("无法压缩：${it.message}") }
         }
     }
 
@@ -1055,14 +1055,14 @@ class CodexChatBackend(
     fun startReview(instructions: String?) {
         val conv = store.currentConversation.value?.takeIf { it.agent == AgentKind.CODEX } ?: return
         backendScope.launch(worker) {
-            if (transcript.isTurnActive) { _toasts.tryEmit("Wait for the reply to finish first"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先等待回复完成"); return@launch }
             val id = if (conv.id in createdSnapshot()) conv.id else createThread(conv) ?: return@launch
             _isStreaming.value = true
             client.rpc("review/start", buildJsonObject {
                 put("threadId", id)
                 put("target", if (instructions == null) buildJsonObject { put("type", "uncommittedChanges") }
                 else buildJsonObject { put("type", "custom"); put("instructions", instructions) })
-            }).onFailure { _isStreaming.value = false; _toasts.tryEmit("Could not start the review: ${it.message}") }
+            }).onFailure { _isStreaming.value = false; _toasts.tryEmit("无法启动审查：${it.message}") }
         }
     }
 
@@ -1078,7 +1078,7 @@ class CodexChatBackend(
         })
         val tid = r.getOrNull().obj().o("thread").str("id")
         if (tid == null) {
-            _toasts.tryEmit("Could not start the Codex chat: ${r.exceptionOrNull()?.message}")
+            _toasts.tryEmit("无法启动 Codex 聊天：${r.exceptionOrNull()?.message}")
             return null
         }
         localConversations[conv.id] = conv
@@ -1104,10 +1104,10 @@ class CodexChatBackend(
     fun regenerate(assistantMessageId: String) {
         backendScope.launch(worker) {
             val sid = attachedId ?: return@launch
-            if (transcript.isTurnActive) { _toasts.tryEmit("Stop the reply first"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先停止回复"); return@launch }
             val turn = transcript.turnOfItem(assistantMessageId)
             val prompt = turn?.let { transcript.promptOf(it) }
-            if (turn == null || prompt.isNullOrBlank()) { _toasts.tryEmit("Nothing to retry here"); return@launch }
+            if (turn == null || prompt.isNullOrBlank()) { _toasts.tryEmit("此处没有可重试的内容"); return@launch }
             if (!revertTo(sid, turn.id)) return@launch
             reload(sid)
             kotlinx.coroutines.withContext(Dispatchers.Main) { sendMessage(prompt) }
@@ -1121,9 +1121,9 @@ class CodexChatBackend(
     fun editMessage(userMessageId: String, onRestored: (String) -> Unit) {
         backendScope.launch(worker) {
             val sid = attachedId ?: return@launch
-            if (transcript.isTurnActive) { _toasts.tryEmit("Stop the reply first"); return@launch }
+            if (transcript.isTurnActive) { _toasts.tryEmit("请先停止回复"); return@launch }
             val turn = transcript.turnOfItem(userMessageId)
-            if (turn == null) { _toasts.tryEmit("This message can't be edited yet"); return@launch }
+            if (turn == null) { _toasts.tryEmit("此消息暂时无法编辑"); return@launch }
             val text = turn.items[userMessageId]?.json?.a("content").orEmpty().mapNotNull { it.obj() }
                 .filter { it.str("type") == "text" }.joinToString("\n") { it.str("text").orEmpty() }
                 .ifBlank { transcript.promptOf(turn).orEmpty() }
@@ -1135,7 +1135,7 @@ class CodexChatBackend(
 
     private suspend fun revertTo(sid: String, turnId: String): Boolean {
         val r = client.rpc("thread/revert", buildJsonObject { put("threadId", sid); put("beforeTurnId", turnId) })
-        r.onFailure { _toasts.tryEmit("Could not go back in the chat: ${it.message}") }
+        r.onFailure { _toasts.tryEmit("无法在聊天中回退：${it.message}") }
         return r.isSuccess
     }
 
@@ -1240,7 +1240,7 @@ class CodexChatBackend(
             if (note.isNotBlank() && p.turnId != null) {
                 client.rpc("turn/steer", buildJsonObject {
                     put("threadId", tid); put("expectedTurnId", p.turnId); put("input", JsonArray(listOf(textInput(note))))
-                }).onFailure { _toasts.tryEmit("Codex did not get your note: ${it.message}") }
+                }).onFailure { _toasts.tryEmit("Codex 没有收到你的备注：${it.message}") }
             }
         }
     }
@@ -1249,7 +1249,7 @@ class CodexChatBackend(
         pendingAll.remove(p.key)
         emitNow()
         val r = client.reply(p.key, result)
-        r.onFailure { _toasts.tryEmit("Could not answer the request: ${it.message}") }
+        r.onFailure { _toasts.tryEmit("无法回复请求：${it.message}") }
         return r.isSuccess
     }
 
@@ -1332,7 +1332,7 @@ class CodexChatBackend(
         backendScope.launch(worker) {
             val tid = attachedId ?: return@launch
             client.rpc("thread/queue/delete", buildJsonObject { put("threadId", tid); put("queuedSubmissionId", id) })
-                .onFailure { _toasts.tryEmit("Could not remove the message: ${it.message}") }
+                .onFailure { _toasts.tryEmit("无法移除消息：${it.message}") }
             refreshQueue(tid)
         }
     }
@@ -1363,7 +1363,7 @@ class CodexChatBackend(
                         running.clear()
                         publishConversations()
                         attachedId?.takeIf { it in created && transcript.isTurnActive }?.let { reload(it) }
-                        f.str("error")?.takeIf { it.isNotBlank() }?.let { _toasts.tryEmit("Codex stopped: ${it.take(160)}") }
+                        f.str("error")?.takeIf { it.isNotBlank() }?.let { _toasts.tryEmit("Codex 已停止：${it.take(160)}") }
                     }
                 }
                 emitNow()
@@ -1422,12 +1422,12 @@ class CodexChatBackend(
             "account/login/completed" -> {
                 if (_login.value?.loginId == p.str("loginId")) _login.value = null
                 if (p.str("success") == "true") {
-                    _toasts.tryEmit("Signed in to Codex")
+                    _toasts.tryEmit("已登录 Codex")
                     backendScope.launch { refreshAccount(); refreshModels(); refreshThreads() }
-                } else p.str("error")?.takeIf { it != "Login was not completed" }?.let { _toasts.tryEmit("Codex sign-in failed: $it") }
+                } else p.str("error")?.takeIf { it != "Login was not completed" }?.let { _toasts.tryEmit("Codex 登录失败：$it") }
             }
             "thread/queue/changed" -> if (tid != null && tid == attachedId) refreshQueue(tid)
-            "model/rerouted" -> if (tid == attachedId) _toasts.tryEmit("Codex switched from ${p.str("fromModel")} to ${p.str("toModel")}")
+            "model/rerouted" -> if (tid == attachedId) _toasts.tryEmit("Codex 已从 ${p.str("fromModel")} 切换到 ${p.str("toModel")}")
         }
         if (tid != null && tid != attachedId) {
             // a reply running in a chat that is not on screen: keep its live copy current

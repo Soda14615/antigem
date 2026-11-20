@@ -171,10 +171,10 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
         Column(Modifier.padding(12.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(stringResource(R.string.claude_providers_page_third_party_models_work_better_in_opencode), fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = oc)
             Text(
-                "Claude Code only speaks Anthropic's API, so a provider here must offer an Anthropic-compatible endpoint, and tools or " +
-                    "thinking can break on the way. OpenCode talks to each provider in its own format: 200+ built-in providers, any " +
-                    "OpenAI-compatible API (Ollama, LM Studio, NVIDIA NIM, Groq…) and free models. Turn it on in Settings → Agents. " +
-                    "Keep using this page for Anthropic and Anthropic-compatible APIs.",
+                "Claude Code 只支持 Anthropic 的 API，因此这里的提供商必须提供兼容 Anthropic 的端点，工具调用和" +
+                    "思考过程可能在中途出错。OpenCode 则按各家自己的格式通信：200+ 内置提供商、任何 " +
+                    "兼容 OpenAI 的 API（Ollama、LM Studio、NVIDIA NIM、Groq……）以及免费模型。可在“设置 → 智能体”中开启。" +
+                    "Anthropic 及兼容 Anthropic 的 API 仍可继续在此页面配置。",
                 fontSize = 11.5.sp, color = muted
             )
         }
@@ -260,8 +260,8 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
             title = { Text(stringResource(R.string.claude_providers_page_saved, p.name.toString()), fontWeight = FontWeight.Bold) },
             text = {
                 Text(
-                    "New chats and chats you reopen use these settings right away. Chats that are already running on ${p.name} keep the " +
-                        "settings they started with until they restart (the conversation is kept). You can also use \"Restart chat\" in a chat's menu.",
+                    "新聊天和你重新打开的聊天会立即使用这些设置。已经在 ${p.name} 上运行的聊天会保持" +
+                        "启动时的设置，直到重启（对话内容会保留）。你也可以在聊天菜单中使用“重启聊天”。",
                     fontSize = 13.5.sp
                 )
             },
@@ -512,7 +512,7 @@ private fun ProviderEditor(
                 out.models.isNotEmpty() -> {
                     fetched = out.models
                     out.raw?.paging_error?.takeIf { it.isNotBlank() }?.let {
-                        Toast.makeText(context, "Only part of the list was read ($it)", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "只读取了列表的一部分（$it）", Toast.LENGTH_LONG).show()
                     }
                 }
                 else -> {
@@ -698,7 +698,7 @@ private fun ProviderEditor(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             OutlinedTextField(
                                 value = newModel, onValueChange = { newModel = it }, singleLine = true, modifier = Modifier.weight(1f),
-                                placeholder = { Text("model id, e.g. kimi-k2-0905-preview", fontSize = 12.sp) },
+                                placeholder = { Text("模型 ID，例如 kimi-k2-0905-preview", fontSize = 12.sp) },
                                 textStyle = MaterialTheme.typography.bodySmall
                             )
                             IconButton(
@@ -712,10 +712,10 @@ private fun ProviderEditor(
                     }
 
                     // ---- behaviour
-                    EditorSection("Behavior", "How chats on this provider run.") {
+                    EditorSection("行为", "此提供商上的聊天如何运行。") {
                         ModelIdField(
                             value = smallModel, onValueChange = { smallModel = it }, models = models,
-                            label = "Background model (optional)", placeholder = "titles & summaries; default: the chat's model"
+                            label = "后台模型（可选）", placeholder = "用于标题与摘要；默认使用聊天自身的模型"
                         )
                         Text(
                             stringResource(R.string.claude_providers_page_sonnet_opus_and_subagent_requests_are_always),
@@ -1051,7 +1051,7 @@ private fun RawResponseDialog(raw: ClaudeFetchRaw, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 clipboard.setText(AnnotatedString(text))
-                Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
             }) { Icon(Icons.Outlined.ContentCopy, null, Modifier.size(14.dp), tint = ClaudeAccent); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.copy_text), color = ClaudeAccent) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) } }

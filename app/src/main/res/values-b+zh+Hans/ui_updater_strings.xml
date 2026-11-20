@@ -6,5 +6,5 @@
     <string name="app_update_dialog_what_s_new">"更新内容"</string>
     <string name="app_update_dialog_downloading">"正在下载…"</string>
     <string name="app_update_dialog_downloaded_launching_installer">"已下载！正在启动安装程序…"</string>
-    <string name="app_update_dialog_download_failed">"下载失败： %1$s"</string>
+    <string name="app_update_dialog_download_failed">"下载失败：%1$s"</string>
 </resources>

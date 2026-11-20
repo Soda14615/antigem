@@ -449,7 +449,7 @@ fun AgentStatusMenu(
         modifier = Modifier.width(300.dp)
     ) {
         Text(
-            "AGENTS",
+            "智能体",
             fontSize = 10.5.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp,

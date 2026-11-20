@@ -340,7 +340,7 @@ object FileExplorerApi {
         try {
             transferClient.newCall(Request.Builder().url(rawUrl(path)).get().build()).execute().use { resp ->
                 if (!resp.isSuccessful) return@withContext FsResult(false, error = errorOf(resp.code, resp.body?.string()))
-                val body = resp.body ?: return@withContext FsResult(false, error = "Empty response")
+                val body = resp.body ?: return@withContext FsResult(false, error = "响应为空")
                 val total = body.contentLength()
                 dest.parentFile?.mkdirs()
                 val tmp = File(dest.path + ".part")
@@ -358,11 +358,11 @@ object FileExplorerApi {
                     }
                 }
                 if (dest.exists()) dest.delete()
-                if (!tmp.renameTo(dest)) return@withContext FsResult(false, error = "Could not save download")
+                if (!tmp.renameTo(dest)) return@withContext FsResult(false, error = "无法保存下载内容")
                 FsResult(true, dest.absolutePath)
             }
         } catch (e: Exception) {
-            FsResult(false, error = e.message ?: "Download failed")
+            FsResult(false, error = e.message ?: "下载失败")
         }
     }
 }

@@ -338,8 +338,8 @@ private fun BackupKeyDialog(afterCreate: Boolean, onResult: (String?) -> Unit) {
         title = { Text(if (afterCreate) stringResource(R.string.mini_app_install_ui_back_up_your_new_key) else stringResource(R.string.mini_app_install_ui_back_up_the_key)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                Text("The key is saved, locked with this password, to Download/AntiGem on this phone: it stays there even if AntiGem is " +
-                    "uninstalled. Then you can also send it to Drive or email. If the key is lost, apps signed with it can never be updated.",
+                Text("密钥已用此密码加密保存到本机的 Download/AntiGem：即使卸载 AntiGem 也仍会保留。" +
+                    "之后你也可以把它发送到云端硬盘或邮箱。一旦密钥丢失，用它签名的应用将永远无法更新。",
                     style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 12.dp))
                 OutlinedTextField(pw, { pw = it }, singleLine = true, label = { Text(stringResource(R.string.mini_app_install_ui_password_8_characters)) }, modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))

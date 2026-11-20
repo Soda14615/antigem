@@ -88,9 +88,9 @@ class ClaudeConfigManager(
                         _settingsError.value = null
                         _messages.tryEmit(feedback)
                         onSettingsChanged()
-                    } else _messages.tryEmit("Save failed: ${it.error}")
+                    } else _messages.tryEmit("保存失败：${it.error}")
                 }
-                .onFailure { _messages.tryEmit("Save failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("保存失败：${it.message}") }
         }
     }
 
@@ -153,7 +153,7 @@ class ClaudeConfigManager(
             _memory.value = null
             client.memory(scopeName, cwd)
                 .onSuccess { _memory.value = it }
-                .onFailure { _messages.tryEmit("Could not read CLAUDE.md: ${it.message}") }
+                .onFailure { _messages.tryEmit("无法读取 CLAUDE.md：${it.message}") }
         }
     }
 
@@ -164,9 +164,9 @@ class ClaudeConfigManager(
                     if (it.success) {
                         _messages.tryEmit("CLAUDE.md saved")
                         _memory.value = _memory.value?.copy(content = content, exists = true)
-                    } else _messages.tryEmit("Save failed: ${it.error}")
+                    } else _messages.tryEmit("保存失败：${it.error}")
                 }
-                .onFailure { _messages.tryEmit("Save failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("保存失败：${it.message}") }
         }
     }
 
@@ -190,9 +190,9 @@ class ClaudeConfigManager(
                     if (it.success) {
                         _messages.tryEmit("Deleted $name")
                         _autoMemory.value = _autoMemory.value?.let { m -> m.copy(files = m.files.filter { f -> f.name != name }) }
-                    } else _messages.tryEmit("Delete failed: ${it.error}")
+                    } else _messages.tryEmit("删除失败：${it.error}")
                 }
-                .onFailure { _messages.tryEmit("Delete failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("删除失败：${it.message}") }
         }
     }
 
@@ -231,7 +231,7 @@ class ClaudeConfigManager(
             if (error != null) {
                 setMcpOp(req.name, null)
                 _mcpAddError.value = req.name to error
-                _messages.tryEmit("Could not add '${req.name}': $error")
+                _messages.tryEmit("无法添加“${req.name}”：$error")
                 return@launch
             }
             // added: the status check connects to it (can take a few seconds)
@@ -259,7 +259,7 @@ class ClaudeConfigManager(
                         _mcpServers.value = _mcpServers.value.filter { s -> s.name != name }
                     } else _messages.tryEmit(it.error ?: "Remove failed")
                 }
-                .onFailure { _messages.tryEmit("Remove failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("移除失败：${it.message}") }
             setMcpOp(name, null)
             loadMcpNow(cwd)
         }
@@ -268,8 +268,8 @@ class ClaudeConfigManager(
     private suspend fun loadMcpNow(cwd: String?) {
         _mcpLoading.value = true
         client.mcpServers(cwd)
-            .onSuccess { if (it.success) _mcpServers.value = it.servers else _messages.tryEmit("MCP status failed: ${it.error}") }
-            .onFailure { _messages.tryEmit("MCP status failed: ${it.message}") }
+            .onSuccess { if (it.success) _mcpServers.value = it.servers else _messages.tryEmit("MCP 状态查询失败：${it.error}") }
+            .onFailure { _messages.tryEmit("MCP 状态查询失败：${it.message}") }
         _mcpLoading.value = false
     }
 
@@ -292,7 +292,7 @@ class ClaudeConfigManager(
         scope.launch {
             client.plugins()
                 .onSuccess { _plugins.value = it }
-                .onFailure { _messages.tryEmit("Plugin list failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("插件列表获取失败：${it.message}") }
         }
     }
 
@@ -310,23 +310,36 @@ class ClaudeConfigManager(
                         if (it.success) _messages.tryEmit("${pluginActionDone(action)} $label")
                         else _messages.tryEmit("$label: " + (it.error?.lines()?.lastOrNull { l -> l.isNotBlank() } ?: "$action failed"))
                     }
-                    .onFailure { _messages.tryEmit("$label: $action failed: ${it.message}") }
+                    .onFailure { _messages.tryEmit("$label：${actionZh(action)}失败：${it.message}") }
                 client.plugins().onSuccess { _plugins.value = it }
             }
             _pluginOps.value = _pluginOps.value - key
         }
     }
 
+    /** 动作名转中文，用于提示文案（action 本身仍走 API 路径，不能改）。 */
+    private fun actionZh(action: String) = when (action) {
+        "install" -> "安装"
+        "uninstall" -> "卸载"
+        "enable" -> "启用"
+        "disable" -> "禁用"
+        "update" -> "更新"
+        "marketplace-add" -> "添加市场"
+        "marketplace-remove" -> "移除市场"
+        "marketplace-update" -> "更新市场"
+        else -> action
+    }
+
     private fun pluginActionDone(action: String) = when (action) {
-        "install" -> "Installed"
-        "uninstall" -> "Uninstalled"
-        "enable" -> "Enabled"
-        "disable" -> "Disabled"
-        "update" -> "Updated"
-        "marketplace-add" -> "Added marketplace"
-        "marketplace-remove" -> "Removed marketplace"
-        "marketplace-update" -> "Updated marketplace"
-        else -> "Done:"
+        "install" -> "已安装"
+        "uninstall" -> "已卸载"
+        "enable" -> "已启用"
+        "disable" -> "已禁用"
+        "update" -> "已更新"
+        "marketplace-add" -> "已添加市场"
+        "marketplace-remove" -> "已移除市场"
+        "marketplace-update" -> "已更新市场"
+        else -> "已完成："
     }
 
     // ---------------------------------------------------------------- CLI install / update
@@ -342,7 +355,7 @@ class ClaudeConfigManager(
             client.startCliJob(action)
                 .onSuccess { resp ->
                     if (!resp.success) {
-                        _messages.tryEmit(resp.error ?: "$action failed to start")
+                        _messages.tryEmit(resp.error ?: "${actionZh(action)}无法启动")
                         return@onSuccess
                     }
                     _cliJob.value = resp.job
@@ -351,13 +364,13 @@ class ClaudeConfigManager(
                         val job = client.cliJob().getOrNull()?.job ?: break
                         _cliJob.value = job
                         if (!job.running) {
-                            _messages.tryEmit(if (job.exit_code == 0) "Claude Code $action finished" else "Claude Code $action failed (exit ${job.exit_code})")
+                            _messages.tryEmit(if (job.exit_code == 0) "Claude Code ${actionZh(action)}完成" else "Claude Code ${actionZh(action)}失败（退出码 ${job.exit_code}）")
                             onCliChanged()
                             break
                         }
                     }
                 }
-                .onFailure { _messages.tryEmit("$action failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("${actionZh(action)}失败：${it.message}") }
         }
     }
 }

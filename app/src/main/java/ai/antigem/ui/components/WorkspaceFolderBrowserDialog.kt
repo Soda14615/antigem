@@ -58,7 +58,7 @@ fun WorkspaceFolderBrowserDialog(
                 parentPath = res.parentPath
                 directories = res.directories
             } else {
-                errorMessage = "Cannot read directory. Make sure the IDE Bridge is running."
+                errorMessage = "无法读取目录。请确认 IDE 桥接服务正在运行。"
             }
             isLoading = false
         }

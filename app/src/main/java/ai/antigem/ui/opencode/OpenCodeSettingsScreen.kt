@@ -229,8 +229,8 @@ fun OpenCodeSettingsScreen(
             if (state == OpenCodeState.NOT_INSTALLED) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "OpenCode is not installed on the server (on this phone when you use the local server). " +
-                        "Install it here: the app downloads the official build (~250 MB) into ~/.opencode/bin.",
+                    "服务器上未安装 OpenCode（使用本地服务器时即为本机）。" +
+                        "在此安装：应用会把官方版本（约 250 MB）下载到 ~/.opencode/bin。",
                     fontSize = 12.5.sp, lineHeight = 17.sp
                 )
             }
@@ -465,7 +465,7 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
                                 backend.client.fetchModels(kind, baseUrl.trim(), apiKey.trim(), initial.id)
                                     .onSuccess { list ->
                                         fetched = list
-                                        if (list.isEmpty()) error = "The endpoint listed no models."
+                                        if (list.isEmpty()) error = "该端点没有列出任何模型。"
                                         // nothing chosen yet (a new provider): every model the endpoint lists is on; untick the unwanted ones
                                         else if (models.isEmpty()) models.addAll(list.distinctBy { it.id })
                                     }
@@ -485,7 +485,7 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(newModel, { newModel = it }, singleLine = true, placeholder = { Text("model id, e.g. llama3.1") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(newModel, { newModel = it }, singleLine = true, placeholder = { Text("模型 ID，例如 llama3.1") }, modifier = Modifier.weight(1f))
                     IconButton(onClick = {
                         val id = newModel.trim()
                         if (id.isNotBlank() && models.none { it.id == id }) models.add(OpenCodeCustomModel(id))

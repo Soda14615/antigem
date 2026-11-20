@@ -304,7 +304,7 @@ fun ProjectSidebar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "FILES",
+                    text = "文件",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,

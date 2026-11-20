@@ -3871,7 +3871,7 @@ private fun TerminalSubScreen(
                 if (remoteMode) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "Remote server mode is on: the terminal and shell runs use the SSH login from Settings > Servers" +
+                        text = "远程服务器模式已开启：终端和 shell 使用“设置 › 服务器”中的 SSH 登录。" +
                             (if (sshHost.isNotBlank()) " ($sshUser@$sshHost:$sshPort)" else "") + ". Nothing to set here.",
                         fontSize = 11.5.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)

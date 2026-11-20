@@ -83,8 +83,8 @@ fun AndroidAutomationScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbCo
                 Icon(Icons.Outlined.WarningAmber, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    "This gives AI agents full control of your phone: they can read everything on screen (including messages and passwords " +
-                        "you can see), tap, type and open or uninstall apps. Only allow it if you trust the agents you connect, and review what they do.",
+                    "这会让 AI 智能体完全控制你的手机：它们能读取屏幕上的所有内容（包括你能看到的" +
+                        "消息和密码）、点击、输入，以及打开或卸载应用。只有信任所连接的智能体时才开启，并留意它们的操作。",
                     fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
             }

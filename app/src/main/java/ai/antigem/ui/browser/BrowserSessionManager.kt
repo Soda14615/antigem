@@ -117,7 +117,7 @@ class BrowserJsDialog(
 class BrowserTabSession(
     val id: String = java.util.UUID.randomUUID().toString(),
     initialUrl: String = "",
-    initialTitle: String = "New Tab"
+    initialTitle: String = "新标签页"
 ) {
     var url by mutableStateOf(initialUrl)
     var title by mutableStateOf(initialTitle)
@@ -189,7 +189,7 @@ class BrowserTabSession(
                     lastError = BrowserNetworkError(
                         url = url,
                         errorCode = -1001,
-                        description = "Page load timed out (took longer than ${timeoutMs / 1000}s). The web server or host might be unreachable or stalled."
+                        description = "页面加载超时（超过 ${timeoutMs / 1000} 秒）。Web 服务器或主机可能无法访问或已卡住。"
                     )
                 }
             }
@@ -564,7 +564,7 @@ class BrowserSessionManager private constructor() {
     private val automationInputStates = mutableMapOf<String, AutomationInputState>()
 
     val tabs = mutableStateListOf<BrowserTabSession>().apply {
-        add(BrowserTabSession(initialUrl = "", initialTitle = "New Tab"))
+        add(BrowserTabSession(initialUrl = "", initialTitle = "新标签页"))
     }
 
     var activeTabId by mutableStateOf<String?>(tabs.firstOrNull()?.id)
@@ -609,7 +609,7 @@ class BrowserSessionManager private constructor() {
 
     fun getMainHandler(): Handler = mainHandler
 
-    fun addNewTab(url: String = "", title: String = "New Tab", activate: Boolean = true, desktopMode: Boolean? = null): BrowserTabSession {
+    fun addNewTab(url: String = "", title: String = "新标签页", activate: Boolean = true, desktopMode: Boolean? = null): BrowserTabSession {
         val formatted = if (url.isNotBlank()) formatUrl(url) else ""
         val newTab = BrowserTabSession(
             initialUrl = formatted,
@@ -722,7 +722,7 @@ class BrowserSessionManager private constructor() {
             val cookies = CookieManager.getInstance()
             cookies.removeAllCookies {
                 cookies.flush()
-                val fresh = BrowserTabSession(initialUrl = "", initialTitle = "New Tab")
+                val fresh = BrowserTabSession(initialUrl = "", initialTitle = "新标签页")
                 tabs.add(fresh)
                 activeTabId = fresh.id
                 onDone()
@@ -830,7 +830,7 @@ class BrowserSessionManager private constructor() {
                 tab.lastError = BrowserNetworkError(
                     url = effectiveUrl,
                     errorCode = -999,
-                    description = "Failed to load page: ${e.message ?: "Unknown WebView Error"}"
+                    description = "页面加载失败：${e.message ?: "未知 WebView 错误"}"
                 )
             }
         }
@@ -999,7 +999,7 @@ class BrowserSessionManager private constructor() {
                     tab.startLoadingWatchdog(mainHandler)
                     if (url.isNullOrBlank() || url == "about:blank") {
                         tab.url = ""
-                        tab.title = "New Tab"
+                        tab.title = "新标签页"
                     } else if (!url.startsWith("data:")) {
                         tab.url = url
                     }
@@ -1016,7 +1016,7 @@ class BrowserSessionManager private constructor() {
                     tab.cancelLoadingWatchdog(mainHandler)
                     if (url.isNullOrBlank() || url == "about:blank") {
                         tab.url = ""
-                        tab.title = "New Tab"
+                        tab.title = "新标签页"
                     } else if (!url.startsWith("data:")) {
                         tab.url = url
                     }
@@ -1107,16 +1107,16 @@ class BrowserSessionManager private constructor() {
                     }
 
                     val primaryMsg = when (error?.primaryError) {
-                        android.net.http.SslError.SSL_UNTRUSTED -> "Untrusted Certificate Authority (Self-signed or invalid CA)"
-                        android.net.http.SslError.SSL_EXPIRED -> "SSL Certificate Expired"
-                        android.net.http.SslError.SSL_IDMISMATCH -> "Hostname Mismatch"
-                        android.net.http.SslError.SSL_NOTYETVALID -> "Certificate Not Yet Valid"
-                        else -> "SSL Handshake / Security Failure"
+                        android.net.http.SslError.SSL_UNTRUSTED -> "证书颁发机构不受信任（自签名或无效 CA）"
+                        android.net.http.SslError.SSL_EXPIRED -> "SSL 证书已过期"
+                        android.net.http.SslError.SSL_IDMISMATCH -> "主机名不匹配"
+                        android.net.http.SslError.SSL_NOTYETVALID -> "证书尚未生效"
+                        else -> "SSL 握手或安全校验失败"
                     }
                     val err = BrowserNetworkError(
                         url = reqUrl,
                         errorCode = error?.primaryError ?: 0,
-                        description = "SSL Certificate Warning: $primaryMsg",
+                        description = "SSL 证书警告：$primaryMsg",
                         isMainFrame = true
                     )
                     tab.addNetworkError(err)
@@ -1218,7 +1218,7 @@ class BrowserSessionManager private constructor() {
                 override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: android.os.Message?): Boolean {
                     val transport = resultMsg?.obj as? WebView.WebViewTransport ?: return false
                     if (!isUserGesture) return false
-                    val popupTab = BrowserTabSession(initialUrl = "", initialTitle = "New Tab").also {
+                    val popupTab = BrowserTabSession(initialUrl = "", initialTitle = "新标签页").also {
                         it.isDesktopMode = tab.isDesktopMode
                     }
                     transport.webView = createWebView(context, popupTab, isDark, loadInitialUrl = false)

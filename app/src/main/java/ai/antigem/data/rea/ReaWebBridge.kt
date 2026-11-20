@@ -90,7 +90,7 @@ object ReaWebBridge {
         val socket = try {
             ServerSocket(port, 16, InetAddress.getByName("127.0.0.1"))
         } catch (e: IOException) {
-            _state.update { State(running = false, port = port, error = "Could not listen on 127.0.0.1:$port: ${e.message}. Another program may use this port.") }
+            _state.update { State(running = false, port = port, error = "无法监听 127.0.0.1:$port：${e.message}。可能有其他程序占用了此端口。") }
             return
         }
         server = socket

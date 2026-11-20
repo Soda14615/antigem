@@ -97,19 +97,19 @@ object JarvisEvents {
     // ------------------------------------------------------------------ the message
 
     private fun kindWord(kind: String) = when (kind) {
-        "task_done" -> "done"
-        "task_failed" -> "failed"
-        "task_stalled" -> "stuck"
-        "task_approval" -> "needs approval"
-        "task_question" -> "asks a question"
-        "nudge" -> "keep going"
-        "autopilot_paused" -> "autopilot paused"
+        "task_done" -> "已完成"
+        "task_failed" -> "失败"
+        "task_stalled" -> "卡住"
+        "task_approval" -> "需要审批"
+        "task_question" -> "有疑问"
+        "nudge" -> "继续推进"
+        "autopilot_paused" -> "自动驾驶已暂停"
         else -> kind
     }
 
     /** The one line the chat shows for the whole batch. */
     fun label(events: List<Event>): String {
-        val parts = events.map { e -> if (e.title.isBlank()) "Mission: ${kindWord(e.kind)}" else "${e.title.take(30)}: ${kindWord(e.kind)}" }
+        val parts = events.map { e -> if (e.title.isBlank()) "任务：${kindWord(e.kind)}" else "${e.title.take(30)}: ${kindWord(e.kind)}" }
         val head = if (events.size == 1) "⚡ Jarvis · " else "⚡ Jarvis · ${events.size} updates — "
         return head + parts.take(4).joinToString(" · ") + if (parts.size > 4) " · +${parts.size - 4} more" else ""
     }

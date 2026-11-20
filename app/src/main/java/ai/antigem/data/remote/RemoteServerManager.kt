@@ -691,7 +691,7 @@ object RemoteServerManager {
                     (s != null && ctx != null && runCatching { serverLoopbackHealthy(s, plan(ctx).bridgePort) }.getOrDefault(false))
                 if (stillUp) {
                     LocalServerManager.publishRemoteStatus(LocalServerStatus.Error(
-                        if (s == null) "Could not stop the bridge: SSH is not connected and the bridge did not accept the shutdown request."
+                        if (s == null) "无法停止桥接服务：SSH 未连接，且桥接服务没有接受关闭请求。"
                         else "The bridge is still running on the server after the stop request."
                     ))
                 } else {
@@ -916,7 +916,7 @@ object RemoteServerManager {
             val (_, out) = exec(s, "tail -n 300 \"$dir/bridge.log\" 2>/dev/null | sed 's/\\x1b\\[[0-9;]*[A-Za-z]//g'", 10_000)
             _log.value = out
         } catch (e: Exception) {
-            _log.value = "Could not read the server log: ${e.message}"
+            _log.value = "无法读取服务器日志：${e.message}"
         }
     }
 

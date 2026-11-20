@@ -285,7 +285,7 @@ class AgyChatBackend(
                 _isAuthBusy.value = false
                 agyBridgeService.updateAuthChecking(false)
                 if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("Cannot check status: device is offline.")
+                    _authFeedbackMessage.tryEmit("无法检查状态：设备离线。")
                 }
                 return@launch
             }
@@ -316,11 +316,11 @@ class AgyChatBackend(
                     _pendingLoginUrl.value = null
                     loginPollJob?.cancel()
                     if (userInitiated) {
-                        _authFeedbackMessage.tryEmit("Signed in as ${info.displayName.ifBlank { info.email }}")
+                        _authFeedbackMessage.tryEmit("已登录：${info.displayName.ifBlank { info.email }}")
                     }
                     refreshQuotas(force = false)
                 } else if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("Not signed in.")
+                    _authFeedbackMessage.tryEmit("未登录。")
                 }
             } else {
                 _agyAuthInfo.value = _agyAuthInfo.value.copy(
@@ -330,7 +330,7 @@ class AgyChatBackend(
                 // Retain current auth state; only clear the isChecking flag on network/RPC failure
                 agyBridgeService.updateAuthChecking(false)
                 if (userInitiated) {
-                    _authFeedbackMessage.tryEmit("Unable to reach server.")
+                    _authFeedbackMessage.tryEmit("无法连接服务器。")
                 }
             }
         }
@@ -357,7 +357,7 @@ class AgyChatBackend(
                             lastAuthCheckTimeMs = System.currentTimeMillis()
                             _isAuthBusy.value = false
                             _pendingLoginUrl.value = null
-                            _authFeedbackMessage.tryEmit("Signed in successfully!")
+                            _authFeedbackMessage.tryEmit("登录成功！")
                             refreshQuotas(force = true)
                             break
                         }
@@ -376,7 +376,7 @@ class AgyChatBackend(
     fun loginToAgyHub(force: Boolean = false) {
         if (_isAuthBusy.value && !force) return
         if (!isNetworkConnected()) {
-            _authFeedbackMessage.tryEmit("Cannot sign in: no internet connection.")
+            _authFeedbackMessage.tryEmit("无法登录：没有网络连接。")
             return
         }
         _isAuthBusy.value = true
@@ -394,12 +394,12 @@ class AgyChatBackend(
                 agyBridgeService.updateAuthState(isAuth = true, isChecking = false)
                 lastAuthCheckTimeMs = System.currentTimeMillis()
                 _isAuthBusy.value = false
-                _authFeedbackMessage.tryEmit("Already signed in as ${authed.displayName}!")
+                _authFeedbackMessage.tryEmit("已登录为 ${authed.displayName}！")
                 refreshQuotas(force = true)
                 return@launch
             }
 
-            _authFeedbackMessage.tryEmit("Initiating sign-in with Antigravity...")
+            _authFeedbackMessage.tryEmit("正在启动 Antigravity 登录…")
 
             // 1. Poll for successful auth completion concurrently every 800ms
             startLoginPoll(hubUrl)
@@ -444,10 +444,10 @@ class AgyChatBackend(
                     isLoggedIn = false
                 )
                 agyBridgeService.updateAuthState(isAuth = false, isChecking = false)
-                _authFeedbackMessage.tryEmit("Logged out successfully.")
+                _authFeedbackMessage.tryEmit("已退出登录。")
                 refreshQuotas(force = true)
             } catch (e: Exception) {
-                _authFeedbackMessage.tryEmit("Logout error: ${e.message}")
+                _authFeedbackMessage.tryEmit("退出失败：${e.message}")
             } finally {
                 _isAuthBusy.value = false
             }
@@ -1306,7 +1306,7 @@ class AgyChatBackend(
                             val isKnownExisting = _conversations.value.any { it.id == conversationId && it.title != "New Chat" }
                             if (activeStreamConversationId == conversationId) {
                                 if (isKnownExisting && _messages.value.isEmpty()) {
-                                    _conversationError.value = "No messages received from Antigravity. Tap Retry."
+                                    _conversationError.value = "未收到 Antigravity 的任何消息。点按“重试”。"
                                     _isServerOnline.value = isHubOnline
                                 } else {
                                     _conversationError.value = null
@@ -1456,7 +1456,7 @@ class AgyChatBackend(
                     _currentConversation.value?.let { if (it.id == id && it.title == clean) _currentConversation.value = it.copy(title = oldTitle) }
                 }
                 ai.antigem.ui.components.AppToastHelper.showToast(
-                    "Could not rename: ${e.message}", ai.antigem.ui.components.ChatToastType.ERROR
+                    "无法重命名：${e.message}", ai.antigem.ui.components.ChatToastType.ERROR
                 )
             }
         }
@@ -1493,11 +1493,11 @@ class AgyChatBackend(
                         selectConversation(newCascadeId)
                     }
                 } else {
-                    _conversationError.value = "Fork failed: ${res.exceptionOrNull()?.message}"
+                    _conversationError.value = "分叉失败：${res.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ChatViewModel", "Fork failed: ${e.message}")
-                _conversationError.value = "Fork error: ${e.message}"
+                _conversationError.value = "分叉出错：${e.message}"
             } finally {
                 _isLoadingConversation.value = false
             }
@@ -2160,12 +2160,12 @@ class AgyChatBackend(
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "sendUserPrompt exception: ${e.message}", e)
                 if (queued) {
-                    failQueued(e.message ?: "Unknown error")
+                    failQueued(e.message ?: "未知错误")
                     return@launch
                 }
                 val formattedErr = formatStructuredErrorMessage(
-                    title = "Execution Failure",
-                    userMessage = e.message ?: "Unknown error",
+                    title = "执行失败",
+                    userMessage = e.message ?: "未知错误",
                     shortError = e.message ?: "",
                     fullError = e.stackTraceToString()
                 )
@@ -2443,7 +2443,7 @@ class AgyChatBackend(
             if (res.isFailure) {
                 val err = res.exceptionOrNull()?.message ?: "Failed to approve tool"
                 Log.e("ChatViewModel", "handleCascadeUserInteraction (approve) error: $err")
-                _conversationError.value = "Approval failed: $err"
+                _conversationError.value = "审批失败：$err"
                 _isStreaming.value = false
 
                 // Roll back optimistic state on failure so UI accurately reflects reality
@@ -2482,7 +2482,7 @@ class AgyChatBackend(
             if (res.isFailure) {
                 val err = res.exceptionOrNull()?.message ?: "Failed to reject tool"
                 Log.e("ChatViewModel", "handleCascadeUserInteraction (deny) error: $err")
-                _conversationError.value = "Rejection failed: $err"
+                _conversationError.value = "拒绝失败：$err"
 
                 // Roll back optimistic state on failure so UI accurately reflects reality
                 trajectoryEngine.unmarkStepResponded(stepIndex)

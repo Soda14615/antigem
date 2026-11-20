@@ -53,13 +53,13 @@ enum class QuickSwitch(val id: String, val title: String) {
     HANDS_FREE("handsfree", "Hands-free"),
     VOICE("voice", "Voice"),
     SEND("send", "Send"),
-    PAUSE("pause", "Pause to send"),
+    PAUSE("pause", "停顿后发送"),
     ANSWERS("answers", "Answers"),
-    LISTEN("listen", "Listen after"),
+    LISTEN("listen", "随后聆听"),
     WAKE("wake", "Wake"),
     SCREEN("screen", "Screen"),
     SPEED("speed", "Speed"),
-    BUSY("busy", "While it works");
+    BUSY("busy", "工作时");
 
     companion object {
         fun pinned(raw: String): List<QuickSwitch> = raw.split(',').mapNotNull { id -> entries.firstOrNull { it.id == id.trim() } }.distinct()
@@ -83,7 +83,7 @@ fun QuickSwitchChip(q: QuickSwitch) {
         }
         QuickSwitch.SEND -> {
             val auto by P.autoSend.state.collectAsState()
-            JarvisQuickChip(q.title, if (auto) "Auto on pause" else "Manual", auto) { P.autoSend.set(!auto) }
+            JarvisQuickChip(q.title, if (auto) "停顿后自动发送" else "Manual", auto) { P.autoSend.set(!auto) }
         }
         QuickSwitch.PAUSE -> {
             val ms by P.silenceMs.state.collectAsState()
@@ -92,12 +92,12 @@ fun QuickSwitchChip(q: QuickSwitch) {
         }
         QuickSwitch.ANSWERS -> {
             val a by P.answerSend.state.collectAsState()
-            JarvisQuickChip(q.title, if (a == "auto") "Send on pause" else "Like send", a == "auto") { P.answerSend.set(if (a == "auto") "same" else "auto") }
+            JarvisQuickChip(q.title, if (a == "auto") "停顿后发送" else "与发送相同", a == "auto") { P.answerSend.set(if (a == "auto") "same" else "auto") }
         }
         QuickSwitch.LISTEN -> {
             val l by P.listenAfter.state.collectAsState()
             val order = listOf("auto", "always", "never")
-            JarvisQuickChip(q.title, when (l) { "always" -> "Always"; "never" -> "Never"; else -> "When asked" }, l != "never") {
+            JarvisQuickChip(q.title, when (l) { "always" -> "Always"; "never" -> "Never"; else -> "被询问时" }, l != "never") {
                 P.listenAfter.set(order[(order.indexOf(l) + 1).mod(order.size)])
             }
         }
@@ -108,7 +108,7 @@ fun QuickSwitchChip(q: QuickSwitch) {
         QuickSwitch.SCREEN -> {
             val s by P.keepScreenOn.state.collectAsState()
             val order = listOf("always", "active", "off")
-            JarvisQuickChip(q.title, when (s) { "off" -> "Can sleep"; "active" -> "On while active"; else -> "Always on" }, s != "off") {
+            JarvisQuickChip(q.title, when (s) { "off" -> "可休眠"; "active" -> "活跃期间开启"; else -> "始终开启" }, s != "off") {
                 P.keepScreenOn.set(order[(order.indexOf(s) + 1).mod(order.size)])
             }
         }
@@ -120,7 +120,7 @@ fun QuickSwitchChip(q: QuickSwitch) {
         QuickSwitch.BUSY -> {
             val b by P.busyBehavior.state.collectAsState()
             val order = listOf("queue", "interrupt", "smart")
-            JarvisQuickChip(q.title, when (b) { "interrupt" -> "Interrupt"; "smart" -> "My phrases"; else -> "Wait" }, b != "queue") {
+            JarvisQuickChip(q.title, when (b) { "interrupt" -> "Interrupt"; "smart" -> "我的短语"; else -> "Wait" }, b != "queue") {
                 P.busyBehavior.set(order[(order.indexOf(b) + 1).mod(order.size)])
             }
         }
@@ -202,33 +202,33 @@ fun JarvisQuickSettings(onClose: () -> Unit) {
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 6.dp)) {
                 QsTitle("Sending")
-                QsChoice(listOf("manual" to "Manual (Send / phrase)", "auto" to "Auto when I pause"), if (auto) "auto" else "manual") { P.autoSend.set(it == "auto") }
-                QsHint(if (auto) "What you say is sent after the pause below. Tap Wait on the card to keep talking."
-                else "Nothing is sent while you think. Tap Send, press the headset button, or say one of your send phrases.")
-                QsSlider("Pause before sending", silence / 1000f, 0.6f..4f, "%.1f s".format(silence / 1000f)) { P.silenceMs.set((it * 1000).toInt()) }
-                QsChoice(listOf("smart" to "Smart pause", "pause" to "Exact pause"), if (sendMode == "pause") "pause" else "smart") { P.sendMode.set(it) }
-                QsHint(if (sendMode == "pause") "Always exactly this pause." else "Longer when you sound unfinished (“…and”), shorter for short answers.")
+                QsChoice(listOf("manual" to "Manual (Send / phrase)", "auto" to "我停顿时自动发送"), if (auto) "auto" else "manual") { P.autoSend.set(it == "auto") }
+                QsHint(if (auto) "你说的话会在下方停顿时间后发送。点按卡片上的“等待”可继续说话。"
+                else "思考时不会发送任何内容。点按“发送”、按耳机键，或说出一句发送短语。")
+                QsSlider("发送前停顿", silence / 1000f, 0.6f..4f, "%.1f s".format(silence / 1000f)) { P.silenceMs.set((it * 1000).toInt()) }
+                QsChoice(listOf("smart" to "智能停顿", "pause" to "精确停顿"), if (sendMode == "pause") "pause" else "smart") { P.sendMode.set(it) }
+                QsHint(if (sendMode == "pause") "始终使用此停顿时长。" else "Longer when you sound unfinished (“…and”), shorter for short answers.")
                 Text(stringResource(R.string.jarvis_quick_settings_answers_to_jarvis_questions), color = Color.White.copy(alpha = 0.8f), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
-                QsChoice(listOf("same" to "Like everything else", "auto" to "Send on pause"), answers) { P.answerSend.set(it) }
+                QsChoice(listOf("same" to "Like everything else", "auto" to "停顿后发送"), answers) { P.answerSend.set(it) }
 
-                QsTitle("After Jarvis speaks")
-                QsChoice(listOf("auto" to "Listen when it asks", "always" to "Always listen", "never" to "Don't listen"), listenAfter) { P.listenAfter.set(it) }
-                if (listenAfter != "never") QsSlider("Wait for my reply", follow.toFloat(), 3f..20f, "$follow s") { P.followUpSeconds.set(it.toInt()) }
+                QsTitle("Jarvis 说话之后")
+                QsChoice(listOf("auto" to "被询问时聆听", "always" to "始终聆听", "never" to "Don't listen"), listenAfter) { P.listenAfter.set(it) }
+                if (listenAfter != "never") QsSlider("等待我的回复", follow.toFloat(), 3f..20f, "$follow s") { P.followUpSeconds.set(it.toInt()) }
 
                 QsTitle("Voice")
-                QsChoice(listOf("speak" to "Speaking", "quiet" to "Quiet (show text)"), if (quiet) "quiet" else "speak") { P.quietMode.set(it == "quiet") }
+                QsChoice(listOf("speak" to "Speaking", "quiet" to "静音（显示文字）"), if (quiet) "quiet" else "speak") { P.quietMode.set(it == "quiet") }
                 QsSlider("Speed", rate, 0.5f..2f, "%.1f×".format(rate)) { P.ttsRate.set((Math.round(it * 20) / 20f)) }
 
                 QsTitle("Hands-free")
                 QsChoice(listOf("off" to "Off", "on" to "On (mic stays ready)"), if (handsFree) "on" else "off") { JarvisController.setHandsFree(it == "on") }
                 QsChoice(listOf("push" to "Wake with button", "phrase" to "Wake phrase"), if (hotword == "phrase") "phrase" else "push") { P.hotword.set(it) }
-                QsChoice(listOf("always" to "Screen always on", "active" to "On while active", "off" to "Can sleep"), screen) { P.keepScreenOn.set(it) }
+                QsChoice(listOf("always" to "屏幕常亮", "active" to "活跃期间开启", "off" to "可休眠"), screen) { P.keepScreenOn.set(it) }
 
-                QsTitle("When I talk while Jarvis works")
-                QsChoice(listOf("queue" to "Wait for it", "interrupt" to "Interrupt it", "smart" to "Only my interrupt phrases"), busy) { P.busyBehavior.set(it) }
+                QsTitle("Jarvis 工作时我说话")
+                QsChoice(listOf("queue" to "等它说完", "interrupt" to "打断它", "smart" to "仅我的打断短语"), busy) { P.busyBehavior.set(it) }
 
-                QsTitle("Quick row in the panel")
-                QsHint("Tap to show or hide a switch in the Jarvis panel.")
+                QsTitle("面板中的快捷栏")
+                QsHint("点按可显示或隐藏 Jarvis 面板中的开关。")
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     QuickSwitch.entries.forEach { q ->
                         val on = q in pins
@@ -250,7 +250,7 @@ fun JarvisQuickSettings(onClose: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     QsLink("Phrases & shortcuts") { onClose(); JarvisController.requestSettings("JARVIS_LISTEN") }
-                    QsLink("All Jarvis settings") { onClose(); JarvisController.requestSettings("JARVIS") }
+                    QsLink("全部 Jarvis 设置") { onClose(); JarvisController.requestSettings("JARVIS") }
                 }
                 Spacer(Modifier.height(8.dp))
             }

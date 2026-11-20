@@ -2,7 +2,7 @@
 <resources>
     <string name="onboarding_step_step_of">"第 %1$s 步，共 %2$s 步"</string>
     <string name="terminal_launcher_onboarding_dialog_home_screen_preview">"主屏幕预览"</string>
-    <string name="terminal_launcher_onboarding_dialog_chat_ide">"聊天和集成开发环境"</string>
+    <string name="terminal_launcher_onboarding_dialog_chat_ide">"聊天与 IDE"</string>
     <string name="terminal_launcher_onboarding_dialog_hidden">"隐藏"</string>
     <string name="terminal_launcher_onboarding_dialog_in_app_only">"仅限应用程序内"</string>
     <string name="terminal_launcher_onboarding_dialog_standalone_terminal_app_icon">"独立终端应用程序图标"</string>

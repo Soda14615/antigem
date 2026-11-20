@@ -501,7 +501,7 @@ object YouTubeMediaSessionManager {
 
             val ytVideoId = extractYouTubeVideoId(url)
             activeVideoId = ytVideoId ?: "browser_media"
-            activeTitle = title.takeIf { it.isNotBlank() && it != "New Tab" } ?: appCtx.getString(R.string.notification_browser_video)
+            activeTitle = title.takeIf { it.isNotBlank() && it != "新标签页" } ?: appCtx.getString(R.string.notification_browser_video)
             activeThumbnailUrl = if (!ytVideoId.isNullOrBlank()) {
                 "https://img.youtube.com/vi/$ytVideoId/hqdefault.jpg"
             } else null

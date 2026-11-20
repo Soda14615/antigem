@@ -421,7 +421,7 @@ fun FloatingSwitcherWidget(
                         modifier = Modifier
                             .clip(RoundedCornerShape(24.dp))
                             .semantics {
-                                onClick(label = "Expand Switcher") {
+                                onClick(label = "展开切换器") {
                                     expand()
                                     true
                                 }

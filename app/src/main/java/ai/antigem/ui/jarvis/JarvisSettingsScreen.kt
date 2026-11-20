@@ -64,28 +64,28 @@ fun JarvisSettingsScreen(cardBg: Color, cardBorder: BorderStroke, onOpen: (Jarvi
         JCard(cardBg, cardBorder, "Jarvis") {
             JSwitch(
                 stringResource(R.string.jarvis_settings_screen_turn_on_jarvis),
-                "A hands-free assistant for the whole app: talk to open projects and files, run and watch tasks, answer approvals, " +
-                    "change settings, ask for help or your usage. Off by default; nothing listens until you turn it on.",
+                "覆盖整个应用的免手操作助手：可与打开的项目和文件对话、运行并查看任务、处理审批，" +
+                    "更改设置、查询帮助或用量。默认关闭；开启前不会监听任何内容。",
                 enabled
             ) { JarvisController.setEnabled(it) }
             if (enabled) {
                 JSwitch(
                     stringResource(R.string.jarvis_settings_screen_floating_button_voice),
-                    "Off = chat only: no floating button, no microphone, nothing read out loud. You use Jarvis in the Jarvis chats you open " +
-                        "from the chat list (Jarvis tab → New Jarvis chat), by typing.",
+                    "关闭 = 仅聊天：没有浮动按钮、没有麦克风、不会朗读任何内容。你可以用打字的方式使用 Jarvis，入口是聊天列表中的 " +
+                        "Jarvis 标签页 → 新建 Jarvis 聊天。",
                     voiceSide
                 ) { JarvisController.setVoiceAssistant(it) }
             }
             JHint(
-                if (!enabled || voiceSide) "Tap the orb to talk, long-press it for the Jarvis panel (tasks, conversation, typing, quick switches). " +
-                    "You can also type to Jarvis: Jarvis tab in the chat list → New Jarvis chat."
+                if (!enabled || voiceSide) "点按悬浮球说话，长按打开 Jarvis 面板（任务、对话、打字、快捷开关）。" +
+                    "你也可以打字给 Jarvis：聊天列表中的 Jarvis 标签页 → 新建 Jarvis 聊天。"
                 else stringResource(R.string.jarvis_settings_screen_chat_only_open_the_jarvis_tab_in)
             )
         }
         if (enabled && JarvisController.isAttached) {
-            JCard(cardBg, cardBorder, "Jarvis chats in the chat list") {
+            JCard(cardBg, cardBorder, "聊天列表中的 Jarvis 聊天") {
                 val inAll by P.jarvisInAll.state.collectAsState()
-                JChips(listOf("none" to "Only under Jarvis", "text" to "My Jarvis chats in All too", "all" to "All Jarvis chats in All too"), inAll) { P.jarvisInAll.set(it) }
+                JChips(listOf("none" to "仅在 Jarvis 下", "text" to "我的 Jarvis 聊天也显示在“全部”中", "all" to "所有 Jarvis 聊天也显示在“全部”中"), inAll) { P.jarvisInAll.set(it) }
                 JHint(when (inAll) {
                     "text" -> stringResource(R.string.jarvis_settings_screen_the_jarvis_chats_you_opened_yourself_new)
                     "all" -> stringResource(R.string.jarvis_settings_screen_every_jarvis_chat_the_voice_chats_jarvis)
@@ -103,38 +103,38 @@ fun JarvisSettingsScreen(cardBg: Color, cardBorder: BorderStroke, onOpen: (Jarvi
             ai.antigem.ui.settings.SettingsRowItem(icon, tint, title, value) { onOpen(page) }
         listOf(
             listOfNotNull(
-                row(JarvisSettingsPage.AGENT, I.SmartToy, c.info, "Voice agent & model", when (agentName) {
+                row(JarvisSettingsPage.AGENT, I.SmartToy, c.info, "语音智能体与模型", when (agentName) {
                     AgentKind.AGY.name -> "Antigravity"
                     AgentKind.CLAUDE.name -> "Claude Code"
                     AgentKind.OPENCODE.name -> "OpenCode"
                     AgentKind.CODEX.name -> "Codex"
-                    else -> "Not set"
+                    else -> "未设置"
                 }),
-                row(JarvisSettingsPage.PERSONALITY, I.Face, c.accentPink, "Personality & you"),
+                row(JarvisSettingsPage.PERSONALITY, I.Face, c.accentPink, "个性与个人信息"),
                 // the setup checklist is only for a Jarvis that is turned on
-                if (enabled) row(JarvisSettingsPage.SETUP, I.Checklist, c.success, "Setup") else null
+                if (enabled) row(JarvisSettingsPage.SETUP, I.Checklist, c.success, "初始设置") else null
             ),
             // "chat only": nothing listens or speaks, so those pages are hidden
             if (!voiceSide) emptyList() else listOf(
-                row(JarvisSettingsPage.WAKE, I.Hearing, c.accentTeal, "Waking Jarvis", if (hotword == "phrase") "Wake phrase" else "Button"),
-                row(JarvisSettingsPage.LISTEN, I.Mic, c.accentIndigo, "Listening & sending", if (autoSend) "Auto-send" else "Manual send"),
-                row(JarvisSettingsPage.VOICE, I.RecordVoiceOver, c.accentAlt, "Voice output", when {
-                    quiet -> "Quiet"
+                row(JarvisSettingsPage.WAKE, I.Hearing, c.accentTeal, "唤醒 Jarvis", if (hotword == "phrase") "唤醒词" else "Button"),
+                row(JarvisSettingsPage.LISTEN, I.Mic, c.accentIndigo, "聆听与发送", if (autoSend) "自动发送" else "手动发送"),
+                row(JarvisSettingsPage.VOICE, I.RecordVoiceOver, c.accentAlt, "语音输出", when {
+                    quiet -> "静音"
                     engine == "google_cloud" -> "Google Cloud"
                     engine == "openai" -> "OpenAI"
-                    else -> "This device"
+                    else -> "本机"
                 })
             ),
             listOf(
-                row(JarvisSettingsPage.TASKS, I.TaskAlt, c.warning, "Manager & tasks"),
-                row(JarvisSettingsPage.APPROVALS, I.VerifiedUser, c.danger, "Approvals", when (policy) {
-                    "auto_readonly" -> "Auto: read-only"
-                    "auto_except_risky" -> "Auto: not risky"
-                    "auto_all" -> "Auto: all"
-                    else -> "Ask each time"
+                row(JarvisSettingsPage.TASKS, I.TaskAlt, c.warning, "管理器与任务"),
+                row(JarvisSettingsPage.APPROVALS, I.VerifiedUser, c.danger, "审批", when (policy) {
+                    "auto_readonly" -> "自动：只读"
+                    "auto_except_risky" -> "自动：非高风险"
+                    "auto_all" -> "自动：全部"
+                    else -> "每次询问"
                 }),
-                row(JarvisSettingsPage.SCREEN, I.Visibility, c.info, "Screen & look"),
-                row(JarvisSettingsPage.CHAT, I.ChatBubbleOutline, JarvisCyan, "Jarvis chat")
+                row(JarvisSettingsPage.SCREEN, I.Visibility, c.info, "屏幕与外观"),
+                row(JarvisSettingsPage.CHAT, I.ChatBubbleOutline, JarvisCyan, "Jarvis 聊天")
             )
         ).filter { it.isNotEmpty() }.forEach { ai.antigem.ui.settings.SettingsRowGroup(it, cardBg) }
     }
@@ -155,7 +155,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
         AgentKind.AGY -> "Antigravity"
         AgentKind.OPENCODE -> "OpenCode"
         AgentKind.CODEX -> "Codex"
-        null -> "the agent"
+        null -> "该智能体"
     }
 
     Column(
@@ -200,17 +200,17 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                             }
                         }
                     }
-                    JHint("Jarvis talks to a normal hidden chat of this agent (find it under Jarvis in the chat list). A fast model feels best for voice; " +
-                        "big jobs run as tasks in their own chats.")
+                    JHint("Jarvis 与该智能体的一个隐藏普通聊天对话（在聊天列表的 Jarvis 下可找到）。语音场景建议用响应快的模型；" +
+                        "大型任务会在各自的聊天中作为任务运行。")
                 }
             }
             JarvisSettingsPage.PERSONALITY -> {
                 JCard(cardBg, cardBorder, "") {
                     val persona by P.persona.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_jarvis_speaks_as), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("" to "Not set", "female" to "Female", "male" to "Male", "neutral" to "Neutral"), persona) { P.persona.set(it) }
-                    JHint("The grammatical gender Jarvis uses for itself. It matters in languages like Hindi (“main kar rahi hoon” / “main kar raha hoon”). " +
-                        "Pick a matching voice under Voice output.")
+                    JChips(listOf("" to "未设置", "female" to "Female", "male" to "Male", "neutral" to "Neutral"), persona) { P.persona.set(it) }
+                    JHint("Jarvis 自称时使用的语法性别。在印地语等语言中会影响措辞（“main kar rahi hoon” / “main kar raha hoon”）。" +
+                        "请在“语音输出”中选择匹配的音色。")
                     val about by P.aboutUser.state.collectAsState()
                     OutlinedTextField(
                         value = about, onValueChange = { P.aboutUser.set(it.take(2000)) },
@@ -218,8 +218,8 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                         placeholder = { Text(stringResource(R.string.jarvis_settings_screen_e_g_call_me_santosh_reply_in), fontSize = 12.sp) },
                         modifier = Modifier.fillMaxWidth(), minLines = 3, maxLines = 8
                     )
-                    JHint("Sent with the first message of every new Jarvis chat. When you change it (or the persona), the open chat is told with your next message. " +
-                        "Jarvis' own memory note (Settings → Jarvis → Jarvis chat) is separate: Jarvis edits that one itself.")
+                    JHint("随每个新 Jarvis 聊天的首条消息发送。当你修改此内容（或人格）后，当前聊天会在你下一条消息时获知更新。" +
+                        "Jarvis 自己的记忆备注（设置 → Jarvis → Jarvis 聊天）是独立的，由 Jarvis 自行编辑。")
                 }
             }
             JarvisSettingsPage.SETUP -> {
@@ -228,7 +228,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                 } else {
                     if (agent == null) {
                         JHint(stringResource(R.string.jarvis_settings_screen_pick_the_agent_jarvis_talks_to_first))
-                    } else JCard(cardBg, cardBorder, "Setup for $agentTitle") {
+                    } else JCard(cardBg, cardBorder, "为 ${agentTitle} 进行初始设置") {
                         val deviceId = remember(context) {
                             runCatching { android.provider.Settings.Secure.getString(context.contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "" }.getOrDefault("")
                         }
@@ -272,8 +272,8 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                             else -> agyServers.any { it.name == name }
                         }
                         JStep(
-                            "1. Add the Jarvis MCP server",
-                            if (mcpAdded) "Added" + (mcpState?.let { " · $it" } ?: "") else "Required: these are the tools Jarvis controls the app with.",
+                            "1. 添加 Jarvis MCP 服务器",
+                            if (mcpAdded) "已添加" + (mcpState?.let { " · $it" } ?: "") else "Required: these are the tools Jarvis controls the app with.",
                             mcpAdded, if (mcpAdded) "Refresh" else "Add"
                         ) {
                             if (agent == AgentKind.CODEX) {
@@ -305,9 +305,9 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                             LaunchedEffect(Unit) { vm.claudeConfig.loadSettings() }
                             val allowed = settings != null && vm.claudeConfig.rules("allow").contains("mcp__$name")
                             JStep(
-                                "2. Let Jarvis' tools run without asking",
-                                if (allowed) "Allowed" else "Otherwise every spoken answer would need an approval.",
-                                allowed, "Allow"
+                                "2. 让 Jarvis 的工具免询问运行",
+                                if (allowed) "已允许" else "否则每次语音回答都需要审批。",
+                                allowed, "允许"
                             ) { vm.claudeConfig.addRule("allow", "mcp__$name") }
                         }
 
@@ -315,18 +315,18 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                         var hasMic by remember { mutableStateOf(JarvisController.hasMic()) }
                         val micLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasMic = it }
                         JStep(
-                            "${if (agent == AgentKind.CLAUDE) "3" else "2"}. Allow the microphone",
-                            if (hasMic) "Allowed" else "Needed to hear you.",
-                            hasMic, "Allow"
+                            "${if (agent == AgentKind.CLAUDE) "3" else "2"}. 允许使用麦克风",
+                            if (hasMic) "已允许" else "用于听到你的声音。",
+                            hasMic, "允许"
                         ) { micLauncher.launch(Manifest.permission.RECORD_AUDIO) }
 
                         // 4. the optional skill
                         var skillInstalled by remember(agent) { mutableStateOf<Boolean?>(null) }
                         LaunchedEffect(agent) { skillInstalled = runCatching { JarvisSkill.isInstalled(agent) }.getOrDefault(false) }
                         JStep(
-                            "Optional: install the Jarvis skill",
-                            when (skillInstalled) { true -> "Installed"; false -> "Not needed: the guide goes with the first message."; null -> "Checking…" },
-                            skillInstalled == true, if (skillInstalled == true) "Reinstall" else "Install"
+                            "可选：安装 Jarvis 技能",
+                            when (skillInstalled) { true -> "已安装"; false -> "不需要：指南会随首条消息一起发送。"; null -> "Checking…" },
+                            skillInstalled == true, if (skillInstalled == true) "重新安装" else "安装"
                         ) {
                             scope.launch {
                                 JarvisSkill.install(agent)
@@ -334,8 +334,8 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                                     .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.jarvis_settings_install_failed), Toast.LENGTH_LONG).show() }
                             }
                         }
-                        JHint("The first message of every Jarvis chat carries the whole guide and the list of its tools with their parameters, so the " +
-                            "model acts at once instead of searching. If the Jarvis MCP server is missing, Jarvis says so and this card shows a warning.")
+                        JHint("每个 Jarvis 聊天的首条消息都会带上完整指南，以及其工具的清单与参数，因此" +
+                            "模型可以立即行动，无需先检索。如果缺少 Jarvis MCP 服务器，Jarvis 会说明，此卡片也会显示警告。")
                     }
                 }
             }
@@ -349,14 +349,14 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                         JField("Wake phrase(s), comma separated", phrase) { P.wakePhrase.set(it.lowercase()) }
                         val match by P.wakeMatch.state.collectAsState()
                         JChips(listOf("phrase" to "Whole phrase", "name" to "The name alone"), match) { P.wakeMatch.set(it) }
-                        JHint("“Hey Jarvis, open my project” starts right away. Common mishearings of “Jarvis” count too. The wake phrase needs " +
-                            "hands-free mode and keeps the device recognizer busy, which uses battery.")
+                        JHint("“Hey Jarvis，打开我的项目”会立即触发。“Jarvis”的常见误听也算。唤醒词需要 " +
+                            "免手模式，并会让系统语音识别器持续工作，比较耗电。")
                     }
                     val hands by P.handsFree.state.collectAsState()
                     JSwitch(
                         stringResource(R.string.jarvis_settings_screen_hands_free_mode),
-                        "Keeps Jarvis' microphone service running so the wake phrase and the headset button work with the screen off or another app open. " +
-                            "A notification shows its state with Talk / Send / Stop.",
+                        "保持 Jarvis 麦克风服务运行，使唤醒词和耳机键在息屏或使用其他应用时也能工作。" +
+                            "通知栏会用“说话 / 发送 / 停止”显示其状态。",
                         hands, enabledSwitch = enabled
                     ) { JarvisController.setHandsFree(it) }
                     val headset by P.headsetButton.state.collectAsState()
@@ -375,15 +375,15 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     ) { P.autoSend.set(it) }
                     if (auto) {
                         val mode by P.sendMode.state.collectAsState()
-                        JChips(listOf("smart" to "Smart pause", "pause" to "Fixed pause"), if (mode == "pause") "pause" else "smart") { P.sendMode.set(it) }
+                        JChips(listOf("smart" to "智能停顿", "pause" to "固定停顿"), if (mode == "pause") "pause" else "smart") { P.sendMode.set(it) }
                         JHint(if (mode == "pause") stringResource(R.string.jarvis_settings_screen_sent_after_a_fixed_pause_a_bar)
                         else stringResource(R.string.jarvis_settings_screen_jarvis_waits_longer_when_you_sound_unfinished))
                     }
                     val silence by P.silenceMs.state.collectAsState()
-                    JSlider("Pause before sending", silence.toFloat(), 600f..4000f, "%.1f s".format(silence / 1000f)) { P.silenceMs.set(it.toInt()) }
+                    JSlider("发送前停顿", silence.toFloat(), 600f..4000f, "%.1f s".format(silence / 1000f)) { P.silenceMs.set(it.toInt()) }
                     val answers by P.answerSend.state.collectAsState()
                     Text(stringResource(R.string.jarvis_quick_settings_answers_to_jarvis_questions), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("same" to "Like everything else", "auto" to "Send on pause"), answers) { P.answerSend.set(it) }
+                    JChips(listOf("same" to "与其他设置相同", "auto" to "停顿后发送"), answers) { P.answerSend.set(it) }
                     JHint(if (answers == "auto") stringResource(R.string.jarvis_settings_screen_when_jarvis_just_asked_you_something_your)
                     else stringResource(R.string.jarvis_settings_screen_answers_are_sent_exactly_like_everything_else))
 
@@ -396,7 +396,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     val cancelList = remember(cancelRaw) { ai.antigem.data.jarvis.JarvisPhrases.parse(cancelRaw) }
                     JSwitch(stringResource(R.string.jarvis_settings_screen_send_with_a_phrase), stringResource(R.string.jarvis_settings_screen_end_with_one_of_these_and_it), sendOn) { P.sendPhrasesOn.set(it) }
                     if (sendOn) {
-                        FoldedPhrases("Send phrases", sendList.size) {
+                        FoldedPhrases("发送短语", sendList.size) {
                             PhraseEditor(sendList, cancelList, "cancel", ai.antigem.data.jarvis.JarvisPhrases.SUGGESTED_SEND) {
                                 P.sendPhrases.set(ai.antigem.data.jarvis.JarvisPhrases.format(it))
                             }
@@ -404,20 +404,20 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     }
                     JSwitch(stringResource(R.string.jarvis_settings_screen_cancel_with_a_phrase), stringResource(R.string.jarvis_settings_screen_end_with_one_of_these_and_nothing), cancelOn) { P.cancelPhrasesOn.set(it) }
                     if (cancelOn) {
-                        FoldedPhrases("Cancel phrases", cancelList.size) {
+                        FoldedPhrases("取消短语", cancelList.size) {
                             PhraseEditor(cancelList, sendList, "send", ai.antigem.data.jarvis.JarvisPhrases.SUGGESTED_CANCEL) {
                                 P.cancelPhrases.set(ai.antigem.data.jarvis.JarvisPhrases.format(it))
                             }
                         }
                     }
                     if (sendOn || cancelOn) {
-                        JHint("A phrase only counts at the very end. “…and send it”, “…to send it”, “can you do it” and “don't send it” stay part of your " +
-                            "message. Short or everyday phrases (“send”, “over”, “do it”) only count when you say them on their own after a short pause. " +
-                            "When a phrase keeps firing by mistake, remove it or add a longer sentence instead (e.g. “jarvis send it now”).")
+                        JHint("短语只在句末才算数。“……and send it”“……to send it”“can you do it”和“don't send it”仍属于你的" +
+                            "消息内容。短句或日常用语（“send”“over”“do it”）只有在短暂停顿后单独说出时才生效。" +
+                            "如果某个短语频繁误触发，请删掉它，或改用更长的句子（例如“jarvis send it now”）。")
                     }
                     val listenAfter by P.listenAfter.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_after_jarvis_speaks_listen_for_your_reply), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("auto" to "When it expects an answer", "always" to "Always", "never" to "Never"), listenAfter) { P.listenAfter.set(it) }
+                    JChips(listOf("auto" to "当它期待回答时", "always" to "总是", "never" to "从不"), listenAfter) { P.listenAfter.set(it) }
                     JHint(when (listenAfter) {
                         "always" -> stringResource(R.string.jarvis_settings_screen_the_microphone_opens_after_every_answer_while)
                         "never" -> stringResource(R.string.jarvis_settings_screen_the_microphone_only_opens_when_you_tap)
@@ -425,14 +425,14 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     })
                     if (listenAfter != "never") {
                         val follow by P.followUpSeconds.state.collectAsState()
-                        JSlider("Wait for a reply", follow.toFloat(), 3f..20f, "$follow s") { P.followUpSeconds.set(it.toInt()) }
+                        JSlider("等待回复", follow.toFloat(), 3f..20f, "${follow} 秒") { P.followUpSeconds.set(it.toInt()) }
                         JHint(stringResource(R.string.jarvis_settings_screen_if_you_say_nothing_at_all_in))
                     }
                     val maxListen by P.maxListenSeconds.state.collectAsState()
-                    JSlider("Longest single message", maxListen.toFloat(), 20f..240f, "$maxListen s") { P.maxListenSeconds.set(it.toInt()) }
+                    JSlider("单条消息最长", maxListen.toFloat(), 20f..240f, "${maxListen} 秒") { P.maxListenSeconds.set(it.toInt()) }
                     val side by P.sideTalk.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_talking_to_other_people_nearby), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("off" to "Off", "smart" to "Smart", "strict" to "Strict"), side) { P.sideTalk.set(it) }
+                    JChips(listOf("off" to "关闭", "smart" to "智能", "strict" to "严格"), side) { P.sideTalk.set(it) }
                     JHint(when (side) {
                         "off" -> stringResource(R.string.jarvis_settings_screen_everything_heard_is_for_jarvis)
                         "strict" -> stringResource(R.string.jarvis_settings_screen_during_follow_up_listening_jarvis_only_reacts)
@@ -440,31 +440,31 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     })
                     val busyB by P.busyBehavior.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_speaking_while_jarvis_is_still_working), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("queue" to "Wait for it", "interrupt" to "Always interrupt", "smart" to "My interrupt phrases"), busyB) { P.busyBehavior.set(it) }
+                    JChips(listOf("queue" to "等它说完", "interrupt" to "总是打断", "smart" to "我的打断短语"), busyB) { P.busyBehavior.set(it) }
                     if (busyB == "smart") JHint(stringResource(R.string.jarvis_settings_screen_only_a_message_that_starts_with_one))
                     val earcons by P.earcons.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_tones_when_the_microphone_opens_and_closes), null, earcons) { P.earcons.set(it) }
                     val stt by P.sttEngine.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_speech_recognition), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("auto" to "Same as agent", "claude" to "Claude", "agy" to "Antigravity", "android" to "This device"), stt) { P.sttEngine.set(it) }
+                    JChips(listOf("auto" to "与智能体相同", "claude" to "Claude", "agy" to "Antigravity", "android" to "本机"), stt) { P.sttEngine.set(it) }
                     JHint(stringResource(R.string.jarvis_settings_screen_this_device_uses_android_s_recognizer_and))
                     val lang by P.sttLanguage.state.collectAsState()
-                    JField("Language (e.g. en, hi, es)", lang) { P.sttLanguage.set(it) }
+                    JField("语言（如 zh、en、hi）", lang) { P.sttLanguage.set(it) }
                 }
-                JCard(cardBg, cardBorder, "Voice shortcuts") {
-                    JHint("Your own phrases that act at once, without asking the model, when you say them on their own (optionally with “Jarvis” or “please”). " +
-                        "There are none until you add them, so a plain “okay” or “stop” in a conversation always goes to Jarvis like anything else.")
+                JCard(cardBg, cardBorder, "语音快捷指令") {
+                    JHint("你自己设定的短语，单独说出时（可带“Jarvis”或“please”）会立即执行，无需询问模型。" +
+                        "在你添加之前没有任何短语，因此对话中随口说的“okay”“stop”仍会像普通内容一样发给 Jarvis。")
                     val J = ai.antigem.data.jarvis.JarvisPhrases
                     listOf(
-                        Triple("Stop everything", P.cmdStop, "stop"),
-                        Triple("End the conversation", P.cmdBye, "bye"),
-                        Triple("Repeat the last answer", P.cmdRepeat, "repeat"),
-                        Triple("Speak slower", P.cmdSlower, "slower"),
-                        Triple("Speak faster", P.cmdFaster, "faster"),
-                        Triple("Quiet mode on", P.cmdQuietOn, "quiet_on"),
-                        Triple("Quiet mode off", P.cmdQuietOff, "quiet_off"),
-                        Triple("Start a new session", P.cmdNewSession, "new_session"),
-                        Triple("Interrupt Jarvis' work (starts a message)", P.interruptPhrases, "interrupt")
+                        Triple("停止一切", P.cmdStop, "stop"),
+                        Triple("结束对话", P.cmdBye, "bye"),
+                        Triple("重复上一个回答", P.cmdRepeat, "repeat"),
+                        Triple("说慢一点", P.cmdSlower, "slower"),
+                        Triple("说快一点", P.cmdFaster, "faster"),
+                        Triple("开启静音模式", P.cmdQuietOn, "quiet_on"),
+                        Triple("关闭静音模式", P.cmdQuietOff, "quiet_off"),
+                        Triple("开始新会话", P.cmdNewSession, "new_session"),
+                        Triple("打断 Jarvis 的工作（会开始一条消息）", P.interruptPhrases, "interrupt")
                     ).forEach { (title, pref, id) ->
                         val raw by pref.state.collectAsState()
                         val list = remember(raw) { J.parse(raw) }
@@ -479,7 +479,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     val quiet by P.quietMode.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_quiet_mode), stringResource(R.string.jarvis_settings_screen_jarvis_shows_its_answers_on_the_card), quiet) { P.quietMode.set(it) }
                     val engine by P.ttsEngine.state.collectAsState()
-                    JChips(listOf("android" to "This device", "google_cloud" to "Google Cloud", "openai" to "OpenAI-compatible"), engine) { P.ttsEngine.set(it) }
+                    JChips(listOf("android" to "本机", "google_cloud" to "Google Cloud", "openai" to "OpenAI-compatible"), engine) { P.ttsEngine.set(it) }
                     val voice by P.ttsVoice.state.collectAsState()
                     val language by P.ttsLanguage.state.collectAsState()
                     if (engine == "android") {
@@ -495,29 +495,29 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                                 }
                             }
                         }
-                        JField("Language (optional, e.g. en-US)", language) { P.ttsLanguage.set(it) }
+                        JField("语言（可选，如 zh-CN）", language) { P.ttsLanguage.set(it) }
                     } else {
                         val key by P.ttsApiKey.state.collectAsState()
-                        JField("API key", key, secret = true) { P.ttsApiKey.set(it) }
+                        JField("API 密钥", key, secret = true) { P.ttsApiKey.set(it) }
                         if (engine == "google_cloud") {
-                            JField("Voice name (e.g. en-US-Neural2-F)", voice) { P.ttsVoice.set(it) }
-                            JField("Language code (e.g. en-US)", language) { P.ttsLanguage.set(it) }
+                            JField("音色名称（如 en-US-Neural2-F）", voice) { P.ttsVoice.set(it) }
+                            JField("语言代码（如 zh-CN）", language) { P.ttsLanguage.set(it) }
                         } else {
                             val base by P.ttsBaseUrl.state.collectAsState()
                             val model by P.ttsModel.state.collectAsState()
-                            JField("Base URL (default https://api.openai.com/v1)", base) { P.ttsBaseUrl.set(it) }
-                            JField("Model (default tts-1)", model) { P.ttsModel.set(it) }
-                            JField("Voice (default alloy)", voice) { P.ttsVoice.set(it) }
+                            JField("基础 URL（默认 https://api.openai.com/v1）", base) { P.ttsBaseUrl.set(it) }
+                            JField("模型（默认 tts-1）", model) { P.ttsModel.set(it) }
+                            JField("音色（默认 alloy）", voice) { P.ttsVoice.set(it) }
                         }
                         JHint(stringResource(R.string.jarvis_settings_screen_if_the_online_voice_fails_jarvis_falls))
                     }
                     val rate by P.ttsRate.state.collectAsState()
-                    JSlider("Speed", rate, 0.5f..2f, "%.1fx".format(rate)) { P.ttsRate.set(it) }
+                    JSlider("语速", rate, 0.5f..2f, "%.1fx".format(rate)) { P.ttsRate.set(it) }
                     val pitch by P.ttsPitch.state.collectAsState()
-                    JSlider("Pitch", pitch, 0.5f..2f, "%.1f".format(pitch)) { P.ttsPitch.set(it) }
+                    JSlider("音调", pitch, 0.5f..2f, "%.1f".format(pitch)) { P.ttsPitch.set(it) }
                     val err by JarvisVoice.lastError.collectAsState()
                     err?.let { Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
-                    OutlinedButton(onClick = { scope.launch { JarvisVoice.speak("Hello, I'm Jarvis. This is how I sound.", wait = false) } }) { Text(stringResource(R.string.jarvis_settings_screen_test_voice)) }
+                    OutlinedButton(onClick = { scope.launch { JarvisVoice.speak("你好，我是 Jarvis。这是我说话的声音。", wait = false) } }) { Text(stringResource(R.string.jarvis_settings_screen_test_voice)) }
                     val progress by P.speakProgress.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_speak_progress_updates), stringResource(R.string.jarvis_settings_screen_jarvis_says_a_short_line_while_a), progress) { P.speakProgress.set(it) }
                     JHint(stringResource(R.string.jarvis_settings_screen_you_can_also_say_speak_slower_faster))
@@ -525,21 +525,21 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
             }
             JarvisSettingsPage.TASKS -> {
                 JCard(cardBg, cardBorder, "") {
-                    JHint("Say “build the release and tell me when it's done”: Jarvis starts a task in its own chat and watches it. You can ask how it is going, " +
-                        "redirect it (“also run the tests”), stop it, or answer its questions by voice. Tasks are listed in the Jarvis panel.")
+                    JHint("说“构建发布包，完成后告诉我”：Jarvis 会在独立聊天中启动任务并持续关注。你可以询问进度、" +
+                        "调整方向（“顺便跑一下测试”）、停止它，或用语音回答它的问题。任务会列在 Jarvis 面板中。")
                     val routing by P.eventRouting.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_when_a_task_finishes_fails_or_gets), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("model" to "Jarvis decides", "speak" to "Just tell me"), routing) { P.eventRouting.set(it) }
+                    JChips(listOf("model" to "由 Jarvis 决定", "speak" to "直接告诉我"), routing) { P.eventRouting.set(it) }
                     JHint(if (routing == "model") stringResource(R.string.jarvis_settings_screen_jarvis_reads_the_result_tells_you_the)
                     else stringResource(R.string.jarvis_settings_screen_jarvis_just_announces_it_release_build_is))
                     val taskAppr by P.taskApprovals.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_approvals_inside_tasks), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("policy" to "Use my approval rules", "jarvis" to "Jarvis decides"), taskAppr) { P.taskApprovals.set(it) }
+                    JChips(listOf("policy" to "使用我的审批规则", "jarvis" to "由 Jarvis 决定"), taskAppr) { P.taskApprovals.set(it) }
                     JHint(if (taskAppr == "jarvis") stringResource(R.string.jarvis_settings_screen_jarvis_approves_what_clearly_serves_the_task)
                     else stringResource(R.string.jarvis_settings_screen_approvals_follow_approvals_by_voice_below_approved))
                     val stall by P.stallMinutes.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_report_a_task_with_no_progress_after), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("0" to "Never", "5" to "5 min", "10" to "10 min", "20" to "20 min", "45" to "45 min"), stall.toString()) { P.stallMinutes.set(it.toInt()) }
+                    JChips(listOf("0" to "从不", "5" to "5 分钟", "10" to "10 分钟", "20" to "20 分钟", "45" to "45 分钟"), stall.toString()) { P.stallMinutes.set(it.toInt()) }
                     val done by P.announceDone.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_say_when_any_other_chat_finishes), stringResource(R.string.jarvis_settings_screen_chat_title_is_done_please_check_it), done) { P.announceDone.set(it) }
                     if (done) {
@@ -551,10 +551,10 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     val low by P.announceUsageLow.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_warn_when_the_5_hour_usage_is), stringResource(R.string.jarvis_settings_screen_once_per_window_at_about_15_left), low) { P.announceUsageLow.set(it) }
                 }
-                JCard(cardBg, cardBorder, "Command center") {
-                    JHint("Open the Jarvis tab in the chat list and tap “New Jarvis chat” to type to Jarvis like in any chat. Give it a big job: it writes a " +
-                        "mission (goal, done-when, steps), creates teams of agents (e.g. builders and reviewers), hands out tasks in parallel, checks what comes " +
-                        "back and keeps going. The strip above the input shows the mission, the teams' tasks and the switches below.")
+                JCard(cardBg, cardBorder, "指挥中心") {
+                    JHint("在聊天列表中打开 Jarvis 标签页，点按“新建 Jarvis 聊天”即可像普通聊天一样打字给 Jarvis。交给它一个大任务：它会拟定" +
+                        "任务书（目标、完成标准、步骤），组建智能体团队（如构建者和审查者），并行派发任务，检查回传结果" +
+                        "并持续推进。输入框上方会显示任务书、各团队任务以及下方开关。")
                     val speakDefault by P.managerSpeakDefault.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_read_replies_out_loud_in_new_jarvis), stringResource(R.string.jarvis_settings_screen_each_chat_has_its_own_voice_switch), speakDefault) {
                         P.managerSpeakDefault.set(it)
@@ -584,16 +584,16 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     val policy by P.permissionPolicy.state.collectAsState()
                     var confirmAll by remember { mutableStateOf(false) }
                     JChips(
-                        listOf("ask_each" to "Ask me each time", "auto_readonly" to "Auto: read-only", "auto_except_risky" to "Auto: except risky", "auto_all" to "Auto: everything"),
+                        listOf("ask_each" to "每次问我", "auto_readonly" to "自动：只读", "auto_except_risky" to "自动：高风险除外", "auto_all" to "自动：全部"),
                         policy
                     ) { if (it == "auto_all") confirmAll = true else P.permissionPolicy.set(it) }
                     JHint(
                         when (policy) {
-                            "auto_readonly" -> "Reading files and searching is approved; anything else is read out and needs a yes."
-                            "auto_except_risky" -> "Everything is approved except risky actions (deleting, pushing, installing from the web), which are read out first."
-                            "auto_all" -> "Nothing is asked. Use only if you fully trust what the agents do."
-                            else -> "Jarvis reads each request out (“It wants to run the command…”) and waits for your yes or no."
-                        } + " Jarvis' own tools never need approval. The chat on screen is only handled while hands-free mode is on (tasks always are)."
+                            "auto_readonly" -> "读取文件和搜索会自动通过；其他操作都会朗读出来，需要你确认。"
+                            "auto_except_risky" -> "除高风险操作（删除、推送、从网页安装）外都会自动通过，高风险操作会先朗读出来。"
+                            "auto_all" -> "不再询问任何操作。仅在你完全信任智能体行为时使用。"
+                            else -> "Jarvis 会朗读每个请求（“它想执行这条命令……”），然后等待你确认或拒绝。"
+                        } + " Jarvis 自己的工具无需审批。仅当免手模式开启时才会处理屏幕上的聊天（任务则始终处理）。"
                     )
                     if (confirmAll) {
                         AlertDialog(
@@ -607,8 +607,8 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     val allow by P.allowSettingChanges.state.collectAsState()
                     JSwitch(
                         stringResource(R.string.jarvis_settings_screen_let_jarvis_change_app_settings),
-                        "Theme, chat font size, floating bubble and switcher, new-chat agent. Jarvis' own voice and listening options can always be changed by voice; " +
-                            "approval and security settings never.",
+                        "主题、聊天字号、悬浮球与切换器、新聊天使用的智能体。Jarvis 自己的语音和聆听选项始终可用语音修改；" +
+                            "审批与安全设置则永远不能。",
                         allow
                     ) { P.allowSettingChanges.set(it) }
                 }
@@ -617,14 +617,14 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                 JCard(cardBg, cardBorder, "") {
                     val screenOn by P.keepScreenOn.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_keep_the_screen_on), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("always" to "While Jarvis is on", "active" to "While it's active", "off" to "Never"), screenOn) { P.keepScreenOn.set(it) }
+                    JChips(listOf("always" to "Jarvis 开启期间", "active" to "活跃期间", "off" to "从不"), screenOn) { P.keepScreenOn.set(it) }
                     JHint(stringResource(R.string.jarvis_settings_screen_while_it_s_active_while_jarvis_listens))
                     val size by P.orbSize.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_orb_while_idle), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("tiny" to "Tiny", "small" to "Small", "normal" to "Normal", "hidden" to "Hidden"), size) { P.orbSize.set(it) }
+                    JChips(listOf("tiny" to "极小", "small" to "小", "normal" to "标准", "hidden" to "隐藏"), size) { P.orbSize.set(it) }
                     JHint(stringResource(R.string.jarvis_settings_screen_drag_the_orb_anywhere_it_rests_on))
                     val style by P.orbStyle.state.collectAsState()
-                    JChips(listOf("floating" to "Floating card", "fullscreen" to "Full screen"), style) { P.orbStyle.set(it) }
+                    JChips(listOf("floating" to "浮动卡片", "fullscreen" to "全屏"), style) { P.orbStyle.set(it) }
                     val haptics by P.haptics.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_vibrate_when_listening_starts), null, haptics) { P.haptics.set(it) }
                     val activity by P.showActivity.state.collectAsState()
@@ -639,16 +639,16 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     JSwitch(stringResource(R.string.jarvis_settings_screen_send_live_context_with_every_message), stringResource(R.string.jarvis_settings_screen_screen_project_chat_on_screen_tasks_approvals), ctx) { P.contextInPrompt.set(it) }
                     val idle by P.rotateIdleMinutes.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_start_a_fresh_chat_after_idle_time), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("0" to "Never", "5" to "5 min", "15" to "15 min", "30" to "30 min", "60" to "1 h", "180" to "3 h"), idle.toString()) { P.rotateIdleMinutes.set(it.toInt()) }
+                    JChips(listOf("0" to "从不", "5" to "5 分钟", "15" to "15 分钟", "30" to "30 分钟", "60" to "1 小时", "180" to "3 小时"), idle.toString()) { P.rotateIdleMinutes.set(it.toInt()) }
                     val maxMsgs by P.rotateMaxMessages.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_start_a_fresh_chat_after_this_many), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    JChips(listOf("0" to "Never", "10" to "10", "20" to "20", "40" to "40", "80" to "80"), maxMsgs.toString()) { P.rotateMaxMessages.set(it.toInt()) }
-                    JHint("Both are off by default so Jarvis never forgets mid-task. A chat is only replaced when you speak the next message, never while it is working. " +
-                        "You can always say “start again” or “new session”.")
+                    JChips(listOf("0" to "从不", "10" to "10", "20" to "20", "40" to "40", "80" to "80"), maxMsgs.toString()) { P.rotateMaxMessages.set(it.toInt()) }
+                    JHint("两者默认都关闭，以免 Jarvis 在任务中途遗忘上下文。只有你说下一条消息时才会更换聊天，工作时绝不会更换。" +
+                        "你随时可以说“重新开始”或“新会话”。")
                     val carry by P.carryOver.state.collectAsState()
                     JSwitch(stringResource(R.string.jarvis_settings_screen_carry_the_conversation_over), stringResource(R.string.jarvis_settings_screen_a_new_chat_starts_with_the_jarvis), carry) { P.carryOver.set(it) }
                     val count by P.currentChatMessages.state.collectAsState()
-                    Text(stringResource(R.string.jarvis_settings_screen_current_chat_message, count.toString(), (if (count == 1) "" else "s").toString()), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    Text(stringResource(R.string.jarvis_settings_screen_current_chat_message, count.toString(), ""), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     OutlinedButton(onClick = { JarvisController.newSession(carry = carry); Toast.makeText(context, context.getString(R.string.jarvis_settings_next_message_new_chat), Toast.LENGTH_SHORT).show() }) {
                         Text(stringResource(R.string.jarvis_settings_screen_start_a_fresh_chat_now))
                     }
@@ -699,12 +699,12 @@ private fun PhraseEditor(phrases: List<String>, other: List<String>, otherName: 
         val p = J.normalize(input)
         if (p.isBlank()) return
         note = when {
-            p in phrases -> "“$p” is already in the list."
-            p in other -> "“$p” is already a $otherName phrase. Remove it there first."
+            p in phrases -> "“${p}”已在列表中。"
+            p in other -> "“${p}”已经是${if (otherName == "cancel") "取消" else "发送"}短语，请先在那里移除。"
             else -> {
                 onChange(phrases + p)
                 input = ""
-                if (J.isRisky(p)) "Added. “$p” is short or common, so it only counts when said on its own after a short pause." else null
+                if (J.isRisky(p)) "已添加。“${p}”较短或常见，只有在短暂停顿后单独说出时才生效。" else null
             }
         }
     }
@@ -820,7 +820,7 @@ private fun JStep(title: String, subtitle: String, done: Boolean, button: String
             Text(subtitle, fontSize = 12.sp, color = if (done) Color(0xFF22C55E) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         }
         Spacer(Modifier.width(8.dp))
-        if (done && button == "Allow") Text("✓", color = Color(0xFF22C55E), fontSize = 18.sp)
+        if (done && button == "允许") Text("✓", color = Color(0xFF22C55E), fontSize = 18.sp)
         else OutlinedButton(onClick = onClick) { Text(button, fontSize = 12.sp) }
     }
 }

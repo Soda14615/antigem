@@ -1715,7 +1715,7 @@ private fun ChatHistoryItemRow(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "RUNNING",
+                        text = "运行中",
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
                         color = ai.antigem.theme.AppColors.success

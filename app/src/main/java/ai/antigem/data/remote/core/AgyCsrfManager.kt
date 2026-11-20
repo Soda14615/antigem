@@ -58,6 +58,6 @@ class AgyCsrfManager {
         }
         Log.w(TAG, "⚠️ [AgyCsrfManager] CSRF token expired on $endpoint")
         _token.compareAndSet(current, "")
-        _csrfEvents.tryEmit("CSRF token expired on $endpoint")
+        _csrfEvents.tryEmit("$endpoint 上的 CSRF 令牌已过期")
     }
 }

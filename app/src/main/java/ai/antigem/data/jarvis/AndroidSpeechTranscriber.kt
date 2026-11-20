@@ -58,7 +58,7 @@ class AndroidSpeechTranscriber(
     private fun begin() {
         if (!SpeechRecognizer.isRecognitionAvailable(app)) {
             active = false
-            onError("This device has no speech recognizer. Install or enable Google speech services.")
+            onError("此设备没有语音识别器。请安装或启用 Google 语音服务。")
             return
         }
         destroy()
@@ -122,10 +122,10 @@ class AndroidSpeechTranscriber(
                 SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> main.postDelayed({ begin() }, 600)
                 SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> {
                     active = false
-                    this@AndroidSpeechTranscriber.onError("Microphone permission is missing.")
+                    this@AndroidSpeechTranscriber.onError("缺少麦克风权限。")
                 }
                 SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT, SpeechRecognizer.ERROR_SERVER -> {
-                    this@AndroidSpeechTranscriber.onError("Speech recognition needs a connection right now.")
+                    this@AndroidSpeechTranscriber.onError("语音识别当前需要网络连接。")
                     main.postDelayed({ if (active) begin() }, 2000)
                 }
                 else -> main.postDelayed({ if (active) begin() }, 500)

@@ -202,7 +202,7 @@ private fun CallContent(st: AgyVoiceCall.State, agentWorking: Boolean, onOpenAgy
                 Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                     Text(st.title.ifBlank { "Antigravity" }, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
-                        "Antigravity voice · ${voice.name}" +
+                        "Antigravity 语音 · ${voice.name}" +
                             (if (st.language != AgyVoicePreferences.LANGUAGE_AUTO) " · ${AgyVoicePreferences.languageLabel(st.language)}" else ""),
                         color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, maxLines = 1
                     )
@@ -316,7 +316,7 @@ private fun CallContent(st: AgyVoiceCall.State, agentWorking: Boolean, onOpenAgy
     if (showPicker) {
         AgyVoicePickerDialog(
             initialVoice = AgyVoicePreferences.voice.value,
-            subtitle = "Swipe to hear each voice. The call switches to the one you pick.",
+            subtitle = "左右滑动试听各音色，通话会切换到你所选的那个。",
             onChoose = {
                 AgyVoicePreferences.setVoice(it)
                 AgyVoiceCall.changeVoice(it)
@@ -779,7 +779,7 @@ fun AgyVoiceCallPill(agentWorking: Boolean, modifier: Modifier = Modifier) {
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Voice call" + (clock?.let { " · $it" } ?: ""),
+                    "语音通话" + (clock?.let { " · $it" } ?: ""),
                     color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1
                 )
                 Text(statusLine(st, agentWorking), color = Color.White.copy(alpha = 0.65f), fontSize = 11.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

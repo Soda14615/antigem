@@ -155,7 +155,7 @@ fun BrowserScreen(
     // Ensure at least one tab exists when opening browser
     LaunchedEffect(isVisible) {
         if (isVisible && sessionManager.tabs.isEmpty()) {
-            val newTab = sessionManager.addNewTab(url = "", title = "New Tab", activate = true)
+            val newTab = sessionManager.addNewTab(url = "", title = "新标签页", activate = true)
             activeTabId = newTab.id
         }
     }
@@ -271,7 +271,7 @@ fun BrowserScreen(
         sessionManager.openUrl(targetUrl, tabId = activeTabId, newTab = false)
     }
 
-    fun addNewTab(url: String = "", title: String = "New Tab") {
+    fun addNewTab(url: String = "", title: String = "新标签页") {
         activeTab?.capturePreview()
         val newTab = sessionManager.addNewTab(url = url, title = title, activate = true)
         activeTabId = newTab.id
@@ -849,10 +849,10 @@ fun BrowserScreen(
             title = { Text(stringResource(R.string.browser_screen_clear_browsing_data), fontWeight = FontWeight.SemiBold) },
             text = {
                 Text(
-                    "This deletes all cookies, site data (local storage, IndexedDB, service workers), cache, " +
-                        "saved site logins, site permissions, history and closes every tab. " +
-                        "You will be signed out of all websites, including Google accounts. " +
-                        "Speed dial shortcuts are kept. This cannot be undone.",
+                    "这会删除所有 Cookie、网站数据（localStorage、IndexedDB、Service Worker）、缓存、" +
+                        "已保存的网站登录信息、网站权限、历史记录，并关闭所有标签页。" +
+                        "你将退出所有网站的登录状态，包括 Google 账号。" +
+                        "快速拨号快捷方式会保留。此操作无法撤销。",
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1970,7 +1970,7 @@ private fun TabCardView(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = when {
-                            (tab.url.isBlank() || tab.url == "about:blank") && tab.title == "New Tab" -> stringResource(R.string.workspace_browser_default_tab)
+                            (tab.url.isBlank() || tab.url == "about:blank") && tab.title == "新标签页" -> stringResource(R.string.workspace_browser_default_tab)
                             tab.url.isBlank() && tab.title.isBlank() -> stringResource(R.string.workspace_browser_home)
                             else -> tab.title.ifBlank { tab.url }
                         },

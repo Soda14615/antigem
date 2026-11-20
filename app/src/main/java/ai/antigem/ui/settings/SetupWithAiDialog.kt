@@ -178,7 +178,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "AntiGem couldn't add ${source.trim()} by itself" + (reason?.takeIf { it.isNotBlank() }?.let { ": $it" } ?: ".") +
+                    "AntiGem 无法自行添加 ${source.trim()}" + (reason?.takeIf { it.isNotBlank() }?.let { ": $it" } ?: ".") +
                         " An AI agent can read its README and set it up for you.",
                     fontSize = 12.5.sp, lineHeight = 17.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                 )

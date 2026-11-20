@@ -234,7 +234,7 @@ object ConversationShareHelper {
      */
     fun parseSharedConversation(inputStream: InputStream): SharedConversationData {
         val reader = BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8))
-        var title = "Shared Conversation"
+        var title = "分享的对话"
         var conversationId = "shared_${System.currentTimeMillis()}"
         var exportedAt = ""
         val steps = mutableListOf<Step>()

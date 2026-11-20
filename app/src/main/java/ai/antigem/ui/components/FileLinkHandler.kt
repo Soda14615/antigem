@@ -216,7 +216,7 @@ fun FileDetailsDialog(
                     onClick = {
                         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         cm.setPrimaryClip(ClipData.newPlainText("File Path", details.fullPath))
-                        Toast.makeText(context, "Path copied to clipboard", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "路径已复制到剪贴板", Toast.LENGTH_SHORT).show()
                     }
                 ) {
                     Icon(Icons.Outlined.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -318,7 +318,7 @@ fun MarkdownDocViewerModal(
                             onClick = {
                                 val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 cm.setPrimaryClip(ClipData.newPlainText("Markdown Content", content))
-                                Toast.makeText(context, "Markdown content copied", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Markdown 内容已复制", Toast.LENGTH_SHORT).show()
                             }
                         ) {
                             Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.file_link_handler_copy_content))

@@ -107,7 +107,7 @@ class ClaudeAccountManager(
         statusJob?.cancel()
         _checking.value = false
         _failure.value = ClaudeStatus.BRIDGE_OFFLINE
-        _statusError.value = "The bridge is not running."
+        _statusError.value = "桥接服务未运行。"
     }
 
     private fun classify(error: Throwable): ClaudeStatus = when {
@@ -174,12 +174,12 @@ class ClaudeAccountManager(
                         _login.value = st
                         pollLogin(st.login_id)
                     } else {
-                        _messages.tryEmit("Sign-in could not start: ${resp.error ?: "unknown error"}")
+                        _messages.tryEmit("登录无法启动：${resp.error ?: "unknown error"}")
                         _isBusy.value = false
                     }
                 }
                 .onFailure {
-                    _messages.tryEmit("Sign-in could not start: ${it.message}")
+                    _messages.tryEmit("登录无法启动：${it.message}")
                     _isBusy.value = false
                 }
         }
@@ -190,8 +190,8 @@ class ClaudeAccountManager(
         val id = _login.value?.login_id ?: return
         scope.launch {
             client.submitLoginCode(id, code)
-                .onSuccess { if (!it.success) _messages.tryEmit("Code rejected: ${it.error}") }
-                .onFailure { _messages.tryEmit("Could not send code: ${it.message}") }
+                .onSuccess { if (!it.success) _messages.tryEmit("验证码被拒绝：${it.error}") }
+                .onFailure { _messages.tryEmit("无法发送验证码：${it.message}") }
         }
     }
 
@@ -208,9 +208,9 @@ class ClaudeAccountManager(
             _isBusy.value = true
             client.logout()
                 .onSuccess {
-                    if (it.success) _messages.tryEmit("Signed out of Claude") else _messages.tryEmit("Sign-out failed: ${it.error}")
+                    if (it.success) _messages.tryEmit("已退出 Claude 登录") else _messages.tryEmit("退出登录失败：${it.error}")
                 }
-                .onFailure { _messages.tryEmit("Sign-out failed: ${it.message}") }
+                .onFailure { _messages.tryEmit("退出登录失败：${it.message}") }
             _isBusy.value = false
             _usage.value = null
             refreshStatus()
@@ -227,7 +227,7 @@ class ClaudeAccountManager(
                 _login.value = st
                 when (st.state) {
                     "success" -> {
-                        _messages.tryEmit("Signed in to Claude")
+                        _messages.tryEmit("已登录 Claude")
                         finishLogin()
                         return@launch
                     }

@@ -97,8 +97,8 @@ fun FullPromptDialog(prompt: String, attachmentCount: Int = 0, onDismiss: () -> 
                     IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.accounts_ui_close)) }
                 }
                 Text(
-                    "Exactly what was sent to the agent, including the parts the chat hides." +
-                        if (attachmentCount > 0) " $attachmentCount attachment${if (attachmentCount == 1) " was" else "s were"} sent alongside (not shown)." else "",
+                    "发送给智能体的完整内容，包括聊天中隐藏的部分。" +
+                        if (attachmentCount > 0) " 同时发送了 $attachmentCount 个附件（未显示）。" else "",
                     fontSize = 12.sp, lineHeight = 16.sp, color = muted,
                     modifier = Modifier.padding(top = 4.dp, end = 8.dp)
                 )
@@ -126,7 +126,7 @@ fun FullPromptDialog(prompt: String, attachmentCount: Int = 0, onDismiss: () -> 
                     TextButton(onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         clipboard.setPrimaryClip(ClipData.newPlainText("Full prompt", prompt))
-                        Toast.makeText(context, "Copied the full prompt", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "完整提示已复制", Toast.LENGTH_SHORT).show()
                     }) {
                         Icon(Icons.Outlined.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                         Text(stringResource(R.string.full_prompt_dialog_copy_all), modifier = Modifier.padding(start = 6.dp))

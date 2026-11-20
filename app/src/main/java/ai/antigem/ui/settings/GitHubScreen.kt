@@ -298,8 +298,8 @@ private fun AccountCard(state: GitHubManager.State, cardBg: Color, cardBorder: B
         AlertDialog(
             onDismissRequest = { confirmLogout = false },
             title = { Text(stringResource(R.string.git_hub_screen_sign_out_of_github)) },
-            text = { Text("gh forgets this login, so git can no longer push or reach private repositories" +
-                (if (GitHubManager.remote) " on the server" else " in the terminal") + " until you sign in again. Cloned projects stay where they are.") },
+            text = { Text("gh 会忘记此次登录，因此在重新登录之前，git 无法推送，也无法访问私有仓库" +
+                (if (GitHubManager.remote) "（服务器上）" else "（终端中）") + "。已克隆的项目仍保留在原处。") },
             confirmButton = { TextButton(onClick = { confirmLogout = false; GitHubManager.logout() }) { Text(stringResource(R.string.accounts_ui_sign_out), color = MaterialTheme.colorScheme.error) } },
             dismissButton = { TextButton(onClick = { confirmLogout = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
@@ -328,10 +328,10 @@ private fun GitSetupCard(state: GitHubManager.State, cardBg: Color, cardBorder: 
                     fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                 return@Column
             }
-            CheckRow("git uses your GitHub login", state.gitCredentialHelper)
+            CheckRow("git 使用你的 GitHub 登录", state.gitCredentialHelper)
             if (state.gitCredentialHelper) {
-                Hint("git clone, pull and push over https://github.com use this account, in the terminal, the IDE and agent commands" +
-                    (if (GitHubManager.remote) " on the server." else "."))
+                Hint("通过 https://github.com 进行的 git clone、pull 和 push 都会使用此账号，包括终端、IDE 以及智能体命令" +
+                    (if (GitHubManager.remote) "（在服务器上）。" else "。"))
             } else {
                 Hint(stringResource(R.string.git_hub_screen_without_this_git_asks_for_a_password))
                 Button(enabled = state.busy == null, onClick = { GitHubManager.setupGit() }) { Text(stringResource(R.string.git_hub_screen_set_up_git)) }

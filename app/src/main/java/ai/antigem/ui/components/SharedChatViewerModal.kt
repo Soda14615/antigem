@@ -66,7 +66,7 @@ fun SharedChatViewerModal(
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = data.title.ifBlank { "Shared Conversation" },
+                                    text = data.title.ifBlank { "分享的对话" },
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface,
@@ -80,7 +80,7 @@ fun SharedChatViewerModal(
                                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
                                 ) {
                                     Text(
-                                        text = "READ-ONLY",
+                                        text = "只读",
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -359,7 +359,7 @@ fun IdeScreen(
                             if (res == null) {
                                 Toast.makeText(
                                     context,
-                                    "Cannot open '${node.name}'. IDE Bridge is offline or file is unreachable.",
+                                    "无法打开“${node.name}”。IDE 桥接服务离线或文件不可达。",
                                     Toast.LENGTH_LONG
                                 ).show()
                             } else {

@@ -140,7 +140,7 @@ object AdbTunnel {
             }
             _state.value = _state.value.copy(
                 enabled = true, serverPort = serverPort, serverPairPort = pairPort, phonePort = null, phoneMode = "",
-                message = "No adb found on the phone. Turn on Wireless debugging, or run `adb tcpip 5555` once (root: setprop service.adb.tcp.port 5555; stop adbd; start adbd)."
+                message = "手机上未找到 adb。请开启“无线调试”，或执行一次 `adb tcpip 5555`（root：setprop service.adb.tcp.port 5555; stop adbd; start adbd）。"
             )
             return@withLock
         }
@@ -153,7 +153,7 @@ object AdbTunnel {
                 forwardedPort = port
             } catch (e: Exception) {
                 Log.w(TAG, "Reverse forward $serverPort failed: ${e.message}")
-                _state.value = _state.value.copy(enabled = true, message = "Could not open port $serverPort on the server: ${e.message?.take(80)}")
+                _state.value = _state.value.copy(enabled = true, message = "无法在服务器上开放端口 $serverPort：${e.message?.take(80)}")
                 return@withLock
             }
             // connect the server's adb right away (needs adb installed there, and the key paired once for Wireless debugging)

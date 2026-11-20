@@ -119,7 +119,7 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
     ) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Antigravity CLI (agy)", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                Text("Antigravity CLI（agy）", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                 if (checking) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                 else IconButton(onClick = { BridgeInfo.refreshAgyCli() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
             }

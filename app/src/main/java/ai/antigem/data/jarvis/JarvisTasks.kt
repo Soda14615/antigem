@@ -277,7 +277,7 @@ object JarvisTasks {
         put(Task(
             id = id, agent = agent, title = conv?.title?.takeIf { it.isNotBlank() && it != "New Chat" }?.take(60) ?: shortTitle(message),
             goal = message.trim().take(600), project = conv?.workspaceUri?.removePrefix("file://").orEmpty(),
-            note = "Message sent", adopted = true, owner = JarvisManagers.ownerOrVoice(owner)
+            note = "消息已发送", adopted = true, owner = JarvisManagers.ownerOrVoice(owner)
         ))
     }
 
@@ -342,9 +342,9 @@ object JarvisTasks {
                 if (vm.currentConversation.value?.id == t.id) vm.claudeBackend.stopStreaming()
                 else ensureBackend(t.id).stopStreaming()
             }
-            AgentKind.AGY -> hub.cancelCascadeInvocation(t.id).onFailure { return "Could not stop: ${it.message}" }
-            AgentKind.OPENCODE -> (openCodeBackends[t.id] ?: vm.openCodeBackend).interrupt(t.id).onFailure { return "Could not stop: ${it.message}" }
-            AgentKind.CODEX -> (codexBackends[t.id] ?: vm.codexBackend).interrupt(t.id).onFailure { return "Could not stop: ${it.message}" }
+            AgentKind.AGY -> hub.cancelCascadeInvocation(t.id).onFailure { return "无法停止：${it.message}" }
+            AgentKind.OPENCODE -> (openCodeBackends[t.id] ?: vm.openCodeBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
+            AgentKind.CODEX -> (codexBackends[t.id] ?: vm.codexBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
         }
         if (!quiet) put(t.copy(state = State.STOPPED, updatedAt = System.currentTimeMillis(), note = "Stopped", reported = true))
         return "Stopped."

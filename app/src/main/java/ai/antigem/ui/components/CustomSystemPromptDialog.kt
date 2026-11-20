@@ -185,7 +185,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 val clip = ClipData.newPlainText("Antigravity System Prompt", defaultSystemPrompt)
                                 clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, "System prompt copied to clipboard", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "系统提示已复制到剪贴板", Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier.size(32.dp)
                         ) {

@@ -59,8 +59,8 @@ fun StemRenderingScreen() {
 
     Column(Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)) {
         Text(
-            "Extra blocks for study notes in chats: chemistry, molecules, graphs, geometry, physics simulations and " +
-                "TikZ figures (circuits, free-body diagrams, optics). Everything runs on this phone, offline.",
+            "聊天学习笔记的扩展块：化学式、分子结构、函数图像、几何、物理仿真以及 " +
+                "TikZ 图形（电路、受力分析图、光学）。全部在本机离线运行。",
             fontSize = 12.5.sp, lineHeight = 17.sp, color = muted
         )
         Spacer(Modifier.height(16.dp))
@@ -79,8 +79,8 @@ fun StemRenderingScreen() {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "SmilesDrawer, function-plot, JSXGraph, Matter.js, TikZJax (TeX with circuitikz, pgfplots, chemfig) and " +
-                        "Mermaid, at fixed versions, from AntiGem's GitHub release. Checked against a fixed checksum, then kept in the app's private storage.",
+                    "SmilesDrawer、function-plot、JSXGraph、Matter.js、TikZJax（TeX 加 circuitikz、pgfplots、chemfig）以及 " +
+                        "Mermaid，均为固定版本，来自 AntiGem 的 GitHub Release。下载后按固定校验和核对，再存入应用的私有存储。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
                 Spacer(Modifier.height(10.dp))
@@ -97,10 +97,10 @@ fun StemRenderingScreen() {
                     Icon(Icons.Outlined.Warning, null, tint = warn, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Heavy on the phone. Each diagram block runs in its own web view, and TikZ pictures run TeX on the " +
-                            "phone (a few seconds and a lot of memory the first time, one at a time; after that they're saved). " +
-                            "Chats with many diagrams can lag or scroll less smoothly, especially on older phones. " +
-                            "Switch off what you don't use below.",
+                        "比较吃手机性能。每个图表块都在独立的 WebView 中运行，TikZ 图形会在手机上跑 TeX" +
+                            "（首次需要几秒并占用较多内存，且逐个执行；之后会缓存）。" +
+                            "图表较多的聊天可能卡顿或滚动不畅，旧机型尤为明显。" +
+                            "下方不用的项可以关掉。",
                         fontSize = 12.5.sp, lineHeight = 17.sp
                     )
                 }
@@ -150,8 +150,8 @@ fun StemRenderingScreen() {
         Spacer(Modifier.height(22.dp))
         Text(stringResource(R.string.stem_rendering_screen_what_to_use), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         Text(
-            "All off at first. Switched off: the block shows as code, and agents aren't told about it." +
-                if (installed) "" else " Download the bundle to switch on the parts that need it.",
+            "初始全部关闭。关闭时：该块会以代码形式显示，也不会告知智能体。" +
+                if (installed) "" else " 下载离线包后即可开启依赖它的部分。",
             fontSize = 12.sp, color = muted
         )
         Spacer(Modifier.height(10.dp))
@@ -164,8 +164,8 @@ fun StemRenderingScreen() {
                             Text(c.title, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                             Text(c.summary, fontSize = 12.sp, lineHeight = 16.sp, color = muted)
                             val note = when {
-                                !c.fromBundle -> "${c.library} · built in, no download"
-                                !installed -> "${c.library} ${c.version} · needs the bundle"
+                                !c.fromBundle -> "${c.library} · 内置，无需下载"
+                                !installed -> "${c.library} ${c.version} · 需要离线包"
                                 else -> "${c.library} ${c.version}"
                             }
                             Text(note, fontSize = 11.5.sp, color = if (c in active) QuotaGreen else muted)
@@ -195,9 +195,9 @@ fun StemRenderingScreen() {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "A short list of the blocks that work here, with their exact versions, so agents use them in their answers" +
-                        (if (GlobalContext.runsOnPhone) ", and where the full guide is on this phone (they read it only when needed)" else "") +
-                        ". Chats get it again when it changes. Jarvis doesn't get it.",
+                    "简要列出本机可用的块及其确切版本，供智能体在回答中使用" +
+                        (if (GlobalContext.runsOnPhone) "，并说明完整指南在本机的位置（仅在需要时读取）" else "") +
+                        "。内容变化后聊天会重新获取。Jarvis 不会获取。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
                 TextButton(onClick = { showPrompt = !showPrompt }, contentPadding = PaddingValues(horizontal = 0.dp)) {

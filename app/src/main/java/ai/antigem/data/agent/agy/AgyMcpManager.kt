@@ -163,7 +163,7 @@ class AgyMcpManager(
                 }
 
                 if (fetchError != null) {
-                    _mcpErrorMessage.value = "Cannot reach Antigravity daemon ($hubUrl): $fetchError"
+                    _mcpErrorMessage.value = "无法连接 Antigravity 守护进程（$hubUrl）：$fetchError"
                 }
 
                 // If daemon RPC failed and no servers found, preserve existing cached servers if available
@@ -193,7 +193,7 @@ class AgyMcpManager(
                 val res = agyHubClient.refreshMcpServers(hubUrl)
                 if (res.isFailure) {
                     val err = res.exceptionOrNull()?.message ?: "Refresh failed"
-                    _mcpErrorMessage.value = "Daemon refresh error ($hubUrl): $err"
+                    _mcpErrorMessage.value = "守护进程刷新出错（$hubUrl）：$err"
                 }
                 delay(600)
                 loadMcpServers()
@@ -209,7 +209,7 @@ class AgyMcpManager(
                 } else {
                     val count = _mcpServers.value.size
                     val toolsCount = _mcpServers.value.sumOf { it.tools.size }
-                    _mcpStatusMessage.value = "Refreshed: $count server(s) configured, $toolsCount tool(s) discovered"
+                    _mcpStatusMessage.value = "已刷新：配置了 $count 个服务器，发现 $toolsCount 个工具"
                 }
             } catch (e: Exception) {
                 _mcpErrorMessage.value = e.message
@@ -313,12 +313,12 @@ class AgyMcpManager(
 
                 val success = ai.antigem.data.daemon.IdeApiClient.saveMcpConfig(json.toString(2))
                 if (!success) {
-                    _mcpErrorMessage.value = "Failed to save configuration to mcp_config.json"
+                    _mcpErrorMessage.value = "无法将配置保存到 mcp_config.json"
                 } else {
                     val hubUrl = AuthPreferences.currentHubUrl
                     agyHubClient.refreshMcpServers(hubUrl)
                     loadMcpServers()
-                    _mcpStatusMessage.value = "Saved '${spec.serverName}'. Tap Refresh on the server to connect."
+                    _mcpStatusMessage.value = "已保存“${spec.serverName}”。在服务器上点按“刷新”以连接。"
                 }
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "saveMcpServer error: ${e.message}", e)
@@ -385,15 +385,15 @@ class AgyMcpManager(
             try {
                 val res = agyHubClient.installCascadePlugin(plugin)
                 if (res.isSuccess) {
-                    _mcpStatusMessage.value = "Installed and activated '${plugin.title}' MCP server"
+                    _mcpStatusMessage.value = "已安装并激活“${plugin.title}”MCP 服务器"
                     delay(500)
                     loadMcpServers()
                 } else {
                     val err = res.exceptionOrNull()?.message ?: "Installation failed"
-                    _mcpErrorMessage.value = "Failed to install ${plugin.title}: $err"
+                    _mcpErrorMessage.value = "安装 ${plugin.title} 失败：$err"
                 }
             } catch (e: Exception) {
-                _mcpErrorMessage.value = "Error installing ${plugin.title}: ${e.message}"
+                _mcpErrorMessage.value = "安装 ${plugin.title} 时出错：${e.message}"
             } finally {
                 _installingCascadePluginId.value = null
             }

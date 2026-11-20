@@ -86,9 +86,9 @@ fun AgentHistoryScreen() {
 
     Column(Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)) {
         Text(
-            "Chats saved for the agents to look up: your messages and the replies, no tool output. Open one to read or " +
-                "edit it, or remove it. A removed chat is not saved again (new chats are). An edited one keeps your text, " +
-                "and the chat's new messages are added at the end.",
+            "供智能体检索的聊天存档：你的消息与回复，不含工具输出。打开可查看或" +
+                "编辑，也可移除。被移除的聊天不会再保存（新聊天仍会）。编辑过的聊天会保留你的文本，" +
+                "后续新消息会追加在末尾。",
             fontSize = 12.5.sp, lineHeight = 17.sp, color = muted
         )
 

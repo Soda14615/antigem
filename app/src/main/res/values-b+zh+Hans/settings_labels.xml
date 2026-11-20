@@ -29,7 +29,7 @@
     <string name="settings_section_project_checkpoints_title">"项目检查点"</string>
     <string name="settings_section_project_checkpoints_subtitle">"回到任意聊天消息之前的状态，恢复文件前可预览"</string>
     <string name="settings_section_commands_title">"命令与权限"</string>
-    <string name="settings_section_commands_subtitle">"自动运行策略、沙盒模式和工具审批"</string>
+    <string name="settings_section_commands_subtitle">"自动运行策略、沙箱模式和工具审批"</string>
     <string name="settings_section_antigravity_title">"Antigravity"</string>
     <string name="settings_section_antigravity_subtitle">"CLI、MCP 服务器、技能与插件、命令与权限"</string>
     <string name="settings_section_agy_cli_title">"Antigravity CLI"</string>

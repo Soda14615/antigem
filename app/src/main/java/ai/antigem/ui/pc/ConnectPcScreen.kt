@@ -561,10 +561,10 @@ fun PcServersNotice(cardBg: Color, cardBorder: BorderStroke, onOpenConnectPc: ()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Computer, null, tint = QuotaGreen)
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.connect_pc_screen_connected_to, (active?.name ?: "a PC").toString()), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(R.string.connect_pc_screen_connected_to, (active?.name ?: "一台电脑").toString()), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
-            Hint("Connect to PC is in use, so the agents and chats come from the PC. Your server settings here are kept " +
-                "as they were and are used again after you switch back.")
+            Hint("“连接电脑”已启用，因此智能体和聊天都来自电脑。这里的服务器设置会原样保留，" +
+                "切回后继续使用。")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onOpenConnectPc, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.connect_pc_screen_connect_to_pc)) }
                 Button(onClick = { switchBack = true }, modifier = Modifier.weight(1f)) { Text(PcConnect.ownModeLabel()) }

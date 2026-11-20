@@ -29,7 +29,7 @@ object CustomSlashCommands {
     val DEFAULTS = listOf(
         CustomSlashCommand(
             name = "custom_plugin",
-            description = "Create a custom AntiGem plugin with the plugin developer MCP",
+            description = "使用插件开发者 MCP 创建一个自定义 AntiGem 插件",
             expansion = """
                 The user wants to create a custom AntiGem plugin: a package that gives you MCP tools and/or skills inside the AntiGem app (tools can automate websites in the app's browser). What it should do: ${'$'}ARGUMENTS
                 If that is empty or unclear, first ask what the plugin should do and on which website, then continue.
@@ -43,7 +43,7 @@ object CustomSlashCommands {
         ),
         CustomSlashCommand(
             name = "mini_app",
-            description = "Build a mini app (an app inside AntiGem) with the Mini App Developer MCP",
+            description = "使用小程序开发者 MCP 构建一个小程序（AntiGem 内置应用）",
             expansion = """
                 The user wants a mini app: a small app that runs inside AntiGem (HTML/CSS/JS with AntiGem's native SDK for storage, files, network, notifications and more), with its own icon and Recents card. What it should do: ${'$'}ARGUMENTS
                 If that is empty or unclear, first ask what the app should do, then continue.
@@ -58,7 +58,7 @@ object CustomSlashCommands {
         ),
         CustomSlashCommand(
             name = "browser_mcp",
-            description = "Do a task in AntiGem's built-in browser with the Browser Automation MCP",
+            description = "使用浏览器自动化 MCP 在 AntiGem 内置浏览器中执行任务",
             expansion = """
                 Use AntiGem's built-in browser to do this: ${'$'}ARGUMENTS
                 If that is empty or unclear, first ask the user what to do and on which website, then continue.
@@ -76,7 +76,7 @@ object CustomSlashCommands {
         ),
         CustomSlashCommand(
             name = "automation",
-            description = "Control this phone (read the screen, tap, type, open apps) with the Android Automation MCP",
+            description = "使用安卓自动化 MCP 控制此手机（读取屏幕、点击、输入、打开应用）",
             expansion = """
                 Use Android Automation to do this on the user's phone: ${'$'}ARGUMENTS
                 If that is empty or unclear, first ask the user what they want done, then continue.

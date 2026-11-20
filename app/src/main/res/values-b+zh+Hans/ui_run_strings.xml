@@ -7,16 +7,16 @@
     <string name="run_screen_browse">"浏览…"</string>
     <string name="run_screen_run">"运行 %1$s"</string>
     <string name="run_screen_in">"在 %1$s"</string>
-    <string name="run_screen_delete">"删除“ %1$s ”？"</string>
+    <string name="run_screen_delete">"删除“%1$s”？"</string>
     <string name="run_screen_save_to_this_project">"保存到该项目"</string>
     <string name="run_screen_edit_command">"编辑命令"</string>
     <string name="run_screen_build_debug_apk">"构建调试 APK"</string>
-    <string name="run_screen_adev_gradlew_assembledebug">"adev ./gradlew assemble调试"</string>
+    <string name="run_screen_adev_gradlew_assembledebug">"adev ./gradlew assembleDebug"</string>
     <string name="run_screen_folder_optional">"文件夹（可选）"</string>
     <string name="run_screen_android_empty_the_project_folder">"android · 空 = 项目文件夹"</string>
     <string name="run_screen_save_to">"保存到"</string>
-    <string name="run_screen_kept_in_the_app_s_home_antigem">"保存在应用程序的家中（~/.antigem/global-run.json）；在面板中选择的文件夹中运行。"</string>
-    <string name="run_screen_saved_in_the_project_s_antigem_run">"保存在项目的 . antigem / run.json，IDE 和智能体也使用。"</string>
+    <string name="run_screen_kept_in_the_app_s_home_antigem">保存在应用主目录（~/.antigem/global-run.json）；在面板中所选文件夹中运行。</string>
+    <string name="run_screen_saved_in_the_project_s_antigem_run">保存在项目的 .antigem/run.json 中，IDE 和智能体也会使用它。</string>
     <string name="run_screen_nothing_running">"没有运行。"</string>
     <string name="run_screen_show_commands">"显示命令"</string>
     <string name="run_screen_stop_and_close">"停止并关闭"</string>
@@ -24,7 +24,7 @@
     <string name="run_screen_run_again">"再次运行"</string>
     <string name="run_screen_failed_send_the_output_to_the_chat">"失败了。将输出发送到聊天，以便智能体可以修复它"</string>
     <string name="run_screen_stopped">"已停止"</string>
-    <string name="run_screen_runs">"跑步"</string>
+    <string name="run_screen_runs">"运行记录"</string>
     <string name="run_screen_a_run_failed">"运行失败"</string>
     <string name="run_screen_runs_finished">"运行完成"</string>
 </resources>

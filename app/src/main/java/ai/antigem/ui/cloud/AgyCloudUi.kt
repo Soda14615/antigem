@@ -159,14 +159,14 @@ fun AgyCloudSettingsCard(modifier: Modifier = Modifier) {
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Antigravity chats can run on a Google cloud machine with your GitHub repos (Antigravity's Remote " +
-                        "Agents) and keep working while the phone is off. Needs Google AI Pro or Ultra on a personal account.",
+                    "Antigravity 聊天可以在挂载你 GitHub 仓库的 Google 云端机器上运行（Antigravity 的 Remote " +
+                        "Agents），手机关机也能继续工作。需要在个人账号上开通 Google AI Pro 或 Ultra。",
                     fontSize = 12.5.sp, color = subtle()
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    if (enabled) "On: cloud projects show in the project picker of Antigravity chats, and cloud chats in the " +
-                        "chat list. They are ready about a minute after the Antigravity server starts."
+                    if (enabled) "已开启：云项目会出现在 Antigravity 聊天的项目选择器中，云聊天会出现在 " +
+                        "聊天列表里。Antigravity 服务器启动约一分钟后即可用。"
                     else stringResource(R.string.agy_cloud_ui_off_the_app_does_not_ask_the),
                     fontSize = 12.5.sp, color = subtle()
                 )
@@ -368,8 +368,8 @@ fun CloudProjectsDialog(
                     LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 8.dp)) {
                         if (projects.isEmpty() && !loading && error == null) item {
                             Text(
-                                "No cloud projects yet. A cloud project holds GitHub repos; its chats run in a Google VM with them " +
-                                    "cloned in, and keep working when your phone is off.",
+                                "还没有云项目。云项目用来承载 GitHub 仓库；其聊天在已克隆这些仓库的 Google 虚拟机中运行，" +
+                                    "手机关机后仍可继续。",
                                 fontSize = 13.sp, color = subtle(), lineHeight = 18.sp
                             )
                         }
@@ -555,8 +555,8 @@ private fun CloudProjectEditor(
                 when {
                     notConnected -> {
                         Text(
-                            "GitHub is not connected to your cloud agents yet. Connect opens Antigravity's GitHub page in your " +
-                                "browser, as your Antigravity Google account: connect GitHub there and choose the repos it may use, then come back here.",
+                            "GitHub 尚未连接到你的云智能体。“连接”会用你的 Antigravity Google 账号在浏览器中打开 " +
+                                "Antigravity 的 GitHub 页面：在那里连接 GitHub 并选择允许使用的仓库，然后回到这里。",
                             fontSize = 12.5.sp, lineHeight = 17.sp, color = subtle()
                         )
                         Spacer(Modifier.height(8.dp))
@@ -665,7 +665,7 @@ private fun ConnectionsTab(modifier: Modifier) {
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch {
-                        AgyCloud.disconnectPlugin(p).onFailure { error = "Disconnect failed: ${it.message ?: "unknown error"}" }
+                        AgyCloud.disconnectPlugin(p).onFailure { error = "断开连接失败：${it.message ?: "unknown error"}" }
                         disconnecting = null
                         reload++
                     }

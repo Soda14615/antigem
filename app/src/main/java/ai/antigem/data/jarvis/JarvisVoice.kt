@@ -212,7 +212,7 @@ object JarvisVoice {
         val ok = ready.await()
         val engine = tts
         if (!ok || engine == null) {
-            _lastError.value = "The device's text-to-speech is not available."
+            _lastError.value = "设备的文字转语音不可用。"
             ttsReady = null
             tts = null
             return null
@@ -291,7 +291,7 @@ object JarvisVoice {
     private suspend fun playOnline(engine: String, text: String): Boolean {
         val key = JarvisPreferences.ttsApiKey.value.trim()
         if (key.isBlank()) {
-            _lastError.value = "No API key set for the online voice; using the device voice."
+            _lastError.value = "未设置在线语音的 API 密钥，将使用设备语音。"
             return false
         }
         return try {
@@ -306,7 +306,7 @@ object JarvisVoice {
             throw e
         } catch (e: Exception) {
             Log.w(TAG, "online voice failed: ${e.message}")
-            _lastError.value = "Online voice failed (${e.message}); used the device voice."
+            _lastError.value = "在线语音失败（${e.message}），已改用设备语音。"
             false
         }
     }

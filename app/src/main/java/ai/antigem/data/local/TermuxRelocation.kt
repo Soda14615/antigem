@@ -25,6 +25,14 @@ object TermuxRelocation {
     private const val TAG = "TermuxRelocation"
     const val TERMUX_PACKAGE = "com.termux"
 
+    /**
+     * The package the shipped rootfs was built for. Its binaries carry absolute "/data/data/ai.antigem/..."
+     * paths (RUNPATH, defaults, config files), so a variant with another applicationId (the debug build,
+     * ai.antidev) has to rewrite those prefixes as well, not just "com.termux".
+     */
+    private const val APP_PACKAGE = "ai.antigem"
+    private val APP_PACKAGE_PREFIXES = listOf("/data/data/$APP_PACKAGE", "/data/user/0/$APP_PACKAGE")
+
     /** Zip-based files keep CRCs and dex files a checksum: rewriting bytes in them would corrupt them, so they are skipped. */
     private val SKIPPED_EXTENSIONS = setOf("apk", "jar", "zip", "aar", "whl", "dex", "jmod")
 
@@ -82,7 +90,7 @@ object TermuxRelocation {
                     OsConstants.S_ISDIR(mode) -> dirs.add(f)
                     OsConstants.S_ISREG(mode) -> {
                         stats.files++
-                        if (patchFile(f, mode, old, new, pathsOnly)) stats.patchedFiles++
+                        if (patchFile(f, mode, old, new, pathsOnly, newPackage)) stats.patchedFiles++
                         if (stats.files % 500 == 0) onProgress?.invoke(stats.files)
                     }
                 }
@@ -93,9 +101,19 @@ object TermuxRelocation {
 
     private fun relink(link: File, newPackage: String, pathsOnly: Boolean): Boolean {
         val target = try { Os.readlink(link.absolutePath) } catch (_: Exception) { return false }
-        if (!target.contains(TERMUX_PACKAGE)) return false
-        val newTarget = String(rewrite(target.toByteArray(Charsets.UTF_8), newPackage, pathsOnly), Charsets.UTF_8)
-        if (newTarget == target) return false
+        val original = target.toByteArray(Charsets.UTF_8)
+        var next = rewrite(original, newPackage, pathsOnly)
+        if (newPackage != APP_PACKAGE) {
+            for (prefix in APP_PACKAGE_PREFIXES) {
+                next = replaceAll(
+                    next,
+                    prefix.toByteArray(Charsets.US_ASCII),
+                    prefix.replace(APP_PACKAGE, newPackage).toByteArray(Charsets.US_ASCII)
+                )
+            }
+        }
+        if (next.contentEquals(original)) return false
+        val newTarget = String(next, Charsets.UTF_8)
         return try {
             link.delete()
             Os.symlink(newTarget, link.absolutePath)
@@ -106,19 +124,26 @@ object TermuxRelocation {
         }
     }
 
-    private fun patchFile(file: File, mode: Int, old: ByteArray, new: ByteArray, pathsOnly: Boolean): Boolean {
+    private fun patchFile(file: File, mode: Int, old: ByteArray, new: ByteArray, pathsOnly: Boolean, newPackage: String): Boolean {
         if (file.extension.lowercase() in SKIPPED_EXTENSIONS) return false
         return try {
-            val offsets = findAll(file, old, pathsOnly)
-            if (offsets.isEmpty()) return false
+            val rewrites = ArrayList<Pair<Long, ByteArray>>()
+            findAll(file, old, pathsOnly).forEach { rewrites.add(it to new) }
+            if (newPackage != APP_PACKAGE) {
+                for (prefix in APP_PACKAGE_PREFIXES) {
+                    val replacement = prefix.replace(APP_PACKAGE, newPackage).toByteArray(Charsets.US_ASCII)
+                    findAll(file, prefix.toByteArray(Charsets.US_ASCII), false).forEach { rewrites.add(it to replacement) }
+                }
+            }
+            if (rewrites.isEmpty()) return false
             val perms = mode and 0xFFF
             val ownerWritable = (perms and 0x80) != 0 // S_IWUSR
             if (!ownerWritable) Os.chmod(file.absolutePath, perms or 0x80)
             try {
                 RandomAccessFile(file, "rw").use { raf ->
-                    for (offset in offsets) {
+                    for ((offset, bytes) in rewrites) {
                         raf.seek(offset)
-                        raf.write(new)
+                        raf.write(bytes)
                     }
                 }
             } finally {
@@ -129,6 +154,19 @@ object TermuxRelocation {
             Log.w(TAG, "Rewriting ${file.absolutePath} failed: ${e.message}")
             false
         }
+    }
+
+    /** [bytes] with every [old] replaced by [new]; both must have the same length. */
+    private fun replaceAll(bytes: ByteArray, old: ByteArray, new: ByteArray): ByteArray {
+        val out = bytes.copyOf()
+        var i = 0
+        while (i <= out.size - old.size) {
+            if (matchesAt(out, i, old)) {
+                System.arraycopy(new, 0, out, i, new.size)
+                i += old.size
+            } else i++
+        }
+        return out
     }
 
     /**

@@ -119,10 +119,10 @@ fun AgyVoiceTranscriptSheet(record: VoiceChatRecord, onDismiss: () -> Unit) {
                         ) {
                             Icon(Icons.Rounded.ArrowForward, null, tint = subtle, modifier = Modifier.size(13.dp))
                             Spacer(Modifier.width(5.dp))
-                            Text("Sent to the agent" + (time?.let { " · $it" } ?: ""), fontSize = 11.5.sp, color = subtle)
+                            Text("已发送给智能体" + (time?.let { " · $it" } ?: ""), fontSize = 11.5.sp, color = subtle)
                         }
                         l.isUser -> Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                            Text("You" + (time?.let { " · $it" } ?: ""), fontSize = 10.5.sp, color = subtle)
+                            Text("你" + (time?.let { " · $it" } ?: ""), fontSize = 10.5.sp, color = subtle)
                             Text(
                                 l.text, fontSize = 14.5.sp, lineHeight = 20.sp,
                                 modifier = Modifier.widthIn(max = 300.dp).clip(RoundedCornerShape(14.dp))
@@ -130,7 +130,7 @@ fun AgyVoiceTranscriptSheet(record: VoiceChatRecord, onDismiss: () -> Unit) {
                             )
                         }
                         else -> Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                            Text("Voice" + (time?.let { " · $it" } ?: ""), fontSize = 10.5.sp, color = GeminiBlue.copy(alpha = 0.85f), fontWeight = FontWeight.SemiBold)
+                            Text("语音" + (time?.let { " · $it" } ?: ""), fontSize = 10.5.sp, color = GeminiBlue.copy(alpha = 0.85f), fontWeight = FontWeight.SemiBold)
                             Text(l.text, fontSize = 14.5.sp, lineHeight = 20.sp, modifier = Modifier.widthIn(max = 320.dp))
                         }
                     }

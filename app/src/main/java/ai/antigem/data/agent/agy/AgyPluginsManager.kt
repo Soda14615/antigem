@@ -114,7 +114,7 @@ class AgyPluginsManager(
                     }
                     _allSkills.value = skills
                 } else {
-                    _pluginActionErrorMessage.value = "Failed to load skills: ${res.exceptionOrNull()?.message}"
+                    _pluginActionErrorMessage.value = "加载技能失败：${res.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
                 _pluginActionErrorMessage.value = e.message
@@ -150,7 +150,7 @@ class AgyPluginsManager(
                 if (res.isSuccess) {
                     _googlePluginsCatalog.value = res.getOrDefault(emptyList())
                 } else {
-                    _pluginActionErrorMessage.value = "Failed to load Google plugins: ${res.exceptionOrNull()?.message}"
+                    _pluginActionErrorMessage.value = "加载 Google 插件失败：${res.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
                 _pluginActionErrorMessage.value = e.message
@@ -168,7 +168,7 @@ class AgyPluginsManager(
             try {
                 val res = agyHubClient.downloadBuildWithGooglePlugin(pluginId)
                 if (res.isSuccess) {
-                    _pluginActionStatusMessage.value = "Successfully installed $pluginName!"
+                    _pluginActionStatusMessage.value = "已成功安装 $pluginName！"
                     delay(400)
                     loadAllInstalledPlugins()
                     loadAllSkills()
@@ -194,7 +194,7 @@ class AgyPluginsManager(
             try {
                 val res = agyHubClient.deletePlugin(pluginId)
                 if (res.isSuccess) {
-                    _pluginActionStatusMessage.value = "Uninstalled $pluginName successfully."
+                    _pluginActionStatusMessage.value = "已成功卸载 $pluginName。"
                     delay(400)
                     loadAllInstalledPlugins()
                     loadAllSkills()

@@ -109,7 +109,7 @@ object BridgeInfo {
                     _agyError.value = null
                     parseJob(o.optJSONObject("job"))?.let { if (_job.value?.running != true) _job.value = it }
                 }.onFailure {
-                    _agyError.value = "Cannot reach the bridge: ${it.message ?: it.javaClass.simpleName}"
+                    _agyError.value = "无法连接桥接服务：${it.message ?: it.javaClass.simpleName}"
                 }
             } finally {
                 _checking.value = false
@@ -158,7 +158,7 @@ object BridgeInfo {
                     JSONObject(r.body?.string().orEmpty())
                 }
             }
-            val o = started.getOrElse { _agyError.value = "$label failed to start: ${it.message}"; return@launch }
+            val o = started.getOrElse { _agyError.value = "$label 启动失败：${it.message}"; return@launch }
             if (!o.optBoolean("success")) {
                 _agyError.value = o.optString("error").ifBlank { "$label failed to start" }
                 return@launch

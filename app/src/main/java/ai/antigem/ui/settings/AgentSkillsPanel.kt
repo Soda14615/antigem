@@ -178,7 +178,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
         found?.let { res ->
             Spacer(Modifier.height(10.dp))
             if (res.skills.isEmpty()) {
-                Text("No skills found in ${res.repo}" + (if (res.subpath.isNotBlank()) "/${res.subpath}" else "") + " (no folder with a SKILL.md).",
+                Text("在 ${res.repo}" + (if (res.subpath.isNotBlank()) "/${res.subpath}" else "") + " 中未找到技能（没有包含 SKILL.md 的文件夹）。",
                     fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
                 pluginHint(agent, res.pluginKinds)?.let { PanelHint(it, Modifier.padding(top = 4.dp)) }
                 SetupWithAiLink(accent) { aiSetup = source.trim() to "it has no skills (no folder with a SKILL.md)" }
@@ -322,7 +322,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
         AlertDialog(
             onDismissRequest = { confirmRemove = null },
             title = { Text(stringResource(R.string.claude_providers_page_remove, s.name.toString())) },
-            text = { Text("This deletes the folder ${s.path}" + if (s.source == null) ". It was not added from GitHub, so it can't be downloaded again." else ".") },
+            text = { Text("这将删除文件夹 ${s.path}" + if (s.source == null) "。它不是从 GitHub 添加的，无法重新下载。" else "。") },
             confirmButton = {
                 TextButton(onClick = {
                     confirmRemove = null

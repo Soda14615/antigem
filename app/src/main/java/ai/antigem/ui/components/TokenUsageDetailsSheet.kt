@@ -108,7 +108,7 @@ fun TokenUsageDetailsSheet(usage: TokenUsage, onViewPayload: (() -> Unit)?, onDi
                         }
                         IconButton(onClick = {
                             (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("Model", model))
-                            Toast.makeText(context, "Model name copied", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "模型名称已复制", Toast.LENGTH_SHORT).show()
                         }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.token_usage_details_sheet_copy_model_name), tint = muted, modifier = Modifier.size(18.dp)) }
                     }
                 }

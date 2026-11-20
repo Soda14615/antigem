@@ -321,11 +321,11 @@ fun ClaudeModelSheet(
 
             AgentSheetHeader(
                 AgentKind.CLAUDE,
-                "Select model",
+                "选择模型",
                 when {
-                    rows.size + customCount > 0 -> "${rows.size + customCount} models"
-                    refreshing -> "loading models…"
-                    else -> "no models loaded"
+                    rows.size + customCount > 0 -> "${rows.size + customCount} 个模型"
+                    refreshing -> "正在加载模型…"
+                    else -> "未加载模型"
                 },
                 refreshing = refreshingModels || refreshingUsage,
                 onRefresh = {

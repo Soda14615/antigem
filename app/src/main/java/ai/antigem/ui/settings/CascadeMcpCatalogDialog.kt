@@ -375,7 +375,7 @@ fun ReadmePreviewDialog(
                 }
                 content = text
             } catch (e: Exception) {
-                error = "Failed to load README: ${e.message}"
+                error = "无法加载 README：${e.message}"
             } finally {
                 isLoading = false
             }

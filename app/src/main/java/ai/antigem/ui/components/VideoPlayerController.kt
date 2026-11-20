@@ -329,18 +329,18 @@ class VideoPlayerController(context: Context, val source: String) {
             return
         }
         phase = Phase.ERROR
-        error = "This video can't be played here"
+        error = "此视频无法在此播放"
     }
 
     private fun downloadThenPlay() {
         val primary = stream.uri.toString()
         val legacy = listOfNotNull(HubMediaResolver.bridgeUrlFor(source))
         phase = Phase.PREPARING
-        runTask("Loading video…") { progress ->
+        runTask("正在加载视频…") { progress ->
             val file = HubMediaResolver.downloadBridgeMedia(appContext, primary, legacy, progress)
             if (file == null) {
                 phase = Phase.ERROR
-                error = "Could not load this video from the IDE bridge"
+                error = "无法从 IDE 桥接服务加载此视频"
             } else {
                 stream = HubMediaResolver.MediaStream(Uri.fromFile(file), emptyMap(), false)
                 playWhenReady = true

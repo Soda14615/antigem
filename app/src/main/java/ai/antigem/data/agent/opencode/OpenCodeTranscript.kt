@@ -720,7 +720,7 @@ class OpenCodeTranscript(var sessionId: String = "") {
             output = output,
             durationMs = p.startedAt?.let { s -> p.endedAt?.let { e -> (e - s).coerceAtLeast(0) } },
             interactionType = "opencode",
-            questionnaire = ChoiceQuestionnaire(title = "Questions", questions = questions, allowCustomNote = false)
+            questionnaire = ChoiceQuestionnaire(title = "问题", questions = questions, allowCustomNote = false)
         )
     }
 
@@ -757,7 +757,7 @@ class OpenCodeTranscript(var sessionId: String = "") {
                 }
                 "boolean" -> ChoiceQuestion(
                     id = key, prompt = prompt, description = description,
-                    options = listOf(ChoiceOption(id = "true", label = "Yes"), ChoiceOption(id = "false", label = "No")),
+                    options = listOf(ChoiceOption(id = "true", label = "是"), ChoiceOption(id = "false", label = "否")),
                     allowCustomAnswer = false
                 )
                 "string" -> {

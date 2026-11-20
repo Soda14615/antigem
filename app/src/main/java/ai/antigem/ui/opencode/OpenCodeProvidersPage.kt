@@ -505,7 +505,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                                     modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
                                 IconButton(onClick = {
                                     (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("Code", code))
-                                    toast("Code copied")
+                                    toast("代码已复制")
                                 }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.code_block_copy_code), tint = OpenCodeAccent) }
                             }
                         }
@@ -533,7 +533,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                         Spacer(Modifier.width(8.dp))
                         val left = a.expiresAt?.let { ((it - now) / 1000).coerceAtLeast(0) }
                         Text(
-                            "Waiting for you to finish signing in" + (left?.let { " · ${it / 60}:${String.format("%02d", it % 60)} left" } ?: ""),
+                            "等待你完成登录" + (left?.let { " · 剩余 ${it / 60}:${String.format("%02d", it % 60)}" } ?: ""),
                             fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                         )
                     }
@@ -556,8 +556,8 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                             Column(Modifier.padding(12.dp)) {
                                 Text(stringResource(R.string.open_code_providers_page_after_you_sign_in), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                                 Text(
-                                    "The browser ends on a page that can't load (an address starting with http://127.0.0.1 or http://localhost). " +
-                                        "That's expected with a server: copy that whole address from the address bar and paste it here.",
+                                    "浏览器最后会停在一个无法加载的页面（地址以 http://127.0.0.1 或 http://localhost 开头）。" +
+                                        "使用服务器模式时这是正常的：请从地址栏复制完整地址并粘贴到这里。",
                                     fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                                 )
                                 Spacer(Modifier.height(8.dp))

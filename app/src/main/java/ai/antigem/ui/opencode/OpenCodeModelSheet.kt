@@ -70,8 +70,8 @@ fun OpenCodeModelSheet(backend: OpenCodeChatBackend, onOpenSettings: () -> Unit,
         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 16.dp).navigationBarsPadding()) {
             AgentSheetHeader(
                 AgentKind.OPENCODE,
-                title = "Select model",
-                detail = if (models.isNotEmpty()) "${models.size} models" else null,
+                title = "选择模型",
+                detail = if (models.isNotEmpty()) "${models.size} 个模型" else null,
                 refreshing = refreshing,
                 onRefresh = { backend.refreshModels() }
             )

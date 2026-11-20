@@ -91,8 +91,8 @@ object PhoneSource : ExplorerSource {
     private fun noAccess(f: File): String {
         val ctx = appContext
         val allowed = ctx != null && ai.antigem.data.local.TermuxStorageSetupManager.hasStoragePermission(ctx)
-        return if (!allowed && f.absolutePath.startsWith("/storage")) "Allow AntiGem to access this phone's storage to see these files."
-        else "Cannot open ${f.absolutePath}"
+        return if (!allowed && f.absolutePath.startsWith("/storage")) "请允许 AntiGem 访问此手机的存储空间，才能查看这些文件。"
+        else "无法打开 ${f.absolutePath}"
     }
 
     override suspend fun list(dir: String): Result<ExplorerListing> = withContext(Dispatchers.IO) {
@@ -147,19 +147,19 @@ object PhoneSource : ExplorerSource {
     }
 
     override suspend fun create(dir: String, name: String, isDir: Boolean): FsResult = withContext(Dispatchers.IO) {
-        if (name.isBlank() || name.contains('/')) return@withContext FsResult(false, error = "Invalid name")
+        if (name.isBlank() || name.contains('/')) return@withContext FsResult(false, error = "名称无效")
         val f = File(resolve(dir), name)
-        if (f.exists()) return@withContext FsResult(false, error = "\"$name\" already exists")
+        if (f.exists()) return@withContext FsResult(false, error = "“$name”已存在")
         val ok = runCatching { if (isDir) f.mkdirs() else f.createNewFile() }.getOrDefault(false)
         if (ok) FsResult(true, f.absolutePath) else FsResult(false, error = noAccess(f.parentFile ?: f))
     }
 
     override suspend fun rename(path: String, newName: String): FsResult = withContext(Dispatchers.IO) {
-        if (newName.isBlank() || newName.contains('/')) return@withContext FsResult(false, error = "Invalid name")
+        if (newName.isBlank() || newName.contains('/')) return@withContext FsResult(false, error = "名称无效")
         val f = resolve(path)
         val to = File(f.parentFile, newName)
-        if (to.exists()) return@withContext FsResult(false, error = "\"$newName\" already exists")
-        if (f.renameTo(to)) FsResult(true, to.absolutePath) else FsResult(false, error = "Could not rename ${f.name}")
+        if (to.exists()) return@withContext FsResult(false, error = "“$newName”已存在")
+        if (f.renameTo(to)) FsResult(true, to.absolutePath) else FsResult(false, error = "无法重命名 ${f.name}")
     }
 
     override suspend fun transfer(sources: List<String>, targetDir: String, move: Boolean, conflict: ConflictPolicy): FsResult = withContext(Dispatchers.IO) {
@@ -181,7 +181,7 @@ object PhoneSource : ExplorerSource {
                     ConflictPolicy.OVERWRITE -> {}
                 }
             }
-            if (src.isDirectory && to.absolutePath.startsWith(src.absolutePath + "/")) { failed++; error = "Cannot copy a folder into itself"; continue }
+            if (src.isDirectory && to.absolutePath.startsWith(src.absolutePath + "/")) { failed++; error = "无法将文件夹复制到其自身内部"; continue }
             val ok = runCatching {
                 if (move && (!to.exists() || conflict != ConflictPolicy.OVERWRITE) && src.renameTo(to)) true
                 else {
@@ -190,7 +190,7 @@ object PhoneSource : ExplorerSource {
                     if (move) src.deleteRecursively() else true
                 }
             }.getOrElse { e -> error = e.message; false }
-            if (ok) done++ else { failed++; if (error == null) error = "Could not ${if (move) "move" else "copy"} ${src.name}" }
+            if (ok) done++ else { failed++; if (error == null) error = "无法${if (move) "移动" else "复制"} ${src.name}" }
         }
         FsResult(failed == 0, dest.absolutePath, error, failed, done)
     }
@@ -219,12 +219,12 @@ object PhoneSource : ExplorerSource {
                 }
             }
             FsResult(true, out.absolutePath, count = count)
-        }.getOrElse { e -> out.delete(); FsResult(false, error = e.message ?: "Compress failed") }
+        }.getOrElse { e -> out.delete(); FsResult(false, error = e.message ?: "压缩失败") }
     }
 
     override suspend fun extract(path: String, targetDir: String?): FsResult = withContext(Dispatchers.IO) {
         val zipFile = resolve(path)
-        if (!zipFile.name.endsWith(".zip", true)) return@withContext FsResult(false, error = "Only ZIP files can be extracted on this phone's storage")
+        if (!zipFile.name.endsWith(".zip", true)) return@withContext FsResult(false, error = "在本机存储上只能解压 ZIP 文件")
         val base = targetDir?.let(::resolve) ?: uniqueFile(zipFile.parentFile ?: File(home), zipFile.nameWithoutExtension)
         var count = 0
         runCatching {

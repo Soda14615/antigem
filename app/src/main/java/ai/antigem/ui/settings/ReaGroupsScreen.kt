@@ -184,7 +184,7 @@ private fun GroupCard(
                     if (g.builtin) Pill(stringResource(R.string.custom_slash_commands_screen_built_in), MaterialTheme.colorScheme.primary) else Pill(stringResource(R.string.rea_groups_screen_yours), QuotaGreen)
                 }
                 Text(
-                    "${g.tools.size} tools" + (tokens?.let { " · ≈${formatTokens(it)} tokens" } ?: "") + " · id ${g.id}",
+                    "${g.tools.size} 个工具" + (tokens?.let { " · ≈${formatTokens(it)} tokens" } ?: "") + " · id ${g.id}",
                     fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
                 if (g.description.isNotBlank()) Text(g.description, fontSize = 12.sp, maxLines = 3, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f))

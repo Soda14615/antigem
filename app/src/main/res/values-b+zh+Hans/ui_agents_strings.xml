@@ -16,7 +16,7 @@
     <string name="agent_approval_panel_always">"总是……"</string>
     <string name="agent_question_panel_has">"%1$s 有 %2$s"</string>
     <string name="agent_question_panel_of">"%2$s 的 %1$s"</string>
-    <string name="agent_question_panel_dismiss_question">"驳回问题"</string>
+    <string name="agent_question_panel_dismiss_question">"忽略问题"</string>
     <string name="agent_question_panel_choose_any">"选择任意"</string>
     <string name="agent_question_panel_choose_one">"选择一个"</string>
     <string name="agent_question_panel_your_answer">"你的答案"</string>
@@ -37,10 +37,10 @@
     <string name="agents_setup_ui_one_light_buzz_when_a_chat_stops">"当聊天停止运行时，指示灯会发出蜂鸣声（聊天列表中的点消失）。"</string>
     <string name="agents_setup_ui_restart_to_apply">"重启以应用更改？"</string>
     <string name="agents_setup_ui_restart_app">"重新启动应用程序"</string>
-    <string name="agents_setup_ui_applying_agents">"适用智能体"</string>
+    <string name="agents_setup_ui_applying_agents">"正在应用"</string>
     <string name="agents_setup_ui_stopping_the_local_server_then_restarting_the">"停止本地服务器，然后重新启动应用程序…"</string>
-    <string name="bridge_ui_update_the_ide_bridge">"更新IDE桥"</string>
-    <string name="bridge_ui_later">"后来"</string>
+    <string name="bridge_ui_update_the_ide_bridge">"更新 IDE 桥接"</string>
+    <string name="bridge_ui_later">"稍后"</string>
     <string name="bridge_ui_checking">"正在检查…"</string>
     <string name="bridge_ui_agy_is_not_installed_on">"agy 未安装在 %1$s 上。"</string>
     <string name="bridge_ui_install_agy">"安装 agy"</string>

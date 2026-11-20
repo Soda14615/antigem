@@ -138,8 +138,8 @@ fun AgentMemoryScreen(onOpenHistory: (() -> Unit)? = null) {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Agents save short memories in their replies; the chat shows a chip you can undo. A new chat is told the " +
-                        "Always memories and the most relevant others, and the agents can look up past chats.",
+                    "智能体会在回复中保存简短记忆；聊天里会显示一个可撤销的标签。新聊天会被告知" +
+                        "“始终”类记忆和最相关的其他记忆，智能体也能检索过往聊天。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
                 Spacer(Modifier.height(4.dp))
@@ -205,8 +205,8 @@ fun AgentMemoryScreen(onOpenHistory: (() -> Unit)? = null) {
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.agent_memory_screen_save_chat_history), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         Text(
-                            "A cleaned copy of every chat (your messages and the replies, no tool output) the agents can read " +
-                                "when you refer to earlier work.",
+                            "每个聊天的精简副本（你的消息与回复，不含工具输出），当您提到之前的工作时" +
+                                "智能体可以读取。",
                             fontSize = 12.sp, lineHeight = 16.sp, color = muted
                         )
                     }

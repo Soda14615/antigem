@@ -75,8 +75,8 @@ fun GlobalContextScreen() {
 
     Column(Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)) {
         Text(
-            "Added hidden in front of your messages, for every agent (the chat does not show it). First-message context goes " +
-                "once per chat, and again only when it changes; every-message entries go with each message.",
+            "会隐藏地添加在你的消息前面，对所有智能体生效（聊天中不显示）。首条消息上下文每个聊天发送" +
+                "一次，仅在内容变化时再发；每条消息项则随每条消息发送。",
             fontSize = 12.5.sp, lineHeight = 17.sp, color = muted
         )
         Spacer(Modifier.height(16.dp))
@@ -97,8 +97,8 @@ fun GlobalContextScreen() {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Tells the agent " + (if (GlobalContext.runsOnPhone) "that it runs in AntiGem's Linux system on Android (use \$TMPDIR, not /tmp; pkg, not sudo) and " else "") +
-                        "how to show images, videos and files in this chat. Jarvis and the chats it starts get it too.",
+                    "告知智能体 " + (if (GlobalContext.runsOnPhone) "它运行在 Android 上的 AntiGem Linux 系统中（用 \$TMPDIR 而非 /tmp；用 pkg 而非 sudo），以及 " else "") +
+                        "如何在此聊天中显示图片、视频和文件。Jarvis 及其发起的聊天也会收到。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
                 if (!GlobalContext.runsOnPhone) {
@@ -245,8 +245,8 @@ private fun EntryEditor(
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.global_context_screen_also_for_jarvis), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                         Text(
-                            "Jarvis has strict rules of its own (speaking, not waiting for tasks), so a note meant for normal chats can clash. " +
-                                "When on, Jarvis gets it marked \"Jarvis rules win on conflict\". It also reaches the chats Jarvis starts for tasks.",
+                            "Jarvis 有自己严格的规则（会说话、不等待任务），因此面向普通聊天的说明可能与其冲突。" +
+                                "开启后，Jarvis 收到的内容会标注“冲突时以 Jarvis 规则为准”。Jarvis 为任务发起的聊天也会收到。",
                             fontSize = 11.5.sp, lineHeight = 15.sp, color = muted
                         )
                     }

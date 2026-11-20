@@ -629,7 +629,7 @@ class CodexTranscript(var threadId: String = "") {
             )
         }
         if (questions.isEmpty()) return null
-        return ChoiceQuestionnaire(title = "Codex has a question", questions = questions, allowCustomNote = false)
+        return ChoiceQuestionnaire(title = "Codex 有问题要问", questions = questions, allowCustomNote = false)
     }
 
     companion object {

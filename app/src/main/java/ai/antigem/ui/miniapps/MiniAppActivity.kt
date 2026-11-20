@@ -578,7 +578,7 @@ open class MiniAppActivity : ComponentActivity(), MiniAppHost {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(icon, null, Modifier.size(88.dp).clip(RoundedCornerShape(22.dp)))
                 Text(app.name, color = fg, fontSize = 18.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 16.dp))
-                if (!app.signed) Text("DEV", color = fg.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                if (!app.signed) Text("开发版", color = fg.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
