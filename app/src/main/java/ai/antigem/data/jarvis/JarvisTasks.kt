@@ -171,13 +171,26 @@ object JarvisTasks {
         agent: AgentKind, goal: String, title: String?, modelId: String?, projectPath: String?,
         owner: String = JarvisManagers.VOICE, team: String = "", brief: String? = null,
         /** Reasoning effort for Claude Code / Codex (already checked against the model); null = the model's default. */
-        effort: String? = null
+        effort: String? = null,
+        childProfiles: List<JarvisManagers.Team> = emptyList()
     ): Task {
         val text = goal.trim()
         require(text.isNotEmpty()) { "The task needs a goal." }
-        // the task chat gets Jarvis' brief and the app's global context (with the user's entries allowed for Jarvis)
-        val hiddenNote = listOfNotNull(brief?.takeIf { it.isNotBlank() }, ai.antigem.data.context.GlobalContext.taskBody()).joinToString("\n\n")
-        val prompt = (if (hiddenNote.isNotBlank()) PromptExpansion.hidden(hiddenNote) else "") + PromptExpansion.expand(text)
+        var created: Task? = null
+        fun prepare(id: String): String {
+            val task = Task(id = id, agent = agent,
+                title = title?.trim()?.takeIf { it.isNotEmpty() }?.take(60) ?: shortTitle(text),
+                goal = text.take(600), project = projectPath.orEmpty(), note = "Started",
+                owner = JarvisManagers.ownerOrVoice(owner), team = team.trim())
+            if (childProfiles.isNotEmpty()) JarvisManagers.registerDelegated(id, agent, task.owner, childProfiles, text)
+            created = task
+            put(task)
+            val hiddenNote = listOfNotNull(brief?.takeIf { it.isNotBlank() },
+                JarvisManagers.delegatedNote(id).takeIf { it.isNotBlank() },
+                ai.antigem.data.context.GlobalContext.taskBody()).joinToString("\n\n")
+            return (if (hiddenNote.isNotBlank()) PromptExpansion.hidden(hiddenNote) else "") + PromptExpansion.expand(text)
+        }
+        try {
         val id = when (agent) {
             AgentKind.CODEX -> {
                 val b = newCodexBackend()
@@ -186,9 +199,9 @@ object JarvisTasks {
                 // Codex gives the chat its id when it is created: create it now so the task knows it
                 val id = runCatching { b.createChatNow(projectPath, modelId) }.getOrElse { b.stop(); throw it }
                 effort?.let { b.selectEffort(it) }
-                b.sendMessage(prompt)
                 codexBackends[id] = b
                 attachedAt[id] = System.currentTimeMillis()
+                b.sendMessage(prepare(id))
                 scope.launch {
                     delay(4000)
                     runCatching { vm.codexBackend.refreshThreads() }
@@ -208,9 +221,9 @@ object JarvisTasks {
                 val id = b.currentConversation.value?.id ?: run { b.stop(); error("Could not create the chat") }
                 projectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
-                b.sendMessage(prompt)
                 openCodeBackends[id] = b
                 attachedAt[id] = System.currentTimeMillis()
+                b.sendMessage(prepare(id))
                 scope.launch {
                     delay(4000)
                     runCatching { vm.openCodeBackend.refreshSessions() }
@@ -229,9 +242,9 @@ object JarvisTasks {
                 projectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
                 effort?.let { b.setEffort(it) }
-                b.sendMessage(prompt)
                 claudeBackends[id] = b
                 attachedAt[id] = System.currentTimeMillis()
+                b.sendMessage(prepare(id))
                 scope.launch {
                     delay(4000)
                     runCatching { vm.claudeBackend.refreshSessions() }
@@ -250,19 +263,24 @@ object JarvisTasks {
                     ?: ai.antigem.data.local.LocalEnvironmentManager.getHomeDir(app).absolutePath)
                 hub.startCascade(id, enum, if (ws.startsWith("file://")) ws else "file://$ws").getOrThrow()
                 vm.agyBackend.rememberChatModel(id, chosen)
-                hub.sendUserPrompt(id, prompt, enum).getOrThrow()
+                hub.sendUserPrompt(id, prepare(id), enum).getOrThrow()
                 scope.launch { delay(2500); runCatching { vm.agyBackend.syncAgyConversations(force = true) } }
                 id
             }
         }
-        val task = Task(
-            id = id, agent = agent,
-            title = title?.trim()?.takeIf { it.isNotEmpty() }?.take(60) ?: shortTitle(text),
-            goal = text.take(600), project = projectPath.orEmpty(), note = "Started",
-            owner = JarvisManagers.ownerOrVoice(owner), team = team.trim()
-        )
-        put(task)
-        return task
+        return checkNotNull(created).also { check(it.id == id) }
+        } catch (e: Throwable) {
+            created?.let { task ->
+                if (task.agent == AgentKind.AGY) runCatching { hub.cancelCascadeInvocation(task.id) }
+                release(task.id)
+                put(task.copy(state = State.FAILED, note = "Launch failed: ${e.message.orEmpty().take(160)}", reported = true))
+                if (JarvisManagers.isDelegated(task.id)) {
+                    JarvisManagers.remove(task.id)
+                    JarvisPreferences.removeChatId(task.id)
+                }
+            }
+            throw e
+        }
     }
 
     /** Watches an existing chat the user named (a message was just sent to it). Its news goes to [owner]. */
@@ -294,7 +312,15 @@ object JarvisTasks {
             while (isRunningNow(t) && w < 24) { delay(500); w++ }
         }
         // the user's every-message entries allowed for Jarvis go along with each follow-up
-        val outgoing = ai.antigem.data.context.GlobalContext.taskFollowUp(PromptExpansion.expand(text))
+        val scopedNote = JarvisManagers.delegatedNote(t.id)
+        val outgoing = ai.antigem.data.context.GlobalContext.taskFollowUp(
+            (if (scopedNote.isNotBlank()) PromptExpansion.hidden(scopedNote) else "") + PromptExpansion.expand(text))
+        if (JarvisManagers.isDelegated(t.id) && !t.active) {
+            JarvisManagers.update(t.id) { it.copy(mission = it.mission.copy(status = "active", nudges = 0)) }
+        }
+        val now = System.currentTimeMillis()
+        put(t.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
+            followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0, reported = true))
         when (t.agent) {
             AgentKind.CLAUDE -> {
                 val onScreen = vm.currentConversation.value?.id == t.id
@@ -329,15 +355,18 @@ object JarvisTasks {
                 }
             }
         }
-        val now = System.currentTimeMillis()
-        put(t.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
-            followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0, reported = true))
         return "Sent to the task."
     }
 
     /** Stops what the task is doing. */
     suspend fun stop(id: String, quiet: Boolean = false): String {
         val t = find(id) ?: return "No task with that id."
+        if (!quiet && JarvisManagers.isDelegated(t.id)) {
+            for (child in ownedBy(t.id).filter { it.active }) {
+                val stopped = stop(child.id)
+                if (stopped != "Stopped.") return "Could not stop child ${child.title}: $stopped"
+            }
+        }
         when (t.agent) {
             AgentKind.CLAUDE -> {
                 if (vm.currentConversation.value?.id == t.id) vm.claudeBackend.stopStreaming()
@@ -354,6 +383,7 @@ object JarvisTasks {
     /** Forgets the task (the chat itself stays). */
     fun close(id: String): Boolean {
         val t = find(id) ?: return false
+        if (JarvisManagers.isDelegated(t.id) && (t.active || ownedBy(t.id).any { it.active })) return false
         release(t.id)
         _tasks.value = _tasks.value.filter { it.id != t.id }
         save()
@@ -461,6 +491,15 @@ object JarvisTasks {
         clearAgyPending(id)
     }
 
+    fun delegatedBusy(id: String): Boolean = find(id)?.let { isRunningNow(it) } ?: false
+
+    fun delegatedMessages(id: String) = when (find(id)?.agent) {
+        AgentKind.CLAUDE -> claudeBackends[id]?.messages?.value
+        AgentKind.OPENCODE -> openCodeBackends[id]?.messages?.value
+        AgentKind.CODEX -> codexBackends[id]?.messages?.value
+        else -> null
+    }
+
     private fun isRunningNow(t: Task): Boolean = when (t.agent) {
         AgentKind.CLAUDE -> claudeBackends[t.id]?.isCurrentChatActivelyRunning?.value == true ||
             (vm.currentConversation.value?.id == t.id && vm.claudeBackend.isCurrentChatActivelyRunning.value)
@@ -550,11 +589,17 @@ object JarvisTasks {
         if (running && !t.seenRunning) t = t.copy(seenRunning = true)
         val graceFrom = maxOf(t.turnAt, attachedAt[t.id] ?: 0L)
         val stallMs = JarvisPreferences.stallMinutes.value * 60_000L
+        val delegated = JarvisManagers.isDelegated(t.id)
+        val waitingForChildren = delegated && (ownedBy(t.id).any { it.active } || JarvisEvents.hasPendingWork(t.id))
+        val missionDone = delegated && JarvisManagers.of(t.id).mission.status == "done"
         val next = when {
             needsApproval -> State.NEEDS_APPROVAL
             asking -> State.NEEDS_ANSWER
             running && stallMs > 0 && now - t.progressAt > stallMs -> State.STALLED
             running -> State.RUNNING
+            waitingForChildren -> State.RUNNING
+            delegated && error != null -> State.FAILED
+            delegated && !missionDone -> if (t.seenRunning || now - graceFrom > START_GRACE_MS) State.STALLED else State.STARTING
             t.seenRunning || now - graceFrom > START_GRACE_MS -> if (error != null) State.FAILED else State.DONE
             else -> State.STARTING
         }
@@ -562,7 +607,7 @@ object JarvisTasks {
             t = t.copy(state = next, updatedAt = now, reported = false, note = when (next) {
                 State.NEEDS_APPROVAL -> "Waiting for an approval"
                 State.NEEDS_ANSWER -> "Asking a question"
-                State.STALLED -> "No progress for ${(now - t.progressAt) / 60_000} min"
+                State.STALLED -> if (delegated && !running) "Manager is idle with an unfinished mission" else "No progress for ${(now - t.progressAt) / 60_000} min"
                 State.RUNNING -> "Working"
                 State.DONE -> "Finished"
                 State.FAILED -> "Failed: ${error.orEmpty().take(80)}"
@@ -608,7 +653,7 @@ object JarvisTasks {
         val changed = list.firstOrNull { it.id == task.id } != task
         val ordered = (listOf(task) + list.filter { it.id != task.id }).sortedByDescending { it.createdAt }
         val retainedFinished = ordered.filterNot { it.active }.take(KEEP_FINISHED).mapTo(HashSet()) { it.id }
-        _tasks.value = ordered.filter { it.active || it.id in retainedFinished }
+        _tasks.value = ordered.filter { it.active || it.id in retainedFinished || JarvisManagers.isDelegated(it.id) || JarvisManagers.isDelegated(it.owner) }
         _anyActive.value = _tasks.value.any { it.active }
         if (changed) save()
     }
