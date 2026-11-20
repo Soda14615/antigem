@@ -192,3 +192,62 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Settings > Antigravity > Account & CLI: Antigravity's Google account and sign-in state. */
+@Composable
+fun AgyAccountCard(
+    entry: AgentStatusEntry?,
+    auth: ai.antigem.data.remote.AgyHubClient.AgyAuthInfo,
+    onSignOut: () -> Unit,
+    onCancelSignIn: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val cli by BridgeInfo.agyCli.collectAsState()
+    val subtle = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(14.dp)) {
+            Text(stringResource(R.string.claude_settings_screen_account), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Spacer(Modifier.height(6.dp))
+            when {
+                entry == null -> Text(stringResource(R.string.bridge_ui_checking), fontSize = 12.5.sp, color = subtle)
+                cli?.installed == false -> Text(stringResource(R.string.upgrade_201_install_agy_then_sign_in), fontSize = 12.5.sp, color = subtle)
+                entry.isReady -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(auth.displayName.ifBlank { auth.email.ifBlank { stringResource(R.string.claude_settings_screen_signed_in) } }, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp)
+                        listOf(auth.email.takeIf { it != auth.displayName }.orEmpty(), auth.userTier.ifBlank { auth.planName })
+                            .filter { it.isNotBlank() }.joinToString(" · ").takeIf { it.isNotBlank() }
+                            ?.let { Text(it, fontSize = 12.sp, color = subtle) }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    OutlinedButton(onClick = onSignOut) { Text(stringResource(R.string.accounts_ui_sign_out), color = MaterialTheme.colorScheme.error) }
+                }
+                entry.isSignedOut -> {
+                    Text(stringResource(R.string.main_ui_sign_in_with_google_to_chat_with), fontSize = 12.5.sp, color = subtle)
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { entry.action?.onClick?.invoke() }) { Text(stringResource(R.string.upgrade_201_sign_in_google_button)) }
+                }
+                entry.pending && entry.action != null -> {
+                    entry.detail?.let { Text(it, fontSize = 12.5.sp, color = subtle) }
+                    Spacer(Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        var checking by remember(entry.label) { mutableStateOf(false) }
+                        Button(enabled = !checking, onClick = { checking = true; entry.action.onClick() }) {
+                            Text(if (checking) stringResource(R.string.bridge_ui_checking) else entry.action.label)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        TextButton(onClick = onCancelSignIn) { Text(stringResource(R.string.accounts_ui_cancel)) }
+                    }
+                }
+                else -> {
+                    Text(entry.label, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = entry.color)
+                    entry.detail?.let { Text(it, fontSize = 12.sp, color = subtle, maxLines = 4) }
+                    Text(stringResource(R.string.upgrade_201_signin_when_antigravity_running), fontSize = 11.5.sp, color = subtle, modifier = Modifier.padding(top = 4.dp))
+                }
+            }
+        }
+    }
+}

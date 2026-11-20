@@ -207,6 +207,8 @@ fun ChatScreen(
     val openCodeState by openCodeBackend.state.collectAsState()
     val openCodeStatus by openCodeBackend.status.collectAsState()
     val openCodeModelsError by openCodeBackend.modelsError.collectAsState()
+    val openCodeConnected by openCodeBackend.connectedProviders.collectAsState()
+    val openCodeModelCount = openCodeBackend.availableModels.collectAsState().value.size
     var openOpenCodeSettings by remember { mutableStateOf(false) }
     // the OpenCode page Settings opens on (OpenCode CLI for the Install button, Providers from the model picker)
     var openCodeSettingsPage by remember { mutableStateOf<ai.antigem.ui.opencode.OpenCodeSettingsPage?>(null) }
@@ -221,6 +223,7 @@ fun ChatScreen(
     val codexStatus by codexBackend.status.collectAsState()
     val codexAccount by codexBackend.account.collectAsState()
     val codexModelsError by codexBackend.modelsError.collectAsState()
+    val codexLimits by codexBackend.rateLimits.collectAsState()
     var openCodexSettings by remember { mutableStateOf(false) }
     // the Codex page Settings opens on (Account & CLI for the Install button and Sign in, MCP for /mcp)
     var codexSettingsPage by remember { mutableStateOf<ai.antigem.ui.codex.CodexSettingsPage?>(null) }

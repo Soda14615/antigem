@@ -34,4 +34,7 @@
     <string name="upgrade_201_last_used">上次使用：%1$s</string>
     <string name="upgrade_201_delete_saved_copy_label">删除已保存副本</string>
     <string name="accounts_ui_agy_settings">Antigravity 设置</string>
+    <string name="upgrade_201_install_agy_then_sign_in">请先在上方安装 agy，然后在此使用 Google 登录。</string>
+    <string name="upgrade_201_sign_in_google_button">使用 Google 登录</string>
+    <string name="upgrade_201_signin_when_antigravity_running">Antigravity 运行后即可登录。</string>
 </resources>

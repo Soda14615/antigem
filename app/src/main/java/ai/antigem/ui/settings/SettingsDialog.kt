@@ -1378,9 +1378,9 @@ private fun ThemesSubScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val themes = listOf(
-                Triple("SYSTEM", "自动（系统）", Icons.Outlined.BrightnessAuto),
-                Triple("LIGHT", "浅色", Icons.Outlined.LightMode),
-                Triple("DARK", "深色", Icons.Outlined.DarkMode)
+                Triple("SYSTEM", stringResource(R.string.review_ui_theme_system), Icons.Outlined.BrightnessAuto),
+                Triple("LIGHT", stringResource(R.string.review_ui_theme_light), Icons.Outlined.LightMode),
+                Triple("DARK", stringResource(R.string.review_ui_theme_dark), Icons.Outlined.DarkMode)
             )
 
             themes.forEach { (mode, label, icon) ->
@@ -1750,7 +1750,7 @@ private fun AppearanceSubScreen(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                val timeouts = listOf(0 to "从不", 3 to "3s", 5 to "5s", 10 to "10s", 15 to "15s")
+                val timeouts = listOf(0 to stringResource(R.string.review_ui_never), 3 to "3s", 5 to "5s", 10 to "10s", 15 to "15s")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -1799,13 +1799,13 @@ private fun AppearanceSubScreen(
                 displayedList.forEach { itemId ->
                     val isEnabled = currentItems.contains(itemId)
                     val itemLabel = when (itemId) {
-                        "chat" -> "对话"
-                        "ide" -> "IDE（代码编辑器）"
-                        "terminal" -> "终端"
-                        "browser" -> "网页浏览器"
-                        "notes" -> "笔记与待办"
-                        "files" -> "文件（文件浏览器）"
-                        "run" -> "运行（构建与执行命令）"
+                        "chat" -> stringResource(R.string.review_ui_item_chat)
+                        "ide" -> stringResource(R.string.review_ui_item_ide)
+                        "terminal" -> stringResource(R.string.review_ui_item_terminal)
+                        "browser" -> stringResource(R.string.review_ui_item_browser)
+                        "notes" -> stringResource(R.string.review_ui_item_notes)
+                        "files" -> stringResource(R.string.review_ui_item_files)
+                        "run" -> stringResource(R.string.review_ui_item_run)
                         else -> itemId
                     }
                     val itemIcon = when (itemId) {
@@ -2319,13 +2319,13 @@ private fun ChatHeaderIconsCard(
             displayedList.forEach { itemId ->
                 val isEnabled = currentItems.contains(itemId)
                 val itemLabel = when (itemId) {
-                    "newchat" -> "新对话"
-                    "ide" -> "IDE（代码编辑器）"
-                    "terminal" -> "终端"
-                    "browser" -> "网页浏览器"
-                    "notes" -> "笔记与待办"
-                    "files" -> "文件（文件浏览器）"
-                    "run" -> "运行（构建与执行命令）"
+                    "newchat" -> stringResource(R.string.review_ui_item_new_chat)
+                    "ide" -> stringResource(R.string.review_ui_item_ide)
+                    "terminal" -> stringResource(R.string.review_ui_item_terminal)
+                    "browser" -> stringResource(R.string.review_ui_item_browser)
+                    "notes" -> stringResource(R.string.review_ui_item_notes)
+                    "files" -> stringResource(R.string.review_ui_item_files)
+                    "run" -> stringResource(R.string.review_ui_item_run)
                     else -> itemId
                 }
                 val itemIcon = when (itemId) {
@@ -3342,6 +3342,7 @@ private fun AddEditMcpServerDialog(
     onDismiss: () -> Unit,
     onSave: (ai.antigem.domain.model.McpServerSpec, String?) -> Unit
 ) {
+    val context = LocalContext.current
     var mode by remember {
         mutableStateOf(
             if (initialSpec?.serverUrl?.isNotBlank() == true) McpEditMode.SSE
@@ -3724,7 +3725,7 @@ private fun AddEditMcpServerDialog(
                 onClick = {
                     val cleanName = name.trim()
                     if (cleanName.isBlank()) {
-                        validationError = "请填写服务器名称"
+                        validationError = context.getString(R.string.review_ui_mcp_server_name_required)
                         return@Button
                     }
 
@@ -3752,7 +3753,7 @@ private fun AddEditMcpServerDialog(
                     } else if (mode == McpEditMode.STDIO) {
                         val cleanCmd = command.trim()
                         if (cleanCmd.isBlank()) {
-                            validationError = "请填写命令"
+                            validationError = context.getString(R.string.review_ui_mcp_command_required)
                             return@Button
                         }
                         // Parse arguments, supporting quoted strings
@@ -3783,7 +3784,7 @@ private fun AddEditMcpServerDialog(
                     } else {
                         val cleanUrl = serverUrl.trim()
                         if (cleanUrl.isBlank()) {
-                            validationError = "请填写服务器 URL"
+                            validationError = context.getString(R.string.review_ui_mcp_url_required)
                             return@Button
                         }
 
@@ -4809,7 +4810,7 @@ private fun BackupsSubScreen(
                         }
                     }
                     if (envBackupIncludeSecrets) {
-                        BackupNote("切勿把此备份分享给任何人：拿到它的人可以登录你的账号和服务器。恢复完成后请立即删除。")
+                        BackupNote(stringResource(R.string.review_ui_backup_secrets_warning))
                     }
                 }
             },
@@ -7028,24 +7029,24 @@ private fun CommandsSubScreen(
         val presets = listOf(
             Triple(
                 "DEFAULT",
-                "🛡️ 默认模式",
-                "终端命令需要确认。工作区之外的文件需要确认。"
-            ) to ("推荐" to ai.antigem.theme.AppColors.accentTeal),
+                stringResource(R.string.review_ui_mode_default_title),
+                stringResource(R.string.review_ui_mode_default_description)
+            ) to (stringResource(R.string.review_ui_badge_recommended) to ai.antigem.theme.AppColors.accentTeal),
             Triple(
                 "FULL_MACHINE",
-                "💻 整机模式",
-                "终端命令需要确认。可读写设备上的所有文件。"
-            ) to ("开放文件" to ai.antigem.theme.AppColors.warning),
+                stringResource(R.string.review_ui_mode_full_machine_title),
+                stringResource(R.string.review_ui_mode_full_machine_description)
+            ) to (stringResource(R.string.review_ui_badge_open_files) to ai.antigem.theme.AppColors.warning),
             Triple(
                 "TURBO",
-                "⚡ 涡轮模式",
-                "全自动运行：终端命令立即执行，所有文件均可访问。"
-            ) to ("全自动" to QuotaGreen),
+                stringResource(R.string.review_ui_mode_turbo_title),
+                stringResource(R.string.review_ui_mode_turbo_description)
+            ) to (stringResource(R.string.review_ui_badge_full_auto) to QuotaGreen),
             Triple(
                 "CUSTOM",
-                "⚙️ 自定义精细模式",
-                "分别配置终端命令执行权限与外部文件系统访问权限。"
-            ) to ("自定义" to ai.antigem.theme.AppColors.accentAlt)
+                stringResource(R.string.review_ui_mode_custom_title),
+                stringResource(R.string.review_ui_mode_custom_description)
+            ) to (stringResource(R.string.review_ui_badge_custom) to ai.antigem.theme.AppColors.accentAlt)
         )
 
         presets.forEach { (presetInfo, badgeInfo) ->
@@ -7444,7 +7445,7 @@ private fun CommandsSubScreen(
                                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
                                     ) {
                                         Text(
-                                            text = "${rule.actionIcon} ${rule.actionLabel}",
+                                            text = "${rule.actionIcon} ${rule.actionLabelRes?.let { stringResource(it) } ?: rule.action}",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -7741,9 +7742,9 @@ private fun CommandsSubScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val scopes = listOf(
-                Triple("PERMISSION_SCOPE_ONCE", "仅一次", "单次调用"),
-                Triple("PERMISSION_SCOPE_CONVERSATION", "本次对话", "当前会话"),
-                Triple("PERMISSION_SCOPE_WORKSPACE", "工作区", "始终")
+                Triple("PERMISSION_SCOPE_ONCE", stringResource(R.string.review_ui_scope_once), stringResource(R.string.review_ui_scope_once_description)),
+                Triple("PERMISSION_SCOPE_CONVERSATION", stringResource(R.string.review_ui_scope_chat), stringResource(R.string.review_ui_scope_chat_description)),
+                Triple("PERMISSION_SCOPE_WORKSPACE", stringResource(R.string.review_ui_scope_workspace), stringResource(R.string.review_ui_scope_workspace_description))
             )
 
             scopes.forEach { (scopeKey, title, subtitle) ->
@@ -7815,13 +7816,13 @@ private data class PermissionGrantRule(
     val decision: String,
     val rawString: String
 ) {
-    val actionLabel: String
+    val actionLabelRes: Int?
         get() = when (action.lowercase()) {
-            "command" -> "命令"
-            "mcp" -> "MCP 工具"
-            "read_file" -> "读取文件"
-            "write_file" -> "写入文件"
-            else -> action
+            "command" -> R.string.review_ui_action_command
+            "mcp" -> R.string.review_ui_action_mcp
+            "read_file" -> R.string.review_ui_action_read_file
+            "write_file" -> R.string.review_ui_action_write_file
+            else -> null
         }
 
     val actionIcon: String
@@ -7868,10 +7869,10 @@ private fun AddPermissionRuleDialog(
     }
 
     val actionOptions = listOf(
-        Triple("command", "⌨️ 命令", "终端 bash 命令匹配"),
-        Triple("mcp", "🔌 MCP 工具", "MCP 服务器或工具匹配"),
-        Triple("read_file", "📖 读取文件", "文件系统目录或文件读取路径"),
-        Triple("write_file", "✏️ 写入文件", "文件系统目录或文件写入路径")
+        Triple("command", "⌨️ ${stringResource(R.string.review_ui_action_command)}", stringResource(R.string.review_ui_action_command_description)),
+        Triple("mcp", "🔌 ${stringResource(R.string.review_ui_action_mcp)}", stringResource(R.string.review_ui_action_mcp_description)),
+        Triple("read_file", "📖 ${stringResource(R.string.review_ui_action_read_file)}", stringResource(R.string.review_ui_action_read_file_description)),
+        Triple("write_file", "✏️ ${stringResource(R.string.review_ui_action_write_file)}", stringResource(R.string.review_ui_action_write_file_description))
     )
 
     AlertDialog(

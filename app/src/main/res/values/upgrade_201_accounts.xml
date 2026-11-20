@@ -1,10 +1,10 @@
 <resources>
     <string name="upgrade_201_agy_not_installed">Not installed</string>
     <string name="upgrade_201_agy_install_detail">Antigravity (agy) is not installed yet. The app can install it for you.</string>
-    <string name="upgrade_201_agy_x64_install_note">Google has no Android build of agy for x86_64, so its Linux x64 build is installed into ~/.local/bin and runs through the app's glibc. Its own updater is off; Check for updates installs Google's newest Linux x64 release and, when it is newer, restarts the server so it is used (voice calls need agy 1.5 or newer).</string>
+    <string name="upgrade_201_agy_x64_install_note">Google has no Android build of agy for x86_64, so its Linux x64 build is installed into ~/.local/bin and runs through the app\'s glibc. Its own updater is off; Check for updates installs Google\'s newest Linux x64 release and, when it is newer, restarts the server so it is used (voice calls need agy 1.5 or newer).</string>
     <string name="upgrade_201_saved_accounts">Saved accounts</string>
     <string name="upgrade_201_loading">Loading…</string>
-    <string name="upgrade_201_keychain_accounts_unavailable">Agy on this computer keeps its login in the system keychain, so accounts can't be switched here.</string>
+    <string name="upgrade_201_keychain_accounts_unavailable">Agy on this computer keeps its login in the system keychain, so accounts can\'t be switched here.</string>
     <string name="upgrade_201_accounts_explanation">Keep several Google accounts and switch between them. Antigravity uses the new one right away.</string>
     <string name="upgrade_201_signed_in_account">Signed-in account</string>
     <string name="upgrade_201_signed_in_not_saved">Signed in now, not saved</string>
@@ -15,8 +15,8 @@
     <string name="upgrade_201_add_account">Add account</string>
     <string name="upgrade_201_this_account">this account</string>
     <string name="upgrade_201_saved_account">Saved %1$s</string>
-    <string name="upgrade_201_operation_failed">That didn't work</string>
-    <string name="upgrade_201_account_not_saved">%1$s isn't saved</string>
+    <string name="upgrade_201_operation_failed">That didn\'t work</string>
+    <string name="upgrade_201_account_not_saved">%1$s isn\'t saved</string>
     <string name="upgrade_201_save_first_explanation">Save it first to switch back to it later. Without saving, you will have to sign in again to use it.</string>
     <string name="upgrade_201_save_and_action">Save and %1$s</string>
     <string name="upgrade_201_action_without_saving">%1$s without saving</string>
@@ -34,4 +34,7 @@
     <string name="upgrade_201_last_used">Last used %1$s</string>
     <string name="upgrade_201_delete_saved_copy_label">Delete saved copy</string>
     <string name="accounts_ui_agy_settings">Antigravity settings</string>
+    <string name="upgrade_201_install_agy_then_sign_in">Install agy above, then sign in here with Google.</string>
+    <string name="upgrade_201_sign_in_google_button">Sign in with Google</string>
+    <string name="upgrade_201_signin_when_antigravity_running">Sign-in is available once Antigravity is running.</string>
 </resources>
