@@ -307,20 +307,24 @@ object JarvisTasks {
         if (text.isEmpty()) return "The message is empty."
         if (isRunningNow(t)) {
             if (!interrupt) return "The task is still working. Pass interrupt=true to stop it and send this instead, or wait for it to finish."
-            stop(t.id, quiet = true)
+            val stopped = stop(t.id, quiet = true)
+            if (stopped != "Stopped.") return stopped
             var w = 0
             while (isRunningNow(t) && w < 24) { delay(500); w++ }
+            if (isRunningNow(t)) return "The previous turn has not stopped yet."
         }
         // the user's every-message entries allowed for Jarvis go along with each follow-up
         val scopedNote = JarvisManagers.delegatedNote(t.id)
         val outgoing = ai.antigem.data.context.GlobalContext.taskFollowUp(
             (if (scopedNote.isNotBlank()) PromptExpansion.hidden(scopedNote) else "") + PromptExpansion.expand(text))
+        val previousMission = JarvisManagers.of(t.id).mission
         if (JarvisManagers.isDelegated(t.id) && !t.active) {
             JarvisManagers.update(t.id) { it.copy(mission = it.mission.copy(status = "active", nudges = 0)) }
         }
         val now = System.currentTimeMillis()
         put(t.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
             followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0, reported = true))
+        try {
         when (t.agent) {
             AgentKind.CLAUDE -> {
                 val onScreen = vm.currentConversation.value?.id == t.id
@@ -334,7 +338,7 @@ object JarvisTasks {
             }
             AgentKind.AGY -> {
                 val enum = AgyHubClient.resolveModelEnum(vm.agyBackend.modelOfChat(t.id))
-                hub.sendUserPrompt(t.id, outgoing, enum).getOrElse { return "Could not send: ${it.message}" }
+                hub.sendUserPrompt(t.id, outgoing, enum).getOrThrow()
             }
             AgentKind.OPENCODE -> {
                 if (vm.currentConversation.value?.id == t.id) {
@@ -354,6 +358,14 @@ object JarvisTasks {
                     b.sendMessage(outgoing)
                 }
             }
+        }
+        } catch (e: Exception) {
+            if (find(t.id)?.turnAt == now) {
+                put(t)
+                if (JarvisManagers.isDelegated(t.id)) JarvisManagers.update(t.id) { it.copy(mission = previousMission) }
+            }
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            return "Could not send: ${e.message.orEmpty()}"
         }
         return "Sent to the task."
     }
@@ -632,7 +644,7 @@ object JarvisTasks {
                 t = t.copy(result = cutEnd(full, RESULT_MAX), resultChars = full.length)
             }
         }
-        put(t)
+        if (!putIfCurrent(t0, if (t.reported) t else t.copy(reported = true))) return
         if (!t.reported) {
             // approvals and questions are reported by the controller's own loops (they can be answered there)
             val kind = when (t.state) {
@@ -641,7 +653,6 @@ object JarvisTasks {
                 State.STALLED -> "stalled"
                 else -> null
             }
-            put(t.copy(reported = true))
             if (kind != null) JarvisController.onTaskEvent(t, kind, if (kind == "failed") error.orEmpty() else t.result)
             if (!t.state.active) {
                 // keep the chat readable, but stop listening to it
@@ -659,6 +670,13 @@ object JarvisTasks {
     }
 
     // ------------------------------------------------------------------ list and storage
+
+    @Synchronized
+    private fun putIfCurrent(expected: Task, updated: Task): Boolean {
+        if (_tasks.value.firstOrNull { it.id == expected.id } != expected) return false
+        put(updated)
+        return true
+    }
 
     @Synchronized
     private fun put(task: Task) {
