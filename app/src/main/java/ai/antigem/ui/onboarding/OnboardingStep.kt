@@ -1,5 +1,7 @@
 package ai.antigem.ui.onboarding
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -89,7 +91,7 @@ fun OnboardingStepScreen(
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "STEP $step OF $total", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
+                            stringResource(R.string.onboarding_step_step_of, step.toString(), total.toString()), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
                     }

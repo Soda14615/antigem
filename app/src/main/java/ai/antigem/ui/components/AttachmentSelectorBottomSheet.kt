@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,7 +48,7 @@ fun AttachmentSelectorBottomSheet(
                 .padding(bottom = 24.dp)
         ) {
             Text(
-                text = "Add to Chat",
+                text = stringResource(R.string.attachment_selector_bottom_sheet_add_to_chat),
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

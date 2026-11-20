@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -219,7 +221,7 @@ fun AppPermissionsDialog(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Welcome to AntiGem",
+                    text = stringResource(R.string.app_permissions_dialog_welcome_to_antigem),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = textPrimary,
@@ -227,7 +229,7 @@ fun AppPermissionsDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Allow a few things so AntiGem can run in the background and work with your files.",
+                    text = stringResource(R.string.app_permissions_dialog_allow_a_few_things_so_antigem_can),
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     color = textSecondary,
@@ -243,14 +245,14 @@ fun AppPermissionsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Permissions",
+                        text = stringResource(R.string.app_permissions_dialog_permissions),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = textPrimary,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "$allowedCount of 3 allowed",
+                        text = stringResource(R.string.app_permissions_dialog_of_3_allowed, allowedCount.toString()),
                         fontSize = 12.5.sp,
                         color = textSecondary
                     )
@@ -322,7 +324,7 @@ fun AppPermissionsDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "You can change these anytime in Android settings.",
+                    text = stringResource(R.string.app_permissions_dialog_you_can_change_these_anytime_in_android),
                     fontSize = 12.sp,
                     color = textSecondary.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
@@ -339,7 +341,7 @@ fun AppPermissionsDialog(
             ) {
                 AnimatedVisibility(visible = !hasNotification) {
                     Text(
-                        text = "Allow notifications to continue",
+                        text = stringResource(R.string.app_permissions_dialog_allow_notifications_to_continue),
                         fontSize = 12.5.sp,
                         color = textSecondary,
                         modifier = Modifier.padding(bottom = 10.dp)
@@ -359,7 +361,7 @@ fun AppPermissionsDialog(
                         disabledContentColor = AppColors.textSecondary
                     )
                 ) {
-                    Text(text = "Continue", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(text = stringResource(R.string.app_permissions_dialog_continue), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 }
             }
         }
@@ -405,7 +407,7 @@ private fun PermissionRow(
                 if (required && !isGranted) {
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Required",
+                        text = stringResource(R.string.app_permissions_dialog_required),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color = ClaudeTerracotta
@@ -432,7 +434,7 @@ private fun PermissionRow(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Allowed",
+                        contentDescription = stringResource(R.string.app_permissions_dialog_allowed),
                         tint = AppColors.success,
                         modifier = Modifier.size(18.dp)
                     )
@@ -448,7 +450,7 @@ private fun PermissionRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     modifier = Modifier.height(34.dp)
                 ) {
-                    Text(text = "Allow", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = stringResource(R.string.app_permissions_dialog_allow), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

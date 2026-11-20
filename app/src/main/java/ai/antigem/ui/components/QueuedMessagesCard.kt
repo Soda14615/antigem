@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -69,14 +71,14 @@ fun QueuedMessagesCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = if (messages.size == 1) "1 queued message" else "${messages.size} queued messages",
+                        text = if (messages.size == 1) stringResource(R.string.queued_messages_card_1_queued_message) else stringResource(R.string.queued_messages_card_queued_messages, messages.size.toString()),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = AppColors.onBackground
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "Sends when the agent is done",
+                        text = stringResource(R.string.queued_messages_card_sends_when_the_agent_is_done),
                         fontSize = 12.sp,
                         color = AppColors.textSecondary,
                         maxLines = 1,
@@ -126,7 +128,7 @@ private fun QueuedRow(msg: QueuedMessage, onSendNow: (String) -> Unit, onDelete:
             IconButton(onClick = { onSendNow(msg.id) }, modifier = Modifier.size(36.dp)) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowUpward,
-                    contentDescription = "Send now: ${msg.text.take(60)}",
+                    contentDescription = stringResource(R.string.queued_messages_card_send_now, (msg.text.take(60)).toString()),
                     tint = AppColors.onBackground,
                     modifier = Modifier.size(18.dp)
                 )
@@ -136,7 +138,7 @@ private fun QueuedRow(msg: QueuedMessage, onSendNow: (String) -> Unit, onDelete:
             IconButton(onClick = { onDelete(msg.id) }, modifier = Modifier.size(36.dp)) {
                 Icon(
                     imageVector = Icons.Rounded.Close,
-                    contentDescription = "Delete: ${msg.text.take(60)}",
+                    contentDescription = stringResource(R.string.queued_messages_card_delete, (msg.text.take(60)).toString()),
                     tint = AppColors.textSecondary,
                     modifier = Modifier.size(18.dp)
                 )

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notes_screen_clear_search">"Clear search"</string>
+    <string name="notes_screen_notes">"Notes"</string>
+    <string name="notes_screen_new">"New"</string>
+    <string name="notes_screen_note">"Note"</string>
+    <string name="notes_screen_to_do_list">"To-do list"</string>
+    <string name="notes_screen_tap_to_add_one_or_ask_an">"Tap + to add one, or ask an agent with the Notes MCP"</string>
+    <string name="notes_screen_pinned">"Pinned"</string>
+    <string name="notes_screen_done">"%1$s/%2$s done"</string>
+    <string name="notes_screen_unpin">"Unpin"</string>
+    <string name="notes_screen_pin">"Pin"</string>
+    <string name="notes_screen_check_all">"Check all"</string>
+    <string name="notes_screen_uncheck_all">"Uncheck all"</string>
+    <string name="notes_screen_clear_completed">"Clear completed"</string>
+    <string name="notes_screen_turn_into_note">"Turn into note"</string>
+    <string name="notes_screen_turn_into_to_do_list">"Turn into to-do list"</string>
+    <string name="notes_screen_add_item">"Add item"</string>
+    <string name="notes_screen_of_done">"%1$s of %2$s done"</string>
+    <string name="notes_screen_edited">"Edited %1$s"</string>
+    <string name="notes_screen_remove_item">"Remove item"</string>
+</resources>

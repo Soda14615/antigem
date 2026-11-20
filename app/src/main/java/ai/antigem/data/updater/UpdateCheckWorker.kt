@@ -49,8 +49,8 @@ class UpdateCheckWorker(context: Context, params: WorkerParameters) : CoroutineW
         if (!manager.areNotificationsEnabled()) return false
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "App Updates", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Notifies when a new AntiGem version is available"
+            val channel = NotificationChannel(CHANNEL_ID, context.getString(R.string.notification_app_updates_channel), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_app_updates_channel_description)
             }
             context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
         }
@@ -64,8 +64,8 @@ class UpdateCheckWorker(context: Context, params: WorkerParameters) : CoroutineW
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Update available: v${info.versionName}")
-            .setContentText(info.changelog.firstOrNull() ?: "Tap to update AntiGem")
+            .setContentTitle(context.getString(R.string.notification_app_update_available, info.versionName))
+            .setContentText(info.changelog.firstOrNull() ?: context.getString(R.string.notification_app_update_tap))
             .setStyle(NotificationCompat.BigTextStyle().bigText(info.changelog.joinToString("\n") { "• $it" }))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

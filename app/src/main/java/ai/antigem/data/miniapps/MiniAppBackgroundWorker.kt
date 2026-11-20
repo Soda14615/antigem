@@ -99,9 +99,9 @@ class MiniAppBackgroundWorker(context: Context, params: WorkerParameters) : Coro
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val nm = applicationContext.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel("mini_apps_background") == null)
-            nm.createNotificationChannel(NotificationChannel("mini_apps_background", "Mini app background tasks", NotificationManager.IMPORTANCE_MIN))
+            nm.createNotificationChannel(NotificationChannel("mini_apps_background", applicationContext.getString(R.string.notification_mini_apps_background_channel), NotificationManager.IMPORTANCE_MIN))
         val n = NotificationCompat.Builder(applicationContext, "mini_apps_background")
-            .setSmallIcon(R.mipmap.ic_launcher).setContentTitle("Mini app task").setContentText(inputData.getString("task").orEmpty())
+            .setSmallIcon(R.mipmap.ic_launcher).setContentTitle(applicationContext.getString(R.string.notification_mini_apps_background_title)).setContentText(inputData.getString("task").orEmpty())
             .setPriority(NotificationCompat.PRIORITY_MIN).setOngoing(true).build()
         return ForegroundInfo(0x6d1a, n)
     }

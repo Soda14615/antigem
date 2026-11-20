@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,9 +48,9 @@ fun GlobalContextEntryRow(onClick: () -> Unit, modifier: Modifier = Modifier) {
             ) { Icon(Icons.Outlined.Psychology, null, tint = MaterialTheme.colorScheme.primary) }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text("Global context", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.global_context_screen_global_context), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Built-in ${if (builtInOn) "on" else "off"}  ·  $own of yours on",
+                    stringResource(R.string.global_context_screen_built_in_of_yours_on, (if (builtInOn) "on" else "off").toString(), own.toString()),
                     fontSize = 12.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -84,11 +86,11 @@ fun GlobalContextScreen() {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Built-in context", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.global_context_screen_built_in_context), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.Lock, null, tint = muted, modifier = Modifier.size(12.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("By AntiGem · read-only · first message", fontSize = 12.sp, color = muted)
+                            Text(stringResource(R.string.global_context_screen_by_antigem_read_only_first_message), fontSize = 12.sp, color = muted)
                         }
                     }
                     Switch(checked = builtInOn, onCheckedChange = { GlobalContext.setBuiltInEnabled(it) })
@@ -101,10 +103,10 @@ fun GlobalContextScreen() {
                 )
                 if (!GlobalContext.runsOnPhone) {
                     Spacer(Modifier.height(4.dp))
-                    Text("The Android part is added only while the bridge runs on this phone.", fontSize = 11.5.sp, color = muted)
+                    Text(stringResource(R.string.global_context_screen_the_android_part_is_added_only_while), fontSize = 11.5.sp, color = muted)
                 }
                 TextButton(onClick = { showBuiltIn = !showBuiltIn }, contentPadding = PaddingValues(horizontal = 0.dp)) {
-                    Text(if (showBuiltIn) "Hide the text" else "Show exactly what is sent")
+                    Text(if (showBuiltIn) stringResource(R.string.global_context_screen_hide_the_text) else stringResource(R.string.global_context_screen_show_exactly_what_is_sent))
                 }
                 if (showBuiltIn) {
                     SelectionContainer {
@@ -128,19 +130,19 @@ fun GlobalContextScreen() {
         Spacer(Modifier.height(22.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Your context", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                Text("Your own instructions for every chat", fontSize = 12.sp, color = muted)
+                Text(stringResource(R.string.global_context_screen_your_context), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.global_context_screen_your_own_instructions_for_every_chat), fontSize = 12.sp, color = muted)
             }
             FilledTonalButton(onClick = { editing = GlobalContext.Entry(title = "", text = "") }) {
                 Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Add")
+                Text(stringResource(R.string.browser_screen_add))
             }
         }
         Spacer(Modifier.height(10.dp))
         if (entries.isEmpty()) {
             Text(
-                "Nothing yet. Examples: \"Reply in Hindi\", \"Never run git push\", \"My projects are in ~/work\".",
+                stringResource(R.string.global_context_screen_nothing_yet_examples_reply_in_hindi_never),
                 fontSize = 12.5.sp, color = muted, modifier = Modifier.padding(vertical = 8.dp)
             )
         }
@@ -216,23 +218,23 @@ private fun EntryEditor(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier.fillMaxWidth(0.94f).widthIn(max = 560.dp),
-        title = { Text(if (isNew) "New context" else "Edit context", fontWeight = FontWeight.SemiBold) },
+        title = { Text(if (isNew) stringResource(R.string.global_context_screen_new_context) else stringResource(R.string.global_context_screen_edit_context), fontWeight = FontWeight.SemiBold) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 OutlinedTextField(
                     value = title, onValueChange = { title = it }, singleLine = true,
-                    label = { Text("Title") }, placeholder = { Text("e.g. Language") },
+                    label = { Text(stringResource(R.string.global_context_screen_title)) }, placeholder = { Text(stringResource(R.string.global_context_screen_e_g_language)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
                 OutlinedTextField(
                     value = text, onValueChange = { text = it },
-                    label = { Text("What the agent should know or do") },
+                    label = { Text(stringResource(R.string.global_context_screen_what_the_agent_should_know_or_do)) },
                     minLines = 5, maxLines = 12,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(14.dp))
-                Text("When to send", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.global_context_screen_when_to_send), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 WhenOption("First message of each chat", "Enough for most things. Sent again when you change it.", !everyMessage) { everyMessage = false }
                 WhenOption("Every message", "For rules the agent must never forget, even in long chats. Costs a few tokens each time.", everyMessage) { everyMessage = true }
                 Spacer(Modifier.height(10.dp))
@@ -241,7 +243,7 @@ private fun EntryEditor(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Also for Jarvis", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.global_context_screen_also_for_jarvis), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                         Text(
                             "Jarvis has strict rules of its own (speaking, not waiting for tasks), so a note meant for normal chats can clash. " +
                                 "When on, Jarvis gets it marked \"Jarvis rules win on conflict\". It also reaches the chats Jarvis starts for tasks.",
@@ -257,12 +259,12 @@ private fun EntryEditor(
             Button(
                 enabled = text.isNotBlank(),
                 onClick = { onSave(entry.copy(title = title.trim(), text = text.trim(), everyMessage = everyMessage, forJarvis = forJarvis)) }
-            ) { Text("Save") }
+            ) { Text(stringResource(R.string.claude_providers_page_save)) }
         },
         dismissButton = {
             Row {
-                if (!isNew) TextButton(onClick = { confirmDelete = true }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                if (!isNew) TextButton(onClick = { confirmDelete = true }) { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) }
             }
         }
     )
@@ -270,10 +272,10 @@ private fun EntryEditor(
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
-            title = { Text("Delete \"${entry.title.ifBlank { "Untitled" }}\"?") },
-            text = { Text("New messages will no longer carry it. Chats that already got it keep what they were told.") },
-            confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text("Delete", color = MaterialTheme.colorScheme.error) } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } }
+            title = { Text(stringResource(R.string.run_screen_delete, (entry.title.ifBlank { "Untitled" }).toString())) },
+            text = { Text(stringResource(R.string.global_context_screen_new_messages_will_no_longer_carry_it)) },
+            confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }

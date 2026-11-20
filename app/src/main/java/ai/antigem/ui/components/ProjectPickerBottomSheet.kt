@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -121,13 +123,13 @@ fun ProjectPickerDialog(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "Select Workspace",
+                                text = stringResource(R.string.project_picker_bottom_sheet_select_workspace),
                                 fontSize = 16.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "${projects.size} available workspace${if (projects.size == 1) "" else "s"}",
+                                text = stringResource(R.string.project_picker_bottom_sheet_available_workspace, projects.size.toString(), (if (projects.size == 1) "" else "s").toString()),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             )
@@ -142,7 +144,7 @@ fun ProjectPickerDialog(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Refresh",
+                                    contentDescription = stringResource(R.string.agent_sheet_ui_refresh),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -155,7 +157,7 @@ fun ProjectPickerDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Close,
-                                contentDescription = "Close",
+                                contentDescription = stringResource(R.string.accounts_ui_close),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -214,7 +216,7 @@ fun ProjectPickerDialog(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "General (No Workspace)",
+                                            text = stringResource(R.string.project_picker_bottom_sheet_general_no_workspace),
                                             fontSize = 13.5.sp,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                             color = MaterialTheme.colorScheme.onSurface
@@ -226,7 +228,7 @@ fun ProjectPickerDialog(
                                                 color = ClaudeTerracotta.copy(alpha = 0.2f)
                                             ) {
                                                 Text(
-                                                    text = "Active",
+                                                    text = stringResource(R.string.project_picker_bottom_sheet_active),
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = ClaudeTerracotta,
@@ -236,7 +238,7 @@ fun ProjectPickerDialog(
                                         }
                                     }
                                     Text(
-                                        text = "Chat without attaching to a directory",
+                                        text = stringResource(R.string.project_picker_bottom_sheet_chat_without_attaching_to_a_directory),
                                         fontSize = 11.5.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                                     )
@@ -251,7 +253,7 @@ fun ProjectPickerDialog(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(15.dp)
                                         )
@@ -317,7 +319,7 @@ fun ProjectPickerDialog(
                                                 color = ClaudeTerracotta.copy(alpha = 0.2f)
                                             ) {
                                                 Text(
-                                                    text = "Active",
+                                                    text = stringResource(R.string.project_picker_bottom_sheet_active),
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = ClaudeTerracotta,
@@ -344,7 +346,7 @@ fun ProjectPickerDialog(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected),
                                             tint = Color.White,
                                             modifier = Modifier.size(15.dp)
                                         )
@@ -378,7 +380,7 @@ fun ProjectPickerDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Use Git Repository...",
+                            text = stringResource(R.string.project_picker_bottom_sheet_use_git_repository),
                             fontSize = 13.5.sp,
                             fontWeight = FontWeight.Bold,
                             color = ClaudeTerracotta
@@ -407,7 +409,7 @@ fun ProjectPickerDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Browse or Open Other Folder...",
+                        text = stringResource(R.string.project_picker_bottom_sheet_browse_or_open_other_folder),
                         fontSize = 13.5.sp,
                         fontWeight = FontWeight.Bold
                     )

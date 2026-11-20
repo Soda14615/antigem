@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,10 +64,10 @@ fun ThemeGallery(cardBg: Color, themeMode: String, onSetThemeMode: (String) -> U
     toDelete?.let { t ->
         AlertDialog(
             onDismissRequest = { toDelete = null },
-            title = { Text("Delete “${t.name}”?") },
-            text = { Text("This custom theme is removed. If it is in use, the default theme takes its place.") },
-            confirmButton = { TextButton(onClick = { ThemeManager.deleteCustom(t.id); toDelete = null }) { Text("Delete") } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Cancel") } }
+            title = { Text(stringResource(R.string.theme_gallery_delete, t.name.toString())) },
+            text = { Text(stringResource(R.string.theme_gallery_this_custom_theme_is_removed_if_it)) },
+            confirmButton = { TextButton(onClick = { ThemeManager.deleteCustom(t.id); toDelete = null }) { Text(stringResource(R.string.browser_screen_delete)) } },
+            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -148,7 +150,7 @@ internal fun ThemeCard(t: AppTheme, selected: Boolean, cardBg: Color, modifier: 
                         .border(1.5.dp, col("background"), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Filled.Star, "Default theme", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(11.dp))
+                    Icon(Icons.Filled.Star, stringResource(R.string.theme_gallery_default_theme), tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(11.dp))
                 }
             }
         }
@@ -156,14 +158,14 @@ internal fun ThemeCard(t: AppTheme, selected: Boolean, cardBg: Color, modifier: 
             Column(Modifier.weight(1f)) {
                 Text(t.name, fontSize = 12.5.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface)
-                if (!t.builtIn) Text("Custom", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f))
+                if (!t.builtIn) Text(stringResource(R.string.theme_gallery_custom), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f))
             }
             if (onDelete != null) {
-                Icon(Icons.Outlined.Delete, "Delete", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_delete), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                     modifier = Modifier.size(18.dp).clip(CircleShape).clickable { onDelete() })
                 Spacer(Modifier.width(4.dp))
             }
-            if (selected) Icon(Icons.Filled.CheckCircle, "In use", tint = accent, modifier = Modifier.size(18.dp))
+            if (selected) Icon(Icons.Filled.CheckCircle, stringResource(R.string.theme_gallery_in_use), tint = accent, modifier = Modifier.size(18.dp))
         }
     }
 }

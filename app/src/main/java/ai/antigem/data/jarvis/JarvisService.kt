@@ -59,7 +59,7 @@ class JarvisService : Service() {
             }
         }
         ensureChannel()
-        val n = notification("Hands-free is on", JarvisController.Phase.IDLE)
+        val n = notification(getString(R.string.notification_jarvis_hands_free), JarvisController.Phase.IDLE)
         if (Build.VERSION.SDK_INT >= 30) startForeground(NOTIF_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
         else startForeground(NOTIF_ID, n)
         acquireWakeLock()
@@ -70,18 +70,28 @@ class JarvisService : Service() {
                 val active = tasks.count { it.active }
                 val needs = tasks.count { it.state.needsUser }
                 val taskLine = when {
-                    needs > 0 -> " · $needs task${if (needs == 1) "" else "s"} need${if (needs == 1) "s" else ""} you"
-                    active > 0 -> " · $active task${if (active == 1) "" else "s"} running"
+                    needs > 0 -> resources.getQuantityString(R.plurals.notification_jarvis_tasks_need_user, needs, needs)
+                    active > 0 -> resources.getQuantityString(R.plurals.notification_jarvis_tasks_running, active, active)
                     else -> ""
                 }
-                val text = when (p) {
-                    JarvisController.Phase.LISTENING -> if (h.isNotBlank()) "Listening: $h" else "Listening…"
-                    JarvisController.Phase.THINKING -> "Working on it…$taskLine"
-                    JarvisController.Phase.SPEAKING -> "Speaking…"
-                    JarvisController.Phase.OFF -> "Jarvis is off"
-                    JarvisController.Phase.IDLE ->
-                        (if (JarvisPreferences.hotword.value == "phrase") "Say “${JarvisPreferences.wakePhrase.value.substringBefore(',').trim()}”" else "Tap Talk to speak") + taskLine
+                val phaseText = when (p) {
+                    JarvisController.Phase.LISTENING -> if (h.isNotBlank()) {
+                        getString(R.string.notification_jarvis_listening_with_transcript, h)
+                    } else {
+                        getString(R.string.notification_jarvis_listening)
+                    }
+                    JarvisController.Phase.THINKING -> getString(R.string.notification_jarvis_thinking)
+                    JarvisController.Phase.SPEAKING -> getString(R.string.notification_jarvis_speaking)
+                    JarvisController.Phase.OFF -> getString(R.string.notification_jarvis_off)
+                    JarvisController.Phase.IDLE -> if (JarvisPreferences.hotword.value == "phrase") {
+                        getString(R.string.notification_jarvis_say_wake_phrase, JarvisPreferences.wakePhrase.value.substringBefore(',').trim())
+                    } else {
+                        getString(R.string.notification_jarvis_tap_talk)
+                    }
                 }
+                val text = if (taskLine.isNotBlank() && (p == JarvisController.Phase.THINKING || p == JarvisController.Phase.IDLE)) {
+                    getString(R.string.notification_jarvis_task_summary, phaseText, taskLine)
+                } else phaseText
                 runCatching { getSystemService(NotificationManager::class.java).notify(NOTIF_ID, notification(text, p)) }
             }
         }
@@ -143,8 +153,8 @@ class JarvisService : Service() {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = getSystemService(NotificationManager::class.java)
         if (nm.getNotificationChannel(CHANNEL) == null) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Jarvis hands-free", NotificationManager.IMPORTANCE_LOW).apply {
-                description = "Shown while Jarvis listens for your voice"
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, getString(R.string.notification_jarvis_channel), NotificationManager.IMPORTANCE_LOW).apply {
+                description = getString(R.string.notification_jarvis_channel_description)
                 setShowBadge(false)
             })
         }
@@ -162,9 +172,9 @@ class JarvisService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(open)
-        if (phase == JarvisController.Phase.LISTENING) b.addAction(0, "Send", action(ACTION_SEND, 3))
-        else b.addAction(0, "Talk", action(ACTION_TALK, 1))
-        b.addAction(0, "Stop", action(ACTION_STOP, 2))
+        if (phase == JarvisController.Phase.LISTENING) b.addAction(0, getString(R.string.notification_action_send), action(ACTION_SEND, 3))
+        else b.addAction(0, getString(R.string.notification_action_talk), action(ACTION_TALK, 1))
+        b.addAction(0, getString(R.string.notification_action_stop), action(ACTION_STOP, 2))
         return b.build()
     }
 

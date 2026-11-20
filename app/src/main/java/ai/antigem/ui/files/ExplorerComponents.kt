@@ -1,5 +1,7 @@
 package ai.antigem.ui.files
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
@@ -127,7 +129,7 @@ internal fun EntryIcon(entry: ExplorerEntry, size: Dp, thumbnails: Boolean, corn
                     .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Outlined.Link, contentDescription = "Link", tint = tint, modifier = Modifier.size(size * 0.26f))
+                Icon(Icons.Outlined.Link, contentDescription = stringResource(R.string.explorer_components_link), tint = tint, modifier = Modifier.size(size * 0.26f))
             }
         }
     }
@@ -197,7 +199,7 @@ internal fun EntryRow(
             Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) { SelectionMark(selected) }
         } else {
             IconButton(onClick = onMore) {
-                Icon(Icons.Outlined.MoreVert, contentDescription = "More for ${entry.name}", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.explorer_components_more_for, entry.name.toString()), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -305,7 +307,7 @@ internal fun BreadcrumbBar(
             modifier = Modifier.size(36.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Outlined.SdStorage, contentDescription = "Places", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(19.dp))
+                Icon(Icons.Outlined.SdStorage, contentDescription = stringResource(R.string.explorer_components_places), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(19.dp))
             }
         }
         Spacer(Modifier.width(8.dp))

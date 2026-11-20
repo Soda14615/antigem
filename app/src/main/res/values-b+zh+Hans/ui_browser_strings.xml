@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="browser_screen_secure_connection">"安全连接"</string>
+    <string name="browser_screen_local_server">"本地服务器"</string>
+    <string name="browser_screen_not_secure">"不安全"</string>
+    <string name="browser_screen_search_or_type_url">"搜索或输入 URL"</string>
+    <string name="browser_screen_clear_browsing_data">"清除浏览数据？"</string>
+    <string name="browser_screen_clear_all">"全部清除"</string>
+    <string name="browser_screen_new_tab">"新建标签页"</string>
+    <string name="browser_screen_start_page">"起始页"</string>
+    <string name="browser_screen_search_google_for">"在 Google 中搜索“ %1$s ”"</string>
+    <string name="browser_screen_no_recent_search_history">"没有最近的搜索历史记录"</string>
+    <string name="browser_screen_recent_searches">"最近的搜索"</string>
+    <string name="browser_screen_history_suggestions">"历史建议"</string>
+    <string name="browser_screen_clear_all_2">"全部清除"</string>
+    <string name="browser_screen_insert">"插入"</string>
+    <string name="browser_screen_delete">"删除"</string>
+    <string name="browser_screen_add_shortcut">"添加快捷方式"</string>
+    <string name="browser_screen_name">"名称"</string>
+    <string name="browser_screen_e_g_github">"例如 GitHub"</string>
+    <string name="browser_screen_add">"添加"</string>
+    <string name="browser_screen_remove_shortcut">"删除快捷方式"</string>
+    <string name="browser_screen_remove_from_your_home_shortcuts">"从你的主页快捷方式中删除“ %1$s ”？"</string>
+    <string name="browser_screen_remove">"移除"</string>
+    <string name="browser_screen_add_shortcut_2">"添加快捷方式"</string>
+    <string name="browser_screen_tabs">"标签 ( %1$s )"</string>
+    <string name="browser_screen_done">"完成"</string>
+    <string name="browser_screen_delete_all">"全部删除"</string>
+    <string name="browser_screen_new_tab_2">"新标签页"</string>
+    <string name="browser_screen_tab_closed">"标签页已关闭"</string>
+    <string name="browser_screen_undo">"撤消"</string>
+    <string name="browser_screen_close_all_tabs">"关闭所有标签页"</string>
+    <string name="browser_screen_are_you_sure_you_want_to_close">"你确定要关闭所有打开的标签页并返回聊天吗？"</string>
+    <string name="browser_screen_close_all">"关闭全部"</string>
+    <string name="browser_screen_locked_by_ai">"被 AI 锁定"</string>
+    <string name="browser_screen_close_tab">"关闭标签页"</string>
+    <string name="browser_screen_home">"首页"</string>
+    <string name="browser_screen_hide_diagnostic_logs">"隐藏诊断日志"</string>
+    <string name="browser_screen_show_diagnostic_logs">"显示诊断日志 ( %1$s )"</string>
+    <string name="browser_screen_reload">"重新加载"</string>
+    <string name="browser_screen_search">"搜索"</string>
+    <string name="browser_screen_dismiss">"关闭"</string>
+    <string name="browser_screen_ai_is_working">"AI 正在工作…"</string>
+    <string name="browser_screen_controlled_by_ai">"由 AI 控制"</string>
+    <string name="browser_screen_unlock">"解锁"</string>
+</resources>

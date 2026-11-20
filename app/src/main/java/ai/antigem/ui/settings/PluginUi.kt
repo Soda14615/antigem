@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ContentValues
 import android.content.Context
 import android.os.Build
@@ -66,7 +68,7 @@ fun VersionChange(installed: String, incoming: String, incomingLabel: String = "
         in 1..Int.MAX_VALUE -> " (newer)"
         else -> " (older than installed)"
     }
-    Text("Installed: ${PluginVersions.label(installed)}  →  $incomingLabel: ${PluginVersions.label(incoming)}$hint", style = MaterialTheme.typography.bodySmall,
+    Text(stringResource(R.string.plugin_ui_installed, (PluginVersions.label(installed)).toString(), incomingLabel.toString(), (PluginVersions.label(incoming)).toString(), hint.toString()), style = MaterialTheme.typography.bodySmall,
         color = if (hint.startsWith(" (older")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
@@ -121,7 +123,7 @@ private suspend fun saveToDownloads(context: Context, fileName: String, mime: St
             }
         }
     }
-    Toast.makeText(context, if (saved.isSuccess) "$fileName saved to Downloads/AntiGem" else "Could not save $fileName: ${saved.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+    Toast.makeText(context, if (saved.isSuccess) context.getString(R.string.settings_plugin_saved, fileName) else context.getString(R.string.settings_plugin_save_failed, fileName, saved.exceptionOrNull()?.message), Toast.LENGTH_LONG).show()
 }
 
 /** Full-screen view of a Markdown document with a download button. */
@@ -134,8 +136,8 @@ fun MarkdownViewerDialog(title: String, markdown: String, fileName: String, onDi
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).padding(start = 8.dp))
-                    IconButton(onClick = { scope.launch { saveToDownloads(context, fileName, markdown) } }) { Icon(Icons.Outlined.Download, "Download") }
-                    TextButton(onClick = onDismiss) { Text("Close") }
+                    IconButton(onClick = { scope.launch { saveToDownloads(context, fileName, markdown) } }) { Icon(Icons.Outlined.Download, stringResource(R.string.full_screen_image_dialog_download)) }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) }
                 }
                 HorizontalDivider()
                 Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp)) { MarkdownContent(content = markdown) }

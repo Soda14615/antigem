@@ -1,5 +1,7 @@
 package ai.antigem.ui.models
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -142,8 +144,8 @@ fun ModelSelectorBottomSheet(
         ) {
             AgentSheetHeader(
                 AgentKind.AGY,
-                title = "Select model",
-                detail = if (availableModels.isNotEmpty()) "${availableModels.size} models" else "no models loaded",
+                title = stringResource(R.string.main_ui_select_model),
+                detail = if (availableModels.isNotEmpty()) stringResource(R.string.main_ui_models, availableModels.size) else stringResource(R.string.main_ui_no_models_loaded),
                 refreshing = isRefreshing,
                 onRefresh = onRefresh,
                 actions = if (groups.size > 1) ({ EditGroupsAction(editing, AgyAccent) { editing = !editing } }) else null
@@ -224,10 +226,10 @@ private fun NoModelsCard() {
         modifier = Modifier.fillMaxWidth().padding(top = 14.dp)
     ) {
         Column(Modifier.padding(18.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("No models loaded", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(stringResource(R.string.claude_chat_controls_no_models_loaded), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Connect your Google account in Settings or tap refresh to load your models.",
+                stringResource(R.string.model_selector_bottom_sheet_connect_your_google_account_in_settings_or),
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

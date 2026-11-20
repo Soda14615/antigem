@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -176,12 +178,12 @@ fun MemoryChipView(body: String, complete: Boolean, modifier: Modifier = Modifie
                 } else if (canUndo) {
                     TextButton(onClick = { confirmUndo = true }) {
                         Icon(Icons.AutoMirrored.Outlined.Undo, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Undo", fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.browser_screen_undo), fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
                     }
                 }
                 Icon(
                     if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = if (expanded) "Hide what was written" else "Show what was written",
+                    contentDescription = if (expanded) stringResource(R.string.memory_chip_hide_what_was_written) else stringResource(R.string.memory_chip_show_what_was_written),
                     tint = muted,
                     modifier = Modifier.padding(end = 6.dp).size(20.dp)
                 )
@@ -237,7 +239,7 @@ fun MemoryChipView(body: String, complete: Boolean, modifier: Modifier = Modifie
         }
         AlertDialog(
             onDismissRequest = { confirmUndo = false },
-            title = { Text("Undo this memory change?") },
+            title = { Text(stringResource(R.string.memory_chip_undo_this_memory_change)) },
             text = {
                 Text(
                     "$what This cannot be undone: to save it again, ask the agent or add it in " +
@@ -260,9 +262,9 @@ fun MemoryChipView(body: String, complete: Boolean, modifier: Modifier = Modifie
                             .onFailure { error = it.message ?: "Undo failed" }
                         busy = false
                     }
-                }) { Text("Undo", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.browser_screen_undo), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirmUndo = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmUndo = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }

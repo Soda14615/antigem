@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -64,20 +66,20 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
             ) {
                 Row(Modifier.fillMaxWidth().padding(start = 14.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(msg, fontSize = 12.5.sp, color = if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen, modifier = Modifier.weight(1f))
-                    IconButton(onClick = X11DesktopManager::clearMessage) { Icon(Icons.Default.Close, "Dismiss", Modifier.size(18.dp)) }
+                    IconButton(onClick = X11DesktopManager::clearMessage) { Icon(Icons.Default.Close, stringResource(R.string.browser_screen_dismiss), Modifier.size(18.dp)) }
                 }
             }
         }
 
         if (!state.ready) {
-            Hint("Checking…")
+            Hint(stringResource(R.string.bridge_ui_checking))
             return@Column
         }
         if (!state.bootstrapInstalled) {
             Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Install the Linux environment first", fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
-                    Hint("The desktop runs in AntiGem's terminal. Install it in Settings → Terminal & Shell, then come back here.")
+                    Text(stringResource(R.string.x11_desktop_screen_install_the_linux_environment_first), fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
+                    Hint(stringResource(R.string.x11_desktop_screen_the_desktop_runs_in_antigem_s_terminal))
                 }
             }
             return@Column
@@ -86,20 +88,20 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
         // Step 1: the Termux:X11 app (shows the desktop)
         val app = state.app
         StepCard(
-            1, "Termux:X11 app",
+            1, stringResource(R.string.x11_desktop_screen_termux_x11_app),
             when {
                 app == null -> null
-                state.appOk -> "Installed"
-                else -> "Wrong build"
+                state.appOk -> stringResource(R.string.claude_settings_screen_installed)
+                else -> stringResource(R.string.x11_desktop_screen_wrong_build)
             },
             cardBg, cardBorder,
             badgeColor = if (state.appOk) QuotaGreen else Amber
         ) {
             when {
                 app == null -> {
-                    Hint("AntiGem's own build of Termux:X11, the app that shows the desktop. It runs inside AntiGem, so Android keeps the desktop running at full speed while you use it.")
+                    Hint(stringResource(R.string.x11_desktop_screen_antigem_s_own_build_of_termux_x11))
                     Button(enabled = !busy, onClick = X11DesktopManager::installApp) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Download & install")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.x11_desktop_screen_download_install))
                     }
                 }
                 state.appOk -> {
@@ -110,56 +112,56 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
                             else -> "Official build"
                         }
                     )
-                    OutlinedButton(enabled = !busy, onClick = X11DesktopManager::installApp) { Text("Update") }
+                    OutlinedButton(enabled = !busy, onClick = X11DesktopManager::installApp) { Text(stringResource(R.string.claude_settings_screen_update)) }
                 }
                 else -> {
                     Text(
-                        if (app.antigemBuild) "This Termux:X11 doesn't share AntiGem's UID, so it can't run inside AntiGem. Uninstall it, then install it again."
-                        else "The official Termux:X11 is installed. It can't run inside AntiGem, and Android won't install AntiGem's build over it (they are signed differently). Uninstall it first, then install AntiGem's build.",
+                        if (app.antigemBuild) stringResource(R.string.x11_desktop_screen_this_termux_x11_doesn_t_share_antigem)
+                        else stringResource(R.string.x11_desktop_screen_the_official_termux_x11_is_installed_it),
                         fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error
                     )
                     Button(enabled = !busy, onClick = { X11DesktopManager.uninstallApp(context) }) {
-                        Icon(Icons.Outlined.Delete, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Uninstall Termux:X11")
+                        Icon(Icons.Outlined.Delete, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.x11_desktop_screen_uninstall_termux_x11))
                     }
                 }
             }
             TextButton(
                 onClick = { openUrl(context, X11DesktopManager.FORK_RELEASES_PAGE) },
                 contentPadding = PaddingValues(0.dp)
-            ) { Text("Open the download page", fontSize = 12.5.sp) }
+            ) { Text(stringResource(R.string.x11_desktop_screen_open_the_download_page), fontSize = 12.5.sp) }
             TaskOutput(state, Task.APP)
         }
 
         // Step 2: the companion package (the termux-x11 command)
         StepCard(
-            2, "termux-x11 command",
+            2, stringResource(R.string.x11_desktop_screen_termux_x11_command),
             when {
-                state.companionOk -> "Installed"
-                state.companion != null -> "Wrong package"
+                state.companionOk -> stringResource(R.string.claude_settings_screen_installed)
+                state.companion != null -> stringResource(R.string.x11_desktop_screen_wrong_package)
                 else -> null
             },
             cardBg, cardBorder,
             badgeColor = if (state.companionOk) QuotaGreen else Amber
         ) {
-            Hint("The terminal part: the termux-x11 command that starts the X server. ${state.neededCompanion} goes with ${if (app == null) "the Termux:X11 above" else "the installed Termux:X11"}.")
+            Hint(stringResource(R.string.x11_desktop_screen_the_terminal_part_the_termux_x11_command, state.neededCompanion.toString(), (if (app == null) "the Termux:X11 above" else "the installed Termux:X11").toString()))
             if (state.companion != null && !state.companionOk) {
                 Text(
-                    "${state.companion} is installed, but this Termux:X11 needs ${state.neededCompanion}. Installing replaces it.",
+                    stringResource(R.string.x11_desktop_screen_is_installed_but_this_termux_x11_needs, state.companion.toString(), state.neededCompanion.toString()),
                     fontSize = 12.5.sp, color = Amber
                 )
             }
             if (!state.companionOk) {
                 Button(enabled = !busy, onClick = X11DesktopManager::installCompanion) {
-                    Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Install ${state.neededCompanion}")
+                    Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.plugin_repositories_tab_install, state.neededCompanion.toString()))
                 }
             } else {
-                OutlinedButton(enabled = !busy, onClick = X11DesktopManager::installCompanion) { Text("Reinstall") }
+                OutlinedButton(enabled = !busy, onClick = X11DesktopManager::installCompanion) { Text(stringResource(R.string.android_dev_screen_reinstall)) }
             }
             TaskOutput(state, Task.COMPANION)
         }
 
         // Step 3: a desktop
-        StepCard(3, "Desktop", if (state.desktopOk) "Installed" else null, cardBg, cardBorder) {
+        StepCard(3, stringResource(R.string.x11_desktop_screen_desktop), if (state.desktopOk) stringResource(R.string.claude_settings_screen_installed) else null, cardBg, cardBorder) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Desktop.entries.forEach { d ->
                     FilterChip(
@@ -178,26 +180,26 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
             )
             if (!state.desktopOk) {
                 Button(enabled = !busy, onClick = X11DesktopManager::installDesktop) {
-                    Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Install ${state.desktop.label}")
+                    Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.plugin_repositories_tab_install, state.desktop.label.toString()))
                 }
             }
             TaskOutput(state, Task.DESKTOP)
         }
 
         // Step 4: start / open / stop
-        StepCard(4, "Start the desktop", if (state.running) "Running" else null, cardBg, cardBorder) {
+        StepCard(4, stringResource(R.string.x11_desktop_screen_start_the_desktop), if (state.running) stringResource(R.string.agent_tool_call_card_running) else null, cardBg, cardBorder) {
             if (state.running) {
-                Hint("The X server is running on display :0. Programs started from the terminal with DISPLAY=:0 show up on the desktop.")
+                Hint(stringResource(R.string.x11_desktop_screen_the_x_server_is_running_on_display))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy, onClick = { X11DesktopManager.open(context) }) {
-                        Icon(Icons.Outlined.DesktopWindows, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Open desktop")
+                        Icon(Icons.Outlined.DesktopWindows, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.x11_desktop_screen_open_desktop))
                     }
-                    OutlinedButton(enabled = !busy, onClick = { X11DesktopManager.stop(context) }) { Text("Stop") }
+                    OutlinedButton(enabled = !busy, onClick = { X11DesktopManager.stop(context) }) { Text(stringResource(R.string.chat_input_bar_stop)) }
                 }
             } else {
-                if (!state.canStart) Hint("Finish the steps above first.")
+                if (!state.canStart) Hint(stringResource(R.string.adb_connect_screen_finish_the_steps_above_first))
                 Button(enabled = !busy && state.canStart, onClick = { X11DesktopManager.start(context) }) {
-                    Icon(Icons.Outlined.PlayArrow, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Start ${state.desktop.label}")
+                    Icon(Icons.Outlined.PlayArrow, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.x11_desktop_screen_start, state.desktop.label.toString()))
                 }
             }
             TaskOutput(state, Task.START)
@@ -208,11 +210,11 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
         Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Web Browser", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.x11_desktop_screen_web_browser), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                     if (browserInstalled) {
-                        Pill("Installed", QuotaGreen)
+                        Pill(stringResource(R.string.claude_settings_screen_installed), QuotaGreen)
                     } else {
-                        Pill("Optional", MaterialTheme.colorScheme.primary)
+                        Pill(stringResource(R.string.android_automation_screen_optional), MaterialTheme.colorScheme.primary)
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -225,9 +227,9 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
                         )
                     }
                 }
-                Hint("Install a browser from tur-repo to browse the web on your desktop.")
+                Hint(stringResource(R.string.x11_desktop_screen_install_a_browser_from_tur_repo_to))
                 if (!state.desktopOk) {
-                    Hint("Install a desktop above first.")
+                    Hint(stringResource(R.string.x11_desktop_screen_install_a_desktop_above_first))
                 }
                 if (!browserInstalled) {
                     Button(
@@ -236,14 +238,14 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
                     ) {
                         Icon(Icons.Outlined.Download, null, Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Install ${state.browser.label}")
+                        Text(stringResource(R.string.plugin_repositories_tab_install, state.browser.label.toString()))
                     }
                 } else {
                     OutlinedButton(
                         enabled = !busy && state.desktopOk,
                         onClick = X11DesktopManager::installBrowser
                     ) {
-                        Text("Reinstall ${state.browser.label}")
+                        Text(stringResource(R.string.x11_desktop_screen_reinstall, state.browser.label.toString()))
                     }
                 }
                 TaskOutput(state, Task.BROWSER)
@@ -255,16 +257,16 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
             Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("If the desktop closes by itself", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                        Pill("Optional", MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.x11_desktop_screen_if_the_desktop_closes_by_itself), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        Pill(stringResource(R.string.android_automation_screen_optional), MaterialTheme.colorScheme.primary)
                     }
-                    Hint("Android 12 and newer stop the extra processes of apps once there are more than 32 in total. A desktop starts many, so Android may close it. You can turn this limit off once, over ADB. It stays off until you turn it back on or reset the phone.")
+                    Hint(stringResource(R.string.x11_desktop_screen_android_12_and_newer_stop_the_extra))
                     val device = adb.connectedDevice
                     if (device != null) {
-                        Button(enabled = !busy, onClick = { X11DesktopManager.disableChildProcessLimit(device.serial) }) { Text("Turn off the limit") }
+                        Button(enabled = !busy, onClick = { X11DesktopManager.disableChildProcessLimit(device.serial) }) { Text(stringResource(R.string.x11_desktop_screen_turn_off_the_limit)) }
                     } else {
-                        Hint("Connect the terminal's adb to this phone first.")
-                        OutlinedButton(onClick = onOpenAdbConnect) { Text("Set up ADB Connect") }
+                        Hint(stringResource(R.string.x11_desktop_screen_connect_the_terminal_s_adb_to_this))
+                        OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_dev_screen_set_up_adb_connect)) }
                     }
                     TaskOutput(state, Task.CHILD_LIMIT)
                 }
@@ -282,12 +284,12 @@ private fun IntroCard(running: Boolean, cardBg: Color, cardBorder: BorderStroke)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.DesktopWindows, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("Linux desktop", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                if (running) Pill("Running", QuotaGreen)
+                Text(stringResource(R.string.x11_desktop_screen_linux_desktop), fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                if (running) Pill(stringResource(R.string.agent_tool_call_card_running), QuotaGreen)
             }
-            Hint("Run Linux desktop apps (a browser, an IDE, office apps) from AntiGem's terminal. Termux:X11 shows the desktop.")
+            Hint(stringResource(R.string.x11_desktop_screen_run_linux_desktop_apps_a_browser_an))
             Text(
-                "The desktop runs inside AntiGem, so Android won't slow it down or stop it while you use it.",
+                stringResource(R.string.x11_desktop_screen_the_desktop_runs_inside_antigem_so_android),
                 fontSize = 12.sp, color = QuotaGreen
             )
         }
@@ -299,7 +301,7 @@ private fun IntroCard(running: Boolean, cardBg: Color, cardBorder: BorderStroke)
 private fun TaskOutput(state: X11DesktopManager.State, task: Task) {
     if (state.task == task) {
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: "Starting…")
+        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
     }
     if (state.logTask == task && state.log.isNotEmpty()) LogBox(state.log)
 }
@@ -319,11 +321,11 @@ private fun ManualSetupCard(desktop: Desktop, cardBg: Color, cardBorder: BorderS
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Set up manually", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                TextButton(onClick = { open = !open }) { Text(if (open) "Hide" else "Show", fontSize = 12.5.sp) }
+                Text(stringResource(R.string.x11_desktop_screen_set_up_manually), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) {
-                Hint("Prefer the terminal? These are the same steps as commands.")
+                Hint(stringResource(R.string.android_dev_screen_prefer_the_terminal_these_are_the_same))
                 return@Column
             }
             commands.forEach { (label, command) ->
@@ -332,12 +334,12 @@ private fun ManualSetupCard(desktop: Desktop, cardBg: Color, cardBorder: BorderS
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.weight(1f)) { Mono(command) }
                         IconButton(onClick = { clipboard.setText(AnnotatedString(command)) }) {
-                            Icon(Icons.Outlined.ContentCopy, "Copy", Modifier.size(18.dp))
+                            Icon(Icons.Outlined.ContentCopy, stringResource(R.string.copy_text), Modifier.size(18.dp))
                         }
                     }
                 }
             }
-            Hint("Don't install termux-x11-nightly from x11-repo: it only works with the official Termux:X11, not AntiGem's build.")
+            Hint(stringResource(R.string.x11_desktop_screen_don_t_install_termux_x11_nightly_from))
         }
     }
 }

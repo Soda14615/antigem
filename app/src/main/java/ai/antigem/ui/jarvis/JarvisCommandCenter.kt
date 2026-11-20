@@ -1,5 +1,7 @@
 package ai.antigem.ui.jarvis
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -130,7 +132,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
                 Text("${mission.doneCount}/${mission.steps.size}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = accent)
                 Spacer(Modifier.width(2.dp))
             }
-            Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, if (expanded) "Hide the board" else "Show the board", tint = onSurface.copy(alpha = 0.6f))
+            Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, if (expanded) stringResource(R.string.jarvis_command_center_hide_the_board) else stringResource(R.string.jarvis_command_center_show_the_board), tint = onSurface.copy(alpha = 0.6f))
         }
         if (mission.steps.isNotEmpty()) {
             val p = mission.doneCount.toFloat() / mission.steps.size
@@ -157,7 +159,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
             }
             active.forEach { t -> TaskPill(t) { onOpenChat(t.id) } }
             if (active.isEmpty() && mine.isNotEmpty()) {
-                Text("${mine.size} finished task${if (mine.size == 1) "" else "s"}", fontSize = 11.sp, color = onSurface.copy(alpha = 0.5f))
+                Text(stringResource(R.string.jarvis_command_center_finished_task, mine.size.toString(), (if (mine.size == 1) "" else "s").toString()), fontSize = 11.sp, color = onSurface.copy(alpha = 0.5f))
             }
         }
         if (toolsMissing) {
@@ -170,7 +172,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "This chat's agent has no Jarvis tools yet. Tap to add the Jarvis MCP server (Settings → Jarvis → Setup).",
+                    stringResource(R.string.jarvis_command_center_this_chat_s_agent_has_no_jarvis),
                     fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.85f), modifier = Modifier.weight(1f)
                 )
             }
@@ -230,11 +232,11 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
         BoardTitle("Mission")
         if (mi.isEmpty) {
             Text(
-                "No mission yet. Ask for something big (\"build the settings screen, test it and don't stop until it works\"): Jarvis writes the plan here and works through it.",
+                stringResource(R.string.jarvis_command_center_no_mission_yet_ask_for_something_big),
                 fontSize = 12.sp, color = onSurface.copy(alpha = 0.6f), lineHeight = 17.sp
             )
         } else {
-            if (mi.doneWhen.isNotBlank()) Text("Done when: ${mi.doneWhen}", fontSize = 12.sp, color = onSurface.copy(alpha = 0.7f), lineHeight = 16.sp)
+            if (mi.doneWhen.isNotBlank()) Text(stringResource(R.string.jarvis_command_center_done_when, mi.doneWhen.toString()), fontSize = 12.sp, color = onSurface.copy(alpha = 0.7f), lineHeight = 16.sp)
             mi.steps.forEach { s ->
                 Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.Top) {
                     val (mark, c) = when (s.status) {
@@ -250,7 +252,7 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
                     }
                 }
             }
-            if (mi.notes.isNotBlank()) Text("Notes: ${mi.notes}", fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
+            if (mi.notes.isNotBlank()) Text(stringResource(R.string.jarvis_command_center_notes, mi.notes.toString()), fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SmallAction("Clear mission", Danger) { JarvisManagers.clearMission(key) }
                 if (mi.status != "active") SmallAction("Resume", Cyan) { JarvisManagers.updateMission(key, null, null, null, emptyList(), "active", null, null) }
@@ -269,13 +271,13 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
                         )
                         if (t.role.isNotBlank()) Text(t.role, fontSize = 11.sp, color = onSurface.copy(alpha = 0.55f), maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
-                    if (running > 0) Text("$running working", fontSize = 11.sp, color = Violet)
+                    if (running > 0) Text(stringResource(R.string.jarvis_command_center_working, running.toString()), fontSize = 11.sp, color = Violet)
                     IconMini(Icons.Filled.Close, "Remove team", onSurface.copy(alpha = 0.45f)) { JarvisManagers.removeTeam(key, t.name) }
                 }
             }
         }
         BoardTitle("Tasks")
-        if (mine.isEmpty()) Text("None yet.", fontSize = 12.sp, color = onSurface.copy(alpha = 0.5f))
+        if (mine.isEmpty()) Text(stringResource(R.string.jarvis_command_center_none_yet), fontSize = 12.sp, color = onSurface.copy(alpha = 0.5f))
         mine.take(20).forEach { t ->
             val c = taskColor(t.state)
             Row(
@@ -370,10 +372,10 @@ fun JarvisEventCard(raw: String, onOpenChat: (String) -> Unit) {
             JarvisBotIcon(18.dp, Cyan)
             Spacer(Modifier.width(7.dp))
             Text(
-                if (events.size == 1) "Team update" else "${events.size} team updates",
+                if (events.size == 1) stringResource(R.string.jarvis_command_center_team_update) else stringResource(R.string.jarvis_command_center_team_updates, events.size.toString()),
                 fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Cyan, modifier = Modifier.weight(1f)
             )
-            if (hasDetails) Text(if (open) "Hide reports" else "Show reports", fontSize = 11.sp, color = onSurface.copy(alpha = 0.5f))
+            if (hasDetails) Text(if (open) stringResource(R.string.jarvis_command_center_hide_reports) else stringResource(R.string.jarvis_command_center_show_reports), fontSize = 11.sp, color = onSurface.copy(alpha = 0.5f))
         }
         events.forEach { e ->
             val c = eventColor(e.kind)
@@ -413,10 +415,10 @@ fun JarvisChatWelcome(onExample: (String) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.widthIn(max = 520.dp)) {
         JarvisBotBadge(72.dp, Cyan, animated = true)
         Spacer(Modifier.height(14.dp))
-        Text("Jarvis command center", fontSize = 21.sp, fontWeight = FontWeight.SemiBold, color = onSurface)
+        Text(stringResource(R.string.jarvis_command_center_jarvis_command_center), fontSize = 21.sp, fontWeight = FontWeight.SemiBold, color = onSurface)
         Spacer(Modifier.height(6.dp))
         Text(
-            "Give me a big job. I write the plan, put together teams of agents, hand out the work in parallel, check what comes back and keep going until it's done.",
+            stringResource(R.string.jarvis_command_center_give_me_a_big_job_i_write),
             fontSize = 13.5.sp, lineHeight = 19.sp, color = onSurface.copy(alpha = 0.6f),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )

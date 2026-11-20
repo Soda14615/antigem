@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -106,18 +108,18 @@ private fun GroupList(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Category, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                         Spacer(Modifier.width(10.dp))
-                        Text("Tool groups", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.rea_groups_screen_tool_groups), fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                     }
-                    Hint("Each REA MCP server lets the agent use the tools of the groups chosen for it (the REA preset in each agent's MCP settings). Open a group to add or remove tools; a tool can be in several groups. Sizes are what a group costs per request on a server that shows its tools directly; on demand, groups cost nothing up front. Tools marked ✎ change things (apps, files, sessions). Changes apply when the server restarts.")
+                    Hint(stringResource(R.string.rea_groups_screen_each_rea_mcp_server_lets_the_agent))
                     Text(
-                        state.toolsServer?.let { "${state.allToolNames.size} tools, from $it" } ?: "Install REA to see every tool with its description.",
+                        state.toolsServer?.let { "${state.allToolNames.size} tools, from $it" } ?: stringResource(R.string.rea_groups_screen_install_rea_to_see_every_tool_with),
                         fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(enabled = state.groups.isNotEmpty() || state.filesReady, onClick = { onDialog(GroupDialog.Create) }) {
-                            Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("New group")
+                            Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.rea_groups_screen_new_group))
                         }
-                        OutlinedButton(enabled = !state.busy && state.usable, onClick = ReaManager::refreshTools) { Text("Refresh tools") }
+                        OutlinedButton(enabled = !state.busy && state.usable, onClick = ReaManager::refreshTools) { Text(stringResource(R.string.rea_groups_screen_refresh_tools)) }
                     }
                     if (state.task == "tools") LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
@@ -127,9 +129,9 @@ private fun GroupList(
             item {
                 Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("No groups yet", fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
-                        Hint("The built-in groups come with REA's setup files. Get them on the REA page (step 1), or create your own group here.")
-                        OutlinedButton(onClick = onOpenRea) { Text("Open REA setup") }
+                        Text(stringResource(R.string.rea_groups_screen_no_groups_yet), fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
+                        Hint(stringResource(R.string.rea_groups_screen_the_built_in_groups_come_with_rea))
+                        OutlinedButton(onClick = onOpenRea) { Text(stringResource(R.string.rea_groups_screen_open_rea_setup)) }
                     }
                 }
             }
@@ -140,10 +142,10 @@ private fun GroupList(
                 Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("In no group (${state.ungrouped.size})", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { showUngrouped = !showUngrouped }) { Text(if (showUngrouped) "Hide" else "Show", fontSize = 12.5.sp) }
+                            Text(stringResource(R.string.rea_groups_screen_in_no_group, state.ungrouped.size.toString()), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            TextButton(onClick = { showUngrouped = !showUngrouped }) { Text(if (showUngrouped) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
                         }
-                        Hint("Only servers that show all tools offer these. New tools from REA updates appear here: add them to a group.")
+                        Hint(stringResource(R.string.rea_groups_screen_only_servers_that_show_all_tools_offer))
                     }
                 }
             }
@@ -152,7 +154,7 @@ private fun GroupList(
         if (state.defaultGroups.isNotEmpty()) {
             item {
                 TextButton(onClick = { onDialog(GroupDialog.ResetAll) }) {
-                    Text("Reset all groups to the defaults", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.rea_groups_screen_reset_all_groups_to_the_defaults), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -179,24 +181,24 @@ private fun GroupCard(
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(g.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    if (g.builtin) Pill("Built-in", MaterialTheme.colorScheme.primary) else Pill("Yours", QuotaGreen)
+                    if (g.builtin) Pill(stringResource(R.string.custom_slash_commands_screen_built_in), MaterialTheme.colorScheme.primary) else Pill(stringResource(R.string.rea_groups_screen_yours), QuotaGreen)
                 }
                 Text(
                     "${g.tools.size} tools" + (tokens?.let { " · ≈${formatTokens(it)} tokens" } ?: "") + " · id ${g.id}",
                     fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
                 if (g.description.isNotBlank()) Text(g.description, fontSize = 12.sp, maxLines = 3, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f))
-                if (unknown > 0) Text("$unknown tools this REA version doesn't have", fontSize = 11.5.sp, color = Amber)
+                if (unknown > 0) Text(stringResource(R.string.rea_groups_screen_tools_this_rea_version_doesn_t_have, unknown.toString()), fontSize = 11.5.sp, color = Amber)
             }
             Box {
-                IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "More") }
+                IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, stringResource(R.string.text_selection_more)) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    DropdownMenuItem(text = { Text("Edit tools") }, onClick = { menu = false; onOpen() })
-                    DropdownMenuItem(text = { Text("Rename / describe") }, onClick = { menu = false; onDialog(GroupDialog.Edit(g)) })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.rea_groups_screen_edit_tools)) }, onClick = { menu = false; onOpen() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.rea_groups_screen_rename_describe)) }, onClick = { menu = false; onDialog(GroupDialog.Edit(g)) })
                     if (g.builtin && state.defaultGroups.any { it.id == g.id }) {
-                        DropdownMenuItem(text = { Text("Reset to default") }, onClick = { menu = false; onDialog(GroupDialog.Reset(g)) })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.rea_groups_screen_reset_to_default)) }, onClick = { menu = false; onDialog(GroupDialog.Reset(g)) })
                     }
-                    DropdownMenuItem(text = { Text("Delete", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDialog(GroupDialog.Delete(g)) })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDialog(GroupDialog.Delete(g)) })
                 }
             }
         }
@@ -214,7 +216,7 @@ private fun UngroupedRow(name: String, state: ReaManager.State) {
                 tool?.description?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 11.5.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) }
             }
             Box {
-                TextButton(enabled = state.groups.isNotEmpty(), onClick = { menu = true }) { Text("Add to…", fontSize = 12.sp) }
+                TextButton(enabled = state.groups.isNotEmpty(), onClick = { menu = true }) { Text(stringResource(R.string.rea_groups_screen_add_to), fontSize = 12.sp) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     state.groups.forEach { g ->
                         DropdownMenuItem(text = { Text(g.name) }, onClick = { menu = false; ReaManager.toggleTool(g.id, name) })
@@ -259,7 +261,7 @@ private fun GroupEditor(
             Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back to groups") }
+                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.rea_groups_screen_back_to_groups)) }
                         Column(Modifier.weight(1f)) {
                             Text(group.name, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             Text(
@@ -267,12 +269,12 @@ private fun GroupEditor(
                                 fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         }
-                        IconButton(onClick = onEditInfo) { Icon(Icons.Outlined.Edit, "Rename") }
+                        IconButton(onClick = onEditInfo) { Icon(Icons.Outlined.Edit, stringResource(R.string.agy_cloud_ui_rename)) }
                     }
                     if (group.description.isNotBlank()) Hint(group.description)
                     OutlinedTextField(
                         value = query, onValueChange = { query = it }, singleLine = true,
-                        placeholder = { Text("Search tools") },
+                        placeholder = { Text(stringResource(R.string.rea_groups_screen_search_tools)) },
                         leadingIcon = { Icon(Icons.Outlined.Search, null) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -281,10 +283,10 @@ private fun GroupEditor(
                             FilterChip(selected = filter == f, onClick = { filter = f }, label = {
                                 Text(
                                     when (f) {
-                                        ToolFilter.ALL -> "All ${state.allToolNames.size}"
-                                        ToolFilter.IN -> "In group ${inGroup.size}"
-                                        ToolFilter.OUT -> "Not in group"
-                                        ToolFilter.NONE -> "In no group ${ungrouped.size}"
+                                        ToolFilter.ALL -> stringResource(R.string.rea_groups_screen_all, state.allToolNames.size.toString())
+                                        ToolFilter.IN -> stringResource(R.string.rea_groups_screen_in_group, inGroup.size.toString())
+                                        ToolFilter.OUT -> stringResource(R.string.rea_groups_screen_not_in_group)
+                                        ToolFilter.NONE -> stringResource(R.string.rea_groups_screen_in_no_group_2, ungrouped.size.toString())
                                     },
                                     fontSize = 12.sp
                                 )
@@ -293,17 +295,17 @@ private fun GroupEditor(
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(enabled = shown.any { it !in inGroup }, onClick = { ReaManager.setGroupTools(group.id, group.tools + shown) }) {
-                            Text("Add ${shown.count { it !in inGroup }} shown", fontSize = 12.5.sp)
+                            Text(stringResource(R.string.rea_groups_screen_add_shown, (shown.count { it !in inGroup }).toString()), fontSize = 12.5.sp)
                         }
                         OutlinedButton(enabled = shown.any { it in inGroup }, onClick = { ReaManager.setGroupTools(group.id, group.tools - shown.toSet()) }) {
-                            Text("Remove ${shown.count { it in inGroup }} shown", fontSize = 12.5.sp)
+                            Text(stringResource(R.string.rea_groups_screen_remove_shown, (shown.count { it in inGroup }).toString()), fontSize = 12.5.sp)
                         }
                     }
-                    if (state.tools.isEmpty()) Hint("Install REA (and Refresh tools) to see every tool with its description. Until then only tools already in groups are listed.")
+                    if (state.tools.isEmpty()) Hint(stringResource(R.string.rea_groups_screen_install_rea_and_refresh_tools_to_see))
                 }
             }
         }
-        if (shown.isEmpty()) item { Hint("No tools match.") }
+        if (shown.isEmpty()) item { Hint(stringResource(R.string.rea_groups_screen_no_tools_match)) }
         items(shown, key = { it }) { name ->
             ToolRow(name, name in inGroup, byName[name], state.groups.filter { it.id != group.id && name in it.tools }.map { it.name }) {
                 ReaManager.toggleTool(group.id, name)
@@ -324,7 +326,7 @@ private fun ToolRow(name: String, checked: Boolean, tool: ReaManager.Tool?, also
             Column(Modifier.weight(1f).padding(top = 10.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(name, fontSize = 12.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Medium)
                 if (tool == null) {
-                    Text("Not in the installed REA's tool list", fontSize = 11.sp, color = Amber)
+                    Text(stringResource(R.string.rea_groups_screen_not_in_the_installed_rea_s_tool), fontSize = 11.sp, color = Amber)
                 } else if (tool.description.isNotBlank()) {
                     Text(tool.description, fontSize = 11.5.sp, maxLines = 3, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 }
@@ -349,12 +351,12 @@ private fun GroupInfoDialog(title: String, name0: String, description0: String, 
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it.take(60) }, singleLine = true, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = description, onValueChange = { description = it.take(300) }, label = { Text("What it is for (optional)") }, minLines = 2, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it.take(60) }, singleLine = true, label = { Text(stringResource(R.string.browser_screen_name)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = description, onValueChange = { description = it.take(300) }, label = { Text(stringResource(R.string.rea_groups_screen_what_it_is_for_optional)) }, minLines = 2, modifier = Modifier.fillMaxWidth())
             }
         },
-        confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onSave(name, description) }) { Text("Save") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onSave(name, description) }) { Text(stringResource(R.string.claude_providers_page_save)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -365,6 +367,6 @@ private fun ConfirmDialog(title: String, text: String, action: String, onDismiss
         title = { Text(title) },
         text = { Text(text) },
         confirmButton = { TextButton(onClick = onConfirm) { Text(action, color = MaterialTheme.colorScheme.error) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }

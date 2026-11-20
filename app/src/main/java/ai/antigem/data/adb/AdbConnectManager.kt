@@ -214,7 +214,7 @@ object AdbConnectManager {
         val found = shell("command -v adb >/dev/null 2>&1 || exit 127; adb version", 15)
         val output = found.output.trim()
         val works = found.exitCode == 0 && output.startsWith("Android Debug Bridge")
-        val broken = if (!works && found.exitCode != 127) output.ifBlank { "adb exited with code ${found.exitCode}" }.take(600) else null
+        val broken = if (!works && found.exitCode != 127) output.ifBlank { appContext.getString(R.string.notification_adb_exited, found.exitCode) }.take(600) else null
         _state.update { it.copy(adbInstalled = works, adbBroken = broken, adbVersion = output.lineSequence().firstOrNull()?.takeIf { works }) }
         if (!works) {
             _state.update { it.copy(devices = emptyList()) }
@@ -237,9 +237,9 @@ object AdbConnectManager {
         installJob = scope.launch {
             _state.update { it.copy(installing = true, installLog = emptyList(), installError = null) }
             if (remote) {
-                appendInstallLog("Installing adb on the server…")
+                appendInstallLog(appContext.getString(R.string.notification_adb_installing_server))
                 val r = AdbTunnel.installServerAdb()
-                appendInstallLog(r.fold({ it }, { it.message ?: "Install failed" }))
+                appendInstallLog(r.fold({ it }, { it.message ?: appContext.getString(R.string.notification_adb_install_failed) }))
                 refreshNow()
                 _state.update { it.copy(installing = false, installError = r.exceptionOrNull()?.message) }
                 return@launch
@@ -255,9 +255,9 @@ object AdbConnectManager {
             refreshNow()
             val ok = _state.value.adbInstalled == true
             _state.update {
-                it.copy(installing = false, installError = if (ok) null else "Install failed (exit ${result.exitCode}). Check the log above, or run \"pkg upgrade\" in the terminal and try again.")
+                it.copy(installing = false, installError = if (ok) null else appContext.getString(R.string.notification_adb_install_log, result.exitCode))
             }
-            if (ok) appendInstallLog("✓ ${_state.value.adbVersion ?: "adb installed"}")
+            if (ok) appendInstallLog("✓ ${_state.value.adbVersion ?: appContext.getString(R.string.notification_adb_installed)}")
         }
     }
 
@@ -277,22 +277,22 @@ object AdbConnectManager {
         connectJob?.cancel()
         autoConnectJob?.cancel()
         _state.update { it.copy(busy = null) }
-        report("Cancelled.")
+        report(appContext.getString(R.string.notification_adb_cancelled))
     }
 
     /** Disconnects every device (in server mode: takes the phone away from the server's adb). */
     fun disconnectAll() = scope.launch {
         if (remote) AdbTunnel.disconnectServer(appContext) else adb("disconnect", 10)
         _state.update { it.copy(devices = listDevices()) }
-        report("Disconnected.")
+        report(appContext.getString(R.string.notification_adb_disconnected))
     }
 
     private suspend fun connectNow(port: Int?, quiet: Boolean): Boolean {
         if (remote) {
             try {
-                _state.update { it.copy(busy = "Connecting the server's adb to this phone…") }
+                _state.update { it.copy(busy = appContext.getString(R.string.notification_adb_connecting_server)) }
                 val r = AdbTunnel.connectServer(appContext, port)
-                r.fold({ report(it) }, { if (!quiet) report(it.message ?: "Could not connect", true) })
+                r.fold({ report(it) }, { if (!quiet) report(it.message ?: appContext.getString(R.string.notification_adb_failed_to_connect), true) })
                 _state.update { it.copy(devices = listDevices()) }
                 return r.isSuccess
             } finally {
@@ -302,19 +302,19 @@ object AdbConnectManager {
         val host = _state.value.host
         try {
             val target = port ?: run {
-                _state.update { it.copy(busy = "Looking for the Wireless debugging port…") }
+                _state.update { it.copy(busy = appContext.getString(R.string.notification_adb_finding_port)) }
                 withTimeoutOrNull(25_000) { localServicePorts(CONNECT_SERVICE).first() }
             }
             if (target == null) {
-                if (!quiet) report("Couldn't find the Wireless debugging port. Make sure Wireless debugging is on, or enter the port shown under \"IP address & Port\".", true)
+                if (!quiet) report(appContext.getString(R.string.notification_adb_debugging_port_missing), true)
                 return false
             }
-            _state.update { it.copy(busy = "Connecting to $host:$target…") }
+            _state.update { it.copy(busy = appContext.getString(R.string.notification_adb_connecting_host, host, target)) }
             // Old ports from an earlier Wireless debugging session show up as offline; drop them first
             listDevices().filter { it.state == "offline" }.forEach { adb("disconnect ${it.serial}", 10) }
             val out = adb("connect $host:$target").output.trim()
             val ok = out.contains("connected to") && !out.contains("failed") && !out.contains("cannot")
-            if (ok) report("Connected to $host:$target") else if (!quiet) report(out.ifBlank { "adb connect failed" }, true)
+            if (ok) report(appContext.getString(R.string.notification_adb_connected_host, host, target)) else if (!quiet) report(out.ifBlank { appContext.getString(R.string.notification_adb_connect_failed) }, true)
             _state.update { it.copy(devices = listDevices()) }
             return ok
         } finally {
@@ -325,7 +325,7 @@ object AdbConnectManager {
     fun disconnect(serial: String) = scope.launch {
         if (remote) AdbTunnel.disconnectServer(appContext) else adb("disconnect $serial", 10)
         _state.update { it.copy(devices = listDevices()) }
-        report("Disconnected $serial")
+        report(appContext.getString(R.string.notification_adb_disconnected_host, serial))
     }
 
     // ---------------- for other features (android_automation_mcp) ----------------
@@ -378,7 +378,7 @@ object AdbConnectManager {
                 localServicePorts(PAIRING_SERVICE).collect { port ->
                     if (_state.value.pairing !is Pairing.InProgress) setPairing(Pairing.Ready(port))
                 }
-            }.onFailure { if (it !is kotlinx.coroutines.CancellationException) setPairing(Pairing.Failed(it.message ?: "mDNS discovery failed", null)) }
+            }.onFailure { if (it !is kotlinx.coroutines.CancellationException) setPairing(Pairing.Failed(it.message ?: appContext.getString(R.string.notification_adb_pairing_discovery_failed), null)) }
         }
     }
 
@@ -401,11 +401,11 @@ object AdbConnectManager {
             else -> knownPort to ""
         }
         if (code.length != 6) {
-            setPairing(Pairing.Failed("The pairing code has 6 digits.", knownPort))
+            setPairing(Pairing.Failed(appContext.getString(R.string.notification_adb_pairing_bad_code), knownPort))
             return
         }
         if (port == null) {
-            setPairing(Pairing.Failed("Pairing port not found yet. Tap \"Pair device with pairing code\" in Wireless debugging, or type the port and code.", null))
+            setPairing(Pairing.Failed(appContext.getString(R.string.notification_adb_pairing_missing_port), null))
             return
         }
         pair(context, port, code)
@@ -423,8 +423,8 @@ object AdbConnectManager {
         val out = if (remote) AdbTunnel.pairServer(appContext, code, port).fold({ "Successfully paired" }, { it.message ?: "Pairing failed" })
         else adb("pair $host:$port $code", 25).output.trim()
         if (!out.contains("Successfully paired")) {
-            val reason = out.lineSequence().lastOrNull { it.isNotBlank() }?.removePrefix("error: ") ?: "No response from adb"
-            setPairing(Pairing.Failed("$reason. Check the code and try again.", port))
+            val reason = out.lineSequence().lastOrNull { it.isNotBlank() }?.removePrefix("error: ") ?: appContext.getString(R.string.notification_adb_no_response)
+            setPairing(Pairing.Failed(appContext.getString(R.string.notification_adb_pairing_try_again, reason), port))
             return@launch
         }
         prefs.edit().putBoolean("paired_once", true).apply()
@@ -435,10 +435,10 @@ object AdbConnectManager {
         val connected = connectNow(null, quiet = true)
         val device = _state.value.connectedDevice?.serial
         postResult(
-            if (connected) "ADB connected" else "ADB paired",
-            if (connected) "Connected to $device. Use adb in the terminal." else "Paired. Open AntiGem → Settings → ADB Connect to connect."
+            if (connected) appContext.getString(R.string.notification_adb_connected) else appContext.getString(R.string.notification_adb_result_paired),
+            if (connected) appContext.getString(R.string.notification_adb_connected_device, device) else appContext.getString(R.string.notification_adb_connect_in_settings)
         )
-        if (!connected) report("Paired, but couldn't find the Wireless debugging port yet. Tap Connect.", true)
+        if (!connected) report(appContext.getString(R.string.notification_adb_unavailable_port), true)
         if (pairingServiceRunning) stopPairing(context)
     }
 
@@ -493,8 +493,8 @@ object AdbConnectManager {
     private fun ensureChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "ADB pairing", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Enter the Wireless debugging pairing code without leaving Settings"
+            NotificationChannel(CHANNEL_ID, context.getString(R.string.notification_adb_pairing_channel), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = context.getString(R.string.notification_adb_pairing_channel_description)
                 setShowBadge(false)
             }
         )
@@ -504,11 +504,11 @@ object AdbConnectManager {
         ensureChannel(context)
         val pairing = _state.value.pairing
         val (title, text) = when (pairing) {
-            is Pairing.Ready -> "Pairing service found" to "Enter the 6-digit Wi-Fi pairing code shown in Wireless debugging."
-            is Pairing.InProgress -> "Pairing…" to "Pairing with ${_state.value.host}:${pairing.port}"
-            is Pairing.Failed -> "Pairing failed" to pairing.message
-            is Pairing.Paired -> "Paired" to "Connecting…"
-            else -> "Waiting for pairing code" to "Open Wireless debugging → Pair device with pairing code. Then enter the code here."
+            is Pairing.Ready -> context.getString(R.string.notification_adb_pairing_ready) to context.getString(R.string.notification_adb_pairing_ready_instruction)
+            is Pairing.InProgress -> context.getString(R.string.notification_adb_pairing_in_progress) to context.getString(R.string.notification_adb_pairing_target, _state.value.host, pairing.port)
+            is Pairing.Failed -> context.getString(R.string.notification_adb_pairing_failed) to pairing.message
+            is Pairing.Paired -> context.getString(R.string.notification_adb_paired) to context.getString(R.string.notification_connecting)
+            else -> context.getString(R.string.notification_adb_pairing_wait) to context.getString(R.string.notification_adb_pairing_wait_instruction)
         }
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -522,14 +522,14 @@ object AdbConnectManager {
             .setContentIntent(PendingIntent.getActivity(context, 0,
                 Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS).putExtra(":settings:fragment_args_key", "toggle_adb_wireless"),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-            .addAction(0, "Stop", servicePendingIntent(context, AdbPairingService.ACTION_STOP, 1, mutable = false))
+            .addAction(0, context.getString(R.string.notification_action_stop), servicePendingIntent(context, AdbPairingService.ACTION_STOP, 1, mutable = false))
         if (pairing is Pairing.InProgress || pairing is Pairing.Paired) {
             builder.setProgress(0, 0, true)
         } else {
             val hasPort = pairing is Pairing.Ready || (pairing as? Pairing.Failed)?.port != null
-            val label = if (hasPort) "Enter pairing code" else "Enter port and code"
+            val label = if (hasPort) context.getString(R.string.notification_adb_enter_code) else context.getString(R.string.notification_adb_enter_port_and_code)
             val input = RemoteInput.Builder(KEY_PAIRING_CODE)
-                .setLabel(if (hasPort) "6-digit pairing code" else "Port and code, e.g. 37123 482916")
+                .setLabel(if (hasPort) context.getString(R.string.notification_adb_code_format) else context.getString(R.string.notification_adb_port_and_code_format))
                 .build()
             builder.addAction(
                 NotificationCompat.Action.Builder(0, label, servicePendingIntent(context, AdbPairingService.ACTION_CODE, 2, mutable = true))

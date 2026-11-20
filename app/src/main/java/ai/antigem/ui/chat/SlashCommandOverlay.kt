@@ -1,5 +1,7 @@
 package ai.antigem.ui.chat
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,14 +47,14 @@ import ai.antigem.theme.QuotaGreen
 import ai.antigem.ui.components.AgyAccent
 import ai.antigem.theme.ClaudeTerracotta
 
-private data class SlashGroup(val title: String, val icon: ImageVector, val color: Color)
+private data class SlashGroup(@androidx.annotation.StringRes val title: Int, val icon: ImageVector, val color: Color)
 
 private fun groupOf(type: String): SlashGroup = when (type) {
-    "app" -> SlashGroup("Opens in the app", Icons.AutoMirrored.Outlined.OpenInNew, AgyAccent)
-    "command" -> SlashGroup("Commands", Icons.Outlined.Terminal, ClaudeTerracotta)
-    "custom" -> SlashGroup("Custom commands", Icons.Outlined.AutoAwesome, ClaudeTerracotta)
-    "plugin" -> SlashGroup("Custom AntiGem plugins", Icons.Outlined.Extension, AgyAccent)
-    else -> SlashGroup("Skills & plugins", Icons.Outlined.Extension, QuotaGreen)
+    "app" -> SlashGroup(R.string.main_ui_opens_in_the_app, Icons.AutoMirrored.Outlined.OpenInNew, AgyAccent)
+    "command" -> SlashGroup(R.string.main_ui_commands, Icons.Outlined.Terminal, ClaudeTerracotta)
+    "custom" -> SlashGroup(R.string.main_ui_custom_commands, Icons.Outlined.AutoAwesome, ClaudeTerracotta)
+    "plugin" -> SlashGroup(R.string.main_ui_custom_antigem_plugins, Icons.Outlined.Extension, AgyAccent)
+    else -> SlashGroup(R.string.main_ui_skills_plugins, Icons.Outlined.Extension, QuotaGreen)
 }
 
 /**
@@ -92,7 +94,7 @@ fun SlashCommandOverlay(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            group.title.uppercase(),
+                            stringResource(group.title).uppercase(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 0.8.sp,

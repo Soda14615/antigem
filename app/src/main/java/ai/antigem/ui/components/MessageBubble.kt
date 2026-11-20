@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -180,7 +182,7 @@ fun MessageBubble(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ContentCopy,
-                                contentDescription = "Copy",
+                                contentDescription = stringResource(R.string.copy_text),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                 modifier = Modifier.size(15.dp)
                             )
@@ -198,7 +200,7 @@ fun MessageBubble(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Edit,
-                                contentDescription = "Edit prompt",
+                                contentDescription = stringResource(R.string.message_bubble_edit_prompt),
                                 tint = ClaudeTerracotta,
                                 modifier = Modifier.size(15.dp)
                             )
@@ -216,7 +218,7 @@ fun MessageBubble(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Refresh,
-                                contentDescription = "Retry prompt",
+                                contentDescription = stringResource(R.string.message_bubble_retry_prompt),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -234,7 +236,7 @@ fun MessageBubble(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.DataObject,
-                                    contentDescription = "View Raw Request Payload",
+                                    contentDescription = stringResource(R.string.message_bubble_view_raw_request_payload),
                                     tint = ai.antigem.theme.AppColors.accentTeal,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -298,7 +300,7 @@ fun MessageBubble(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.ContentCopy,
-                                    contentDescription = "Copy message",
+                                    contentDescription = stringResource(R.string.message_bubble_copy_message),
                                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                                     modifier = Modifier.size(15.dp)
                                 )
@@ -312,7 +314,7 @@ fun MessageBubble(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Refresh,
-                                    contentDescription = "Regenerate response",
+                                    contentDescription = stringResource(R.string.message_bubble_regenerate_response),
                                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -327,7 +329,7 @@ fun MessageBubble(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.DataObject,
-                                        contentDescription = "View Raw Request Payload",
+                                        contentDescription = stringResource(R.string.message_bubble_view_raw_request_payload),
                                         tint = ai.antigem.theme.AppColors.accentTeal,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -342,7 +344,7 @@ fun MessageBubble(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.Layers,
-                                        contentDescription = "View Artifacts ($artifactsCount)",
+                                        contentDescription = stringResource(R.string.message_bubble_view_artifacts, artifactsCount.toString()),
                                         tint = ClaudeTerracotta,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -464,7 +466,7 @@ fun UserMessageBubble(
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Voice", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = GeminiBlue)
+                        Text(stringResource(R.string.message_bubble_voice), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = GeminiBlue)
                     }
                 }
 
@@ -518,7 +520,7 @@ fun UserMessageBubble(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = if (isTextExpanded) "Show less ▲" else "Show more (${lineCount} lines) ▼",
+                                    text = if (isTextExpanded) stringResource(R.string.message_bubble_show_less) else stringResource(R.string.message_bubble_show_more_lines, lineCount.toString()),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = ClaudeTerracotta
@@ -558,7 +560,7 @@ fun UserMessageBubble(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Restore point",
+                    text = stringResource(R.string.message_bubble_restore_point),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
@@ -589,7 +591,7 @@ fun UserMessageBubble(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ContentCopy,
-                        contentDescription = "Copy",
+                        contentDescription = stringResource(R.string.copy_text),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         modifier = Modifier.size(15.dp)
                     )
@@ -606,7 +608,7 @@ fun UserMessageBubble(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Visibility,
-                        contentDescription = "View full prompt",
+                        contentDescription = stringResource(R.string.message_bubble_view_full_prompt),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         modifier = Modifier.size(16.dp)
                     )
@@ -623,7 +625,7 @@ fun UserMessageBubble(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Undo and edit prompt",
+                        contentDescription = stringResource(R.string.message_bubble_undo_and_edit_prompt),
                         tint = ClaudeTerracotta,
                         modifier = Modifier.size(15.dp)
                     )
@@ -641,7 +643,7 @@ fun UserMessageBubble(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.History,
-                            contentDescription = "Restore to before this message",
+                            contentDescription = stringResource(R.string.message_bubble_restore_to_before_this_message),
                             tint = ai.antigem.theme.AppColors.info,
                             modifier = Modifier.size(16.dp)
                         )
@@ -660,7 +662,7 @@ fun UserMessageBubble(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.DataObject,
-                            contentDescription = "View Raw Request Payload",
+                            contentDescription = stringResource(R.string.message_bubble_view_raw_request_payload),
                             tint = ai.antigem.theme.AppColors.accentTeal,
                             modifier = Modifier.size(16.dp)
                         )
@@ -717,7 +719,7 @@ fun AssistantMessageFooter(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ContentCopy,
-                    contentDescription = "Copy message",
+                    contentDescription = stringResource(R.string.message_bubble_copy_message),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     modifier = Modifier.size(15.dp)
                 )
@@ -733,7 +735,7 @@ fun AssistantMessageFooter(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.SelectAll,
-                    contentDescription = "Select text",
+                    contentDescription = stringResource(R.string.message_bubble_select_text),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     modifier = Modifier.size(16.dp)
                 )
@@ -752,7 +754,7 @@ fun AssistantMessageFooter(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Refresh,
-                    contentDescription = "Regenerate response",
+                    contentDescription = stringResource(R.string.message_bubble_regenerate_response),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     modifier = Modifier.size(16.dp)
                 )
@@ -760,10 +762,10 @@ fun AssistantMessageFooter(
             if (confirmRetry) {
                 AlertDialog(
                     onDismissRequest = { confirmRetry = false },
-                    title = { Text("Regenerate response?", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.message_bubble_regenerate_response_2), fontWeight = FontWeight.Bold) },
                     text = {
                         Text(
-                            "The same message is sent again and this reply is replaced by a new one.",
+                            stringResource(R.string.message_bubble_the_same_message_is_sent_again_and),
                             fontSize = 14.sp
                         )
                     },
@@ -771,9 +773,9 @@ fun AssistantMessageFooter(
                         TextButton(onClick = {
                             confirmRetry = false
                             onRetry(message)
-                        }) { Text("Regenerate", color = ClaudeTerracotta, fontWeight = FontWeight.Bold) }
+                        }) { Text(stringResource(R.string.chat_screen_regenerate), color = ClaudeTerracotta, fontWeight = FontWeight.Bold) }
                     },
-                    dismissButton = { TextButton(onClick = { confirmRetry = false }) { Text("Cancel") } }
+                    dismissButton = { TextButton(onClick = { confirmRetry = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
                 )
             }
 
@@ -786,7 +788,7 @@ fun AssistantMessageFooter(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.DataObject,
-                        contentDescription = "View Raw Request Payload",
+                        contentDescription = stringResource(R.string.message_bubble_view_raw_request_payload),
                         tint = ai.antigem.theme.AppColors.accentTeal,
                         modifier = Modifier.size(16.dp)
                     )
@@ -801,7 +803,7 @@ fun AssistantMessageFooter(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Layers,
-                        contentDescription = "View Artifacts ($artifactsCount)",
+                        contentDescription = stringResource(R.string.message_bubble_view_artifacts, artifactsCount.toString()),
                         tint = ClaudeTerracotta,
                         modifier = Modifier.size(16.dp)
                     )
@@ -979,7 +981,7 @@ fun TokenUsageTelemetryPill(
             }
             if (usage.isEstimated) {
                 Text(
-                    text = "(est.)",
+                    text = stringResource(R.string.message_bubble_est),
                     fontSize = 9.5.sp,
                     fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
@@ -1017,14 +1019,14 @@ fun ContextSummaryCheckpointBanner(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "🧠 Context Compacted (History Summarized)",
+                    text = stringResource(R.string.message_bubble_context_compacted_history_summarized),
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = ClaudeTerracotta,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = if (expanded) "Hide ▲" else "Show Details ▼",
+                    text = if (expanded) stringResource(R.string.message_bubble_hide) else stringResource(R.string.message_bubble_show_details),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

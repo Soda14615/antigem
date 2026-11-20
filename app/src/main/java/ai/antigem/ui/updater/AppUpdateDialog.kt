@@ -1,5 +1,7 @@
 package ai.antigem.ui.updater
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -100,7 +102,7 @@ fun AppUpdateDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.RocketLaunch,
-                            contentDescription = "Update",
+                            contentDescription = stringResource(R.string.claude_settings_screen_update),
                             tint = primaryColor,
                             modifier = Modifier.size(22.dp)
                         )
@@ -110,13 +112,13 @@ fun AppUpdateDialog(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "New Update Available",
+                            text = stringResource(R.string.app_update_dialog_new_update_available),
                             color = onSurfaceColor,
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (updateInfo.isCritical) "Critical Release" else "Release Update",
+                            text = if (updateInfo.isCritical) stringResource(R.string.app_update_dialog_critical_release) else stringResource(R.string.app_update_dialog_release_update),
                             color = if (updateInfo.isCritical) QuotaRed else primaryColor,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
@@ -179,7 +181,7 @@ fun AppUpdateDialog(
 
                 // Changelog Card
                 Text(
-                    text = "WHAT'S NEW",
+                    text = stringResource(R.string.app_update_dialog_what_s_new),
                     color = onSurfaceVariantColor,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -274,7 +276,7 @@ fun AppUpdateDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Downloading...",
+                                    text = stringResource(R.string.app_update_dialog_downloading),
                                     color = onSurfaceVariantColor,
                                     fontSize = 12.sp
                                 )
@@ -323,7 +325,7 @@ fun AppUpdateDialog(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Downloaded! Launching installer...",
+                                text = stringResource(R.string.app_update_dialog_downloaded_launching_installer),
                                 color = QuotaGreen,
                                 fontSize = 12.sp
                             )
@@ -348,7 +350,7 @@ fun AppUpdateDialog(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Download failed: ${state.message}",
+                                text = stringResource(R.string.app_update_dialog_download_failed, state.message.toString()),
                                 color = QuotaRed,
                                 fontSize = 11.5.sp,
                                 maxLines = 2
@@ -398,7 +400,7 @@ fun AppUpdateDialog(
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 colors = ButtonDefaults.textButtonColors(contentColor = onSurfaceVariantColor)
                             ) {
-                                Text("Later", fontSize = 13.sp)
+                                Text(stringResource(R.string.bridge_ui_later), fontSize = 13.sp)
                             }
                         }
 

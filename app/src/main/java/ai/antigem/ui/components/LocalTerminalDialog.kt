@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -146,7 +148,7 @@ fun LocalTerminalContent(
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
-                    text = "Restoring active terminal sessions...",
+                    text = stringResource(R.string.local_terminal_dialog_restoring_active_terminal_sessions),
                     color = Color.LightGray,
                     fontSize = 13.sp
                 )
@@ -377,7 +379,7 @@ fun LocalTerminalContent(
                                 ) {
                                     Icon(
                                         imageVector = if (isMaximized) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
-                                        contentDescription = if (isMaximized) "Minimize / Restore" else "Maximize",
+                                        contentDescription = if (isMaximized) stringResource(R.string.local_terminal_dialog_minimize_restore) else stringResource(R.string.local_terminal_dialog_maximize),
                                         tint = Color.LightGray,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -392,7 +394,7 @@ fun LocalTerminalContent(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
-                                        contentDescription = "Retry",
+                                        contentDescription = stringResource(R.string.chat_screen_retry),
                                         tint = ai.antigem.theme.AppColors.success,
                                         modifier = Modifier.size(18.dp)
                                     )
@@ -406,7 +408,7 @@ fun LocalTerminalContent(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Close",
+                                    contentDescription = stringResource(R.string.accounts_ui_close),
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -795,7 +797,7 @@ fun LocalTerminalContent(
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Switch Tab",
+                            contentDescription = stringResource(R.string.local_terminal_dialog_switch_tab),
                             tint = Color.LightGray,
                             modifier = Modifier.size(16.dp)
                         )
@@ -845,7 +847,7 @@ fun LocalTerminalContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Close Tab",
+                                                contentDescription = stringResource(R.string.floating_terminal_inspector_close_tab),
                                                 tint = Color.Gray,
                                                 modifier = Modifier.size(12.dp)
                                             )
@@ -882,20 +884,20 @@ fun LocalTerminalContent(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
-                                    contentDescription = "New Tab",
+                                    contentDescription = stringResource(R.string.browser_screen_new_tab),
                                     tint = if (!isSyncingTmux) ClaudeTerracotta else Color.Gray,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column {
                                     Text(
-                                        text = "New Session",
+                                        text = stringResource(R.string.floating_terminal_inspector_new_session),
                                         color = if (!isSyncingTmux) ClaudeTerracotta else Color.Gray,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
-                                        text = "Long-press to force Bash shell",
+                                        text = stringResource(R.string.local_terminal_dialog_long_press_to_force_bash_shell),
                                         color = ai.antigem.theme.AppColors.editorText.copy(alpha = 0.53f),
                                         fontSize = 10.sp
                                     )
@@ -924,7 +926,7 @@ fun LocalTerminalContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.accounts_ui_close),
                         tint = Color.White,
                         modifier = Modifier.size(14.dp)
                     )
@@ -959,7 +961,7 @@ fun LocalTerminalContent(
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Close Tab?",
+                            text = stringResource(R.string.local_terminal_dialog_close_tab),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
@@ -968,7 +970,7 @@ fun LocalTerminalContent(
                 },
                 text = {
                     Text(
-                        text = "Are you sure you want to close \"$sessTitle\"?\nAny process running in this session will be terminated.",
+                        text = stringResource(R.string.local_terminal_dialog_are_you_sure_you_want_to_close, sessTitle.toString()),
                         fontSize = 13.sp,
                         color = ai.antigem.theme.AppColors.editorText,
                         lineHeight = 18.sp
@@ -985,7 +987,7 @@ fun LocalTerminalContent(
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text("Close Tab", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.floating_terminal_inspector_close_tab), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 },
                 dismissButton = {
@@ -993,7 +995,7 @@ fun LocalTerminalContent(
                         onClick = { sessionToClose = null },
                         shape = RoundedCornerShape(10.dp)
                     ) {
-                        Text("Cancel", color = Color.Gray, fontSize = 13.sp)
+                        Text(stringResource(R.string.accounts_ui_cancel), color = Color.Gray, fontSize = 13.sp)
                     }
                 }
             )

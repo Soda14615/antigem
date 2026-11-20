@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -122,13 +124,13 @@ fun NetworkInspectorDialog(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Network Inspector",
+                                text = stringResource(R.string.floating_network_inspector_bubble_network_inspector),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "${logs.size} calls recorded · ${activeStreams} active stream${if (activeStreams == 1) "" else "s"}",
+                                text = stringResource(R.string.network_inspector_dialog_calls_recorded_active_stream, logs.size.toString(), activeStreams.toString(), (if (activeStreams == 1) "" else "s").toString()),
                                 fontSize = 11.5.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -142,7 +144,7 @@ fun NetworkInspectorDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteOutline,
-                                contentDescription = "Clear logs",
+                                contentDescription = stringResource(R.string.network_inspector_dialog_clear_logs),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(19.dp)
                             )
@@ -154,7 +156,7 @@ fun NetworkInspectorDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
+                                contentDescription = stringResource(R.string.accounts_ui_close),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -174,7 +176,7 @@ fun NetworkInspectorDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-                        placeholder = { Text("Filter by endpoint, route, or status...", fontSize = 12.5.sp) },
+                        placeholder = { Text(stringResource(R.string.network_inspector_dialog_filter_by_endpoint_route_or_status), fontSize = 12.5.sp) },
                         leadingIcon = {
                             Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
                         },
@@ -234,7 +236,7 @@ fun NetworkInspectorDialog(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = if (logs.isEmpty()) "No network calls captured yet" else "No matching calls found",
+                                text = if (logs.isEmpty()) stringResource(R.string.network_inspector_dialog_no_network_calls_captured_yet) else stringResource(R.string.network_inspector_dialog_no_matching_calls_found),
                                 fontSize = 13.5.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
@@ -396,9 +398,9 @@ private fun NetworkLogItemRow(
             ) {
                 Text(
                     text = when {
-                        isConnected && elapsed >= 2000L -> "Live Stream"
-                        isConnected -> "Connected"
-                        entry.error != null -> "Err"
+                        isConnected && elapsed >= 2000L -> stringResource(R.string.network_inspector_dialog_live_stream)
+                        isConnected -> stringResource(R.string.network_inspector_dialog_connected)
+                        entry.error != null -> stringResource(R.string.network_inspector_dialog_err)
                         entry.grpcStatus != null && entry.grpcStatus != "0" -> "gRPC ${entry.grpcStatus}"
                         entry.statusCode > 0 -> "${entry.statusCode}"
                         else -> "OK"
@@ -480,7 +482,7 @@ private fun NetworkLogDetailDialog(
                         )
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accounts_ui_close), modifier = Modifier.size(18.dp))
                     }
                 }
 
@@ -545,17 +547,17 @@ private fun OverviewTab(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        DetailRow("Full URL", entry.url, isCopyable = true, onCopy = onCopy)
-        DetailRow("Method", entry.method)
-        DetailRow("Service Target", entry.serviceType)
-        DetailRow("Timestamp", entry.formattedTime)
-        DetailRow("Duration", durationStr)
-        DetailRow("HTTP Status", if (entry.statusCode > 0) "${entry.statusCode}" else if (isConnected) "Connected / Streaming" else "Pending")
+        DetailRow(stringResource(R.string.network_inspector_dialog_full_url), entry.url, isCopyable = true, onCopy = onCopy)
+        DetailRow(stringResource(R.string.network_inspector_dialog_method), entry.method)
+        DetailRow(stringResource(R.string.network_inspector_dialog_service_target), entry.serviceType)
+        DetailRow(stringResource(R.string.network_inspector_dialog_timestamp), entry.formattedTime)
+        DetailRow(stringResource(R.string.network_inspector_dialog_duration), durationStr)
+        DetailRow(stringResource(R.string.network_inspector_dialog_http_status), if (entry.statusCode > 0) "${entry.statusCode}" else if (isConnected) stringResource(R.string.network_inspector_dialog_connected_streaming) else stringResource(R.string.network_inspector_dialog_pending))
         if (entry.grpcStatus != null) {
-            DetailRow("gRPC Status", entry.grpcStatus)
+            DetailRow(stringResource(R.string.network_inspector_dialog_grpc_status), entry.grpcStatus)
         }
         if (entry.error != null) {
-            DetailRow("Error Message", entry.error, isError = true, isCopyable = true, onCopy = onCopy)
+            DetailRow(stringResource(R.string.network_inspector_dialog_error_message), entry.error, isError = true, isCopyable = true, onCopy = onCopy)
         }
     }
 }
@@ -571,9 +573,9 @@ private fun HeadersTab(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Request Headers (${entry.requestHeaders.size})", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text(stringResource(R.string.network_inspector_dialog_request_headers, entry.requestHeaders.size.toString()), fontWeight = FontWeight.Bold, fontSize = 13.sp)
         if (entry.requestHeaders.isEmpty()) {
-            Text("No request headers recorded.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.network_inspector_dialog_no_request_headers_recorded), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             entry.requestHeaders.forEach { (k, v) ->
                 HeaderItem(k, v, onCopy)
@@ -582,9 +584,9 @@ private fun HeadersTab(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Response Headers (${entry.responseHeaders.size})", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text(stringResource(R.string.network_inspector_dialog_response_headers, entry.responseHeaders.size.toString()), fontWeight = FontWeight.Bold, fontSize = 13.sp)
         if (entry.responseHeaders.isEmpty()) {
-            Text("No response headers recorded.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.network_inspector_dialog_no_response_headers_recorded), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             entry.responseHeaders.forEach { (k, v) ->
                 HeaderItem(k, v, onCopy)

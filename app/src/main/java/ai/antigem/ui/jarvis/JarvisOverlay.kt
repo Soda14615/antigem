@@ -1,5 +1,7 @@
 package ai.antigem.ui.jarvis
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -419,7 +421,7 @@ private fun StatusPill(phase: Phase, steps: List<JarvisController.Step>) {
             Box(
                 Modifier.size(24.dp).clip(CircleShape).background(Danger.copy(alpha = 0.16f)).clickable { JarvisController.stopEverything() },
                 contentAlignment = Alignment.Center
-            ) { Icon(Icons.Filled.Stop, "Stop", tint = Danger, modifier = Modifier.size(14.dp)) }
+            ) { Icon(Icons.Filled.Stop, stringResource(R.string.chat_input_bar_stop), tint = Danger, modifier = Modifier.size(14.dp)) }
         }
     }
 }
@@ -443,7 +445,7 @@ internal fun NoticeChip(n: JarvisController.Notice, onAction: (String) -> Unit, 
         n.action?.let { a ->
             Spacer(Modifier.width(8.dp))
             Text(
-                when { a == "mic" -> "Allow"; a.startsWith("chat:") -> "Open"; else -> "Set up" }, color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                when { a == "mic" -> stringResource(R.string.app_permissions_dialog_allow); a.startsWith("chat:") -> stringResource(R.string.jarvis_overlay_open); else -> stringResource(R.string.jarvis_overlay_set_up) }, color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clip(RoundedCornerShape(50)).background(color).clickable { onAction(a) }.padding(horizontal = 10.dp, vertical = 5.dp)
             )
         }
@@ -505,7 +507,7 @@ private fun ActionButtons(phase: Phase, holding: Boolean, auto: Boolean, quiet: 
                     .background(Color.White.copy(alpha = 0.06f))
                     .clickable { JarvisController.quickSettingsOpen.value = true },
                 contentAlignment = Alignment.Center
-            ) { Icon(Icons.Filled.Tune, "Quick settings", tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(if (big) 20.dp else 16.dp)) }
+            ) { Icon(Icons.Filled.Tune, stringResource(R.string.jarvis_overlay_quick_settings), tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(if (big) 20.dp else 16.dp)) }
         }
     }
 }

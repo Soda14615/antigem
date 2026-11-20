@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_pc_screen_use">"使用 %1$s 吗？"</string>
+    <string name="connect_pc_screen_antigem_reopens_with_your_own_settings_again">"AntiGem 再次使用你自己的设置重新打开。 PC 继续运行其智能体for VS Code。"</string>
+    <string name="connect_pc_screen_reopening">"重新开放…"</string>
+    <string name="connect_pc_screen_reopen_now">"立即重新开放"</string>
+    <string name="connect_pc_screen_connect_to_pc">"连接至电脑"</string>
+    <string name="connect_pc_screen_use_the_agents_running_on_your_pc">"通过此手机使用 PC 上运行的智能体（VS Code 中的 AntiGem）：两者上的聊天相同。"</string>
+    <string name="connect_pc_screen_turning_this_on_adds_a_pc_button">"打开此功能会在侧边栏添加一个 PC 按钮。在你选择一台电脑之前，没有任何连接。"</string>
+    <string name="connect_pc_screen_now_using">"正在使用"</string>
+    <string name="connect_pc_screen_your_server_settings_servers">"你的服务器（设置 &gt; 服务器）"</string>
+    <string name="connect_pc_screen_this_phone">"这个电话"</string>
+    <string name="connect_pc_screen_paired_pcs">"已配对的电脑"</string>
+    <string name="connect_pc_screen_no_pc_yet_tap_add_a_pc">"还没有电脑。点击添加电脑并按照步骤操作。"</string>
+    <string name="connect_pc_screen_add_a_pc">"添加电脑"</string>
+    <string name="connect_pc_screen_on_the_pc_once">"在电脑上操作一次"</string>
+    <string name="connect_pc_screen_the_phone_gets_its_own_key_for">"手机拥有自己的 PC 密钥（此处不存储 PC 密码）。要阻止手机，请在 VS Code › 连接手机中将其删除。"</string>
+    <string name="connect_pc_screen_turn_off_connect_to_pc">"关闭连接到电脑？"</string>
+    <string name="connect_pc_screen_you_are_using_antigem_reopens_with_your">"你正在使用 %1$s。 AntiGem 使用你自己的设置重新打开；配对的电脑将保留以供日后使用。"</string>
+    <string name="connect_pc_screen_turn_off_reopen">"关闭并重新打开"</string>
+    <string name="connect_pc_screen_rename_pc">"重命名电脑"</string>
+    <string name="connect_pc_screen_pairing_with">"与 %1$s 配对"</string>
+    <string name="connect_pc_screen_paired_with">"与 %1$s 配对"</string>
+    <string name="connect_pc_screen_connect_now_to_use_its_agents_here">"现在连接以在此处使用其智能体（AntiGem 重新打开），或稍后通过侧栏中的 PC 按钮进行连接。"</string>
+    <string name="connect_pc_screen_connect_now">"立即连接"</string>
+    <string name="connect_pc_screen_is_saved_fix_the_ssh_problem_on">"%1$s 已保存。修复PC上的 SSH 问题，然后从列表中连接。"</string>
+    <string name="connect_pc_screen_on_the_pc_open_antigem_in_vs">"在 PC 上，在 VS Code 中打开 AntiGem › 连接手机。它显示在这里："</string>
+    <string name="connect_pc_screen_looking_for_pcs_on_this_wi_fi">"正在寻找此 Wi-Fi 上的电脑…"</string>
+    <string name="connect_pc_screen_not_listed_enter_the_address_shown_on">"未列出？输入PC上显示的地址"</string>
+    <string name="connect_pc_screen_some_routers_hide_devices_from_each_other">"一些路由器将设备相互隐藏（访客 Wi-Fi、“客户端隔离”）；然后输入地址也可以。"</string>
+    <string name="connect_pc_screen_address_shown_on_the_pc">"PC上显示的地址"</string>
+    <string name="connect_pc_screen_pair_with">"与 %1$s 配对"</string>
+    <string name="connect_pc_screen_6_digit_code_shown_on_the_pc">"PC上显示的6位代码"</string>
+    <string name="connect_pc_screen_the_code_is_only_valid_while_connect">"该代码仅在 PC 上打开 Connect 手机时有效。"</string>
+    <string name="connect_pc_screen_pair">"一对"</string>
+    <string name="connect_pc_screen_now_using_2">"现在使用： "</string>
+    <string name="connect_pc_screen_your_server">"你的服务器"</string>
+    <string name="connect_pc_screen_no_pc_paired_yet">"尚未配对电脑。"</string>
+    <string name="connect_pc_screen_add_pc">"添加电脑"</string>
+    <string name="connect_pc_screen_manage_pcs">"管理电脑…"</string>
+    <string name="connect_pc_screen_connected_to">"连接至 %1$s"</string>
+</resources>

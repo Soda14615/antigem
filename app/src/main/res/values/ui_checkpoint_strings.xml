@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="checkpoint_restore_sheet_try_again">"Try again"</string>
+    <string name="checkpoint_restore_sheet_what_goes_back">"What goes back"</string>
+    <string name="checkpoint_restore_sheet_restore_chat_files">"Restore chat &amp; files"</string>
+    <string name="checkpoint_restore_sheet_restore_files">"Restore files"</string>
+    <string name="checkpoint_restore_sheet_restore_chat">"Restore chat"</string>
+    <string name="checkpoint_restore_sheet_undo_that_restore">"Undo that restore"</string>
+    <string name="checkpoint_restore_sheet_go_back_to_before_this_message">"Go back to before this message"</string>
+    <string name="checkpoint_restore_sheet_restore_this_checkpoint">"Restore this checkpoint"</string>
+    <string name="checkpoint_restore_sheet_tap_a_file_to_see_exactly_what">"Tap a file to see exactly what changes in it."</string>
+    <string name="checkpoint_restore_sheet_message">"• %1$s: “%2$s” (%3$s message%4$s, %5$s)"</string>
+    <string name="checkpoint_restore_sheet_binary">"binary"</string>
+    <string name="checkpoint_restore_sheet_a_binary_file_it_is_put_back">"A binary file: it is put back as it was."</string>
+    <string name="checkpoint_restore_sheet_more_lines">"… %1$s more lines"</string>
+    <string name="checkpoint_restore_sheet_files_restored">"Files restored"</string>
+    <string name="checkpoint_restore_sheet_files_restored_with_problems">"Files restored, with problems"</string>
+    <string name="checkpoint_restore_sheet_nothing_had_to_change">"Nothing had to change."</string>
+    <string name="checkpoint_restore_sheet_the_chat_went_back_too_the_message">"The chat went back too: the message is in the input box."</string>
+    <string name="checkpoint_restore_sheet_undo_files">"Undo files"</string>
+    <string name="checkpoint_restore_sheet_undo_restore">"Undo restore"</string>
+    <string name="checkpoint_restore_sheet_undo_brings_the_files_back_the_chat">"Undo brings the files back; the chat part can't be undone."</string>
+    <string name="project_checkpoints_screen_checkpoints_work_in_git_projects_only_a">"Checkpoints work in git projects only (a folder with git init done). Nested repositories inside a project are saved too."</string>
+    <string name="project_checkpoints_screen_loading">"Loading…"</string>
+    <string name="project_checkpoints_screen_turn_checkpoints_on_above_then_start_a">"Turn checkpoints on above, then start a chat in a project."</string>
+    <string name="project_checkpoints_screen_no_project_has_checkpoints_yet_they_appear">"No project has checkpoints yet. They appear here after the first message in a project."</string>
+    <string name="project_checkpoints_screen_delete_all_checkpoints">"Delete all checkpoints?"</string>
+    <string name="project_checkpoints_screen_also_forget_my_answer_for_this_project">"Also forget my answer for this project"</string>
+    <string name="project_checkpoints_screen_run_git_init_in_this_folder_to">"Run git init in this folder to start checkpoints."</string>
+    <string name="project_checkpoints_screen_history">"History"</string>
+    <string name="project_checkpoints_screen_clean_old">"Clean old"</string>
+    <string name="project_checkpoints_screen_clean_old_checkpoints">"Clean old checkpoints"</string>
+    <string name="project_checkpoints_screen_delete_the_checkpoints_of_older_than">"Delete the checkpoints of %1$s older than:"</string>
+    <string name="project_checkpoints_screen_newer_checkpoints_stay_and_keep_working">"Newer checkpoints stay and keep working."</string>
+    <string name="project_checkpoints_screen_checkpoints">"%1$s checkpoints · %2$s"</string>
+    <string name="project_checkpoints_screen_no_checkpoints_left">"No checkpoints left."</string>
+    <string name="project_checkpoints_screen_before_a_restore">"Before a restore"</string>
+    <string name="project_checkpoints_screen_message">"Message"</string>
+    <string name="project_checkpoints_screen_keep_checkpoints_for">"Keep checkpoints for %1$s?"</string>
+    <string name="project_checkpoints_screen_you_can_change_this_any_time_in">"You can change this any time in Settings → Project checkpoints."</string>
+    <string name="project_checkpoints_screen_keep_checkpoints">"Keep checkpoints"</string>
+    <string name="project_checkpoints_screen_not_for_this_project">"Not for this project"</string>
+</resources>

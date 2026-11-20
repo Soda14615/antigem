@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agy_voice_call_ui_minimize">"Minimize"</string>
+    <string name="agy_voice_call_ui_call_log">"Call log"</string>
+    <string name="agy_voice_call_ui_end_call">"End call"</string>
+    <string name="agy_voice_call_ui_end">"End"</string>
+    <string name="agy_voice_call_ui_say_what_you_want_done_the_agent">"Say what you want done: the agent works in this chat while you talk."</string>
+    <string name="agy_voice_call_ui_you">"You"</string>
+    <string name="agy_voice_call_ui_the_call_couldn_t_continue">"The call couldn't continue"</string>
+    <string name="agy_voice_call_ui_something_went_wrong">"Something went wrong."</string>
+    <string name="agy_voice_call_ui_update_agy">"Update agy"</string>
+    <string name="agy_voice_call_ui_browse_voices">"Browse voices"</string>
+    <string name="agy_voice_call_ui_tap_a_voice_to_hear_it_then">"Tap a voice to hear it, then switch the call to it."</string>
+    <string name="agy_voice_call_ui_tap_a_voice_to_hear_it">"Tap a voice to hear it."</string>
+    <string name="agy_voice_call_ui_playing">"Playing"</string>
+    <string name="agy_voice_call_ui_in_use_now">"In use now"</string>
+    <string name="agy_voice_call_ui_language">"Language"</string>
+    <string name="agy_voice_call_ui_the_language_the_voice_talks_in_phone">"The language the voice talks in. Phone language uses your phone's language list."</string>
+    <string name="agy_voice_call_ui_speed">"Speed"</string>
+    <string name="agy_voice_call_ui_apply_changes">"Apply changes"</string>
+    <string name="agy_voice_call_ui_switch_to">"Switch to %1$s"</string>
+    <string name="agy_voice_call_ui_use">"Use %1$s"</string>
+    <string name="agy_voice_picker_choose_a_voice">"Choose a voice"</string>
+    <string name="agy_voice_picker_playing">"Playing…"</string>
+    <string name="agy_voice_picker_play_again">"Play again"</string>
+    <string name="agy_voice_picker_previous_voice">"Previous voice"</string>
+    <string name="agy_voice_picker_next_voice">"Next voice"</string>
+    <string name="agy_voice_transcript_voice_transcript">"Voice transcript"</string>
+</resources>

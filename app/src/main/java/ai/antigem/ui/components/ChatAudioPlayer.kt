@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Base64
@@ -261,7 +263,7 @@ fun ChatAudioPlayer(
                         ) { playing ->
                             Icon(
                                 imageVector = if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                contentDescription = if (playing) "Pause" else "Play",
+                                contentDescription = if (playing) stringResource(R.string.chat_audio_player_pause) else stringResource(R.string.chat_audio_player_play),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -288,7 +290,7 @@ fun ChatAudioPlayer(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = if (attachment.name.isNotBlank()) attachment.name else "Voice Note",
+                            text = if (attachment.name.isNotBlank()) attachment.name else stringResource(R.string.chat_audio_player_voice_note),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface

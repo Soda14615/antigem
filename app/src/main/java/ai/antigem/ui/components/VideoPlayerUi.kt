@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -219,7 +221,7 @@ fun ChatVideoPlayer(source: String, caption: String, modifier: Modifier = Modifi
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Fullscreen, null, tint = Color.White, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Playing full screen", color = Color.White, fontSize = 13.sp)
+                        Text(stringResource(R.string.video_player_ui_playing_full_screen), color = Color.White, fontSize = 13.sp)
                     }
                 }
             } else {
@@ -387,11 +389,11 @@ private fun VideoOverlay(
             ) {
                 Icon(Icons.Outlined.ErrorOutline, null, tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(30.dp))
                 Spacer(Modifier.height(6.dp))
-                Text(c.error ?: "Video could not be loaded", color = Color.White, fontSize = 12.5.sp, textAlign = TextAlign.Center)
+                Text(c.error ?: stringResource(R.string.video_player_ui_video_could_not_be_loaded), color = Color.White, fontSize = 12.5.sp, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { c.retry() }, contentPadding = PaddingValues(horizontal = 12.dp)) { Text("Retry", color = Color.White, fontSize = 12.5.sp) }
-                    Button(onClick = { c.openElsewhere() }, contentPadding = PaddingValues(horizontal = 12.dp)) { Text("Open in another app", fontSize = 12.5.sp) }
+                    OutlinedButton(onClick = { c.retry() }, contentPadding = PaddingValues(horizontal = 12.dp)) { Text(stringResource(R.string.chat_screen_retry), color = Color.White, fontSize = 12.5.sp) }
+                    Button(onClick = { c.openElsewhere() }, contentPadding = PaddingValues(horizontal = 12.dp)) { Text(stringResource(R.string.video_player_ui_open_in_another_app), fontSize = 12.5.sp) }
                 }
             }
             if (fullscreen) TopBar(title, onBack = onToggleFullscreen, pad = pad, menu = {})
@@ -413,7 +415,7 @@ private fun VideoOverlay(
                         color = Color.White, fontSize = 12.sp,
                         modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Color.Black.copy(alpha = 0.55f)).padding(horizontal = 8.dp, vertical = 3.dp)
                     )
-                    TextButton(onClick = { c.cancelTask() }) { Text("Cancel", color = Color.White, fontSize = 12.5.sp) }
+                    TextButton(onClick = { c.cancelTask() }) { Text(stringResource(R.string.accounts_ui_cancel), color = Color.White, fontSize = 12.5.sp) }
                 }
             }
         }
@@ -431,7 +433,7 @@ private fun VideoOverlay(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(if (skipForward) Icons.Filled.FastForward else Icons.Filled.FastRewind, null, tint = Color.White, modifier = Modifier.size(if (fullscreen) 34.dp else 26.dp))
-                    Text("$skipSeconds seconds", color = Color.White, fontSize = if (fullscreen) 13.sp else 11.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.video_player_ui_seconds, skipSeconds.toString()), color = Color.White, fontSize = if (fullscreen) 13.sp else 11.sp, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -448,12 +450,12 @@ private fun VideoOverlay(
                         ControlIcon(Icons.Filled.MoreVert, "More") { menuOpen = true; poke() }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
-                                text = { Text("Playback speed  ·  ${speedLabel(c.speed)}") },
+                                text = { Text(stringResource(R.string.video_player_ui_playback_speed, (speedLabel(c.speed)).toString())) },
                                 leadingIcon = { Icon(Icons.Filled.Speed, null) },
                                 onClick = { menuOpen = false; speedMenuOpen = true }
                             )
                             DropdownMenuItem(
-                                text = { Text(if (c.muted) "Unmute" else "Mute") },
+                                text = { Text(if (c.muted) stringResource(R.string.video_player_ui_unmute) else stringResource(R.string.video_player_ui_mute)) },
                                 leadingIcon = { Icon(if (c.muted) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff, null) },
                                 onClick = { menuOpen = false; c.toggleMute() }
                             )
@@ -462,18 +464,18 @@ private fun VideoOverlay(
                             // give the playlist text. Other players can still open it.
                             if (!c.isStream) {
                                 DropdownMenuItem(
-                                    text = { Text("Download") },
+                                    text = { Text(stringResource(R.string.full_screen_image_dialog_download)) },
                                     leadingIcon = { Icon(Icons.Filled.Download, null) },
                                     onClick = { menuOpen = false; ImageDownloadHelper.downloadVideo(context, c.source, title, scope) }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Share") },
+                                    text = { Text(stringResource(R.string.share_text)) },
                                     leadingIcon = { Icon(Icons.Filled.Share, null) },
                                     onClick = { menuOpen = false; c.share() }
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("Open in another app") },
+                                text = { Text(stringResource(R.string.video_player_ui_open_in_another_app)) },
                                 leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, null) },
                                 onClick = { menuOpen = false; c.openElsewhere() }
                             )
@@ -569,7 +571,7 @@ private fun BoxScope.TopBar(title: String, onBack: () -> Unit, pad: Dp, menu: @C
 private fun PlayDisc(icon: ImageVector, size: Dp, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Surface(onClick = onClick, shape = CircleShape, color = Color.Black.copy(alpha = 0.5f), modifier = modifier.size(size)) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(icon, contentDescription = "Play or pause", tint = Color.White, modifier = Modifier.size(size * 0.6f))
+            Icon(icon, contentDescription = stringResource(R.string.video_player_ui_play_or_pause), tint = Color.White, modifier = Modifier.size(size * 0.6f))
         }
     }
 }

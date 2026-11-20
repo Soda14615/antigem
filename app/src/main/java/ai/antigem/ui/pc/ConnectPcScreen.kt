@@ -1,5 +1,7 @@
 package ai.antigem.ui.pc
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -79,12 +81,12 @@ private fun SwitchConfirm(target: PairedPc?, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
         icon = { Icon(if (target != null) osIcon(target.os) else Icons.Outlined.PhoneAndroid, null, tint = PcAccent) },
-        title = { Text(if (target != null) "Use ${target.name}?" else "$back?", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
+        title = { Text(if (target != null) stringResource(R.string.connect_pc_screen_use, target.name.toString()) else "$back?", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
         text = {
             Text(
                 if (target != null) "AntiGem reopens and connects to ${target.name}: its agents and chats show here. " +
                     "Agents running on this phone stop; nothing on the PC is stopped."
-                else "AntiGem reopens with your own settings again. The PC keeps running its agents for VS Code.",
+                else stringResource(R.string.connect_pc_screen_antigem_reopens_with_your_own_settings_again),
                 fontSize = 13.5.sp, lineHeight = 19.sp
             )
         },
@@ -92,9 +94,9 @@ private fun SwitchConfirm(target: PairedPc?, onDismiss: () -> Unit) {
             Button(enabled = !busy, onClick = {
                 busy = true
                 scope.launch { PcConnect.switchTo(context, target?.id) }
-            }) { Text(if (busy) "Reopening…" else "Reopen now", fontWeight = FontWeight.Bold) }
+            }) { Text(if (busy) stringResource(R.string.connect_pc_screen_reopening) else stringResource(R.string.connect_pc_screen_reopen_now), fontWeight = FontWeight.Bold) }
         },
-        dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -129,9 +131,9 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Connect to PC", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text(stringResource(R.string.connect_pc_screen_connect_to_pc), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                     Text(
-                        "Use the agents running on your PC (AntiGem in VS Code) from this phone: the same chats on both.",
+                        stringResource(R.string.connect_pc_screen_use_the_agents_running_on_your_pc),
                         fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                     )
                 }
@@ -140,19 +142,19 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
                     if (!on && active != null) confirmOff = true else PcConnect.setEnabled(on)
                 })
             }
-            if (!enabled) Hint("Turning this on adds a PC button to the side bar. Nothing connects until you pick a PC.")
+            if (!enabled) Hint(stringResource(R.string.connect_pc_screen_turning_this_on_adds_a_pc_button))
         }
 
         if (enabled) {
             // what the app uses now
             Card(cardBg, cardBorder) {
-                Text("NOW USING", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                Text(stringResource(R.string.connect_pc_screen_now_using), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(9.dp).background(if (active != null) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f), CircleShape))
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        active?.name ?: if (ai.antigem.data.preferences.AuthPreferences.storedRemoteMode) "Your server (Settings › Servers)" else "This phone",
+                        active?.name ?: if (ai.antigem.data.preferences.AuthPreferences.storedRemoteMode) stringResource(R.string.connect_pc_screen_your_server_settings_servers) else stringResource(R.string.connect_pc_screen_this_phone),
                         fontWeight = FontWeight.SemiBold, fontSize = 15.sp, modifier = Modifier.weight(1f)
                     )
                     if (active != null) OutlinedButton(onClick = { switchBack = true }) { Text(PcConnect.ownModeLabel()) }
@@ -161,9 +163,9 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
 
             // paired PCs
             Card(cardBg, cardBorder) {
-                Text("PAIRED PCS", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                Text(stringResource(R.string.connect_pc_screen_paired_pcs), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                if (pcs.isEmpty()) Hint("No PC yet. Tap Add a PC and follow the steps.")
+                if (pcs.isEmpty()) Hint(stringResource(R.string.connect_pc_screen_no_pc_yet_tap_add_a_pc))
                 pcs.forEach { pc ->
                     PcRow(
                         pc = pc,
@@ -175,20 +177,20 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
                     )
                 }
                 Button(onClick = { showAdd = true }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Add a PC")
+                    Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.connect_pc_screen_add_a_pc))
                 }
             }
 
             // how to get the PC ready
             Card(cardBg, cardBorder) {
-                Text("ON THE PC (ONCE)", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                Text(stringResource(R.string.connect_pc_screen_on_the_pc_once), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 Step(1, "Install AntiGem in VS Code and open it once (it starts the agents).")
                 Step(2, "Turn on the PC's SSH server. Linux: sudo systemctl enable --now sshd (Ubuntu: install openssh-server first). " +
                     "macOS: System Settings › General › Sharing › Remote Login. Windows: Settings › Optional features › OpenSSH Server.")
                 Step(3, "In AntiGem on the PC open Connect phone. It shows a 6-digit code.")
                 Step(4, "Here: Add a PC, pick it from the list and type the code. Both must be on the same Wi-Fi.")
-                Hint("The phone gets its own key for the PC (no PC password is stored here). To block a phone, remove it in VS Code › Connect phone.")
+                Hint(stringResource(R.string.connect_pc_screen_the_phone_gets_its_own_key_for))
             }
         }
     }
@@ -200,25 +202,25 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
         val scope = rememberCoroutineScope()
         AlertDialog(
             onDismissRequest = { confirmOff = false },
-            title = { Text("Turn off Connect to PC?", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
-            text = { Text("You are using ${active?.name}. AntiGem reopens with your own settings; the paired PCs are kept for later.", fontSize = 13.5.sp) },
+            title = { Text(stringResource(R.string.connect_pc_screen_turn_off_connect_to_pc), fontWeight = FontWeight.Bold, fontSize = 17.sp) },
+            text = { Text(stringResource(R.string.connect_pc_screen_you_are_using_antigem_reopens_with_your, (active?.name).toString()), fontSize = 13.5.sp) },
             confirmButton = {
                 Button(onClick = {
                     PcConnect.setEnabled(false)
                     scope.launch { PcConnect.switchTo(context, null) }
-                }) { Text("Turn off & reopen") }
+                }) { Text(stringResource(R.string.connect_pc_screen_turn_off_reopen)) }
             },
-            dismissButton = { TextButton(onClick = { confirmOff = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmOff = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
     renaming?.let { pc ->
         var name by remember(pc.id) { mutableStateOf(pc.name) }
         AlertDialog(
             onDismissRequest = { renaming = null },
-            title = { Text("Rename PC", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
-            text = { OutlinedTextField(name, { name = it.take(40) }, singleLine = true, label = { Text("Name") }) },
-            confirmButton = { Button(enabled = name.isNotBlank(), onClick = { PcConnect.rename(pc.id, name); renaming = null }) { Text("Save") } },
-            dismissButton = { TextButton(onClick = { renaming = null }) { Text("Cancel") } }
+            title = { Text(stringResource(R.string.connect_pc_screen_rename_pc), fontWeight = FontWeight.Bold, fontSize = 17.sp) },
+            text = { OutlinedTextField(name, { name = it.take(40) }, singleLine = true, label = { Text(stringResource(R.string.browser_screen_name)) }) },
+            confirmButton = { Button(enabled = name.isNotBlank(), onClick = { PcConnect.rename(pc.id, name); renaming = null }) { Text(stringResource(R.string.claude_providers_page_save)) } },
+            dismissButton = { TextButton(onClick = { renaming = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
     removing?.let { pc ->
@@ -226,7 +228,7 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
         AlertDialog(
             onDismissRequest = { removing = null },
             icon = { Icon(Icons.Outlined.DeleteOutline, null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Remove ${pc.name}?", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
+            title = { Text(stringResource(R.string.claude_providers_page_remove, pc.name.toString()), fontWeight = FontWeight.Bold, fontSize = 17.sp) },
             text = {
                 Text(
                     (if (inUse) "You are using it now: switch back first. " else "") +
@@ -240,9 +242,9 @@ fun ConnectPcScreen(cardBg: Color, cardBorder: BorderStroke) {
                     enabled = !inUse,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     onClick = { PcConnect.remove(pc.id); removing = null }
-                ) { Text("Remove") }
+                ) { Text(stringResource(R.string.browser_screen_remove)) }
             },
-            dismissButton = { TextButton(onClick = { removing = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { removing = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -275,12 +277,12 @@ private fun PcRow(pc: PairedPc, inUse: Boolean, reachable: Boolean?, onConnect: 
                         fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
-            if (!inUse) TextButton(onClick = onConnect) { Text("Connect") }
+            if (!inUse) TextButton(onClick = onConnect) { Text(stringResource(R.string.agy_cloud_ui_connect)) }
             Box {
-                IconButton(onClick = { menu = true }) { Icon(Icons.Outlined.MoreVert, "More", Modifier.size(20.dp)) }
+                IconButton(onClick = { menu = true }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.text_selection_more), Modifier.size(20.dp)) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    DropdownMenuItem(text = { Text("Rename") }, leadingIcon = { Icon(Icons.Outlined.Edit, null) }, onClick = { menu = false; onRename() })
-                    DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) }, onClick = { menu = false; onRemove() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.agy_cloud_ui_rename)) }, leadingIcon = { Icon(Icons.Outlined.Edit, null) }, onClick = { menu = false; onRename() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.browser_screen_remove)) }, leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) }, onClick = { menu = false; onRemove() })
                 }
             }
         }
@@ -311,8 +313,8 @@ fun AddPcDialog(onDismiss: () -> Unit, onConnect: (PairedPc) -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Outlined.Computer, null, tint = PcAccent)
                     Spacer(Modifier.width(10.dp))
-                    Text("Add a PC", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
-                    if (step !is AddStep.Working) IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, "Close") }
+                    Text(stringResource(R.string.connect_pc_screen_add_a_pc), fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    if (step !is AddStep.Working) IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close)) }
                 }
                 when (val s = step) {
                     AddStep.Pick -> PickPc { name, host, port -> step = AddStep.Code(name, host, port) }
@@ -331,7 +333,7 @@ fun AddPcDialog(onDismiss: () -> Unit, onConnect: (PairedPc) -> Unit) {
                         }
                     }
                     is AddStep.Working -> {
-                        Text("Pairing with ${s.name}", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.connect_pc_screen_pairing_with, s.name.toString()), fontWeight = FontWeight.SemiBold)
                         LinearProgressIndicator(Modifier.fillMaxWidth())
                         Hint(s.text)
                     }
@@ -339,22 +341,22 @@ fun AddPcDialog(onDismiss: () -> Unit, onConnect: (PairedPc) -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.CheckCircle, null, tint = QuotaGreen)
                             Spacer(Modifier.width(8.dp))
-                            Text("Paired with ${s.pc.name}", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                            Text(stringResource(R.string.connect_pc_screen_paired_with, s.pc.name.toString()), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                         }
-                        Hint("Connect now to use its agents here (AntiGem reopens), or later from the PC button in the side bar.")
+                        Hint(stringResource(R.string.connect_pc_screen_connect_now_to_use_its_agents_here))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f)) { Text("Later") }
-                            Button(onClick = { onConnect(s.pc) }, modifier = Modifier.weight(1f)) { Text("Connect now") }
+                            OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.bridge_ui_later)) }
+                            Button(onClick = { onConnect(s.pc) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.connect_pc_screen_connect_now)) }
                         }
                     }
                     is AddStep.Failed -> {
                         Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f)) {
                             Text(s.message, fontSize = 13.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(12.dp))
                         }
-                        if (s.pairedPc != null) Hint("${s.pairedPc.name} is saved. Fix the SSH problem on the PC, then connect from the list.")
+                        if (s.pairedPc != null) Hint(stringResource(R.string.connect_pc_screen_is_saved_fix_the_ssh_problem_on, s.pairedPc.name.toString()))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = { step = AddStep.Pick }, modifier = Modifier.weight(1f)) { Text("Back") }
-                            Button(onClick = { step = AddStep.Code(s.name, s.host, s.port) }, modifier = Modifier.weight(1f)) { Text("Try again") }
+                            OutlinedButton(onClick = { step = AddStep.Pick }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.agent_approval_panel_back)) }
+                            Button(onClick = { step = AddStep.Code(s.name, s.host, s.port) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
                         }
                     }
                 }
@@ -379,12 +381,12 @@ private fun PickPc(onPick: (name: String, host: String, port: Int) -> Unit) {
         }
     }
 
-    Text("On the PC, open AntiGem in VS Code › Connect phone. It shows up here:", fontSize = 13.sp, lineHeight = 18.sp)
+    Text(stringResource(R.string.connect_pc_screen_on_the_pc_open_antigem_in_vs), fontSize = 13.sp, lineHeight = 18.sp)
     if (nearby.isEmpty()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
             Spacer(Modifier.width(10.dp))
-            Text(searchError ?: "Looking for PCs on this Wi-Fi…", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
+            Text(searchError ?: stringResource(R.string.connect_pc_screen_looking_for_pcs_on_this_wi_fi), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
         }
     }
     nearby.forEach { pc ->
@@ -406,16 +408,16 @@ private fun PickPc(onPick: (name: String, host: String, port: Int) -> Unit) {
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
     if (!manual) {
-        TextButton(onClick = { manual = true }) { Text("Not listed? Enter the address shown on the PC") }
-        Hint("Some routers hide devices from each other (guest Wi-Fi, \"client isolation\"); then typing the address works too.")
+        TextButton(onClick = { manual = true }) { Text(stringResource(R.string.connect_pc_screen_not_listed_enter_the_address_shown_on)) }
+        Hint(stringResource(R.string.connect_pc_screen_some_routers_hide_devices_from_each_other))
     } else {
         val parsed = parseAddress(address)
         OutlinedTextField(
             value = address, onValueChange = { address = it.trim().take(60) }, singleLine = true,
-            label = { Text("Address shown on the PC") }, placeholder = { Text("192.168.1.10:$DEFAULT_PAIR_PORT") },
+            label = { Text(stringResource(R.string.connect_pc_screen_address_shown_on_the_pc)) }, placeholder = { Text("192.168.1.10:$DEFAULT_PAIR_PORT") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), modifier = Modifier.fillMaxWidth()
         )
-        Button(enabled = parsed != null, onClick = { parsed?.let { (h, p) -> onPick(h, h, p) } }, modifier = Modifier.fillMaxWidth()) { Text("Next") }
+        Button(enabled = parsed != null, onClick = { parsed?.let { (h, p) -> onPick(h, h, p) } }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.agent_question_panel_next)) }
     }
 }
 
@@ -439,21 +441,21 @@ private fun parseAddress(text: String): Pair<String, Int>? {
 @Composable
 private fun CodeEntry(name: String, host: String, port: Int, onBack: () -> Unit, onPair: (String) -> Unit) {
     var code by remember { mutableStateOf("") }
-    Text("Pair with $name", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+    Text(stringResource(R.string.connect_pc_screen_pair_with, name.toString()), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
     Text("$host:$port", fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f))
     OutlinedTextField(
         value = code,
         onValueChange = { v -> code = v.filter { it.isDigit() }.take(6) },
         singleLine = true,
-        label = { Text("6-digit code shown on the PC") },
+        label = { Text(stringResource(R.string.connect_pc_screen_6_digit_code_shown_on_the_pc)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
         textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 22.sp, letterSpacing = 6.sp),
         modifier = Modifier.fillMaxWidth()
     )
-    Hint("The code is only valid while Connect phone is open on the PC.")
+    Hint(stringResource(R.string.connect_pc_screen_the_code_is_only_valid_while_connect))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Back") }
-        Button(enabled = code.length == 6, onClick = { onPair(code) }, modifier = Modifier.weight(1f)) { Text("Pair") }
+        OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.agent_approval_panel_back)) }
+        Button(enabled = code.length == 6, onClick = { onPair(code) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.connect_pc_screen_pair)) }
     }
 }
 
@@ -468,7 +470,7 @@ fun PcDrawerButton(onClick: () -> Unit) {
     Surface(onClick = onClick, shape = RoundedCornerShape(8.dp), color = Color.Transparent, modifier = Modifier.padding(end = 4.dp)) {
         Box {
             Icon(
-                Icons.Outlined.Computer, contentDescription = "Connect to PC",
+                Icons.Outlined.Computer, contentDescription = stringResource(R.string.connect_pc_screen_connect_to_pc),
                 tint = if (inUse) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(8.dp).size(20.dp)
             )
@@ -493,15 +495,15 @@ fun PcQuickSheet(onDismiss: () -> Unit, onManage: () -> Unit) {
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Connect to PC", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(stringResource(R.string.connect_pc_screen_connect_to_pc), fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Now using: ", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(stringResource(R.string.connect_pc_screen_now_using_2), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 Box(Modifier.size(8.dp).background(if (active != null) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f), CircleShape))
                 Spacer(Modifier.width(6.dp))
-                Text(active?.name ?: if (ai.antigem.data.preferences.AuthPreferences.storedRemoteMode) "Your server" else "This phone",
+                Text(active?.name ?: if (ai.antigem.data.preferences.AuthPreferences.storedRemoteMode) stringResource(R.string.connect_pc_screen_your_server) else stringResource(R.string.connect_pc_screen_this_phone),
                     fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
             }
-            if (pcs.isEmpty()) Hint("No PC paired yet.")
+            if (pcs.isEmpty()) Hint(stringResource(R.string.connect_pc_screen_no_pc_paired_yet))
             pcs.forEach { pc ->
                 val inUse = pc.id == active?.id
                 Surface(
@@ -531,14 +533,14 @@ fun PcQuickSheet(onDismiss: () -> Unit, onManage: () -> Unit) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = { showAdd = true }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Outlined.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text("Add PC")
+                    Icon(Icons.Outlined.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.connect_pc_screen_add_pc))
                 }
                 if (active != null) OutlinedButton(onClick = { switchBack = true }, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Outlined.PhoneAndroid, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
                     Text(PcConnect.ownModeLabel(), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
-            TextButton(onClick = onManage, modifier = Modifier.align(Alignment.End)) { Text("Manage PCs…") }
+            TextButton(onClick = onManage, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.connect_pc_screen_manage_pcs)) }
         }
     }
 
@@ -559,12 +561,12 @@ fun PcServersNotice(cardBg: Color, cardBorder: BorderStroke, onOpenConnectPc: ()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Computer, null, tint = QuotaGreen)
                 Spacer(Modifier.width(10.dp))
-                Text("Connected to ${active?.name ?: "a PC"}", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(R.string.connect_pc_screen_connected_to, (active?.name ?: "a PC").toString()), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
             Hint("Connect to PC is in use, so the agents and chats come from the PC. Your server settings here are kept " +
                 "as they were and are used again after you switch back.")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = onOpenConnectPc, modifier = Modifier.weight(1f)) { Text("Connect to PC") }
+                OutlinedButton(onClick = onOpenConnectPc, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.connect_pc_screen_connect_to_pc)) }
                 Button(onClick = { switchBack = true }, modifier = Modifier.weight(1f)) { Text(PcConnect.ownModeLabel()) }
             }
         }

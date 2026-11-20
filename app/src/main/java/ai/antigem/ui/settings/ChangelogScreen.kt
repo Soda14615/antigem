@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -133,9 +135,9 @@ private fun HeroCard(releases: Int, changes: Int, since: String?, latest: Change
                 }
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("What's new", fontSize = 21.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.changelog_screen_what_s_new), fontSize = 21.sp, fontWeight = FontWeight.Bold)
                     Text(
-                        if (upToDate) "You're on v${BuildConfig.VERSION_NAME}, the latest" else "You're on v${BuildConfig.VERSION_NAME}",
+                        if (upToDate) stringResource(R.string.changelog_screen_you_re_on_v_the_latest, BuildConfig.VERSION_NAME.toString()) else stringResource(R.string.changelog_screen_you_re_on_v, BuildConfig.VERSION_NAME.toString()),
                         fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -262,7 +264,7 @@ private fun VersionCard(
                 }
                 Spacer(Modifier.weight(1f))
                 Icon(
-                    Icons.Outlined.ExpandMore, if (expanded) "Collapse" else "Expand",
+                    Icons.Outlined.ExpandMore, if (expanded) stringResource(R.string.agent_tool_call_card_collapse) else stringResource(R.string.agent_tool_call_card_expand),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(22.dp).rotate(chevron)
                 )
             }
@@ -272,7 +274,7 @@ private fun VersionCard(
                 Spacer(Modifier.width(5.dp))
                 Text(
                     when {
-                        version.dateLabel == null -> "Not released yet"
+                        version.dateLabel == null -> stringResource(R.string.changelog_screen_not_released_yet)
                         version.relativeLabel == null -> version.dateLabel
                         else -> "${version.dateLabel}  ·  ${version.relativeLabel}"
                     },
@@ -352,7 +354,7 @@ private fun OriginMarker(firstDate: String?, railColor: Color) {
             }
         }
         Column(Modifier.padding(top = 8.dp)) {
-            Text("Where it all began", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.changelog_screen_where_it_all_began), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             if (firstDate != null) Text(firstDate, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -381,14 +383,14 @@ internal fun WhatsNewCard(cardBg: Color, cardBorder: BorderStroke, onClick: () -
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("What's new in v${current.versionName}", fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.changelog_screen_what_s_new_in_v, current.versionName.toString()), fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
                     current.dateLabel?.let { Text(it, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 }
                 Icon(Icons.Outlined.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             current.lines.take(2).forEach { line -> ChangeRow(line.text, line.kind) }
             Text(
-                "See all ${versions.size} versions",
+                stringResource(R.string.changelog_screen_see_all_versions, versions.size.toString()),
                 fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = primary
             )
         }

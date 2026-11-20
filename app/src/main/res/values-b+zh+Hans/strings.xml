@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_name">AntiGem Android 自动化</string>
+    <string name="accessibility_service_description">允许连接到 AntiGem Android 自动化 MCP 的 AI 智能体读取屏幕、截图、点按、滑动、输入文字和打开此设备上的应用。只有当智能体调用相应工具时，服务才会执行操作。</string>
+    <string name="copy_text">复制</string>
+    <string name="paste_text">粘贴</string>
+    <string name="text_selection_more">更多</string>
+    <string name="select_all">全选</string>
+    <string name="share_text">分享</string>
+    <string name="select_url">选择网址</string>
+    <string name="share_transcript">分享终端记录</string>
+    <string name="reset_terminal">重置终端</string>
+    <string name="no_urls_found">终端记录中没有找到网址</string>
+</resources>

@@ -1,5 +1,7 @@
 package ai.antigem.ui.agents
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -149,13 +151,13 @@ fun AccountsButton(
             }
             Spacer(Modifier.width(7.dp))
             val text = when {
-                needsSignIn -> "Sign in"
-                single?.agent == AgentKind.AGY && single.isReady -> agyAuth.displayName.ifBlank { "Account" }
-                single?.agent == AgentKind.CLAUDE && single.isReady -> claudeStatus?.auth?.email?.substringBefore('@') ?: "Account"
+                needsSignIn -> stringResource(R.string.claude_settings_screen_sign_in)
+                single?.agent == AgentKind.AGY && single.isReady -> agyAuth.displayName.ifBlank { stringResource(R.string.claude_settings_screen_account) }
+                single?.agent == AgentKind.CLAUDE && single.isReady -> claudeStatus?.auth?.email?.substringBefore('@') ?: stringResource(R.string.claude_settings_screen_account)
                 single?.agent == AgentKind.OPENCODE && single.isReady -> "OpenCode"
                 single?.agent == AgentKind.CODEX && single.isReady -> codexEmail?.substringBefore('@') ?: "Codex"
                 single != null -> single.label
-                else -> "Accounts"
+                else -> stringResource(R.string.accounts_ui_accounts)
             }
             Text(
                 text,
@@ -210,13 +212,13 @@ fun AccountsDialog(
         ) {
             Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Accounts", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.accounts_ui_accounts), fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                     IconButton(onClick = onDismiss, modifier = Modifier.size(30.dp)) {
-                        Icon(Icons.Outlined.Close, "Close", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                        Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     }
                 }
                 Text(
-                    "Each agent signs in on its own.",
+                    stringResource(R.string.accounts_ui_each_agent_signs_in_on_its_own),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
@@ -236,18 +238,18 @@ fun AccountsDialog(
                         when {
                             entry.isReady -> {
                                 if (agyAuth.upgradeSubscriptionUri.isNotBlank()) {
-                                    SectionButton(agyAuth.upgradeSubscriptionText.ifBlank { "Manage plan" }, Icons.AutoMirrored.Outlined.OpenInNew) {
+                                    SectionButton(agyAuth.upgradeSubscriptionText.ifBlank { stringResource(R.string.main_ui_manage_plan) }, Icons.AutoMirrored.Outlined.OpenInNew) {
                                         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(agyAuth.upgradeSubscriptionUri))) }
                                     }
                                 }
-                                SectionButton("Sign out", Icons.AutoMirrored.Outlined.Logout, danger = true) {
+                                SectionButton(stringResource(R.string.accounts_ui_sign_out), Icons.AutoMirrored.Outlined.Logout, danger = true) {
                                     onAgySignOut()
                                     onDismiss()
                                 }
                             }
                             entry.pending && entry.action != null -> {
                                 entry.action.let { SectionButton(it.label, primary = AgentKind.AGY.accent()) { it.onClick() } }
-                                SectionButton("Cancel") { onAgyCancelSignIn() }
+                                SectionButton(stringResource(R.string.accounts_ui_cancel)) { onAgyCancelSignIn() }
                             }
                             else -> entry.action?.let {
                                 SectionButton(it.label, primary = AgentKind.AGY.accent()) {
@@ -275,11 +277,11 @@ fun AccountsDialog(
                         ) else listOfNotNull(claudeStatus?.version?.substringBefore(" ")?.let { "CLI $it" })
                     ) {
                         if (entry.isReady) {
-                            SectionButton("Claude settings", Icons.Outlined.Settings) {
+                            SectionButton(stringResource(R.string.accounts_ui_claude_settings), Icons.Outlined.Settings) {
                                 onClaudeSettings()
                                 onDismiss()
                             }
-                            SectionButton("Sign out", Icons.AutoMirrored.Outlined.Logout, danger = true) { onClaudeSignOut() }
+                            SectionButton(stringResource(R.string.accounts_ui_sign_out), Icons.AutoMirrored.Outlined.Logout, danger = true) { onClaudeSignOut() }
                         } else {
                             entry.action?.let {
                                 SectionButton(it.label, primary = AgentKind.CLAUDE.accent()) {
@@ -287,7 +289,7 @@ fun AccountsDialog(
                                     onDismiss()
                                 }
                             }
-                            if (!entry.pending) SectionButton("Claude settings", Icons.Outlined.Settings) {
+                            if (!entry.pending) SectionButton(stringResource(R.string.accounts_ui_claude_settings), Icons.Outlined.Settings) {
                                 onClaudeSettings()
                                 onDismiss()
                             }
@@ -322,15 +324,15 @@ private fun CodexAccountSection(
         entry = entry,
         avatar = { AccountAvatar(AgentKind.CODEX, entry, email?.firstOrNull(), size = 44.dp) },
         title = AgentKind.CODEX.label(),
-        subtitle = if (entry.isReady) email ?: "Signed in" else entry.detail,
+        subtitle = if (entry.isReady) email ?: stringResource(R.string.claude_settings_screen_signed_in) else entry.detail,
         facts = facts
     ) {
         if (entry.isReady) {
-            SectionButton("Codex settings", Icons.Outlined.Settings) {
+            SectionButton(stringResource(R.string.accounts_ui_codex_settings), Icons.Outlined.Settings) {
                 onSettings()
                 onDismiss()
             }
-            SectionButton("Sign out", Icons.AutoMirrored.Outlined.Logout, danger = true) { onSignOut() }
+            SectionButton(stringResource(R.string.accounts_ui_sign_out), Icons.AutoMirrored.Outlined.Logout, danger = true) { onSignOut() }
         } else {
             entry.action?.let {
                 SectionButton(it.label, primary = AgentKind.CODEX.accent()) {
@@ -338,7 +340,7 @@ private fun CodexAccountSection(
                     onDismiss()
                 }
             }
-            if (!entry.pending) SectionButton("Codex settings", Icons.Outlined.Settings) {
+            if (!entry.pending) SectionButton(stringResource(R.string.accounts_ui_codex_settings), Icons.Outlined.Settings) {
                 onSettings()
                 onDismiss()
             }
@@ -352,7 +354,7 @@ private fun OpenCodeAccountSection(entry: AgentStatusEntry, facts: List<String>,
         entry = entry,
         avatar = { AccountAvatar(AgentKind.OPENCODE, entry, null, size = 44.dp) },
         title = AgentKind.OPENCODE.label(),
-        subtitle = if (entry.isReady) "No sign-in: each provider uses its own API key (free models need none)." else entry.detail,
+        subtitle = if (entry.isReady) stringResource(R.string.main_ui_no_sign_in_each_provider_uses_its) else entry.detail,
         facts = facts
     ) {
         if (!entry.isReady) entry.action?.let {
@@ -361,15 +363,16 @@ private fun OpenCodeAccountSection(entry: AgentStatusEntry, facts: List<String>,
                 onDismiss()
             }
         }
-        SectionButton(if (entry.isReady) "Providers & settings" else "OpenCode settings", Icons.Outlined.Settings) {
+        SectionButton(if (entry.isReady) stringResource(R.string.accounts_ui_providers_settings) else stringResource(R.string.accounts_ui_opencode_settings), Icons.Outlined.Settings) {
             onSettings()
             onDismiss()
         }
     }
 }
 
+@Composable
 private fun claudeAuthMethodLabel(raw: String): String = when (raw.lowercase()) {
-    "claude.ai", "claudeai", "oauth" -> "Claude account"
+    "claude.ai", "claudeai", "oauth" -> stringResource(R.string.main_ui_claude_account)
     "console", "api_key", "apikey" -> "Anthropic Console"
     else -> raw
 }

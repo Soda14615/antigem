@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -178,7 +180,7 @@ fun InteractiveUiView(
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "App",
+                                text = stringResource(R.string.interactive_ui_view_app),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -192,7 +194,7 @@ fun InteractiveUiView(
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "Code",
+                                text = stringResource(R.string.code_block_code),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -209,7 +211,7 @@ fun InteractiveUiView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Restart App",
+                            contentDescription = stringResource(R.string.interactive_ui_view_restart_app),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                             modifier = Modifier.size(15.dp)
                         )
@@ -222,7 +224,7 @@ fun InteractiveUiView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Fullscreen,
-                            contentDescription = "Open Fullscreen",
+                            contentDescription = stringResource(R.string.interactive_ui_view_open_fullscreen),
                             tint = ClaudeTerracotta,
                             modifier = Modifier.size(18.dp)
                         )
@@ -333,14 +335,14 @@ fun InteractiveUiView(
                             IconButton(onClick = { reloadKey++ }) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Restart App",
+                                    contentDescription = stringResource(R.string.interactive_ui_view_restart_app),
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                             IconButton(onClick = { isFullscreen = false }) {
                                 Icon(
                                     imageVector = Icons.Default.FullscreenExit,
-                                    contentDescription = "Exit Fullscreen",
+                                    contentDescription = stringResource(R.string.interactive_ui_view_exit_fullscreen),
                                     tint = ClaudeTerracotta
                                 )
                             }

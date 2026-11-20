@@ -1,5 +1,7 @@
 package ai.antigem.ui.codex
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -64,14 +66,14 @@ import ai.antigem.ui.components.CodexAccent
 import kotlinx.coroutines.launch
 
 /** The pages of Settings → Codex (each opens from the Codex row list). */
-enum class CodexSettingsPage(val title: String, val subtitle: String) {
-    ACCOUNT("Account", "Sign in with ChatGPT, or sign out"),
-    USAGE("Usage limits", "How much of your plan's limits is used, and when they reset"),
-    PERMISSIONS("Permissions", "What Codex asks before acting in new chats"),
-    MCP("MCP servers", "Tools Codex can call: presets and your own servers"),
-    PLUGINS("Plugins", "Install plugins from Codex' catalog or any GitHub marketplace"),
-    SKILLS("Skills", "Add skills from GitHub, update or remove them"),
-    SERVER("Server & install", "Install, update and restart Codex")
+enum class CodexSettingsPage(val titleRes: Int, val subtitleRes: Int) {
+    ACCOUNT(R.string.claude_settings_screen_account, R.string.agent_settings_sign_in_with_chatgpt_or_sign_out),
+    USAGE(R.string.codex_settings_screen_usage_limits, R.string.agent_settings_how_much_of_your_plan_s_limits_is_used_and_when_they_reset),
+    PERMISSIONS(R.string.app_permissions_dialog_permissions, R.string.agent_settings_what_codex_asks_before_acting_in_new_chats),
+    MCP(R.string.agent_settings_mcp_servers, R.string.agent_settings_tools_codex_can_call_presets_and_your_own_servers),
+    PLUGINS(R.string.android_dev_screen_plugins, R.string.agent_settings_install_plugins_from_codex_catalog_or_any_github_marketplace),
+    SKILLS(R.string.agent_settings_skills, R.string.agent_settings_add_skills_from_github_update_or_remove_them),
+    SERVER(R.string.codex_settings_screen_server_install, R.string.agent_settings_install_update_and_restart_codex)
 }
 
 /** Settings → Codex: one row per page, each with its current state. */
@@ -87,8 +89,9 @@ fun CodexSettingsGroup(backend: CodexChatBackend, cardBg: Color, onOpen: (CodexS
         backend.refreshStatus()
         backend.mcpServerNames().onSuccess { mcp = it.size }
     }
+    @Composable
     fun row(page: CodexSettingsPage, icon: androidx.compose.ui.graphics.vector.ImageVector, value: String? = null, valueColor: Color? = null) =
-        ai.antigem.ui.settings.SettingsRowItem(icon, CodexAccent, page.title, value, valueColor) { onOpen(page) }
+        ai.antigem.ui.settings.SettingsRowItem(icon, CodexAccent, stringResource(page.titleRes), value, valueColor) { onOpen(page) }
     val ready = state == CodexState.READY
     ai.antigem.ui.settings.SettingsRowList(
         cardBg = cardBg,
@@ -187,29 +190,29 @@ fun CodexSettingsScreen(
                     )
                 }
                 if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
             }
             val l = login
             when {
                 l != null -> {
                     Spacer(Modifier.height(10.dp))
                     if (l.code != null) {
-                        Text("Open the link, sign in with your ChatGPT account and enter this code:", fontSize = 12.5.sp, lineHeight = 17.sp)
+                        Text(stringResource(R.string.codex_settings_screen_open_the_link_sign_in_with_your), fontSize = 12.5.sp, lineHeight = 17.sp)
                         SelectionContainer {
                             Text(l.code, fontSize = 26.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = CodexAccent,
                                 modifier = Modifier.padding(vertical = 8.dp))
                         }
                     } else {
-                        Text("Finish signing in in your browser. Codex picks it up by itself.", fontSize = 12.5.sp, lineHeight = 17.sp)
+                        Text(stringResource(R.string.codex_settings_screen_finish_signing_in_in_your_browser_codex), fontSize = 12.5.sp, lineHeight = 17.sp)
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Button(
                             onClick = { open(l.url) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = CodexAccent, contentColor = Color.White)
-                        ) { Text("Open sign-in page") }
+                        ) { Text(stringResource(R.string.codex_settings_screen_open_sign_in_page)) }
                         Spacer(Modifier.width(8.dp))
-                        TextButton(onClick = { backend.cancelLogin() }) { Text("Cancel") }
+                        TextButton(onClick = { backend.cancelLogin() }) { Text(stringResource(R.string.accounts_ui_cancel)) }
                     }
                     Text(l.url, fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, maxLines = 2, overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
@@ -217,7 +220,7 @@ fun CodexSettingsScreen(
                 state == CodexState.SIGNED_OUT -> {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Sign in with the ChatGPT account whose plan Codex should use (Free, Plus, Pro, Business…).",
+                        stringResource(R.string.codex_settings_screen_sign_in_with_the_chatgpt_account_whose),
                         fontSize = 12.5.sp, lineHeight = 17.sp
                     )
                     Spacer(Modifier.height(10.dp))
@@ -226,20 +229,20 @@ fun CodexSettingsScreen(
                             onClick = { backend.startLogin(deviceCode = remote) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = CodexAccent, contentColor = Color.White)
-                        ) { Text("Sign in with ChatGPT") }
+                        ) { Text(stringResource(R.string.codex_settings_screen_sign_in_with_chatgpt)) }
                         Spacer(Modifier.width(8.dp))
-                        if (!remote) TextButton(onClick = { backend.startLogin(deviceCode = true) }) { Text("Use a code") }
+                        if (!remote) TextButton(onClick = { backend.startLogin(deviceCode = true) }) { Text(stringResource(R.string.codex_settings_screen_use_a_code)) }
                     }
                     Text(
-                        if (remote) "The server is remote: you get a code to enter on the sign-in page."
-                        else "\"Use a code\" works when the browser cannot come back to the app. It may first need to be allowed in ChatGPT → Settings → Security.",
+                        if (remote) stringResource(R.string.codex_settings_screen_the_server_is_remote_you_get_a)
+                        else stringResource(R.string.codex_settings_screen_use_a_code_works_when_the_browser),
                         fontSize = 11.sp, lineHeight = 15.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                         modifier = Modifier.padding(top = 6.dp)
                     )
                 }
                 account != null -> {
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = { backend.logout() }, shape = RoundedCornerShape(12.dp)) { Text("Sign out") }
+                    OutlinedButton(onClick = { backend.logout() }, shape = RoundedCornerShape(12.dp)) { Text(stringResource(R.string.accounts_ui_sign_out)) }
                 }
             }
         }
@@ -250,22 +253,22 @@ fun CodexSettingsScreen(
             ClaudeCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Usage limits", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(stringResource(R.string.codex_settings_screen_usage_limits), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         (limits?.plan ?: account?.plan)?.let {
-                            Text("${it.replaceFirstChar { c -> c.uppercase() }} plan · every Codex model counts toward the same limits",
+                            Text(stringResource(R.string.codex_settings_screen_plan_every_codex_model_counts_toward_the, (it.replaceFirstChar { c -> c.uppercase() }).toString()),
                                 fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                         }
                     }
-                    IconButton(onClick = { scope.launch { backend.refreshRateLimits() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                    IconButton(onClick = { scope.launch { backend.refreshRateLimits() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
                 }
                 Spacer(Modifier.height(8.dp))
                 val lim = limits
                 when {
                     lim == null -> Text(
-                        if (state == CodexState.READY) "No usage information yet." else "Sign in to Codex to see your limits.",
+                        if (state == CodexState.READY) stringResource(R.string.codex_settings_screen_no_usage_information_yet) else stringResource(R.string.codex_settings_screen_sign_in_to_codex_to_see_your),
                         fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
-                    lim.primary == null && lim.secondary == null -> Text("No limits reported for this account.", fontSize = 12.sp)
+                    lim.primary == null && lim.secondary == null -> Text(stringResource(R.string.codex_settings_screen_no_limits_reported_for_this_account), fontSize = 12.sp)
                     else -> {
                         lim.primary?.let { LimitRow(it) }
                         lim.secondary?.let { Spacer(Modifier.height(10.dp)); LimitRow(it) }
@@ -276,8 +279,8 @@ fun CodexSettingsScreen(
 
         // ---- approvals for new chats
         if (page == CodexSettingsPage.PERMISSIONS) ClaudeCard {
-            Text("Approvals", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Text("What Codex asks before acting. Each chat can change it from the chip above the message box.",
+            Text(stringResource(R.string.codex_settings_screen_approvals), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(stringResource(R.string.codex_settings_screen_what_codex_asks_before_acting_each_chat),
                 fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             Spacer(Modifier.height(8.dp))
             CodexPreferences.MODES.forEach { m ->
@@ -295,7 +298,7 @@ fun CodexSettingsScreen(
 
         // ---- server
         if (page == CodexSettingsPage.SERVER) ClaudeCard {
-            Text("Server & install", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(stringResource(R.string.codex_settings_screen_server_install), fontWeight = FontWeight.Bold, fontSize = 14.sp)
             Text(
                 listOfNotNull(status?.version?.let { "Codex $it" }, if (status?.running == true) "running" else if (status?.installed == true) "starts when needed" else null)
                     .joinToString(" · ").ifBlank { state.label },
@@ -308,8 +311,8 @@ fun CodexSettingsScreen(
             if (state == CodexState.NOT_INSTALLED) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    if (status?.termux_package == true) "Codex is not installed on this phone. Install it here (the Termux package: pkg install codex)."
-                    else "Codex is not installed on the server. Install it here: the app downloads OpenAI's official Linux build into ~/.local/bin.",
+                    if (status?.termux_package == true) stringResource(R.string.codex_settings_screen_codex_is_not_installed_on_this_phone)
+                    else stringResource(R.string.codex_settings_screen_codex_is_not_installed_on_the_server),
                     fontSize = 12.5.sp, lineHeight = 17.sp
                 )
             }
@@ -321,10 +324,10 @@ fun CodexSettingsScreen(
                         enabled = !jobRunning,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = CodexAccent, contentColor = Color.White)
-                    ) { Text(if (jobRunning) "Installing…" else "Install Codex") }
+                    ) { Text(if (jobRunning) stringResource(R.string.claude_settings_screen_installing) else stringResource(R.string.codex_settings_screen_install_codex)) }
                 } else {
                     OutlinedButton(onClick = { backend.startCliJob("update") }, enabled = !jobRunning, shape = RoundedCornerShape(12.dp)) {
-                        Text(if (jobRunning) "Checking…" else "Check for updates")
+                        Text(if (jobRunning) stringResource(R.string.bridge_ui_checking) else stringResource(R.string.bridge_ui_check_for_updates))
                     }
                     Spacer(Modifier.width(8.dp))
                     OutlinedButton(
@@ -340,7 +343,7 @@ fun CodexSettingsScreen(
                         },
                         enabled = !restarting && !jobRunning,
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text(if (restarting) "Restarting…" else "Restart") }
+                    ) { Text(if (restarting) stringResource(R.string.agents_setup_ui_restarting) else stringResource(R.string.codex_settings_screen_restart)) }
                 }
                 if (jobRunning || restarting) {
                     Spacer(Modifier.width(10.dp))
@@ -366,7 +369,7 @@ fun CodexSettingsScreen(
                 )
             }
             Text(
-                "Restarting ends replies that are running. Codex keeps its chats and sign-in in ~/.codex on the server.",
+                stringResource(R.string.codex_settings_screen_restarting_ends_replies_that_are_running_codex),
                 fontSize = 11.sp, lineHeight = 15.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 8.dp)
             )
             status?.error?.takeIf { state != CodexState.READY }?.let {
@@ -397,7 +400,7 @@ private fun LimitRow(w: CodexLimitWindow) {
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(window, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        Text("${w.usedPercent.toInt()}% used", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+        Text(stringResource(R.string.codex_settings_screen_used, (w.usedPercent.toInt()).toString()), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
     }
     Spacer(Modifier.height(4.dp))
     LinearProgressIndicator(

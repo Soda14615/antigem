@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import ai.antigem.ui.components.bouncyVerticalScroll
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -79,8 +81,8 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
     LaunchedEffect(Unit) { PluginRepositories.refreshAll() }
     Column(Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         TabRow(selectedTabIndex = tab) {
-            Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text("Installed") })
-            Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text("Repositories") })
+            Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(R.string.claude_settings_screen_installed)) })
+            Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(R.string.git_hub_screen_repositories)) })
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         notice?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
@@ -91,16 +93,16 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
             PluginRepositoriesTab(busy, ::runOperation, ::folderTaken, ::freeFolder)
             return@Column
         }
-        Text("Install custom AntiGem plugins from ZIP files or from a repository. A plugin can have MCP tools, skills (skills/*.md), or both. Changes apply to the running browser immediately.", style = MaterialTheme.typography.bodyMedium)
-        Text("To create a plugin with your model, add Custom AntiGem Plugin Developer in MCP settings. It supplies the SDK, draft editing, installation, updates, tests and worker logs.", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.web_view_extensions_screen_install_custom_antigem_plugins_from_zip_files), style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.web_view_extensions_screen_to_create_a_plugin_with_your_model), style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(enabled = !busy, onClick = { update = null; picker.launch(arrayOf("*/*")) }) { Text("Install ZIP") }
-            OutlinedButton(enabled = !busy, onClick = { runOperation { manager.refreshExtensions(); null } }) { Text("Refresh") }
+            Button(enabled = !busy, onClick = { update = null; picker.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.web_view_extensions_screen_install_zip)) }
+            OutlinedButton(enabled = !busy, onClick = { runOperation { manager.refreshExtensions(); null } }) { Text(stringResource(R.string.agent_sheet_ui_refresh)) }
             if (busy) CircularProgressIndicator(Modifier.size(24.dp))
         }
         PluginRepositories.installProgress?.let { PluginInstallProgress(it) }
         manager.lastError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-        if (manager.extensions.isEmpty()) Text("No plugins installed. Choose a ZIP containing manifest.json plus a background worker, a skills/ folder, or both.")
+        if (manager.extensions.isEmpty()) Text(stringResource(R.string.web_view_extensions_screen_no_plugins_installed_choose_a_zip_containing))
         manager.extensions.forEach { extension ->
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -122,87 +124,87 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
                                 }.onFailure { error = "Could not zip ${extension.folderName}: ${it.message}" }
                                 exporting = null
                             }
-                        }) { Icon(Icons.Outlined.Download, "Download as ZIP") }
-                        IconButton(enabled = !busy, onClick = { removing = extension; deleteData = false }) { Icon(Icons.Outlined.Delete, "Remove", tint = MaterialTheme.colorScheme.error) }
+                        }) { Icon(Icons.Outlined.Download, stringResource(R.string.web_view_extensions_screen_download_as_zip)) }
+                        IconButton(enabled = !busy, onClick = { removing = extension; deleteData = false }) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = MaterialTheme.colorScheme.error) }
                         Switch(checked = extension.isEnabled, enabled = !busy, onCheckedChange = { enabled -> runOperation { manager.setEnabled(extension.id, enabled); null } })
                     }
                     if (extension.description.isNotBlank()) Text(extension.description, style = MaterialTheme.typography.bodySmall)
                     val source = extension.source
                     val repo = source?.let { s -> PluginRepositories.repos.firstOrNull { it.slug.equals(s.repo, ignoreCase = true) && it.ref == s.ref } }
                     val offered = PluginRepositories.updateFor(extension)
-                    offered?.let { Text("Update available: ${PluginVersions.label(extension.version)} → ${PluginVersions.label(it.version)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+                    offered?.let { Text(stringResource(R.string.plugin_repositories_tab_update_available, (PluginVersions.label(extension.version)).toString(), (PluginVersions.label(it.version)).toString()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         if (repo != null && offered != null) TextButton(enabled = !busy, onClick = {
                             runOperation {
                                 val updated = PluginRepositories.install(repo, offered, extension.folderName, extension.id)
                                 "Updated ${updated.folderName}: ${PluginVersions.label(extension.version)} → ${PluginVersions.label(updated.version)}"
                             }
-                        }) { Text("Update") }
-                        TextButton(enabled = !busy, onClick = { update = extension; picker.launch(arrayOf("*/*")) }) { Text("Update ZIP") }
-                        TextButton(enabled = !busy && extension.isEnabled, onClick = { runOperation { manager.reload(extension.id); null } }) { Text("Reload") }
+                        }) { Text(stringResource(R.string.claude_settings_screen_update)) }
+                        TextButton(enabled = !busy, onClick = { update = extension; picker.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.web_view_extensions_screen_update_zip)) }
+                        TextButton(enabled = !busy && extension.isEnabled, onClick = { runOperation { manager.reload(extension.id); null } }) { Text(stringResource(R.string.browser_screen_reload)) }
                     }
                 }
             }
         }
-        Text("Add an enabled plugin to your model in MCP settings → Custom AntiGem Plugin MCP; its skills come with it as get_skills / get_skill tools. In chat, type /plu: to point the model at a plugin or one of its skills. Updating or reloading restarts that plugin's worker; its MCP connection and stored data are kept.", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.web_view_extensions_screen_add_an_enabled_plugin_to_your_model), style = MaterialTheme.typography.bodySmall)
     }
     conflict?.takeIf { zip != null }?.let { existing -> AlertDialog(
         onDismissRequest = { zip = null; conflict = null },
-        title = { Text("Plugin already installed") },
+        title = { Text(stringResource(R.string.web_view_extensions_screen_plugin_already_installed)) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("${existing.folderName} (${existing.name}) is already installed. Update it with this ZIP, or install the ZIP as a separate new plugin?")
+            Text(stringResource(R.string.web_view_extensions_screen_is_already_installed_update_it_with_this, existing.folderName.toString(), existing.name.toString()))
             VersionChange(existing.version, zipVersion)
         } },
         confirmButton = { TextButton(onClick = {
             val uri = zip!!; zip = null; conflict = null
             install(uri, existing.folderName, existing.id, copy = false, previousVersion = existing.version)
-        }) { Text("Update") } },
+        }) { Text(stringResource(R.string.claude_settings_screen_update)) } },
         dismissButton = { Row {
-            TextButton(onClick = { zip = null; conflict = null }) { Text("Cancel") }
-            TextButton(onClick = { conflict = null; asNew = true; folder = freeFolder(folder) }) { Text("Install as new") }
+            TextButton(onClick = { zip = null; conflict = null }) { Text(stringResource(R.string.accounts_ui_cancel)) }
+            TextButton(onClick = { conflict = null; asNew = true; folder = freeFolder(folder) }) { Text(stringResource(R.string.web_view_extensions_screen_install_as_new)) }
         } }
     ) }
     removing?.let { extension -> AlertDialog(
         onDismissRequest = { removing = null },
-        title = { Text("Remove ${extension.folderName}?") },
+        title = { Text(stringResource(R.string.claude_providers_page_remove, extension.folderName.toString())) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(when (extension.location) {
-                BrowserExtension.Location.BUNDLED -> "This is built into the app: it is removed now and comes back when the app restarts. To keep it off, disable it instead."
-                BrowserExtension.Location.USER_FOLDER -> "This deletes the folder ${extension.dirPath} from your files. Make sure you have another copy if it is your source."
-                BrowserExtension.Location.INSTALLED -> "Deletes the plugin from ${extension.dirPath}."
+                BrowserExtension.Location.BUNDLED -> stringResource(R.string.web_view_extensions_screen_this_is_built_into_the_app_it)
+                BrowserExtension.Location.USER_FOLDER -> stringResource(R.string.web_view_extensions_screen_this_deletes_the_folder_from_your_files, extension.dirPath.toString())
+                BrowserExtension.Location.INSTALLED -> stringResource(R.string.web_view_extensions_screen_deletes_the_plugin_from, extension.dirPath.toString())
             })
-            Text("If you added it in MCP settings, remove that server there too.", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.web_view_extensions_screen_if_you_added_it_in_mcp_settings), style = MaterialTheme.typography.bodySmall)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = deleteData, onCheckedChange = { deleteData = it })
-                Text("Also delete its stored data (otherwise kept for a reinstall)", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.web_view_extensions_screen_also_delete_its_stored_data_otherwise_kept), style = MaterialTheme.typography.bodySmall)
             }
         } },
         confirmButton = { TextButton(onClick = {
             val wipe = deleteData; removing = null
             runOperation { manager.uninstall(extension.id, wipe); "Removed ${extension.folderName}" }
-        }) { Text("Remove", color = MaterialTheme.colorScheme.error) } },
-        dismissButton = { TextButton(onClick = { removing = null }) { Text("Cancel") } }
+        }) { Text(stringResource(R.string.browser_screen_remove), color = MaterialTheme.colorScheme.error) } },
+        dismissButton = { TextButton(onClick = { removing = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     ) }
     if (zip != null && conflict == null) {
         val taken = update == null && folderTaken(folder)
         AlertDialog(
-            onDismissRequest = { zip = null }, title = { Text(if (update != null) "Update plugin" else if (asNew) "Install as new plugin" else "Install plugin") },
+            onDismissRequest = { zip = null }, title = { Text(if (update != null) stringResource(R.string.web_view_extensions_screen_update_plugin) else if (asNew) stringResource(R.string.web_view_extensions_screen_install_as_new_plugin) else stringResource(R.string.web_view_extensions_screen_install_plugin)) },
             text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = folder, onValueChange = { folder = it }, enabled = update == null, label = { Text("Folder name") }, singleLine = true,
-                    isError = taken, supportingText = if (taken) {{ Text("A plugin already uses this folder name") }} else null)
+                OutlinedTextField(value = folder, onValueChange = { folder = it }, enabled = update == null, label = { Text(stringResource(R.string.plugin_repositories_tab_folder_name)) }, singleLine = true,
+                    isError = taken, supportingText = if (taken) {{ Text(stringResource(R.string.plugin_repositories_tab_a_plugin_already_uses_this_folder_name)) }} else null)
                 update?.let { VersionChange(it.version, zipVersion) }
-                if (update == null) Text("Version: ${PluginVersions.label(zipVersion)}", style = MaterialTheme.typography.bodySmall)
+                if (update == null) Text(stringResource(R.string.web_view_extensions_screen_version, (PluginVersions.label(zipVersion)).toString()), style = MaterialTheme.typography.bodySmall)
                 Text(when {
-                    update != null -> "The plugin's ID and stored data are preserved. The previous package is restored if loading fails."
-                    asNew -> "Installed as a separate plugin next to the existing one, with its own ID taken from this folder name. Add it to MCP settings separately."
-                    else -> "The ZIP may contain manifest.json directly or inside one enclosing folder."
+                    update != null -> stringResource(R.string.web_view_extensions_screen_the_plugin_s_id_and_stored_data)
+                    asNew -> stringResource(R.string.web_view_extensions_screen_installed_as_a_separate_plugin_next_to)
+                    else -> stringResource(R.string.web_view_extensions_screen_the_zip_may_contain_manifest_json_directly)
                 })
             } },
             confirmButton = { TextButton(enabled = folder.isNotBlank() && !taken, onClick = {
                 val uri = zip!!; val id = update?.id; val name = folder.trim(); val copy = asNew; val previous = update?.version; zip = null
                 install(uri, name, id, copy, previous)
-            }) { Text(if (update == null) "Install" else "Update") } },
-            dismissButton = { TextButton(onClick = { zip = null }) { Text("Cancel") } }
+            }) { Text(if (update == null) stringResource(R.string.claude_settings_screen_install) else stringResource(R.string.claude_settings_screen_update)) } },
+            dismissButton = { TextButton(onClick = { zip = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -211,10 +213,10 @@ fun WebViewExtensionsScreen(onChanged: () -> Unit) {
 fun WebViewExtensionMcpPicker(onDismiss: () -> Unit, onSelect: (BrowserExtension) -> Unit) {
     val manager = remember { BrowserExtensionManager.instance }
     LaunchedEffect(Unit) { manager.loadExtensions() }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Custom AntiGem Plugin MCP") },
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.web_view_extensions_screen_custom_antigem_plugin_mcp)) },
         text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             val available = manager.extensions.filter { it.isEnabled && (it.toolCount > 0 || it.skillCount > 0) }
-            if (available.isEmpty()) Text("Enable or install a plugin in Settings → Custom AntiGem Plugins first.")
+            if (available.isEmpty()) Text(stringResource(R.string.web_view_extensions_screen_enable_or_install_a_plugin_in_settings))
             available.forEach { extension ->
                 OutlinedButton(onClick = { onSelect(extension) }, modifier = Modifier.fillMaxWidth()) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -227,5 +229,5 @@ fun WebViewExtensionMcpPicker(onDismiss: () -> Unit, onSelect: (BrowserExtension
                     }
                 }
             }
-        } }, confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } })
+        } }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) } })
 }

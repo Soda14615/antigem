@@ -1,5 +1,6 @@
 package ai.antigem.data.files
 
+import ai.antigem.R
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Context
@@ -38,7 +39,7 @@ object FileOpener {
                     val t = if (total > 0) total else size
                     if (t > 0) onProgress((done.toFloat() / t).coerceIn(0f, 1f))
                 }
-                if (!res.ok) return Result.failure(Exception(res.error ?: "Download failed"))
+                if (!res.ok) return Result.failure(Exception(res.error ?: context.getString(R.string.native_file_download_failed)))
             }
             dest
         }
@@ -59,7 +60,7 @@ object FileOpener {
             if (mime == ai.antigem.data.miniapps.MiniAppSigning.MIME && !forceChooser) setClassName(context, "ai.antigem.ui.miniapps.MiniAppInstallActivity")
         }
         return try {
-            val start = if (forceChooser) Intent.createChooser(intent, "Open \"$name\" with").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) else intent
+            val start = if (forceChooser) Intent.createChooser(intent, context.getString(R.string.native_open_file_with, name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) else intent
             context.startActivity(start)
             null
         } catch (_: ActivityNotFoundException) {
@@ -69,18 +70,18 @@ object FileOpener {
                     setDataAndType(uri, "*/*")
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
-                context.startActivity(Intent.createChooser(generic, "Open \"$name\" with").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                context.startActivity(Intent.createChooser(generic, context.getString(R.string.native_open_file_with, name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 null
             } catch (_: Exception) {
-                "No app on this phone can open $name"
+                context.getString(R.string.native_file_no_matching_app, name)
             }
         } catch (e: Exception) {
-            e.message ?: "Could not open $name"
+            e.message ?: context.getString(R.string.native_could_not_open, name)
         }
     }
 
     fun share(context: Context, uris: List<Pair<Uri, String>>): String? {
-        if (uris.isEmpty()) return "Nothing to share"
+        if (uris.isEmpty()) return context.getString(R.string.native_file_nothing_to_share)
         val mimes = uris.map { FileKinds.mimeOf(it.second) }.distinct()
         val mime = when {
             mimes.size == 1 -> mimes.first()
@@ -98,10 +99,10 @@ object FileOpener {
             clipData = ClipData.newRawUri(uris.first().second, uris.first().first).also { c -> uris.drop(1).forEach { c.addItem(ClipData.Item(it.first)) } }
         }
         return try {
-            context.startActivity(Intent.createChooser(intent, if (uris.size == 1) "Share ${uris.first().second}" else "Share ${uris.size} files").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            context.startActivity(Intent.createChooser(intent, if (uris.size == 1) context.getString(R.string.native_share_file, uris.first().second) else context.getString(R.string.native_share_files, uris.size)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             null
         } catch (e: Exception) {
-            e.message ?: "Could not share"
+            e.message ?: context.getString(R.string.native_file_could_not_share)
         }
     }
 }

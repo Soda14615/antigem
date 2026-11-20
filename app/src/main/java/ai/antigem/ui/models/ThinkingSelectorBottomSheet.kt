@@ -1,5 +1,7 @@
 package ai.antigem.ui.models
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,13 +66,13 @@ fun ThinkingSelectorBottomSheet(
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(
-                        text = "Thinking & Reasoning Level",
+                        text = stringResource(R.string.thinking_selector_bottom_sheet_thinking_reasoning_level),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Configure reasoning depth and token budget",
+                        text = stringResource(R.string.thinking_selector_bottom_sheet_configure_reasoning_depth_and_token_budget),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -141,7 +143,7 @@ fun ThinkingSelectorBottomSheet(
                             if (isSelected) {
                                 Icon(
                                     imageVector = Icons.Outlined.Check,
-                                    contentDescription = "Selected",
+                                    contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected),
                                     tint = ClaudeTerracotta,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -162,15 +164,15 @@ fun ThinkingSelectorBottomSheet(
                             OutlinedTextField(
                                 value = customTokensText,
                                 onValueChange = { customTokensText = it.filter { char -> char.isDigit() } },
-                                label = { Text("Token Budget (1 - 32,768)") },
-                                placeholder = { Text("e.g. 2048") },
+                                label = { Text(stringResource(R.string.thinking_selector_bottom_sheet_token_budget_1_32_768)) },
+                                placeholder = { Text(stringResource(R.string.thinking_selector_bottom_sheet_e_g_2048)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 supportingText = {
                                     val tokens = customTokensText.toIntOrNull() ?: 0
                                     val chars = tokens * 4
-                                    Text("Allocates ~$chars characters of reasoning capacity")
+                                    Text(stringResource(R.string.thinking_selector_bottom_sheet_allocates_characters_of_reasoning_capacity, chars.toString()))
                                 }
                             )
 
@@ -186,7 +188,7 @@ fun ThinkingSelectorBottomSheet(
                                 colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                                 shape = RoundedCornerShape(10.dp)
                             ) {
-                                Text("Apply Custom Budget", fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.thinking_selector_bottom_sheet_apply_custom_budget), fontWeight = FontWeight.Bold)
                             }
                         }
                     }

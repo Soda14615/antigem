@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,7 +125,7 @@ fun FloatingVideoPlayerOverlay(
                         // Central Play/Pause badge
                         Icon(
                             imageVector = if (activeState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (activeState.isPlaying) "Pause" else "Play",
+                            contentDescription = if (activeState.isPlaying) stringResource(R.string.chat_audio_player_pause) else stringResource(R.string.chat_audio_player_play),
                             tint = Color.White,
                             modifier = Modifier.size(22.dp)
                         )
@@ -217,7 +219,7 @@ fun FloatingVideoPlayerOverlay(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.ExpandLess,
-                                        contentDescription = "Collapse",
+                                        contentDescription = stringResource(R.string.agent_tool_call_card_collapse),
                                         tint = contentColor.copy(alpha = 0.6f),
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -233,7 +235,7 @@ fun FloatingVideoPlayerOverlay(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
-                                        contentDescription = "Stop & Close",
+                                        contentDescription = stringResource(R.string.floating_video_player_overlay_stop_close),
                                         tint = MaterialTheme.colorScheme.error.copy(alpha = 0.75f),
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -258,7 +260,7 @@ fun FloatingVideoPlayerOverlay(
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
                                 modifier = Modifier.height(28.dp)
                             ) {
-                                Text("-10s", fontSize = 11.sp)
+                                Text(stringResource(R.string.floating_video_player_overlay_10s), fontSize = 11.sp)
                             }
 
                             Spacer(modifier = Modifier.width(10.dp))
@@ -279,7 +281,7 @@ fun FloatingVideoPlayerOverlay(
                             ) {
                                 Icon(
                                     imageVector = if (activeState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                    contentDescription = if (activeState.isPlaying) "Pause" else "Play",
+                                    contentDescription = if (activeState.isPlaying) stringResource(R.string.chat_audio_player_pause) else stringResource(R.string.chat_audio_player_play),
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -296,7 +298,7 @@ fun FloatingVideoPlayerOverlay(
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
                                 modifier = Modifier.height(28.dp)
                             ) {
-                                Text("+10s", fontSize = 11.sp)
+                                Text(stringResource(R.string.floating_video_player_overlay_10s_2), fontSize = 11.sp)
                             }
                         }
                     }

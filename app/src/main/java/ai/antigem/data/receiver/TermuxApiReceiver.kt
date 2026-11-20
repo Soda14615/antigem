@@ -180,13 +180,13 @@ class TermuxApiReceiver : BroadcastReceiver() {
     private fun handleNotification(context: Context, intent: Intent) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
         val id = intent.getIntExtra("id", 4242)
-        val title = intent.getStringExtra("title") ?: "Termux Notification"
+        val title = intent.getStringExtra("title") ?: context.getString(R.string.notification_termux_api_default_title)
         val content = intent.getStringExtra("content") ?: intent.getStringExtra("text") ?: ""
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 API_NOTIFICATION_CHANNEL_ID,
-                "Termux API Notifications",
+                context.getString(R.string.notification_termux_api_channel),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)

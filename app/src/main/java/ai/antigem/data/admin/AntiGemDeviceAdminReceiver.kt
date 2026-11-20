@@ -1,5 +1,6 @@
 package ai.antigem.data.admin
 
+import ai.antigem.R
 import android.app.admin.DeviceAdminReceiver
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -36,7 +37,7 @@ class AntiGemDeviceAdminReceiver : DeviceAdminReceiver() {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, getComponentName(context))
                 putExtra(
                     DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    "Enabling Device Admin protects AntiGem from accidental uninstallation so your Linux environment and coding projects are not lost."
+                    context.getString(R.string.native_device_admin_explanation)
                 )
             }
         }

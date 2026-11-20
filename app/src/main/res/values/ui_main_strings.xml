@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_screen_error_loading_data">"Error loading data: %1$s"</string>
+    <string name="main_screen_hello">"Hello %1$s!"</string>
+</resources>

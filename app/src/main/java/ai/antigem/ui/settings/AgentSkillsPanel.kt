@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -154,7 +156,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 source, { source = it; findError = null }, singleLine = true,
-                placeholder = { Text("owner/repo or github.com link") },
+                placeholder = { Text(stringResource(R.string.agent_skills_panel_owner_repo_or_github_com_link)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { find() }),
                 modifier = Modifier.weight(1f), enabled = !installing
@@ -164,7 +166,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                 onClick = { find() }, enabled = source.isNotBlank() && !inspecting && !installing,
                 colors = ButtonDefaults.buttonColors(containerColor = accent)
             ) {
-                if (inspecting) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White) else Text("Find")
+                if (inspecting) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White) else Text(stringResource(R.string.agent_skills_panel_find))
             }
         }
         if (inspecting) PanelHint("Looking for skills in the repository…", Modifier.padding(top = 6.dp))
@@ -183,11 +185,11 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
             } else {
                 val count = picked.values.count { it }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("${res.skills.size} skill${if (res.skills.size == 1) "" else "s"} in ${res.repo}", fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.agent_skills_panel_skill_in, res.skills.size.toString(), (if (res.skills.size == 1) "" else "s").toString(), res.repo.toString()), fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
                     if (res.skills.size > 1) TextButton(onClick = {
                         val all = count < res.skills.size
                         res.skills.forEach { picked[it.path] = all }
-                    }, enabled = !installing) { Text(if (count < res.skills.size) "Select all" else "Select none", fontSize = 12.sp) }
+                    }, enabled = !installing) { Text(if (count < res.skills.size) stringResource(R.string.claude_providers_page_select_all) else stringResource(R.string.open_code_settings_screen_select_none), fontSize = 12.sp) }
                 }
                 res.skills.forEach { s ->
                     HorizontalDivider(Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
@@ -203,8 +205,8 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                             Text(s.path.ifBlank { "(the whole repository)" } + if (s.id != s.path.substringAfterLast('/')) "  →  ${s.id}" else "",
                                 fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f))
                             when {
-                                s.sameSource -> Text("Already added: adding it again updates it", fontSize = 11.sp, color = accent)
-                                s.exists -> Text("A different skill named ${s.id} is installed and will be replaced", fontSize = 11.sp, color = QuotaAmber)
+                                s.sameSource -> Text(stringResource(R.string.agent_skills_panel_already_added_adding_it_again_updates_it), fontSize = 11.sp, color = accent)
+                                s.exists -> Text(stringResource(R.string.agent_skills_panel_a_different_skill_named_is_installed_and, s.id.toString()), fontSize = 11.sp, color = QuotaAmber)
                             }
                         }
                     }
@@ -241,11 +243,11 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                         if (installing) {
                             CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
                             Spacer(Modifier.width(8.dp))
-                            Text("Adding…")
-                        } else Text(if (count == 1) "Add 1 skill" else "Add $count skills")
+                            Text(stringResource(R.string.agent_skills_panel_adding))
+                        } else Text(if (count == 1) stringResource(R.string.agent_skills_panel_add_1_skill) else stringResource(R.string.agent_skills_panel_add_skills, count.toString()))
                     }
                     Spacer(Modifier.width(8.dp))
-                    TextButton(onClick = { found = null }, enabled = !installing) { Text("Cancel") }
+                    TextButton(onClick = { found = null }, enabled = !installing) { Text(stringResource(R.string.accounts_ui_cancel)) }
                 }
             }
         }
@@ -261,7 +263,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
             }
             IconButton(onClick = { scope.launch { reload() } }, enabled = !loading) {
                 if (loading) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = accent)
-                else Icon(Icons.Outlined.Refresh, "Refresh")
+                else Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh))
             }
         }
         loadError?.let { Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 4.dp)) }
@@ -280,7 +282,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                         if (s.kind == "plugin") {
                             Spacer(Modifier.width(6.dp))
                             Surface(shape = RoundedCornerShape(6.dp), color = accent.copy(alpha = 0.15f)) {
-                                Text("Plugin", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = accent, modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp))
+                                Text(stringResource(R.string.agent_skills_panel_plugin), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = accent, modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp))
                             }
                         }
                     }
@@ -288,14 +290,14 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
                     Text(
                         s.source?.let { src -> "github.com/${src.repo}" + (if (src.path.isNotBlank()) " · ${src.path}" else "") + (if (src.ref.isNotBlank()) " @${src.ref}" else "") }
-                            ?: "Added by hand",
+                            ?: stringResource(R.string.agent_skills_panel_added_by_hand),
                         fontSize = 10.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f), maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }
                 if (op != null) {
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = accent)
                     Spacer(Modifier.width(6.dp))
-                    Text(if (op == "update") "Updating…" else "Removing…", fontSize = 11.5.sp, color = accent)
+                    Text(if (op == "update") stringResource(R.string.claude_settings_screen_updating) else stringResource(R.string.claude_settings_screen_removing), fontSize = 11.5.sp, color = accent)
                 } else {
                     if (s.source != null) IconButton(onClick = {
                         busy[s.id] = "update"
@@ -305,8 +307,8 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                                 .onFailure { toast(it.message ?: "Could not update ${s.name}", ok = false) }
                             busy.remove(s.id)
                         }
-                    }) { Icon(Icons.Outlined.Refresh, "Update from GitHub", tint = accent) }
-                    IconButton(onClick = { confirmRemove = s }) { Icon(Icons.Outlined.Delete, "Remove", tint = QuotaRed.copy(alpha = 0.85f)) }
+                    }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_skills_panel_update_from_github), tint = accent) }
+                    IconButton(onClick = { confirmRemove = s }) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = QuotaRed.copy(alpha = 0.85f)) }
                 }
             }
         }
@@ -319,7 +321,7 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
     confirmRemove?.let { s ->
         AlertDialog(
             onDismissRequest = { confirmRemove = null },
-            title = { Text("Remove ${s.name}?") },
+            title = { Text(stringResource(R.string.claude_providers_page_remove, s.name.toString())) },
             text = { Text("This deletes the folder ${s.path}" + if (s.source == null) ". It was not added from GitHub, so it can't be downloaded again." else ".") },
             confirmButton = {
                 TextButton(onClick = {
@@ -331,9 +333,9 @@ fun AgentSkillsPanel(agent: AgentKind, accent: Color, onChanged: () -> Unit = {}
                             .onFailure { toast(it.message ?: "Could not remove ${s.name}", ok = false) }
                         busy.remove(s.id)
                     }
-                }) { Text("Remove", color = QuotaRed) }
+                }) { Text(stringResource(R.string.browser_screen_remove), color = QuotaRed) }
             },
-            dismissButton = { TextButton(onClick = { confirmRemove = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmRemove = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -349,7 +351,7 @@ fun AgentSkillsDialog(agent: AgentKind, accent: Color, title: String, onDismiss:
             Column(Modifier.padding(top = 12.dp)) {
                 Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                    TextButton(onClick = onDismiss) { Text("Done") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.browser_screen_done)) }
                 }
                 Column(
                     Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp),
@@ -398,14 +400,14 @@ fun AgyGitHubPluginDialog(accent: Color, onInstalled: () -> Unit, onDismiss: () 
     }
     AlertDialog(
         onDismissRequest = { if (!installing) onDismiss() },
-        title = { Text("Install a plugin from GitHub") },
+        title = { Text(stringResource(R.string.agent_skills_panel_install_a_plugin_from_github)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 PanelHint("An Antigravity or Claude Code plugin (or a Claude Code marketplace, which installs all its plugins): owner/repo or a github.com link. agy's own installer adds it, the same as `agy plugin install`.")
                 Spacer(Modifier.height(10.dp))
                 OutlinedTextField(
                     source, { source = it }, singleLine = true, enabled = !installing,
-                    placeholder = { Text("owner/repo or github.com link") },
+                    placeholder = { Text(stringResource(R.string.agent_skills_panel_owner_repo_or_github_com_link)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { install() }),
                     modifier = Modifier.fillMaxWidth()
@@ -427,10 +429,10 @@ fun AgyGitHubPluginDialog(accent: Color, onInstalled: () -> Unit, onDismiss: () 
             }
         },
         confirmButton = {
-            if (output != null && !failed) TextButton(onClick = onDismiss) { Text("Done") }
-            else Button(onClick = { install() }, enabled = source.isNotBlank() && !installing, colors = ButtonDefaults.buttonColors(containerColor = accent)) { Text("Install") }
+            if (output != null && !failed) TextButton(onClick = onDismiss) { Text(stringResource(R.string.browser_screen_done)) }
+            else Button(onClick = { install() }, enabled = source.isNotBlank() && !installing, colors = ButtonDefaults.buttonColors(containerColor = accent)) { Text(stringResource(R.string.claude_settings_screen_install)) }
         },
-        dismissButton = { if (output == null || failed) TextButton(onClick = onDismiss, enabled = !installing) { Text("Cancel") } }
+        dismissButton = { if (output == null || failed) TextButton(onClick = onDismiss, enabled = !installing) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
     aiSetup?.let { (src, why) -> SetupWithAiDialog(src, AgentKind.AGY, why) { aiSetup = null } }
 }

@@ -1,5 +1,6 @@
 package ai.antigem.data.local
 
+import ai.antigem.R
 import android.content.Context
 import android.system.Os
 import android.util.Log
@@ -912,10 +913,10 @@ class LocalPtySession(
         if (text.isEmpty()) return
         try {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Terminal Text", text)
+            val clip = android.content.ClipData.newPlainText(context.getString(R.string.notification_terminal_text_clip), text)
             clipboard?.setPrimaryClip(clip)
             android.os.Handler(android.os.Looper.getMainLooper()).post {
-                android.widget.Toast.makeText(context, "Copied text", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, R.string.notification_terminal_text_copied, android.widget.Toast.LENGTH_SHORT).show()
             }
             Log.d(TAG, "Copied ${text.length} chars to clipboard")
         } catch (e: Exception) {
@@ -932,7 +933,7 @@ class LocalPtySession(
                 if (!text.isNullOrEmpty()) {
                     write(text)
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        android.widget.Toast.makeText(context, "Pasted text", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context, R.string.notification_terminal_text_pasted, android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import ai.antigem.ui.components.bouncyVerticalScroll
 import android.content.Intent
 import android.net.Uri
@@ -89,12 +91,12 @@ fun AndroidAutomationScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbCo
         }
 
         // 1. Accessibility service (required)
-        StepCard(1, "Accessibility service", if (running) "Allowed" else "Required", cardBg, cardBorder, badgeColor = if (running) QuotaGreen else Amber) {
-            Hint("Reads the screen, taps, swipes, types and takes screenshots. In Accessibility settings, open \"AntiGem Android Automation\" (it may be under Installed apps or Downloaded apps) and turn it on.")
+        StepCard(1, stringResource(R.string.android_automation_screen_accessibility_service), if (running) stringResource(R.string.app_permissions_dialog_allowed) else stringResource(R.string.app_permissions_dialog_required), cardBg, cardBorder, badgeColor = if (running) QuotaGreen else Amber) {
+            Hint(stringResource(R.string.android_automation_screen_reads_the_screen_taps_swipes_types_and))
             CheckRow("AntiGem Android Automation", running)
             if (!running) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { AndroidAutomation.openAccessibilitySettings(context) }) { Text("Open Accessibility") }
+                    Button(onClick = { AndroidAutomation.openAccessibilitySettings(context) }) { Text(stringResource(R.string.android_automation_screen_open_accessibility)) }
                     if (adbDevice != null) OutlinedButton(
                         enabled = !enablingViaAdb,
                         onClick = {
@@ -104,12 +106,12 @@ fun AndroidAutomationScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbCo
                                 enablingViaAdb = false
                             }
                         }
-                    ) { Text(if (enablingViaAdb) "Turning on…" else "Turn on with ADB") }
+                    ) { Text(if (enablingViaAdb) stringResource(R.string.android_automation_screen_turning_on) else stringResource(R.string.android_automation_screen_turn_on_with_adb)) }
                 }
                 adbError?.let { Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
                 Surface(shape = RoundedCornerShape(10.dp), color = Amber.copy(alpha = 0.1f)) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Switch greyed out, or \"Restricted setting\"?", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.android_automation_screen_switch_greyed_out_or_restricted_setting), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
                         Text(
                             "Android 13+ blocks this for apps installed from a file. Open App info, tap ⋮ (top right) → Allow restricted settings, " +
                                 "then turn the service on. Or connect ADB and use Turn on with ADB.",
@@ -120,36 +122,36 @@ fun AndroidAutomationScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbCo
                                 context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             }
-                        }) { Text("Open App info") }
+                        }) { Text(stringResource(R.string.android_automation_screen_open_app_info)) }
                     }
                 }
             } else {
-                OutlinedButton(onClick = { AndroidAutomation.openAccessibilitySettings(context) }) { Text("Turn off in Accessibility") }
+                OutlinedButton(onClick = { AndroidAutomation.openAccessibilitySettings(context) }) { Text(stringResource(R.string.android_automation_screen_turn_off_in_accessibility)) }
             }
         }
 
         // 2. Screenshots come with the service on Android 11+
         val screenshots = AndroidAutomation.canTakeScreenshots()
-        StepCard(2, "Screenshots", if (screenshots && running) "Allowed" else null, cardBg, cardBorder) {
+        StepCard(2, stringResource(R.string.android_automation_screen_screenshots), if (screenshots && running) stringResource(R.string.app_permissions_dialog_allowed) else null, cardBg, cardBorder) {
             Hint(
-                if (screenshots) "Included with the accessibility service. Apps that block screenshots (banking, DRM video) show up black."
-                else "Android 10 and older can't take screenshots through accessibility; connect ADB below to allow them."
+                if (screenshots) stringResource(R.string.android_automation_screen_included_with_the_accessibility_service_apps_that)
+                else stringResource(R.string.android_automation_screen_android_10_and_older_can_t_take)
             )
         }
 
         // 3. ADB (optional)
-        StepCard(3, "ADB (optional)", if (adbDevice != null) "Connected" else "Optional", cardBg, cardBorder,
+        StepCard(3, stringResource(R.string.android_automation_screen_adb_optional), if (adbDevice != null) stringResource(R.string.network_inspector_dialog_connected) else stringResource(R.string.android_automation_screen_optional), cardBg, cardBorder,
             badgeColor = if (adbDevice != null) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) {
-            Hint("Adds what accessibility can't do: pressing any key, installing, uninstalling and force-stopping apps, and running adb shell commands.")
+            Hint(stringResource(R.string.android_automation_screen_adds_what_accessibility_can_t_do_pressing))
             CheckRow("ADB connected", adbDevice != null)
             adbDevice?.let { Text(it.serial, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
-            if (adbDevice == null) OutlinedButton(onClick = onOpenAdbConnect) { Text("Open ADB Connect") }
+            if (adbDevice == null) OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_automation_screen_open_adb_connect)) }
         }
 
         // Next step
         Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Then add the MCP", fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.android_automation_screen_then_add_the_mcp), fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
                 Hint("In Settings → MCP Servers (Antigravity) or Claude Code → MCP servers, tap the \"Android Automation\" preset. " +
                     "Until the accessibility service is allowed here, the server refuses to connect and the agent is told what's missing.")
                 Text(AndroidAutomation.tools().let { t -> (0 until t.length()).joinToString(" · ") { t.getJSONObject(it).getString("name").removePrefix("android_") } },

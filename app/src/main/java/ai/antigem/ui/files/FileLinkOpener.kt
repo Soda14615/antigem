@@ -1,5 +1,7 @@
 package ai.antigem.ui.files
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,12 +70,12 @@ class FileLinkOpener internal constructor(private val context: Context, private 
         if (job?.isActive == true) return
         val name = path.trimEnd('/').substringAfterLast('/').ifBlank { path }
         job = scope.launch {
-            busy = "Opening $name…"
+            busy = context.getString(R.string.workspace_file_opening, name)
             progress = null
             val r = try { FileProbe.probe(path) } finally { busy = null }
             when (r) {
                 is FileProbe.Result.Unavailable -> toast(r.message)
-                is FileProbe.Result.Folder -> onShowFolder?.invoke(r.path) ?: toast("$name is a folder")
+                is FileProbe.Result.Folder -> onShowFolder?.invoke(r.path) ?: toast(context.getString(R.string.workspace_file_is_folder, name))
                 is FileProbe.Result.Found -> {
                     val remembered = ExplorerPrefs.rememberedChoice(FileKinds.extOf(r.name))
                     when {
@@ -110,11 +112,11 @@ class FileLinkOpener internal constructor(private val context: Context, private 
     }
 
     private suspend fun share(f: FileProbe.Result.Found) {
-        busy = "Preparing ${f.name}…"
+        busy = context.getString(R.string.workspace_file_prepare, f.name)
         progress = null
         val uri = try { uriOf(f) } finally { busy = null }
         uri.onSuccess { FileOpener.share(context, listOf(it to f.name))?.let(::toast) }
-            .onFailure { toast(it.message ?: "Could not share ${f.name}") }
+            .onFailure { toast(it.message ?: context.getString(R.string.workspace_file_could_not_share, f.name)) }
     }
 
     /** A content uri other apps can read: a file on this phone directly, a bridge file copied here first. */
@@ -128,7 +130,7 @@ class FileLinkOpener internal constructor(private val context: Context, private 
     }
 
     private suspend fun openInIde(f: FileProbe.Result.Found, force: Boolean) {
-        busy = "Opening ${f.name}…"
+        busy = context.getString(R.string.workspace_file_opening, f.name)
         progress = null
         val outcome = try {
             if (f.local) IdeFileLauncher.openLocal(f.path, f.name, f.size, f.textual, f.mime, force)
@@ -149,22 +151,22 @@ class FileLinkOpener internal constructor(private val context: Context, private 
     }
 
     private suspend fun openExternal(f: FileProbe.Result.Found) {
-        busy = "Preparing ${f.name}…"
+        busy = context.getString(R.string.workspace_file_prepare, f.name)
         progress = null
         val uri = try { uriOf(f) } finally { busy = null }
         uri.onSuccess { FileOpener.view(context, it, f.name, contentMime = f.mime)?.let(::toast) }
-            .onFailure { toast(it.message ?: "Could not open ${f.name}") }
+            .onFailure { toast(it.message ?: context.getString(R.string.workspace_file_could_not_open, f.name)) }
     }
 
     internal fun extract(f: FileProbe.Result.Found, targetDir: String?) = launchJob {
-        busy = "Extracting ${f.name}…"
+        busy = context.getString(R.string.workspace_file_extracting, f.name)
         progress = null
         val r = try { FileExplorerApi.extract(f.path, targetDir) } finally { busy = null }
         if (r.ok) {
-            AppToastHelper.showToast("Extracted ${r.count} files", ChatToastType.SUCCESS)
+            AppToastHelper.showToast(context.getString(R.string.workspace_file_extracted, r.count), ChatToastType.SUCCESS)
             r.path?.let { dir -> onShowFolder?.invoke(dir) }
         } else {
-            toast(r.error ?: "Extract failed")
+            toast(r.error ?: context.getString(R.string.workspace_file_extract_failed))
         }
     }
 
@@ -237,8 +239,8 @@ fun FileLinkOpenerHost(opener: FileLinkOpener) {
         FileExplorerDialog(
             stateKey = "destination",
             initialPath = f.path.substringBeforeLast('/', "").ifBlank { null },
-            title = "Extract \"${f.name}\" to",
-            confirmLabel = "Extract here",
+            title = stringResource(R.string.workspace_file_extract_named_to, f.name),
+            confirmLabel = stringResource(R.string.workspace_file_extract_here),
             showClipboard = false,
             onConfirmFolder = { dest -> opener.extractTo = null; opener.extract(f, dest) },
             onDismiss = { opener.extractTo = null }
@@ -271,7 +273,7 @@ private fun BusyDialog(label: String, progress: Float?, onCancel: () -> Unit) {
                     Column(Modifier.weight(1f)) {
                         Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.MiddleEllipsis)
                         if (progress != null) {
-                            Text("${(progress * 100).toInt()}%  ·  copying to this phone", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.file_link_opener_copying_to_this_phone, ((progress * 100).toInt()).toString()), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -279,7 +281,7 @@ private fun BusyDialog(label: String, progress: Float?, onCancel: () -> Unit) {
                     Spacer(Modifier.height(14.dp))
                     LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
                 }
-                TextButton(onClick = onCancel, modifier = Modifier.align(Alignment.End).padding(top = 6.dp)) { Text("Cancel") }
+                TextButton(onClick = onCancel, modifier = Modifier.align(Alignment.End).padding(top = 6.dp)) { Text(stringResource(R.string.accounts_ui_cancel)) }
             }
         }
     }

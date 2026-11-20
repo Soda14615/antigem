@@ -1,5 +1,7 @@
 package ai.antigem.ui.main
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +29,7 @@ fun MainScreen(
       MainScreen(data = (state as MainScreenUiState.Success).data, modifier = modifier)
     }
     is MainScreenUiState.Error -> {
-      Text("Error loading data: ${(state as MainScreenUiState.Error).throwable.message}")
+      Text(stringResource(R.string.main_screen_error_loading_data, ((state as MainScreenUiState.Error).throwable.message).toString()))
     }
   }
 }
@@ -39,7 +41,7 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-  Text(text = "Hello $name!", modifier = modifier)
+  Text(text = stringResource(R.string.main_screen_hello, name.toString()), modifier = modifier)
 }
 
 @Preview(showBackground = true)

@@ -1,5 +1,7 @@
 package ai.antigem.ui.claude
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -159,7 +161,7 @@ fun ClaudeStartupNotice(text: String, modifier: Modifier = Modifier) {
             androidx.compose.foundation.layout.Column(Modifier.weight(1f)) {
                 Text(text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "The first message of a chat starts Claude Code, which can take a little while on a phone.",
+                    stringResource(R.string.claude_status_views_the_first_message_of_a_chat_starts),
                     fontSize = 11.5.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )

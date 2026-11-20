@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -80,8 +82,8 @@ fun TokenUsageDetailsSheet(usage: TokenUsage, onViewPayload: (() -> Unit)?, onDi
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 22.dp).navigationBarsPadding()) {
-            Text("Reply details", fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text(if (usage.isEstimated) "Token counts are estimates" else "What this reply used", fontSize = 12.sp, color = muted)
+            Text(stringResource(R.string.token_usage_details_sheet_reply_details), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(if (usage.isEstimated) stringResource(R.string.token_usage_details_sheet_token_counts_are_estimates) else stringResource(R.string.token_usage_details_sheet_what_this_reply_used), fontSize = 12.sp, color = muted)
             Spacer(Modifier.height(14.dp))
 
             // model: full id, selectable, with a copy button
@@ -98,16 +100,16 @@ fun TokenUsageDetailsSheet(usage: TokenUsage, onViewPayload: (() -> Unit)?, onDi
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("Model", fontSize = 11.sp, color = muted)
+                            Text(stringResource(R.string.token_usage_details_sheet_model), fontSize = 11.sp, color = muted)
                             SelectionContainer {
                                 Text(model.substringAfter('/').takeIf { model.contains('/') } ?: model, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace)
                             }
-                            if (model.contains('/')) Text("Provider: ${model.substringBefore('/')}", fontSize = 11.5.sp, color = muted)
+                            if (model.contains('/')) Text(stringResource(R.string.token_usage_details_sheet_provider, (model.substringBefore('/')).toString()), fontSize = 11.5.sp, color = muted)
                         }
                         IconButton(onClick = {
                             (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("Model", model))
                             Toast.makeText(context, "Model name copied", Toast.LENGTH_SHORT).show()
-                        }) { Icon(Icons.Outlined.ContentCopy, "Copy model name", tint = muted, modifier = Modifier.size(18.dp)) }
+                        }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.token_usage_details_sheet_copy_model_name), tint = muted, modifier = Modifier.size(18.dp)) }
                     }
                 }
                 Spacer(Modifier.height(10.dp))
@@ -152,7 +154,7 @@ fun TokenUsageDetailsSheet(usage: TokenUsage, onViewPayload: (() -> Unit)?, onDi
                 OutlinedButton(onClick = { onDismiss(); onViewPayload() }, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Outlined.DataObject, null, Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("View raw payload")
+                    Text(stringResource(R.string.token_usage_details_sheet_view_raw_payload))
                 }
             }
         }

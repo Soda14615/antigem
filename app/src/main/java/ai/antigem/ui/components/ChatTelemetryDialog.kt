@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -77,7 +79,7 @@ fun ChatTelemetryDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Chat Telemetry & Tokens",
+                        text = stringResource(R.string.chat_screen_chat_telemetry_tokens),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -86,7 +88,7 @@ fun ChatTelemetryDialog(
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Aggregated usage telemetry for \"${conversation?.title ?: "Current Chat"}\":",
+                    text = stringResource(R.string.chat_telemetry_dialog_aggregated_usage_telemetry_for, (conversation?.title ?: "Current Chat").toString()),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -156,7 +158,7 @@ fun ChatTelemetryDialog(
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                text = "Conversation Stats",
+                                text = stringResource(R.string.chat_telemetry_dialog_conversation_stats),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -195,13 +197,13 @@ fun ChatTelemetryDialog(
                             Spacer(modifier = Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Chat System Prompt",
+                                    text = stringResource(R.string.chat_telemetry_dialog_chat_system_prompt),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = if (!conversation?.customSystemPrompt.isNullOrBlank()) "Custom instructions active" else "Using default system instruction",
+                                    text = if (!conversation?.customSystemPrompt.isNullOrBlank()) stringResource(R.string.chat_telemetry_dialog_custom_instructions_active) else stringResource(R.string.chat_telemetry_dialog_using_default_system_instruction),
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -213,7 +215,7 @@ fun ChatTelemetryDialog(
                                         onOpenSystemPrompt()
                                     }
                                 ) {
-                                    Text("Edit", fontSize = 12.5.sp, color = ClaudeTerracotta, fontWeight = FontWeight.SemiBold)
+                                    Text(stringResource(R.string.chat_screen_edit), fontSize = 12.5.sp, color = ClaudeTerracotta, fontWeight = FontWeight.SemiBold)
                                 }
                             }
                         }
@@ -228,7 +230,7 @@ fun ChatTelemetryDialog(
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Close", color = Color.White, fontSize = 13.sp)
+                    Text(stringResource(R.string.accounts_ui_close), color = Color.White, fontSize = 13.sp)
                 }
             }
         }

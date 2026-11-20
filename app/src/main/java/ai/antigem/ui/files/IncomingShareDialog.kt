@@ -1,5 +1,7 @@
 package ai.antigem.ui.files
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -84,7 +86,7 @@ fun IncomingShareDialog(
             if (single != null) {
                 FileExplorerDialog(
                     stateKey = "import",
-                    title = "Save shared file",
+                    title = stringResource(R.string.workspace_file_save_shared),
                     saveFileName = single.name,
                     onSave = { folder, name -> save(folder, name) },
                     showClipboard = false,
@@ -93,8 +95,8 @@ fun IncomingShareDialog(
             } else {
                 FileExplorerDialog(
                     stateKey = "import",
-                    title = "Save ${items.size} shared files to",
-                    confirmLabel = "Save here",
+                    title = stringResource(R.string.workspace_file_save_shared_many, items.size),
+                    confirmLabel = stringResource(R.string.workspace_file_save_here),
                     onConfirmFolder = { folder -> save(folder, null) },
                     showClipboard = false,
                     onDismiss = { step = ShareStep.Choose }
@@ -108,22 +110,22 @@ fun IncomingShareDialog(
             AlertDialog(
                 onDismissRequest = { step = ShareStep.Choose },
                 icon = { Icon(Icons.Outlined.WarningAmber, null, tint = MaterialTheme.colorScheme.error) },
-                title = { Text(if (tooBig) "Too large for the editor" else "This may not work", fontWeight = FontWeight.SemiBold) },
+                title = { Text(if (tooBig) stringResource(R.string.incoming_share_dialog_too_large_for_the_editor) else stringResource(R.string.incoming_share_dialog_this_may_not_work), fontWeight = FontWeight.SemiBold) },
                 text = {
                     Text(
-                        if (tooBig) "\"${item.name}\" is not a text file and is ${FileKinds.formatSize(item.size)}. Save it to a folder instead, then open it with the right app from Files."
-                        else "\"${item.name}\" is ${item.kind.label.lowercase()}, not text. The code editor may show garbled characters, and saving it from there can damage the file.",
+                        if (tooBig) stringResource(R.string.incoming_share_dialog_is_not_a_text_file_and_is, item.name.toString(), (FileKinds.formatSize(item.size)).toString())
+                        else stringResource(R.string.incoming_share_dialog_is_not_text_the_code_editor_may, item.name.toString(), (item.kind.label.lowercase()).toString()),
                         fontSize = 14.sp
                     )
                 },
                 confirmButton = {
-                    if (tooBig) Button(onClick = { step = ShareStep.PickFolder }) { Text("Save to folder") }
-                    else TextButton(onClick = { onOpenInEditor(item); onDismiss() }) { Text("Open anyway", color = MaterialTheme.colorScheme.error) }
+                    if (tooBig) Button(onClick = { step = ShareStep.PickFolder }) { Text(stringResource(R.string.incoming_share_dialog_save_to_folder)) }
+                    else TextButton(onClick = { onOpenInEditor(item); onDismiss() }) { Text(stringResource(R.string.explorer_dialogs_open_anyway), color = MaterialTheme.colorScheme.error) }
                 },
                 dismissButton = {
                     Row {
-                        TextButton(onClick = { step = ShareStep.Choose }) { Text("Back") }
-                        if (!tooBig) Button(onClick = { step = ShareStep.PickFolder }) { Text("Save instead") }
+                        TextButton(onClick = { step = ShareStep.Choose }) { Text(stringResource(R.string.agent_approval_panel_back)) }
+                        if (!tooBig) Button(onClick = { step = ShareStep.PickFolder }) { Text(stringResource(R.string.incoming_share_dialog_save_instead)) }
                     }
                 }
             )
@@ -132,7 +134,7 @@ fun IncomingShareDialog(
         is ShareStep.Saving -> AlertDialog(
             onDismissRequest = {},
             icon = { Icon(Icons.Outlined.Download, null, tint = MaterialTheme.colorScheme.primary) },
-            title = { Text(if (s.total > 1) "Saving ${s.index + 1} of ${s.total}" else "Saving", fontWeight = FontWeight.SemiBold) },
+            title = { Text(if (s.total > 1) stringResource(R.string.incoming_share_dialog_saving_of, (s.index + 1).toString(), s.total.toString()) else stringResource(R.string.incoming_share_dialog_saving), fontWeight = FontWeight.SemiBold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(s.name, maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
@@ -157,9 +159,9 @@ fun IncomingShareDialog(
                 title = {
                     Text(
                         when {
-                            s.paths.isEmpty() -> "Nothing was saved"
-                            s.failed.isEmpty() -> if (s.paths.size == 1) "Saved" else "Saved ${s.paths.size} files"
-                            else -> "Saved ${s.paths.size}, ${s.failed.size} failed"
+                            s.paths.isEmpty() -> stringResource(R.string.incoming_share_dialog_nothing_was_saved)
+                            s.failed.isEmpty() -> if (s.paths.size == 1) stringResource(R.string.incoming_share_dialog_saved) else stringResource(R.string.incoming_share_dialog_saved_files, s.paths.size.toString())
+                            else -> stringResource(R.string.incoming_share_dialog_saved_failed, s.paths.size.toString(), s.failed.size.toString())
                         },
                         fontWeight = FontWeight.SemiBold
                     )
@@ -167,7 +169,7 @@ fun IncomingShareDialog(
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (savedOne != null) Text(savedOne, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        else if (s.paths.isNotEmpty()) Text("In ${s.folder}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        else if (s.paths.isNotEmpty()) Text(stringResource(R.string.incoming_share_dialog_in, s.folder.toString()), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         s.failed.take(4).forEach { Text(it, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error) }
                     }
                 },
@@ -176,17 +178,17 @@ fun IncomingShareDialog(
                         Button(onClick = {
                             onOpenSavedInIde(savedOne, savedOne.substringAfterLast('/'), single?.size ?: 0)
                             onDismiss()
-                        }) { Text("Open in IDE") }
+                        }) { Text(stringResource(R.string.file_link_handler_open_in_ide)) }
                     } else if (s.paths.isNotEmpty()) {
-                        Button(onClick = { onShowInFiles(s.folder); onDismiss() }) { Text("Show in Files") }
+                        Button(onClick = { onShowInFiles(s.folder); onDismiss() }) { Text(stringResource(R.string.incoming_share_dialog_show_in_files)) }
                     } else {
-                        Button(onClick = { step = ShareStep.Choose }) { Text("Try again") }
+                        Button(onClick = { step = ShareStep.Choose }) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
                     }
                 },
                 dismissButton = {
                     Row {
-                        if (textual) TextButton(onClick = { onShowInFiles(s.folder); onDismiss() }) { Text("Show in Files") }
-                        TextButton(onClick = onDismiss) { Text("Done") }
+                        if (textual) TextButton(onClick = { onShowInFiles(s.folder); onDismiss() }) { Text(stringResource(R.string.incoming_share_dialog_show_in_files)) }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.browser_screen_done)) }
                     }
                 }
             )
@@ -200,11 +202,11 @@ fun IncomingShareDialog(
             ) {
                 Column(Modifier.padding(20.dp)) {
                     Text(
-                        if (single != null) "File received" else "${items.size} files received",
+                        if (single != null) stringResource(R.string.incoming_share_dialog_file_received) else stringResource(R.string.incoming_share_dialog_files_received, items.size.toString()),
                         fontSize = 21.sp, fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        if (single != null) "What would you like to do with it?" else "${FileKinds.formatSize(totalSize)} in total. What would you like to do?",
+                        if (single != null) stringResource(R.string.incoming_share_dialog_what_would_you_like_to_do_with) else stringResource(R.string.incoming_share_dialog_in_total_what_would_you_like_to, (FileKinds.formatSize(totalSize)).toString()),
                         fontSize = 13.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(14.dp))
@@ -238,7 +240,7 @@ fun IncomingShareDialog(
                         recommended = single == null || !single.kind.isTextual
                     ) { step = ShareStep.PickFolder }
                     Spacer(Modifier.height(4.dp))
-                    TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text("Cancel") }
+                    TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.accounts_ui_cancel)) }
                 }
             }
         }

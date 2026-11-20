@@ -348,7 +348,7 @@
         <activity
             android:name="ai.antigem.ui.miniapps.MiniAppInstallActivity"
             android:exported="true"
-            android:label="Mini app installer"
+            android:label="@string/native_mini_app_installer"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
@@ -433,7 +433,7 @@
         <activity
             android:name="ai.antigem.ui.miniapps.MiniAppShareActivity"
             android:exported="true"
-            android:label="Mini app"
+            android:label="@string/native_mini_app"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:taskAffinity=""
@@ -469,7 +469,7 @@
         <activity
             android:name="ai.antigem.ui.settings.ManageSpaceActivity"
             android:exported="true"
-            android:label="AntiGem Space Manager"
+            android:label="@string/native_space_manager"
             android:theme="@style/Theme.Gemini">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_SPACE" />

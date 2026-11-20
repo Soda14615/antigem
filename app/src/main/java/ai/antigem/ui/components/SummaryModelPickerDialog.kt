@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -65,7 +67,7 @@ fun SummaryModelPickerDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Summarize Conversation",
+                        text = stringResource(R.string.summary_model_picker_dialog_summarize_conversation),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -74,7 +76,7 @@ fun SummaryModelPickerDialog(
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Select model for summarization:",
+                    text = stringResource(R.string.summary_model_picker_dialog_select_model_for_summarization),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -99,7 +101,7 @@ fun SummaryModelPickerDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Failed: $errorMessage",
+                                text = stringResource(R.string.summary_model_picker_dialog_failed, errorMessage.toString()),
                                 fontSize = 11.5.sp,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
@@ -160,7 +162,7 @@ fun SummaryModelPickerDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel", fontSize = 13.sp)
+                        Text(stringResource(R.string.accounts_ui_cancel), fontSize = 13.sp)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -168,7 +170,7 @@ fun SummaryModelPickerDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Start Summarize", fontSize = 13.sp)
+                        Text(stringResource(R.string.summary_model_picker_dialog_start_summarize), fontSize = 13.sp)
                     }
                 }
             }

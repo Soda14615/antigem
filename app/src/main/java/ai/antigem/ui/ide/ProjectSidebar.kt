@@ -1,5 +1,7 @@
 package ai.antigem.ui.ide
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -109,14 +111,14 @@ fun ProjectSidebar(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = activeProject?.name ?: "Select Project",
+                        text = activeProject?.name ?: stringResource(R.string.project_sidebar_select_project),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = activeProject?.path ?: "No project opened",
+                        text = activeProject?.path ?: stringResource(R.string.project_sidebar_no_project_opened),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -133,7 +135,7 @@ fun ProjectSidebar(
                     onDismissRequest = { projectsDropdownExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Available Projects", fontWeight = FontWeight.Bold) },
+                        text = { Text(stringResource(R.string.project_sidebar_available_projects), fontWeight = FontWeight.Bold) },
                         onClick = {},
                         enabled = false
                     )
@@ -141,7 +143,7 @@ fun ProjectSidebar(
 
                     if (projects.isEmpty()) {
                         DropdownMenuItem(
-                            text = { Text("No projects found in Termux") },
+                            text = { Text(stringResource(R.string.project_sidebar_no_projects_found_in_termux)) },
                             onClick = { projectsDropdownExpanded = false }
                         )
                     } else {
@@ -179,7 +181,7 @@ fun ProjectSidebar(
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Outlined.Close,
-                                                    contentDescription = "Remove project",
+                                                    contentDescription = stringResource(R.string.project_sidebar_remove_project),
                                                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                                     modifier = Modifier.size(14.dp)
                                                 )
@@ -197,7 +199,7 @@ fun ProjectSidebar(
 
                     HorizontalDivider()
                     DropdownMenuItem(
-                        text = { Text("Browse / File Manager...", color = MaterialTheme.colorScheme.primary) },
+                        text = { Text(stringResource(R.string.project_sidebar_browse_file_manager), color = MaterialTheme.colorScheme.primary) },
                         leadingIcon = {
                             Icon(Icons.Default.FolderOpen, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         },
@@ -207,7 +209,7 @@ fun ProjectSidebar(
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("+ New Project", color = MaterialTheme.colorScheme.primary) },
+                        text = { Text(stringResource(R.string.project_sidebar_new_project), color = MaterialTheme.colorScheme.primary) },
                         leadingIcon = {
                             Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         },
@@ -247,7 +249,7 @@ fun ProjectSidebar(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Explorer",
+                        text = stringResource(R.string.project_sidebar_explorer),
                         fontSize = 11.5.sp,
                         fontWeight = if (selectedTab == SidebarTab.EXPLORER) FontWeight.Bold else FontWeight.Medium,
                         color = if (selectedTab == SidebarTab.EXPLORER) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
@@ -322,7 +324,7 @@ fun ProjectSidebar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.NoteAdd,
-                            contentDescription = "New File",
+                            contentDescription = stringResource(R.string.project_sidebar_new_file),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(15.dp)
                         )
@@ -339,7 +341,7 @@ fun ProjectSidebar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.CreateNewFolder,
-                            contentDescription = "New Folder",
+                            contentDescription = stringResource(R.string.workspace_folder_browser_dialog_new_folder),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(15.dp)
                         )
@@ -353,7 +355,7 @@ fun ProjectSidebar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Terminal,
-                            contentDescription = "Terminal",
+                            contentDescription = stringResource(R.string.floating_terminal_inspector_terminal),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(15.dp)
                         )
@@ -364,7 +366,7 @@ fun ProjectSidebar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.FolderOpen,
-                            contentDescription = "File Manager",
+                            contentDescription = stringResource(R.string.project_sidebar_file_manager),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(15.dp)
                         )
@@ -375,7 +377,7 @@ fun ProjectSidebar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh",
+                            contentDescription = stringResource(R.string.agent_sheet_ui_refresh),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(15.dp)
                         )
@@ -407,7 +409,7 @@ fun ProjectSidebar(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "IDE Server Offline",
+                                text = stringResource(R.string.project_sidebar_ide_server_offline),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -415,7 +417,7 @@ fun ProjectSidebar(
                             Spacer(modifier = Modifier.height(4.dp))
                             val ep = AuthPreferences.currentBridgeHttpUrl.removePrefix("http://").removePrefix("https://")
                             Text(
-                                text = "Checking $ep (auto-retrying)",
+                                text = stringResource(R.string.project_sidebar_checking_auto_retrying, ep.toString()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -432,12 +434,12 @@ fun ProjectSidebar(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Retry Now", fontSize = 13.sp)
+                                Text(stringResource(R.string.project_sidebar_retry_now), fontSize = 13.sp)
                             }
                         }
                     } else {
                         Text(
-                            text = if (activeProject == null) "Open or create a project to view files" else "Project is empty",
+                            text = if (activeProject == null) stringResource(R.string.project_sidebar_open_or_create_a_project_to_view) else stringResource(R.string.project_sidebar_project_is_empty),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -493,13 +495,13 @@ fun ProjectSidebar(
                     modifier = Modifier.size(28.dp)
                 )
             },
-            title = { Text(if (isNewFolderMode) "Create Folder" else "Create File", fontWeight = FontWeight.Bold) },
+            title = { Text(if (isNewFolderMode) stringResource(R.string.project_sidebar_create_folder) else stringResource(R.string.project_sidebar_create_file), fontWeight = FontWeight.Bold) },
             text = {
                 OutlinedTextField(
                     value = newItemName,
                     onValueChange = { newItemName = it },
-                    label = { Text(if (isNewFolderMode) "Folder Name" else "File Name") },
-                    placeholder = { Text(if (isNewFolderMode) "e.g. components" else "e.g. utils.py") },
+                    label = { Text(if (isNewFolderMode) stringResource(R.string.project_sidebar_folder_name) else stringResource(R.string.project_sidebar_file_name)) },
+                    placeholder = { Text(if (isNewFolderMode) stringResource(R.string.project_sidebar_e_g_components) else stringResource(R.string.project_sidebar_e_g_utils_py)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -519,12 +521,12 @@ fun ProjectSidebar(
                     enabled = newItemName.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
                 ) {
-                    Text("Create")
+                    Text(stringResource(R.string.workspace_folder_browser_dialog_create))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showCreateFileDialog = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -545,7 +547,7 @@ fun ProjectSidebar(
             },
             title = {
                 Text(
-                    text = "Rename ${if (node.isDir) "Folder" else "File"}",
+                    text = stringResource(R.string.project_sidebar_rename, (if (node.isDir) "Folder" else "File").toString()),
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -553,7 +555,7 @@ fun ProjectSidebar(
                 OutlinedTextField(
                     value = renameInput,
                     onValueChange = { renameInput = it },
-                    label = { Text("New Name") },
+                    label = { Text(stringResource(R.string.project_sidebar_new_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -572,12 +574,12 @@ fun ProjectSidebar(
                     enabled = renameInput.trim().isNotBlank() && renameInput.trim() != node.name,
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
                 ) {
-                    Text("Rename")
+                    Text(stringResource(R.string.agy_cloud_ui_rename))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRenameDialog = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -597,13 +599,13 @@ fun ProjectSidebar(
             },
             title = {
                 Text(
-                    text = "Delete ${if (node.isDir) "Folder" else "File"}?",
+                    text = stringResource(R.string.claude_settings_screen_delete, (if (node.isDir) "Folder" else "File").toString()),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to permanently delete \"${node.name}\"? This action cannot be undone.",
+                    text = stringResource(R.string.project_sidebar_are_you_sure_you_want_to_permanently, node.name.toString()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -617,12 +619,12 @@ fun ProjectSidebar(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.browser_screen_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -727,7 +729,7 @@ fun FileTreeNodeItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Options",
+                        contentDescription = stringResource(R.string.chat_history_drawer_options),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
@@ -743,7 +745,7 @@ fun FileTreeNodeItem(
                 ) {
                     if (node.isDir) {
                         DropdownMenuItem(
-                            text = { Text("New File", fontSize = 13.5.sp) },
+                            text = { Text(stringResource(R.string.project_sidebar_new_file), fontSize = 13.5.sp) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.NoteAdd,
@@ -758,7 +760,7 @@ fun FileTreeNodeItem(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("New Folder", fontSize = 13.5.sp) },
+                            text = { Text(stringResource(R.string.workspace_folder_browser_dialog_new_folder), fontSize = 13.5.sp) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.CreateNewFolder,
@@ -773,7 +775,7 @@ fun FileTreeNodeItem(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Terminal", fontSize = 13.5.sp) },
+                            text = { Text(stringResource(R.string.floating_terminal_inspector_terminal), fontSize = 13.5.sp) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Terminal,
@@ -790,7 +792,7 @@ fun FileTreeNodeItem(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     }
                     DropdownMenuItem(
-                        text = { Text("Rename", fontSize = 13.5.sp) },
+                        text = { Text(stringResource(R.string.agy_cloud_ui_rename), fontSize = 13.5.sp) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.DriveFileRenameOutline,
@@ -806,7 +808,7 @@ fun FileTreeNodeItem(
                     )
                     if (!node.isDir) {
                         DropdownMenuItem(
-                            text = { Text("Share", fontSize = 13.5.sp) },
+                            text = { Text(stringResource(R.string.share_text), fontSize = 13.5.sp) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Outlined.Share,
@@ -829,7 +831,7 @@ fun FileTreeNodeItem(
                         )
                     }
                     DropdownMenuItem(
-                        text = { Text("Details", fontSize = 13.5.sp) },
+                        text = { Text(stringResource(R.string.explorer_dialogs_details), fontSize = 13.5.sp) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Info,
@@ -845,7 +847,7 @@ fun FileTreeNodeItem(
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     DropdownMenuItem(
-                        text = { Text("Delete", color = MaterialTheme.colorScheme.error, fontSize = 13.5.sp) },
+                        text = { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error, fontSize = 13.5.sp) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.DeleteOutline,

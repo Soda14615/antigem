@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,14 +52,14 @@ fun SpeechToTextModeDialog(
                 ) {
                     Column {
                         Text(
-                            text = "Speech to Text",
+                            text = stringResource(R.string.speech_to_text_mode_dialog_speech_to_text),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Select speech recognition method",
+                            text = stringResource(R.string.speech_to_text_mode_dialog_select_speech_recognition_method),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -69,7 +71,7 @@ fun SpeechToTextModeDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.accounts_ui_close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(16.dp)
                         )
@@ -106,7 +108,7 @@ fun SpeechToTextModeDialog(
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.accounts_ui_cancel),
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         fontSize = 13.sp
                     )

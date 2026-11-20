@@ -1,5 +1,7 @@
 package ai.antigem.ui.miniapps
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -137,29 +139,29 @@ private fun MiniAppsScreen(activity: MiniAppsActivity, onBack: () -> Unit) {
     Scaffold(
         topBar = { Column {
             TopAppBar(
-                title = { Text("Mini Apps") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                title = { Text(stringResource(R.string.chat_history_drawer_mini_apps)) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.agent_approval_panel_back)) } },
                 actions = {
                     IconButton(onClick = { context.startActivity(android.content.Intent(context, MiniAppStoreActivity::class.java)) }) {
-                        Icon(Icons.Outlined.Storefront, "Get apps")
+                        Icon(Icons.Outlined.Storefront, stringResource(R.string.mini_apps_activity_get_apps))
                     }
                     IconButton(onClick = {
                         devMode = !devMode
                         prefs.edit().putBoolean("dev_mode", devMode).apply()
                         android.widget.Toast.makeText(context, if (devMode) "Developer mode on: development apps run, with developer tools" else "Developer mode off: only installed (signed) apps run", android.widget.Toast.LENGTH_LONG).show()
-                    }) { Icon(Icons.Outlined.Code, "Developer mode", tint = if (devMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) }
+                    }) { Icon(Icons.Outlined.Code, stringResource(R.string.mini_apps_activity_developer_mode), tint = if (devMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) }
                     Box {
-                        IconButton(onClick = { installMenu = true }) { Icon(Icons.Outlined.InstallMobile, "Install or update an app (.agapp)") }
+                        IconButton(onClick = { installMenu = true }) { Icon(Icons.Outlined.InstallMobile, stringResource(R.string.mini_apps_activity_install_or_update_an_app_agapp)) }
                         androidx.compose.material3.DropdownMenu(expanded = installMenu, onDismissRequest = { installMenu = false }) {
-                            androidx.compose.material3.DropdownMenuItem(text = { Text("Install from a file") }, onClick = {
+                            androidx.compose.material3.DropdownMenuItem(text = { Text(stringResource(R.string.mini_apps_activity_install_from_a_file)) }, onClick = {
                                 installMenu = false
                                 activity.pickFile { uri -> if (uri != null) installing = InstallSource.FromUri(uri) }
                             })
-                            androidx.compose.material3.DropdownMenuItem(text = { Text("Install from a link") }, onClick = { installMenu = false; askLink = true })
+                            androidx.compose.material3.DropdownMenuItem(text = { Text(stringResource(R.string.mini_apps_activity_install_from_a_link)) }, onClick = { installMenu = false; askLink = true })
                         }
                     }
-                    IconButton(onClick = { keyDialog = true }) { Icon(Icons.Outlined.Key, "Developer key") }
-                    IconButton(onClick = { refresh() }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                    IconButton(onClick = { keyDialog = true }) { Icon(Icons.Outlined.Key, stringResource(R.string.mini_app_install_ui_developer_key)) }
+                    IconButton(onClick = { refresh() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
@@ -171,10 +173,10 @@ private fun MiniAppsScreen(activity: MiniAppsActivity, onBack: () -> Unit) {
             ) {
                 androidx.compose.foundation.layout.Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Your developer key isn't backed up", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
-                        Text("If it's lost, the apps you signed can never be updated.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+                        Text(stringResource(R.string.mini_apps_activity_your_developer_key_isn_t_backed_up), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
+                        Text(stringResource(R.string.mini_apps_activity_if_it_s_lost_the_apps_you), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
                     }
-                    androidx.compose.material3.TextButton(onClick = { keyStart = "backup"; keyDialog = true }) { Text("Back up") }
+                    androidx.compose.material3.TextButton(onClick = { keyStart = "backup"; keyDialog = true }) { Text(stringResource(R.string.mini_app_install_ui_back_up)) }
                 }
             }
         } },
@@ -188,13 +190,13 @@ private fun MiniAppsScreen(activity: MiniAppsActivity, onBack: () -> Unit) {
                 verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(Icons.Outlined.Apps, null, Modifier.padding(bottom = 16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("No mini apps yet", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.mini_apps_activity_no_mini_apps_yet), style = MaterialTheme.typography.titleMedium)
                 FolderProblems()
                 androidx.compose.material3.Button(onClick = { context.startActivity(android.content.Intent(context, MiniAppStoreActivity::class.java)) }, modifier = Modifier.padding(top = 16.dp)) {
-                    Text("Get apps")
+                    Text(stringResource(R.string.mini_apps_activity_get_apps))
                 }
                 Text(
-                    "Ask an agent to build one, e.g. \"make me a habit tracker mini app\". Apps live in ~/mini-apps/<name>/ (see ~/mini-apps/README.md).",
+                    stringResource(R.string.mini_apps_activity_ask_an_agent_to_build_one_e),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp),
                 )
@@ -218,7 +220,7 @@ private fun MiniAppsScreen(activity: MiniAppsActivity, onBack: () -> Unit) {
                         Box(Modifier.alpha(if (!app.signed && !devMode || app.tampered) 0.4f else 1f)) { AppIcon(app, 58) }
                         Text(app.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 8.dp))
                         Text(
-                            when { app.tampered -> "modified"; app.signed -> app.version; else -> "DEV · ${app.version}" },
+                            when { app.tampered -> stringResource(R.string.mini_apps_activity_modified); app.signed -> app.version; else -> stringResource(R.string.mini_apps_activity_dev, app.version.toString()) },
                             style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace,
                             color = if (app.tampered) MaterialTheme.colorScheme.error else if (app.signed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.tertiary,
                         )

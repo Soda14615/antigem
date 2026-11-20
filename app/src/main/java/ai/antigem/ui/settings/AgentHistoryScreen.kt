@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -94,7 +96,7 @@ fun AgentHistoryScreen() {
             Spacer(Modifier.height(12.dp))
             Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceContainerLow, modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    "Chat history is off: new messages are not saved. Turn it on in Agent memory & history.",
+                    stringResource(R.string.agent_history_screen_chat_history_is_off_new_messages_are),
                     fontSize = 12.5.sp, lineHeight = 17.sp,
                     modifier = Modifier.padding(14.dp)
                 )
@@ -104,9 +106,9 @@ fun AgentHistoryScreen() {
         Spacer(Modifier.height(14.dp))
         OutlinedTextField(
             value = filter, onValueChange = { filter = it }, singleLine = true,
-            placeholder = { Text("Filter by title, project or agent") },
+            placeholder = { Text(stringResource(R.string.agent_history_screen_filter_by_title_project_or_agent)) },
             leadingIcon = { Icon(Icons.Outlined.Search, null) },
-            trailingIcon = if (filter.isNotEmpty()) ({ IconButton(onClick = { filter = "" }) { Icon(Icons.Outlined.Close, "Clear") } }) else null,
+            trailingIcon = if (filter.isNotEmpty()) ({ IconButton(onClick = { filter = "" }) { Icon(Icons.Outlined.Close, stringResource(R.string.custom_system_prompt_dialog_clear)) } }) else null,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -122,20 +124,20 @@ fun AgentHistoryScreen() {
 
         loadError?.let { err ->
             HistoryErrorText(err)
-            TextButton(onClick = { reload++ }, contentPadding = PaddingValues(horizontal = 0.dp)) { Text("Try again") }
+            TextButton(onClick = { reload++ }, contentPadding = PaddingValues(horizontal = 0.dp)) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
         }
         if (chats.isEmpty() && !loading && loadError == null) {
-            Text("No saved chats yet.", fontSize = 12.5.sp, color = muted, modifier = Modifier.padding(vertical = 8.dp))
+            Text(stringResource(R.string.agent_history_screen_no_saved_chats_yet), fontSize = 12.5.sp, color = muted, modifier = Modifier.padding(vertical = 8.dp))
         }
         if (chats.isNotEmpty() && shown.isEmpty()) {
-            Text("No saved chat matches \"$q\".", fontSize = 12.5.sp, color = muted, modifier = Modifier.padding(vertical = 8.dp))
+            Text(stringResource(R.string.agent_history_screen_no_saved_chat_matches, q.toString()), fontSize = 12.5.sp, color = muted, modifier = Modifier.padding(vertical = 8.dp))
         }
 
         groups.forEach { group ->
             val first = group.first()
             val project = first.project.trim()
             HistoryGroupHeader(
-                title = if (project.isBlank()) "No project folder" else first.projectName.ifBlank { project },
+                title = if (project.isBlank()) stringResource(R.string.settings_history_no_folder) else first.projectName.ifBlank { project },
                 subtitle = project.ifBlank { null }
             )
             group.forEach { c ->
@@ -150,7 +152,7 @@ fun AgentHistoryScreen() {
                 onClick = { clearError = null; confirmClear = true },
                 enabled = !clearing,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-            ) { Text(if (clearing) "Removing…" else "Remove all saved chats") }
+            ) { Text(if (clearing) stringResource(R.string.claude_settings_screen_removing) else stringResource(R.string.agent_history_screen_remove_all_saved_chats)) }
         }
         clearError?.let { HistoryErrorText(it) }
         Spacer(Modifier.height(24.dp))
@@ -164,8 +166,8 @@ fun AgentHistoryScreen() {
         val n = chats.size
         AlertDialog(
             onDismissRequest = { confirmClear = false },
-            title = { Text(if (n == 1) "Remove 1 saved chat?" else "Remove all $n saved chats?") },
-            text = { Text("They are not saved again; new chats are. The chats themselves stay.") },
+            title = { Text(if (n == 1) stringResource(R.string.agent_history_screen_remove_1_saved_chat) else stringResource(R.string.agent_history_screen_remove_all_saved_chats_2, n.toString())) },
+            text = { Text(stringResource(R.string.agent_history_screen_they_are_not_saved_again_new_chats)) },
             confirmButton = {
                 TextButton(onClick = {
                     confirmClear = false
@@ -177,9 +179,9 @@ fun AgentHistoryScreen() {
                             .onFailure { clearError = it.message ?: "Could not remove the saved chats." }
                         clearing = false
                     }
-                }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.browser_screen_remove), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -243,7 +245,7 @@ private fun HistoryRow(c: MemoryBridgeClient.HistoryChat, onClick: () -> Unit) {
 private fun HistoryEditedChip() {
     val c = MaterialTheme.colorScheme.tertiary
     Text(
-        "Edited", fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = c, maxLines = 1,
+        stringResource(R.string.agent_history_screen_edited), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = c, maxLines = 1,
         modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(c.copy(alpha = 0.13f)).padding(horizontal = 6.dp, vertical = 2.dp)
     )
 }
@@ -295,7 +297,7 @@ private fun HistoryViewer(chat: MemoryBridgeClient.HistoryChat, onClose: () -> U
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 val meta = listOfNotNull(
                     historyAgentLabel(info.agent).takeIf { it.isNotBlank() },
-                    info.project.trim().ifBlank { "No project folder" },
+                    info.project.trim().ifBlank { stringResource(R.string.settings_history_no_folder) },
                     historyDay(info.started)?.let { "started $it" },
                     historyDay(info.updated)?.let { "updated $it" }
                 ).joinToString("  ·  ")
@@ -307,7 +309,7 @@ private fun HistoryViewer(chat: MemoryBridgeClient.HistoryChat, onClose: () -> U
                     }
                     failed != null -> HistoryErrorText(failed)
                     tooLarge -> {
-                        Text("Too large to edit here.", fontSize = 12.sp, lineHeight = 16.sp, color = muted)
+                        Text(stringResource(R.string.agent_history_screen_too_large_to_edit_here), fontSize = 12.sp, lineHeight = 16.sp, color = muted)
                         Spacer(Modifier.height(6.dp))
                         Surface(
                             shape = RoundedCornerShape(12.dp),
@@ -348,14 +350,14 @@ private fun HistoryViewer(chat: MemoryBridgeClient.HistoryChat, onClose: () -> U
                         }
                     }
                 }
-            ) { Text(if (saving) "Saving…" else "Save") }
+            ) { Text(if (saving) stringResource(R.string.claude_providers_page_saving) else stringResource(R.string.claude_providers_page_save)) }
         },
         dismissButton = {
             Row {
                 TextButton(onClick = { confirmRemove = true }, enabled = !busy) {
-                    Text(if (removing) "Removing…" else "Remove", color = MaterialTheme.colorScheme.error)
+                    Text(if (removing) stringResource(R.string.claude_settings_screen_removing) else stringResource(R.string.browser_screen_remove), color = MaterialTheme.colorScheme.error)
                 }
-                TextButton(onClick = onClose, enabled = !busy) { Text("Close") }
+                TextButton(onClick = onClose, enabled = !busy) { Text(stringResource(R.string.accounts_ui_close)) }
             }
         }
     )
@@ -363,8 +365,8 @@ private fun HistoryViewer(chat: MemoryBridgeClient.HistoryChat, onClose: () -> U
     if (confirmRemove) {
         AlertDialog(
             onDismissRequest = { confirmRemove = false },
-            title = { Text("Remove this saved chat?") },
-            text = { Text("The agents can no longer look it up, and this chat is not saved again. The chat itself stays.") },
+            title = { Text(stringResource(R.string.agent_history_screen_remove_this_saved_chat)) },
+            text = { Text(stringResource(R.string.agent_history_screen_the_agents_can_no_longer_look_it)) },
             confirmButton = {
                 TextButton(onClick = {
                     confirmRemove = false
@@ -379,9 +381,9 @@ private fun HistoryViewer(chat: MemoryBridgeClient.HistoryChat, onClose: () -> U
                             removing = false
                         }
                     }
-                }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.browser_screen_remove), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }

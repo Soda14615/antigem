@@ -67,11 +67,11 @@ object MiniAppNotify {
     private fun ensureDefaultChannels(context: Context) {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = nm(context)
-        if (nm.getNotificationChannel(CHANNEL_ALERTS) == null) nm.createNotificationChannel(NotificationChannel(CHANNEL_ALERTS, "Mini apps", NotificationManager.IMPORTANCE_HIGH))
-        if (nm.getNotificationChannel(CHANNEL_STATUS) == null) nm.createNotificationChannel(NotificationChannel(CHANNEL_STATUS, "Mini apps (silent)", NotificationManager.IMPORTANCE_LOW))
+        if (nm.getNotificationChannel(CHANNEL_ALERTS) == null) nm.createNotificationChannel(NotificationChannel(CHANNEL_ALERTS, context.getString(R.string.notification_mini_apps_channel), NotificationManager.IMPORTANCE_HIGH))
+        if (nm.getNotificationChannel(CHANNEL_STATUS) == null) nm.createNotificationChannel(NotificationChannel(CHANNEL_STATUS, context.getString(R.string.notification_mini_apps_silent_channel), NotificationManager.IMPORTANCE_LOW))
         if (nm.getNotificationChannel(CHANNEL_ONGOING) == null) nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ONGOING, "Mini apps (running)", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Timers, downloads and other things in progress"
+            NotificationChannel(CHANNEL_ONGOING, context.getString(R.string.notification_mini_apps_ongoing_channel), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_mini_apps_ongoing_description)
                 setSound(null, null); enableVibration(false); setShowBadge(false)
             })
     }
@@ -87,7 +87,7 @@ object MiniAppNotify {
         if (Build.VERSION.SDK_INT < 26) return JSONObject().put("id", id)
         val nm = nm(context)
         val groupId = "miniapp:${app.id}"
-        if (nm.getNotificationChannelGroup(groupId) == null) nm.createNotificationChannelGroup(NotificationChannelGroup(groupId, "Mini app: ${app.name}"))
+        if (nm.getNotificationChannelGroup(groupId) == null) nm.createNotificationChannelGroup(NotificationChannelGroup(groupId, context.getString(R.string.notification_mini_app_channel_group, app.name)))
         val existing = nm.notificationChannels.count { it.id.startsWith("miniapp:${app.id}:") && it.id != channelId(app.id, id) }
         if (existing >= 10) throw MiniAppError("QuotaExceededError", "At most 10 notification channels per app")
         val importance = when (p.optString("importance", "default")) {
@@ -278,7 +278,7 @@ object MiniAppNotify {
                 if (body.isNotBlank()) s.setSummaryText(body)
             })
             messages != null || style == "messages" -> {
-                val me = Person.Builder().setName(p.optString("me").ifBlank { "You" }).build()
+                val me = Person.Builder().setName(p.optString("me").ifBlank { context.getString(R.string.notification_mini_app_recipient_you) }).build()
                 b.setStyle(NotificationCompat.MessagingStyle(me).also { s ->
                     if (title.isNotBlank()) s.conversationTitle = title
                     if (messages != null) for (i in 0 until messages.length()) {

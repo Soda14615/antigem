@@ -1,5 +1,7 @@
 package ai.antigem.ui.codex
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -190,11 +192,11 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                 if (error != null) {
                     Text(error!!, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = { scope.launch { reload() } }, enabled = !loading) { Text("Try again") }
+                    OutlinedButton(onClick = { scope.launch { reload() } }, enabled = !loading) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
                 } else Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = CodexAccent)
                     Spacer(Modifier.width(8.dp))
-                    Text("Loading plugins…", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    Text(stringResource(R.string.codex_plugins_page_loading_plugins), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
             return@Column
@@ -219,38 +221,38 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
             d.loadErrors.forEachIndexed { i, e -> item(key = "le$i") { Text(e, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.error) } }
             when (tab) {
                 0 -> {
-                    if (installed.isEmpty()) item(key = "none") { Hint("No plugins installed. Find some in Discover, or add a marketplace from GitHub.") }
+                    if (installed.isEmpty()) item(key = "none") { Hint(stringResource(R.string.codex_plugins_page_no_plugins_installed_find_some_in_discover)) }
                     items(installed.size, key = { "i_" + installed[it].id }) { i ->
                         val p = installed[i]
                         PluginCard(p, ops[p.id]) {
                             OutlinedButton(onClick = {
                                 run(p.id, "uninstall", "plugin/uninstall", buildJsonObject { put("pluginId", p.id) }) { "${p.title} uninstalled" }
-                            }, enabled = ops[p.id] == null) { Text("Uninstall", fontSize = 12.sp, color = QuotaRed) }
+                            }, enabled = ops[p.id] == null) { Text(stringResource(R.string.claude_settings_screen_uninstall), fontSize = 12.sp, color = QuotaRed) }
                         }
                     }
                 }
                 1 -> {
                     item(key = "search") {
-                        OutlinedTextField(query, { query = it }, singleLine = true, placeholder = { Text("Search ${available.size} plugins") }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(query, { query = it }, singleLine = true, placeholder = { Text(stringResource(R.string.claude_settings_screen_search_plugins, available.size.toString())) }, modifier = Modifier.fillMaxWidth())
                     }
-                    item(key = "count") { Hint("${results.size} plugin(s)") }
+                    item(key = "count") { Hint(stringResource(R.string.claude_settings_screen_plugin_s, results.size.toString())) }
                     items(results.size, key = { "a_" + results[it].id }) { i ->
                         val p = results[i]
                         PluginCard(p, ops[p.id]) {
                             Button(onClick = { install(p) }, enabled = ops[p.id] == null, colors = ButtonDefaults.buttonColors(containerColor = CodexAccent)) {
-                                Text("Install", fontSize = 12.sp)
+                                Text(stringResource(R.string.claude_settings_screen_install), fontSize = 12.sp)
                             }
                         }
                     }
                 }
                 else -> {
                     item(key = "about") {
-                        Hint("A marketplace is a git repository with a plugin catalog. Codex reads its own catalogs and Claude Code's (.claude-plugin/marketplace.json). Tap one to see its plugins and install them here; Discover lists the plugins of every marketplace.")
+                        Hint(stringResource(R.string.codex_plugins_page_a_marketplace_is_a_git_repository_with))
                     }
                     item(key = "add") {
                         ClaudeCard {
-                            Text("Add a marketplace", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Hint("GitHub owner/repo, owner/repo@branch, or a git URL")
+                            Text(stringResource(R.string.claude_settings_screen_add_a_marketplace), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Hint(stringResource(R.string.codex_plugins_page_github_owner_repo_owner_repo_branch_or))
                             lastFailed?.let { failed ->
                                 ai.antigem.ui.settings.SetupWithAiLink(CodexAccent) { aiSetup = failed }
                             }
@@ -282,7 +284,7 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                                         addingMarket = false
                                     }
                                 }, enabled = marketSource.isNotBlank() && !addingMarket, colors = ButtonDefaults.buttonColors(containerColor = CodexAccent)) {
-                                    if (addingMarket) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White) else Text("Add")
+                                    if (addingMarket) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White) else Text(stringResource(R.string.browser_screen_add))
                                 }
                             }
                         }
@@ -303,7 +305,7 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                                             Text(m.title, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp)
                                             Hint("${m.plugins.size} plugin(s)" + (if (builtIn) " · built into Codex" else "") + (if (m.title != m.name) " · ${m.name}" else ""))
                                         }
-                                        Icon(if (open) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore, if (open) "Hide plugins" else "Show plugins")
+                                        Icon(if (open) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore, if (open) stringResource(R.string.claude_settings_screen_hide_plugins) else stringResource(R.string.claude_settings_screen_show_plugins))
                                     }
                                     if (op != null) Progress(op)
                                     else {
@@ -312,10 +314,10 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                                                 val errs = (res as? JsonObject)?.a("errors").orEmpty().mapNotNull { (it as? JsonObject)?.str("message") }
                                                 if (errs.isEmpty()) "${m.title} is up to date" else "${m.title}: ${errs.first()}"
                                             }
-                                        }) { Icon(Icons.Outlined.Refresh, "Update catalog") }
+                                        }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.codex_plugins_page_update_catalog)) }
                                         if (!builtIn) IconButton(onClick = {
                                             run("m:" + m.name, "remove", "marketplace/remove", buildJsonObject { put("marketplaceName", m.name) }) { "${m.title} removed" }
-                                        }) { Icon(Icons.Outlined.Delete, "Remove", tint = QuotaRed.copy(alpha = 0.8f)) }
+                                        }) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = QuotaRed.copy(alpha = 0.8f)) }
                                     }
                                 }
                             }
@@ -324,20 +326,20 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                             // its plugins, to install right here (the same as from Discover)
                             val plugins = m.plugins.sortedBy { it.title.lowercase() }
                             if (plugins.size > 8) item(key = "mq_" + m.name) {
-                                OutlinedTextField(marketQuery, { marketQuery = it }, singleLine = true, placeholder = { Text("Search ${plugins.size} plugins in ${m.title}") },
+                                OutlinedTextField(marketQuery, { marketQuery = it }, singleLine = true, placeholder = { Text(stringResource(R.string.claude_settings_screen_search_plugins_in, plugins.size.toString(), m.title.toString())) },
                                     modifier = Modifier.fillMaxWidth().padding(start = 12.dp))
                             }
                             val mq = marketQuery.trim().lowercase()
                             val shown = if (mq.isEmpty()) plugins else plugins.filter { "${it.title}\n${it.name}\n${it.description}\n${it.category.orEmpty()}".lowercase().contains(mq) }
                             if (plugins.isEmpty()) item(key = "me_" + m.name) {
-                                Column(Modifier.padding(start = 12.dp)) { Hint("No plugins in this marketplace yet. Update it if it was just added.") }
+                                Column(Modifier.padding(start = 12.dp)) { Hint(stringResource(R.string.codex_plugins_page_no_plugins_in_this_marketplace_yet_update)) }
                             }
                             items(shown.size, key = { "mp_" + m.name + "_" + shown[it].id }) { j ->
                                 val p = shown[j]
                                 Column(Modifier.padding(start = 12.dp)) {
                                     PluginCard(p, ops[p.id]) {
                                         if (!p.installed) Button(onClick = { install(p) }, enabled = ops[p.id] == null, colors = ButtonDefaults.buttonColors(containerColor = CodexAccent)) {
-                                            Text("Install", fontSize = 12.sp)
+                                            Text(stringResource(R.string.claude_settings_screen_install), fontSize = 12.sp)
                                         }
                                     }
                                 }
@@ -346,7 +348,7 @@ fun CodexPluginsPage(backend: CodexChatBackend) {
                     }
                 }
             }
-            item(key = "foot") { Hint("Plugins are loaded when a chat starts: start a new chat after installing or removing one.") }
+            item(key = "foot") { Hint(stringResource(R.string.codex_plugins_page_plugins_are_loaded_when_a_chat_starts)) }
         }
     }
     aiSetup?.let { (src, why) ->
@@ -366,10 +368,10 @@ private fun Progress(action: String) {
         Spacer(Modifier.width(6.dp))
         Text(
             when (action) {
-                "install" -> "Installing…"
-                "uninstall", "remove" -> "Removing…"
-                "update" -> "Updating…"
-                else -> "Working…"
+                "install" -> stringResource(R.string.claude_settings_screen_installing)
+                "uninstall", "remove" -> stringResource(R.string.claude_settings_screen_removing)
+                "update" -> stringResource(R.string.claude_settings_screen_updating)
+                else -> stringResource(R.string.claude_settings_screen_working)
             },
             fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold, color = CodexAccent
         )
@@ -385,7 +387,7 @@ private fun PluginCard(p: CxPlugin, op: String?, action: @Composable () -> Unit)
                 Hint(listOfNotNull(p.version?.let { "v$it" }, p.category, p.marketplace, if (p.installed && !p.enabled) "disabled" else null).joinToString(" · "))
             }
             if (op != null) Progress(op)
-            else if (p.installed) Text("Installed", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = QuotaGreen)
+            else if (p.installed) Text(stringResource(R.string.claude_settings_screen_installed), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = QuotaGreen)
         }
         if (p.description.isNotBlank()) Text(p.description, fontSize = 11.5.sp, maxLines = 3, overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))

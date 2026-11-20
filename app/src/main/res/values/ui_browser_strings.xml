@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="browser_screen_secure_connection">"Secure connection"</string>
+    <string name="browser_screen_local_server">"Local server"</string>
+    <string name="browser_screen_not_secure">"Not secure"</string>
+    <string name="browser_screen_search_or_type_url">"Search or type URL"</string>
+    <string name="browser_screen_clear_browsing_data">"Clear browsing data?"</string>
+    <string name="browser_screen_clear_all">"Clear all"</string>
+    <string name="browser_screen_new_tab">"New Tab"</string>
+    <string name="browser_screen_start_page">"Start page"</string>
+    <string name="browser_screen_search_google_for">"Search Google for \"%1$s\""</string>
+    <string name="browser_screen_no_recent_search_history">"No recent search history"</string>
+    <string name="browser_screen_recent_searches">"Recent Searches"</string>
+    <string name="browser_screen_history_suggestions">"History Suggestions"</string>
+    <string name="browser_screen_clear_all_2">"Clear All"</string>
+    <string name="browser_screen_insert">"Insert"</string>
+    <string name="browser_screen_delete">"Delete"</string>
+    <string name="browser_screen_add_shortcut">"Add Shortcut"</string>
+    <string name="browser_screen_name">"Name"</string>
+    <string name="browser_screen_e_g_github">"e.g. GitHub"</string>
+    <string name="browser_screen_add">"Add"</string>
+    <string name="browser_screen_remove_shortcut">"Remove Shortcut"</string>
+    <string name="browser_screen_remove_from_your_home_shortcuts">"Remove '%1$s' from your home shortcuts?"</string>
+    <string name="browser_screen_remove">"Remove"</string>
+    <string name="browser_screen_add_shortcut_2">"Add shortcut"</string>
+    <string name="browser_screen_tabs">"Tabs (%1$s)"</string>
+    <string name="browser_screen_done">"Done"</string>
+    <string name="browser_screen_delete_all">"Delete all"</string>
+    <string name="browser_screen_new_tab_2">"New tab"</string>
+    <string name="browser_screen_tab_closed">"Tab closed"</string>
+    <string name="browser_screen_undo">"Undo"</string>
+    <string name="browser_screen_close_all_tabs">"Close All Tabs"</string>
+    <string name="browser_screen_are_you_sure_you_want_to_close">"Are you sure you want to close all open tabs and return to chat?"</string>
+    <string name="browser_screen_close_all">"Close All"</string>
+    <string name="browser_screen_locked_by_ai">"Locked by AI"</string>
+    <string name="browser_screen_close_tab">"Close tab"</string>
+    <string name="browser_screen_home">"Home"</string>
+    <string name="browser_screen_hide_diagnostic_logs">"Hide Diagnostic Logs"</string>
+    <string name="browser_screen_show_diagnostic_logs">"Show Diagnostic Logs (%1$s)"</string>
+    <string name="browser_screen_reload">"Reload"</string>
+    <string name="browser_screen_search">"Search"</string>
+    <string name="browser_screen_dismiss">"Dismiss"</string>
+    <string name="browser_screen_ai_is_working">"AI is working…"</string>
+    <string name="browser_screen_controlled_by_ai">"Controlled by AI"</string>
+    <string name="browser_screen_unlock">"Unlock"</string>
+</resources>

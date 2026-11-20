@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import ai.antigem.R
 import ai.antigem.data.local.TermuxStorageSetupManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ open class TermuxSystemReceiver : BroadcastReceiver() {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(
                                 context,
-                                if (success) "Storage symlinks setup in ~/storage" else "Failed setting up storage symlinks",
+                                if (success) R.string.notification_storage_symlinks_ready else R.string.notification_storage_symlinks_failed,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -38,7 +39,7 @@ open class TermuxSystemReceiver : BroadcastReceiver() {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(
                                 context,
-                                if (success) "Storage symlinks setup in ~/storage" else "Failed setting up storage symlinks",
+                                if (success) R.string.notification_storage_symlinks_ready else R.string.notification_storage_symlinks_failed,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

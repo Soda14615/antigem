@@ -1,5 +1,7 @@
 package ai.antigem.ui.opencode
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -77,7 +79,7 @@ fun OpenCodeModelSheet(backend: OpenCodeChatBackend, onOpenSettings: () -> Unit,
             if (models.size > 8) {
                 OutlinedTextField(
                     value = query, onValueChange = { query = it }, singleLine = true,
-                    leadingIcon = { Icon(Icons.Outlined.Search, null) }, placeholder = { Text("Search models or providers") },
+                    leadingIcon = { Icon(Icons.Outlined.Search, null) }, placeholder = { Text(stringResource(R.string.open_code_model_sheet_search_models_or_providers)) },
                     shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
@@ -125,7 +127,7 @@ fun OpenCodeModelSheet(backend: OpenCodeChatBackend, onOpenSettings: () -> Unit,
             TextButton(onClick = { onDismiss(); onOpenSettings() }) {
                 Icon(Icons.Outlined.Settings, null, Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Connect providers or add an OpenAI-compatible endpoint")
+                Text(stringResource(R.string.open_code_model_sheet_connect_providers_or_add_an_openai_compatible))
             }
         }
     }

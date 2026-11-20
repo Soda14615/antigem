@@ -1,5 +1,7 @@
 package ai.antigem.ui.agents
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -74,6 +76,7 @@ data class AgentStatusEntry(
 
 class AgentStatusAction(val label: String, val onClick: () -> Unit)
 
+@Composable
 fun agyStatusEntry(
     state: SystemConnectionState,
     authInfo: AgyHubClient.AgyAuthInfo,
@@ -89,40 +92,41 @@ fun agyStatusEntry(
     fun entry(label: String, color: Color = status.dotColor, detail: String? = null, action: AgentStatusAction? = null, pending: Boolean = false) =
         AgentStatusEntry(AgentKind.AGY, label, color, detail, action, pending, isReady = status == SystemStatus.READY && !isAuthBusy)
     return when {
-        serverRestarting -> entry("Restarting…", SystemStatus.STARTING.dotColor, "The local server is restarting.", pending = true)
-        isAuthBusy -> entry("Signing in…", SystemStatus.ACQUIRING_CSRF.dotColor, "Finish signing in with Google in your browser.", AgentStatusAction("Check", onCheckAuth), pending = true)
-        status == SystemStatus.OFFLINE && inStartupGrace -> entry("Starting…", SystemStatus.STARTING.dotColor, "Starting the local server.", pending = true)
+        serverRestarting -> entry(stringResource(R.string.main_ui_restarting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_the_local_server_is_restarting), pending = true)
+        isAuthBusy -> entry(stringResource(R.string.claude_settings_screen_signing_in), SystemStatus.ACQUIRING_CSRF.dotColor, stringResource(R.string.main_ui_finish_signing_in_with_google_in_your), AgentStatusAction(stringResource(R.string.android_dev_screen_check), onCheckAuth), pending = true)
+        status == SystemStatus.OFFLINE && inStartupGrace -> entry(stringResource(R.string.main_ui_starting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_starting_the_local_server), pending = true)
         status == SystemStatus.OFFLINE && state is SystemConnectionState.Connected -> entry(
-            "Offline",
-            detail = "The Antigravity hub is stopped.",
-            action = AgentStatusAction("Restart", onRestartServer)
+            stringResource(R.string.settings_offline),
+            detail = stringResource(R.string.main_ui_the_antigravity_hub_is_stopped),
+            action = AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer)
         )
         status == SystemStatus.OFFLINE -> entry(
-            "Offline",
-            detail = "The local server is not running.",
-            action = AgentStatusAction("Start", onRestartServer)
+            stringResource(R.string.settings_offline),
+            detail = stringResource(R.string.main_ui_the_local_server_is_not_running),
+            action = AgentStatusAction(stringResource(R.string.servers_settings_screen_start), onRestartServer)
         )
-        status == SystemStatus.STARTING -> entry("Starting…", detail = "The Antigravity hub is starting.", pending = true)
-        status == SystemStatus.ACQUIRING_CSRF -> entry("Connecting…", detail = "Getting a session token from the hub.", pending = true)
-        status == SystemStatus.CHECKING_AUTH -> entry("Checking sign-in…", pending = true)
+        status == SystemStatus.STARTING -> entry(stringResource(R.string.main_ui_starting), detail = stringResource(R.string.main_ui_the_antigravity_hub_is_starting), pending = true)
+        status == SystemStatus.ACQUIRING_CSRF -> entry(stringResource(R.string.notification_connecting), detail = stringResource(R.string.main_ui_getting_a_session_token_from_the_hub), pending = true)
+        status == SystemStatus.CHECKING_AUTH -> entry(stringResource(R.string.main_ui_checking_sign_in), pending = true)
         status == SystemStatus.UNAUTHENTICATED -> entry(
-            "Sign in required",
-            detail = "Sign in with Google to chat with Antigravity.",
-            action = AgentStatusAction("Sign in", onSignIn)
+            stringResource(R.string.main_ui_sign_in_required),
+            detail = stringResource(R.string.main_ui_sign_in_with_google_to_chat_with),
+            action = AgentStatusAction(stringResource(R.string.claude_settings_screen_sign_in), onSignIn)
         ).copy(isSignedOut = true)
         status == SystemStatus.READY -> entry(
-            "Ready",
+            stringResource(R.string.main_ui_ready),
             detail = listOf(authInfo.email, authInfo.userTier.ifBlank { authInfo.planName })
                 .filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }
         )
         else -> entry(
-            "Error",
+            stringResource(R.string.markdown_content_error),
             detail = (state as? SystemConnectionState.Connected)?.error ?: (state as? SystemConnectionState.Error)?.message,
-            action = if (state is SystemConnectionState.Connected) AgentStatusAction("Restart", onRestartServer) else AgentStatusAction("Retry", onRetry)
+            action = if (state is SystemConnectionState.Connected) AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer) else AgentStatusAction(stringResource(R.string.chat_screen_retry), onRetry)
         )
     }
 }
 
+@Composable
 fun claudeStatusEntry(
     state: ClaudeStatus,
     status: ClaudeCliStatus?,
@@ -134,30 +138,41 @@ fun claudeStatusEntry(
     onRetry: () -> Unit
 ): AgentStatusEntry {
     if (serverRestarting) {
-        return AgentStatusEntry(AgentKind.CLAUDE, "Restarting…", ClaudeStatus.CHECKING.dotColor, "The local server is restarting.", pending = true)
+        return AgentStatusEntry(AgentKind.CLAUDE, stringResource(R.string.main_ui_restarting), ClaudeStatus.CHECKING.dotColor, stringResource(R.string.main_ui_the_local_server_is_restarting), pending = true)
     }
     val auth = status?.auth
+    val label = stringResource(when (state) {
+            ClaudeStatus.CHECKING -> R.string.bridge_ui_checking
+            ClaudeStatus.BRIDGE_OFFLINE -> R.string.main_ui_bridge_offline
+            ClaudeStatus.BRIDGE_OUTDATED -> R.string.main_ui_restart_needed
+            ClaudeStatus.NOT_INSTALLED -> R.string.main_ui_claude_code_not_found
+            ClaudeStatus.SIGNED_OUT -> R.string.main_ui_sign_in_required
+            ClaudeStatus.SIGNING_IN -> R.string.claude_settings_screen_signing_in
+            ClaudeStatus.READY -> R.string.main_ui_ready
+            ClaudeStatus.ERROR -> R.string.markdown_content_error
+        })
     fun entry(detail: String? = null, action: AgentStatusAction? = null) = AgentStatusEntry(
-        AgentKind.CLAUDE, state.label, state.dotColor, detail, action,
+        AgentKind.CLAUDE, label, state.dotColor, detail, action,
         pending = state == ClaudeStatus.CHECKING || state == ClaudeStatus.SIGNING_IN,
         isReady = state == ClaudeStatus.READY,
         isSignedOut = state == ClaudeStatus.SIGNED_OUT
     )
     return when (state) {
-        ClaudeStatus.CHECKING -> entry("Looking for the Claude Code CLI and its sign-in.")
-        ClaudeStatus.BRIDGE_OFFLINE -> entry(error ?: "The local server is not running.", AgentStatusAction("Start", onRestartServer))
-        ClaudeStatus.BRIDGE_OUTDATED -> entry(error, AgentStatusAction("Restart", onRestartServer))
-        ClaudeStatus.NOT_INSTALLED -> entry("The claude CLI is not installed on this device.", AgentStatusAction("Set up", onSetup))
-        ClaudeStatus.SIGNED_OUT -> entry("Sign in with your Claude subscription or an Anthropic Console account.", AgentStatusAction("Sign in", onSignIn))
-        ClaudeStatus.SIGNING_IN -> entry("Finish signing in in your browser.", AgentStatusAction("Open", onSignIn))
+        ClaudeStatus.CHECKING -> entry(stringResource(R.string.main_ui_looking_for_the_claude_code_cli_and))
+        ClaudeStatus.BRIDGE_OFFLINE -> entry(error ?: stringResource(R.string.main_ui_the_local_server_is_not_running), AgentStatusAction(stringResource(R.string.servers_settings_screen_start), onRestartServer))
+        ClaudeStatus.BRIDGE_OUTDATED -> entry(error, AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer))
+        ClaudeStatus.NOT_INSTALLED -> entry(stringResource(R.string.main_ui_the_claude_cli_is_not_installed_on), AgentStatusAction(stringResource(R.string.jarvis_overlay_set_up), onSetup))
+        ClaudeStatus.SIGNED_OUT -> entry(stringResource(R.string.main_ui_sign_in_with_your_claude_subscription_or), AgentStatusAction(stringResource(R.string.claude_settings_screen_sign_in), onSignIn))
+        ClaudeStatus.SIGNING_IN -> entry(stringResource(R.string.main_ui_finish_signing_in_in_your_browser), AgentStatusAction(stringResource(R.string.jarvis_overlay_open), onSignIn))
         ClaudeStatus.READY -> entry(
             listOfNotNull(auth?.email, auth?.subscriptionType?.let { claudePlanLabel(it) }, status?.version?.substringBefore(" "))
                 .joinToString(" · ").ifBlank { null }
         )
-        ClaudeStatus.ERROR -> entry(error, AgentStatusAction("Retry", onRetry))
+        ClaudeStatus.ERROR -> entry(error, AgentStatusAction(stringResource(R.string.chat_screen_retry), onRetry))
     }
 }
 
+@Composable
 fun openCodeStatusEntry(
     state: ai.antigem.data.agent.opencode.OpenCodeState,
     status: ai.antigem.data.agent.opencode.OpenCodeStatus?,
@@ -173,24 +188,34 @@ fun openCodeStatusEntry(
         else -> ClaudeStatus.ERROR.dotColor
     }
     if (serverRestarting) {
-        return AgentStatusEntry(AgentKind.OPENCODE, "Restarting…", SystemStatus.STARTING.dotColor, "The local server is restarting.", pending = true)
+        return AgentStatusEntry(AgentKind.OPENCODE, stringResource(R.string.main_ui_restarting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_the_local_server_is_restarting), pending = true)
     }
+    val label = stringResource(when (state) {
+            OpenCodeState.CHECKING -> R.string.bridge_ui_checking
+            OpenCodeState.READY -> R.string.main_ui_ready
+            OpenCodeState.NOT_INSTALLED -> R.string.android_dev_screen_not_installed
+            OpenCodeState.DISABLED -> R.string.main_ui_turned_off_on_the_server
+            OpenCodeState.OUTDATED -> R.string.main_ui_server_update_needed
+            OpenCodeState.OFFLINE -> R.string.main_ui_server_offline
+            OpenCodeState.ERROR -> R.string.markdown_content_error
+        })
     fun entry(detail: String? = null, action: AgentStatusAction? = null) = AgentStatusEntry(
-        AgentKind.OPENCODE, state.label, color, detail, action,
+        AgentKind.OPENCODE, label, color, detail, action,
         pending = state == OpenCodeState.CHECKING,
         isReady = state == OpenCodeState.READY
     )
     return when (state) {
-        OpenCodeState.CHECKING -> entry("Starting… waiting for the server.")
-        OpenCodeState.READY -> entry(listOfNotNull(status?.version?.let { "OpenCode $it" }, if (status?.running == true) "running" else "starts with the first message").joinToString(" · "))
-        OpenCodeState.NOT_INSTALLED -> entry("OpenCode is not installed yet. The app can install it for you.", AgentStatusAction("Install", onSetup))
-        OpenCodeState.DISABLED -> entry("The server was started with OpenCode off.", AgentStatusAction("Restart", onRestartServer))
-        OpenCodeState.OUTDATED -> entry("This server has no OpenCode support yet. Update it.", AgentStatusAction("Restart", onRestartServer))
-        OpenCodeState.OFFLINE -> entry("The server is not running.", AgentStatusAction("Start", onRestartServer))
-        OpenCodeState.ERROR -> entry(status?.error, AgentStatusAction("Retry", onRetry))
+        OpenCodeState.CHECKING -> entry(stringResource(R.string.main_ui_starting_waiting_for_the_server))
+        OpenCodeState.READY -> entry(listOfNotNull(status?.version?.let { "OpenCode $it" }, if (status?.running == true) stringResource(R.string.claude_chat_controls_running_2) else stringResource(R.string.main_ui_starts_with_the_first_message)).joinToString(" · "))
+        OpenCodeState.NOT_INSTALLED -> entry(stringResource(R.string.main_ui_opencode_is_not_installed_yet_the_app), AgentStatusAction(stringResource(R.string.claude_settings_screen_install), onSetup))
+        OpenCodeState.DISABLED -> entry(stringResource(R.string.main_ui_the_server_was_started_with_opencode_off), AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer))
+        OpenCodeState.OUTDATED -> entry(stringResource(R.string.main_ui_this_server_has_no_opencode_support_yet), AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer))
+        OpenCodeState.OFFLINE -> entry(stringResource(R.string.main_ui_the_server_is_not_running), AgentStatusAction(stringResource(R.string.servers_settings_screen_start), onRestartServer))
+        OpenCodeState.ERROR -> entry(status?.error, AgentStatusAction(stringResource(R.string.chat_screen_retry), onRetry))
     }
 }
 
+@Composable
 fun codexStatusEntry(
     state: ai.antigem.data.agent.codex.CodexState,
     status: ai.antigem.data.agent.codex.CodexStatus?,
@@ -209,30 +234,40 @@ fun codexStatusEntry(
         else -> ClaudeStatus.ERROR.dotColor
     }
     if (serverRestarting) {
-        return AgentStatusEntry(AgentKind.CODEX, "Restarting…", SystemStatus.STARTING.dotColor, "The local server is restarting.", pending = true)
+        return AgentStatusEntry(AgentKind.CODEX, stringResource(R.string.main_ui_restarting), SystemStatus.STARTING.dotColor, stringResource(R.string.main_ui_the_local_server_is_restarting), pending = true)
     }
+    val label = stringResource(when (state) {
+            CodexState.CHECKING -> R.string.bridge_ui_checking
+            CodexState.READY -> R.string.main_ui_ready
+            CodexState.SIGNED_OUT -> R.string.main_ui_not_signed_in
+            CodexState.NOT_INSTALLED -> R.string.android_dev_screen_not_installed
+            CodexState.DISABLED -> R.string.main_ui_turned_off_on_the_server
+            CodexState.OUTDATED -> R.string.main_ui_server_update_needed
+            CodexState.OFFLINE -> R.string.main_ui_server_offline
+            CodexState.ERROR -> R.string.markdown_content_error
+        })
     fun entry(detail: String? = null, action: AgentStatusAction? = null) = AgentStatusEntry(
-        AgentKind.CODEX, state.label, color, detail, action,
+        AgentKind.CODEX, label, color, detail, action,
         pending = state == CodexState.CHECKING,
         isReady = state == CodexState.READY,
         isSignedOut = state == CodexState.SIGNED_OUT
     )
     return when (state) {
-        CodexState.CHECKING -> entry("Starting… waiting for the server.")
+        CodexState.CHECKING -> entry(stringResource(R.string.main_ui_starting_waiting_for_the_server))
         CodexState.READY -> entry(
             listOfNotNull(account?.email, account?.plan?.replaceFirstChar { it.uppercase() }, status?.version?.let { "Codex $it" })
                 .joinToString(" · ").ifBlank { null }
         )
-        CodexState.SIGNED_OUT -> entry("Sign in with your ChatGPT account to use Codex.", AgentStatusAction("Sign in", onSignIn))
+        CodexState.SIGNED_OUT -> entry(stringResource(R.string.main_ui_sign_in_with_your_chatgpt_account_to), AgentStatusAction(stringResource(R.string.claude_settings_screen_sign_in), onSignIn))
         CodexState.NOT_INSTALLED -> entry(
-            if (status?.termux_package == true) "Codex is not installed yet (pkg install codex). The app can install it for you."
-            else "Codex is not installed yet. The app can install it for you.",
-            AgentStatusAction("Install", onSetup)
+            if (status?.termux_package == true) stringResource(R.string.main_ui_codex_is_not_installed_yet_pkg_install)
+            else stringResource(R.string.main_ui_codex_is_not_installed_yet_the_app),
+            AgentStatusAction(stringResource(R.string.claude_settings_screen_install), onSetup)
         )
-        CodexState.DISABLED -> entry("The server was started with Codex off.", AgentStatusAction("Restart", onRestartServer))
-        CodexState.OUTDATED -> entry("This server has no Codex support yet. Update it.", AgentStatusAction("Restart", onRestartServer))
-        CodexState.OFFLINE -> entry("The server is not running.", AgentStatusAction("Start", onRestartServer))
-        CodexState.ERROR -> entry(status?.error, AgentStatusAction("Retry", onRetry))
+        CodexState.DISABLED -> entry(stringResource(R.string.main_ui_the_server_was_started_with_codex_off), AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer))
+        CodexState.OUTDATED -> entry(stringResource(R.string.main_ui_this_server_has_no_codex_support_yet), AgentStatusAction(stringResource(R.string.codex_settings_screen_restart), onRestartServer))
+        CodexState.OFFLINE -> entry(stringResource(R.string.main_ui_the_server_is_not_running), AgentStatusAction(stringResource(R.string.servers_settings_screen_start), onRestartServer))
+        CodexState.ERROR -> entry(status?.error, AgentStatusAction(stringResource(R.string.chat_screen_retry), onRetry))
     }
 }
 
@@ -440,7 +475,7 @@ fun AgentStatusMenu(
         ) {
             Icon(Icons.Outlined.Terminal, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.size(17.dp))
             Spacer(Modifier.width(10.dp))
-            Text("Server logs", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.agent_status_ui_server_logs), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), modifier = Modifier.size(18.dp))
         }
         if (onRestartServer != null) {
@@ -456,7 +491,7 @@ fun AgentStatusMenu(
             ) {
                 Icon(Icons.Outlined.RestartAlt, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.size(17.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("Restart server", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.agent_status_ui_restart_server), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
             }
         }
     }

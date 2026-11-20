@@ -1,5 +1,7 @@
 package ai.antigem.ui.opencode
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -97,16 +99,18 @@ private fun permissionTitle(action: String): Pair<ImageVector, String> = when (a
     else -> Icons.Outlined.Shield to "Allow $action?"
 }
 
+@Composable
 fun openCodeModeLabel(mode: String): String = when (mode) {
-    OpenCodePreferences.MODE_AUTO -> "Allow all"
-    OpenCodePreferences.MODE_DEFAULT -> "OpenCode rules"
-    else -> "Ask first"
+    OpenCodePreferences.MODE_AUTO -> stringResource(R.string.agent_permission_allow_all)
+    OpenCodePreferences.MODE_DEFAULT -> stringResource(R.string.agent_permission_opencode_rules)
+    else -> stringResource(R.string.agent_permission_ask_first)
 }
 
+@Composable
 fun openCodeModeDescription(mode: String): String = when (mode) {
-    OpenCodePreferences.MODE_AUTO -> "Commands, edits and web access run without asking."
-    OpenCodePreferences.MODE_DEFAULT -> "OpenCode's own rules from its config (by default most tools run without asking)."
-    else -> "Ask before commands, file changes and web access. Reading the project is allowed."
+    OpenCodePreferences.MODE_AUTO -> stringResource(R.string.agent_permission_commands_edits_and_web_access_run_without_asking)
+    OpenCodePreferences.MODE_DEFAULT -> stringResource(R.string.agent_permission_opencode_s_own_rules_from_its_config_by_default_most_tools)
+    else -> stringResource(R.string.agent_permission_ask_before_commands_file_changes_and_web_access_reading_th)
 }
 
 /** Icon and color of an approval mode (chip and sheet). */

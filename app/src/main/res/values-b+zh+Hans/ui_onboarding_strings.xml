@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_step_step_of">"第 %1$s 步，共 %2$s 步"</string>
+    <string name="terminal_launcher_onboarding_dialog_home_screen_preview">"主屏幕预览"</string>
+    <string name="terminal_launcher_onboarding_dialog_chat_ide">"聊天和集成开发环境"</string>
+    <string name="terminal_launcher_onboarding_dialog_hidden">"隐藏"</string>
+    <string name="terminal_launcher_onboarding_dialog_in_app_only">"仅限应用程序内"</string>
+    <string name="terminal_launcher_onboarding_dialog_standalone_terminal_app_icon">"独立终端应用程序图标"</string>
+    <string name="terminal_launcher_onboarding_dialog_places_a_dedicated_icon_in_your_app">"在应用程序启动器中放置一个专用图标，以便一键终端访问"</string>
+    <string name="terminal_launcher_onboarding_dialog_select_icon_app_name">"选择图标和应用程序名称："</string>
+    <string name="terminal_launcher_onboarding_dialog_modern_unified_icon_matching_antigem">"现代统一图标搭配 AntiGem"</string>
+    <string name="terminal_launcher_onboarding_dialog_classic_terminal_prompt_icon_familiar_name">"经典终端&gt;_提示图标&amp;熟悉的名字"</string>
+</resources>

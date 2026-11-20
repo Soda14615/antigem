@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -64,7 +66,7 @@ fun ChoiceQuestionnaireCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Questionnaire",
+                        text = stringResource(R.string.choice_questionnaire_card_questionnaire),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = ai.antigem.theme.AppColors.onBackground
@@ -126,7 +128,7 @@ fun ChoiceQuestionnaireCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Preferences Submitted",
+                        text = stringResource(R.string.choice_questionnaire_card_preferences_submitted),
                         fontSize = 13.5.sp,
                         fontWeight = FontWeight.Bold,
                         color = ai.antigem.theme.AppColors.onBackground
@@ -180,7 +182,7 @@ fun ChoiceQuestionnaireCard(
                                 verticalAlignment = Alignment.Top
                             ) {
                                 Text(
-                                    text = "↳ A:",
+                                    text = stringResource(R.string.choice_questionnaire_card_a),
                                     fontSize = 12.5.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = QuotaGreen,
@@ -267,7 +269,7 @@ fun ChoiceQuestionnaireCard(
                         modifier = Modifier.height(32.dp)
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.accounts_ui_cancel),
                             fontSize = 12.5.sp,
                             color = ai.antigem.theme.AppColors.textSecondary
                         )
@@ -291,7 +293,7 @@ fun ChoiceQuestionnaireCard(
                             modifier = Modifier.height(32.dp)
                         ) {
                             Text(
-                                text = "Skip",
+                                text = stringResource(R.string.agent_question_panel_skip),
                                 fontSize = 12.5.sp,
                                 color = ai.antigem.theme.AppColors.textSecondary
                             )
@@ -350,7 +352,7 @@ fun ChoiceQuestionnaireCard(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = if (questionnaire.questions.size > 1) "Submit All" else "Submit",
+                                text = if (questionnaire.questions.size > 1) stringResource(R.string.choice_questionnaire_card_submit_all) else stringResource(R.string.agent_question_panel_submit),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -407,7 +409,7 @@ private fun QuestionBlockView(
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
                     Text(
-                        text = "Multi-select",
+                        text = stringResource(R.string.choice_questionnaire_card_multi_select),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
                         color = ai.antigem.theme.AppColors.textSecondary,
@@ -422,7 +424,7 @@ private fun QuestionBlockView(
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
                     Text(
-                        text = "$questionNumber of $totalQuestions",
+                        text = stringResource(R.string.agent_question_panel_of, questionNumber.toString(), totalQuestions.toString()),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
                         color = ai.antigem.theme.AppColors.textSecondary,
@@ -489,7 +491,7 @@ private fun QuestionBlockView(
                         onValueChange = onCustomTextChanged,
                         placeholder = {
                             Text(
-                                text = "Type your custom answer here...",
+                                text = stringResource(R.string.choice_questionnaire_card_type_your_custom_answer_here),
                                 fontSize = 12.sp,
                                 color = ai.antigem.theme.AppColors.textSecondary
                             )
@@ -757,10 +759,10 @@ private fun QuestionPanelStatusRow(toolCall: ToolCall, questionnaire: ChoiceQues
                     )
                 }
                 if (questionnaire.questions.size > 3) {
-                    Text("+${questionnaire.questions.size - 3} more", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                    Text(stringResource(R.string.choice_questionnaire_card_more, (questionnaire.questions.size - 3).toString()), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 }
                 if (waiting) {
-                    Text("Answer in the panel above the message box.", fontSize = 11.5.sp, color = tint, modifier = Modifier.padding(top = 4.dp))
+                    Text(stringResource(R.string.choice_questionnaire_card_answer_in_the_panel_above_the_message), fontSize = 11.5.sp, color = tint, modifier = Modifier.padding(top = 4.dp))
                 }
             }
         }

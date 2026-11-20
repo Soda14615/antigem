@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -69,20 +71,20 @@ fun ConnectionStatusBadge(
                             .background(dotColor, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Bridge Status", style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.connection_status_badge_bridge_status), style = MaterialTheme.typography.titleMedium)
                 }
             },
             text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Status: $labelText",
+                        text = stringResource(R.string.connection_status_badge_status, labelText.toString()),
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Endpoint: $bridgeUrl",
+                        text = stringResource(R.string.connection_status_badge_endpoint, bridgeUrl.toString()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -91,7 +93,7 @@ fun ConnectionStatusBadge(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = "Active Worker Instances (${activeInstances.size}):",
+                        text = stringResource(R.string.connection_status_badge_active_worker_instances, activeInstances.size.toString()),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -100,7 +102,7 @@ fun ConnectionStatusBadge(
 
                     if (activeInstances.isEmpty()) {
                         Text(
-                            text = "No active warm processes in RAM.",
+                            text = stringResource(R.string.connection_status_badge_no_active_warm_processes_in_ram),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -125,14 +127,14 @@ fun ConnectionStatusBadge(
                                             color = ClaudeTerracotta
                                         )
                                         Text(
-                                            text = "PID: ${inst.pid}",
+                                            text = stringResource(R.string.connection_status_badge_pid, inst.pid.toString()),
                                             fontSize = 11.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "Chat: ${inst.conversationId.take(12)}... | Uptime: ${inst.uptimeSeconds}s",
+                                        text = stringResource(R.string.connection_status_badge_chat_uptime_s, (inst.conversationId.take(12)).toString(), inst.uptimeSeconds.toString()),
                                         fontSize = 11.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -151,12 +153,12 @@ fun ConnectionStatusBadge(
                 ) {
                     Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Reconnect")
+                    Text(stringResource(R.string.chat_screen_reconnect))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Close")
+                    Text(stringResource(R.string.accounts_ui_close))
                 }
             }
         )

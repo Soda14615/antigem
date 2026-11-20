@@ -1,5 +1,7 @@
 package ai.antigem.ui.cloud
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -152,7 +154,7 @@ fun AgyCloudSettingsCard(modifier: Modifier = Modifier) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(10.dp))
-                    Text("Cloud agents", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.agy_cloud_ui_cloud_agents), fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     Switch(checked = enabled, onCheckedChange = { AgyCloud.setEnabled(it) })
                 }
                 Spacer(Modifier.height(6.dp))
@@ -165,7 +167,7 @@ fun AgyCloudSettingsCard(modifier: Modifier = Modifier) {
                 Text(
                     if (enabled) "On: cloud projects show in the project picker of Antigravity chats, and cloud chats in the " +
                         "chat list. They are ready about a minute after the Antigravity server starts."
-                    else "Off: the app does not ask the Antigravity server for cloud projects or cloud chats.",
+                    else stringResource(R.string.agy_cloud_ui_off_the_app_does_not_ask_the),
                     fontSize = 12.5.sp, color = subtle()
                 )
             }
@@ -335,14 +337,14 @@ fun CloudProjectsDialog(
                     Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue, modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(8.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Cloud agents", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                        Text("Antigravity Remote Agents · Google AI Pro / Ultra", fontSize = 11.5.sp, color = subtle())
+                        Text(stringResource(R.string.agy_cloud_ui_cloud_agents), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                        Text(stringResource(R.string.agy_cloud_ui_antigravity_remote_agents_google_ai_pro_ultra), fontSize = 11.5.sp, color = subtle())
                     }
-                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, "Close") }
+                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close)) }
                 }
                 TabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {
-                    Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text("Projects") })
-                    Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text("Connections") })
+                    Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(R.string.agy_cloud_ui_projects)) })
+                    Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(R.string.agy_cloud_ui_connections)) })
                 }
                 actionError?.let {
                     Text(it, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp).clickable { actionError = null })
@@ -355,11 +357,11 @@ fun CloudProjectsDialog(
                             colors = ButtonDefaults.buttonColors(containerColor = GeminiBlue),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("New cloud project")
+                            Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.agy_cloud_ui_new_cloud_project))
                         }
                         Spacer(Modifier.weight(1f))
                         if (loading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                        else IconButton(onClick = { scope.launch { AgyCloud.refreshProjects() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                        else IconButton(onClick = { scope.launch { AgyCloud.refreshProjects() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
                     }
                     if (error != null) Text(error!!, fontSize = 12.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 6.dp))
                     LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 8.dp)) {
@@ -415,8 +417,8 @@ fun CloudProjectsDialog(
         var name by remember(p.id) { mutableStateOf(p.name) }
         AlertDialog(
             onDismissRequest = { renaming = null },
-            title = { Text("Rename project") },
-            text = { OutlinedTextField(name, { name = it }, singleLine = true, label = { Text("Name") }) },
+            title = { Text(stringResource(R.string.agy_cloud_ui_rename_project)) },
+            text = { OutlinedTextField(name, { name = it }, singleLine = true, label = { Text(stringResource(R.string.browser_screen_name)) }) },
             confirmButton = {
                 TextButton(enabled = name.isNotBlank(), onClick = {
                     scope.launch {
@@ -424,17 +426,17 @@ fun CloudProjectsDialog(
                         AgyCloud.rename(p.id, name).onFailure { actionError = "Rename failed: ${it.message ?: "unknown error"}" }
                         renaming = null
                     }
-                }) { Text("Rename") }
+                }) { Text(stringResource(R.string.agy_cloud_ui_rename)) }
             },
-            dismissButton = { TextButton(onClick = { renaming = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { renaming = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 
     deleting?.let { p ->
         AlertDialog(
             onDismissRequest = { deleting = null },
-            title = { Text("Delete ${p.name}?") },
-            text = { Text("The cloud project and its cloud chats are deleted in Google's cloud. Your GitHub repos are not touched.") },
+            title = { Text(stringResource(R.string.claude_settings_screen_delete, p.name.toString())) },
+            text = { Text(stringResource(R.string.agy_cloud_ui_the_cloud_project_and_its_cloud_chats)) },
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch {
@@ -442,9 +444,9 @@ fun CloudProjectsDialog(
                         AgyCloud.deleteProject(p.id).onFailure { actionError = "Delete failed: ${it.message ?: "unknown error"}" }
                         deleting = null
                     }
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { deleting = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -470,18 +472,18 @@ private fun ProjectCard(
                 Spacer(Modifier.width(8.dp))
                 Text(p.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Box {
-                    IconButton(onClick = { menu = true }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.MoreVert, "More", modifier = Modifier.size(18.dp)) }
+                    IconButton(onClick = { menu = true }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.text_selection_more), modifier = Modifier.size(18.dp)) }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                        DropdownMenuItem(text = { Text("Rename") }, onClick = { menu = false; onRename() })
-                        DropdownMenuItem(text = { Text("Delete", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDelete() })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.agy_cloud_ui_rename)) }, onClick = { menu = false; onRename() })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDelete() })
                     }
                 }
             }
             Spacer(Modifier.height(4.dp))
-            if (p.repos.isEmpty()) Text("No repos: the agent starts in an empty folder.", fontSize = 12.sp, color = subtle())
+            if (p.repos.isEmpty()) Text(stringResource(R.string.agy_cloud_ui_no_repos_the_agent_starts_in_an), fontSize = 12.sp, color = subtle())
             p.repos.forEach { r ->
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 1.dp)) {
-                    if (r.is_private) Icon(Icons.Outlined.Lock, "Private", tint = subtle(), modifier = Modifier.size(12.dp))
+                    if (r.is_private) Icon(Icons.Outlined.Lock, stringResource(R.string.agy_cloud_ui_private), tint = subtle(), modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(r.display_name.ifBlank { r.resource_id }, fontSize = 12.5.sp, fontFamily = FontFamily.Monospace)
                 }
@@ -489,9 +491,9 @@ private fun ProjectCard(
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (onNewChat != null) Button(onClick = onNewChat, colors = ButtonDefaults.buttonColors(containerColor = GeminiBlue), shape = RoundedCornerShape(12.dp)) {
-                    Text("New chat here", fontSize = 13.sp)
+                    Text(stringResource(R.string.agy_cloud_ui_new_chat_here), fontSize = 13.sp)
                 }
-                OutlinedButton(onClick = onRepos, shape = RoundedCornerShape(12.dp)) { Text("Repos", fontSize = 13.sp) }
+                OutlinedButton(onClick = onRepos, shape = RoundedCornerShape(12.dp)) { Text(stringResource(R.string.agy_cloud_ui_repos), fontSize = 13.sp) }
             }
         }
     }
@@ -542,12 +544,12 @@ private fun CloudProjectEditor(
         text = {
             Column {
                 if (askName) {
-                    OutlinedTextField(name, { name = it }, singleLine = true, label = { Text("Project name") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(name, { name = it }, singleLine = true, label = { Text(stringResource(R.string.agy_cloud_ui_project_name)) }, modifier = Modifier.fillMaxWidth())
                     Spacer(Modifier.height(12.dp))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("GitHub repos", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { reload++ }, modifier = Modifier.size(30.dp)) { Icon(Icons.Outlined.Refresh, "Reload", modifier = Modifier.size(18.dp)) }
+                    Text(stringResource(R.string.agy_cloud_ui_github_repos), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { reload++ }, modifier = Modifier.size(30.dp)) { Icon(Icons.Outlined.Refresh, stringResource(R.string.browser_screen_reload), modifier = Modifier.size(18.dp)) }
                 }
                 when {
                     notConnected -> {
@@ -557,13 +559,13 @@ private fun CloudProjectEditor(
                             fontSize = 12.5.sp, lineHeight = 17.sp, color = subtle()
                         )
                         Spacer(Modifier.height(8.dp))
-                        OutlinedButton(onClick = { saveError = null; openConnect(connectScope, uri, "github", onError = { saveError = it }) { connecting = true } }) { Text("Connect GitHub") }
+                        OutlinedButton(onClick = { saveError = null; openConnect(connectScope, uri, "github", onError = { saveError = it }) { connecting = true } }) { Text(stringResource(R.string.agy_cloud_ui_connect_github)) }
                     }
                     loadError != null -> Text(loadError!!, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                     available == null -> Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text("Loading your repos…", fontSize = 12.5.sp)
+                        CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.agy_cloud_ui_loading_your_repos), fontSize = 12.5.sp)
                     }
-                    all.isEmpty() -> Text("No repos are shared with Antigravity. Add some in GitHub's settings for the Antigravity app.", fontSize = 12.5.sp, color = subtle())
+                    all.isEmpty() -> Text(stringResource(R.string.agy_cloud_ui_no_repos_are_shared_with_antigravity_add), fontSize = 12.5.sp, color = subtle())
                 }
                 if (all.isNotEmpty()) {
                     LazyColumn(Modifier.heightIn(max = 300.dp)) {
@@ -577,12 +579,12 @@ private fun CloudProjectEditor(
                                 Checkbox(checked = on, onCheckedChange = { picked = if (on) picked - r.resource_id else picked + r.resource_id })
                                 Column(Modifier.weight(1f)) {
                                     Text(r.display_name.ifBlank { r.resource_id }, fontSize = 13.sp, fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    if (r.is_private) Text("private", fontSize = 10.5.sp, color = subtle())
+                                    if (r.is_private) Text(stringResource(R.string.agy_cloud_ui_private_2), fontSize = 10.5.sp, color = subtle())
                                 }
                             }
                         }
                     }
-                    Text("Private repos in one project must have the same owner.", fontSize = 11.sp, color = subtle(), modifier = Modifier.padding(top = 4.dp))
+                    Text(stringResource(R.string.agy_cloud_ui_private_repos_in_one_project_must_have), fontSize = 11.sp, color = subtle(), modifier = Modifier.padding(top = 4.dp))
                 }
                 saveError?.let { Text(it, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp)) }
             }
@@ -599,9 +601,9 @@ private fun CloudProjectEditor(
                         saving = false
                     }
                 }
-            ) { Text(if (saving) "Saving…" else confirm) }
+            ) { Text(if (saving) stringResource(R.string.claude_providers_page_saving) else confirm) }
         },
-        dismissButton = { TextButton(enabled = !saving, onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(enabled = !saving, onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -624,10 +626,10 @@ private fun ConnectionsTab(modifier: Modifier) {
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Connect opens Antigravity's page for it in your browser, as your Antigravity Google account. Connect it there, then come back here.",
+                stringResource(R.string.agy_cloud_ui_connect_opens_antigravity_s_page_for_it),
                 fontSize = 12.sp, color = subtle(), lineHeight = 16.sp, modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = { reload++ }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+            IconButton(onClick = { reload++ }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
         }
         if (error != null) Text(error!!, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
         if (plugins == null && error == null) CircularProgressIndicator(Modifier.padding(16.dp).size(22.dp), strokeWidth = 2.dp)
@@ -640,15 +642,15 @@ private fun ConnectionsTab(modifier: Modifier) {
                             Text(
                                 when {
                                     p.connected -> "Connected" + (p.account.takeIf { it.isNotBlank() }?.let { " · $it" } ?: "")
-                                    p.expired -> "Expired: connect again"
-                                    else -> "Not connected"
+                                    p.expired -> stringResource(R.string.agy_cloud_ui_expired_connect_again)
+                                    else -> stringResource(R.string.agy_cloud_ui_not_connected)
                                 },
                                 fontSize = 12.sp,
                                 color = if (p.connected) ai.antigem.theme.AppColors.success else subtle()
                             )
                         }
-                        if (p.connected) TextButton(onClick = { disconnecting = p }) { Text("Disconnect", color = MaterialTheme.colorScheme.error) }
-                        else OutlinedButton(onClick = { error = null; openConnect(scope, uri, p.id, onError = { error = it }) { connecting = true } }) { Text(if (p.expired) "Reconnect" else "Connect") }
+                        if (p.connected) TextButton(onClick = { disconnecting = p }) { Text(stringResource(R.string.agy_cloud_ui_disconnect), color = MaterialTheme.colorScheme.error) }
+                        else OutlinedButton(onClick = { error = null; openConnect(scope, uri, p.id, onError = { error = it }) { connecting = true } }) { Text(if (p.expired) stringResource(R.string.chat_screen_reconnect) else stringResource(R.string.agy_cloud_ui_connect)) }
                     }
                 }
             }
@@ -657,8 +659,8 @@ private fun ConnectionsTab(modifier: Modifier) {
     disconnecting?.let { p ->
         AlertDialog(
             onDismissRequest = { disconnecting = null },
-            title = { Text("Disconnect ${p.name}?") },
-            text = { Text("Cloud agents can no longer use ${p.name} until you connect it again.") },
+            title = { Text(stringResource(R.string.agy_cloud_ui_disconnect_2, p.name.toString())) },
+            text = { Text(stringResource(R.string.agy_cloud_ui_cloud_agents_can_no_longer_use_until, p.name.toString())) },
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch {
@@ -666,9 +668,9 @@ private fun ConnectionsTab(modifier: Modifier) {
                         disconnecting = null
                         reload++
                     }
-                }) { Text("Disconnect", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.agy_cloud_ui_disconnect), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { disconnecting = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { disconnecting = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -689,7 +691,7 @@ fun CloudChatStrip(projectName: String?, onProject: () -> Unit, onPreview: () ->
         ) {
             Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue, modifier = Modifier.size(15.dp))
             Spacer(Modifier.width(5.dp))
-            Text(projectName ?: "Cloud", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = GeminiBlue, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(projectName ?: stringResource(R.string.agy_cloud_ui_cloud), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = GeminiBlue, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         StripChip(Icons.Outlined.Visibility, "Preview", onPreview)
         StripChip(Icons.Outlined.Terminal, "Run", onRunCommand)
@@ -718,11 +720,11 @@ fun CloudRunCommandDialog(onRun: (String) -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Outlined.Terminal, null) },
-        title = { Text("Run a command in the cloud VM") },
+        title = { Text(stringResource(R.string.agy_cloud_ui_run_a_command_in_the_cloud_vm)) },
         text = {
             Column {
                 OutlinedTextField(
-                    cmd, { cmd = it }, label = { Text("Command") }, singleLine = false, maxLines = 4,
+                    cmd, { cmd = it }, label = { Text(stringResource(R.string.agy_cloud_ui_command)) }, singleLine = false, maxLines = 4,
                     textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -735,15 +737,15 @@ fun CloudRunCommandDialog(onRun: (String) -> Unit, onDismiss: () -> Unit) {
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                Text("The agent runs it and the output shows in the chat.", fontSize = 11.5.sp, color = subtle())
+                Text(stringResource(R.string.agy_cloud_ui_the_agent_runs_it_and_the_output), fontSize = 11.5.sp, color = subtle())
             }
         },
         confirmButton = {
             TextButton(enabled = cmd.isNotBlank(), onClick = { onRun(cmd.trim()); onDismiss() }) {
-                Icon(Icons.Outlined.PlayArrow, null, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text("Run")
+                Icon(Icons.Outlined.PlayArrow, null, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.agy_cloud_ui_run))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 

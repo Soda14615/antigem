@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -91,47 +93,47 @@ fun ReaScreen(
             Surface(shape = RoundedCornerShape(12.dp), color = (if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen).copy(alpha = 0.1f)) {
                 Row(Modifier.fillMaxWidth().padding(start = 14.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(msg, fontSize = 12.5.sp, color = if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen, modifier = Modifier.weight(1f))
-                    IconButton(onClick = ReaManager::clearMessage) { Icon(Icons.Default.Close, "Dismiss", Modifier.size(18.dp)) }
+                    IconButton(onClick = ReaManager::clearMessage) { Icon(Icons.Default.Close, stringResource(R.string.browser_screen_dismiss), Modifier.size(18.dp)) }
                 }
             }
         }
 
         if (!state.ready) {
-            Hint("Checking…")
+            Hint(stringResource(R.string.bridge_ui_checking))
             return@Column
         }
         if (!state.bootstrapInstalled) {
             InfoCard("Install the terminal first", cardBg, cardBorder) {
-                Hint("REA installs into AntiGem's terminal. Install it in Settings → Terminal & Shell, then come back here.")
+                Hint(stringResource(R.string.rea_screen_rea_installs_into_antigem_s_terminal_install))
             }
             return@Column
         }
 
         // Step 1: setup files, downloaded on demand (nothing of REA ships in the app)
         StepCard(
-            1, "Setup files",
+            1, stringResource(R.string.android_dev_screen_setup_files),
             when {
-                state.filesUpdate != null -> "Update"
+                state.filesUpdate != null -> stringResource(R.string.claude_settings_screen_update)
                 state.filesVersion != null -> "v${state.filesVersion}"
                 else -> null
             },
             cardBg, cardBorder,
             badgeColor = if (state.filesUpdate != null) Amber else QuotaGreen
         ) {
-            Hint("REA's setup scripts (rea-setup.sh, the rea-mcp launcher and the default tool groups) are not part of the app. They are downloaded from the AntiGem plugins repository when you need them.")
+            Hint(stringResource(R.string.rea_screen_rea_s_setup_scripts_rea_setup_sh))
             SourceRow(state.source, enabled = !busy)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     state.filesVersion == null -> Button(enabled = !busy, onClick = ReaManager::downloadSetupFiles) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Get setup files")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_get_setup_files))
                     }
                     state.filesUpdate != null -> Button(enabled = !busy, onClick = ReaManager::downloadSetupFiles) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Update to v${state.filesUpdate}")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_update_to_v, state.filesUpdate.toString()))
                     }
-                    else -> OutlinedButton(enabled = !busy, onClick = ReaManager::downloadSetupFiles) { Text("Download again") }
+                    else -> OutlinedButton(enabled = !busy, onClick = ReaManager::downloadSetupFiles) { Text(stringResource(R.string.android_dev_screen_download_again)) }
                 }
                 if (state.filesVersion != null && state.filesUpdate == null) {
-                    TextButton(enabled = !busy, onClick = ReaManager::checkForUpdate) { Text("Check for update") }
+                    TextButton(enabled = !busy, onClick = ReaManager::checkForUpdate) { Text(stringResource(R.string.android_dev_screen_check_for_update)) }
                 }
             }
             ReaTaskOutput(state, "files")
@@ -142,11 +144,11 @@ fun ReaScreen(
 
         // Step 3: which tools agents see
         StepCard(
-            3, "Tool groups",
-            if (state.groups.isNotEmpty()) "${state.groups.size} groups" else null,
+            3, stringResource(R.string.rea_groups_screen_tool_groups),
+            if (state.groups.isNotEmpty()) stringResource(R.string.rea_screen_groups, state.groups.size.toString()) else null,
             cardBg, cardBorder
         ) {
-            Hint("REA has over 200 tools. Tool groups decide which tools each REA server lets the agent use; on a server that shows its tools directly, every tool also costs context on each request. Start with the built-in groups and change them any time: add or remove tools, or create your own.")
+            Hint(stringResource(R.string.rea_screen_rea_has_over_200_tools_tool_groups))
             if (state.groups.isNotEmpty()) {
                 val grouped = state.allToolNames.size - state.ungrouped.size
                 Mono(
@@ -155,30 +157,30 @@ fun ReaScreen(
                         (state.toolsServer?.let { "\nTool list from $it" } ?: "\nTool list: install REA to read it")
                 )
             } else {
-                Hint("The default groups come with the setup files.")
+                Hint(stringResource(R.string.rea_screen_the_default_groups_come_with_the_setup))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(enabled = state.groups.isNotEmpty() || state.filesReady, onClick = onOpenGroups) {
-                    Icon(Icons.Outlined.Category, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Edit tool groups")
+                    Icon(Icons.Outlined.Category, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.rea_screen_edit_tool_groups))
                 }
-                OutlinedButton(enabled = !busy && state.usable, onClick = ReaManager::refreshTools) { Text("Refresh tool list") }
+                OutlinedButton(enabled = !busy && state.usable, onClick = ReaManager::refreshTools) { Text(stringResource(R.string.rea_screen_refresh_tool_list)) }
             }
             ReaTaskOutput(state, "tools")
         }
 
         // Step 4: connecting it to an agent happens in that agent's MCP settings, the same way for every agent
-        StepCard(4, "Connect REA to your agent", null, cardBg, cardBorder) {
+        StepCard(4, stringResource(R.string.rea_screen_connect_rea_to_your_agent), null, cardBg, cardBorder) {
             ConnectGuide(state)
         }
 
         // Step 5: health check
-        StepCard(5, "Check it works", null, cardBg, cardBorder) {
-            Hint("Runs rea doctor in the container: it reports which engines REA can use (JADX, apktool, objdump, rizin, adb…). Engines you did not install show as missing, which is fine.")
+        StepCard(5, stringResource(R.string.rea_screen_check_it_works), null, cardBg, cardBorder) {
+            Hint(stringResource(R.string.rea_screen_runs_rea_doctor_in_the_container_it))
             OutlinedButton(enabled = !busy && state.usable, onClick = ReaManager::runDoctor) {
-                Icon(Icons.Outlined.HealthAndSafety, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Run health check")
+                Icon(Icons.Outlined.HealthAndSafety, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.rea_screen_run_health_check))
             }
             ReaTaskOutput(state, "doctor")
-            Text("Try in chat", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.android_dev_screen_try_in_chat), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             listOf(
                 "Use REA to find the APK of the installed app com.example.app and summarize its manifest and permissions.",
                 "With REA, is com.example.app a Flutter, React Native or native app? Show the evidence.",
@@ -190,9 +192,9 @@ fun ReaScreen(
 
         // Optional: adb to this phone, for REA's device tools
         InfoCard("Phone access (optional)", cardBg, cardBorder, pill = if (adb.connectedDevice != null) "Connected" to QuotaGreen else "Optional" to MaterialTheme.colorScheme.primary) {
-            Hint("REA's phone tools (installed apps, pulling APKs, logcat, screenshots, starting apps) use adb. Install adb above, then connect the terminal's adb to this phone once over Wireless debugging. Without it, agents can still read installed apps' APKs: pm path <package> gives the path.")
+            Hint(stringResource(R.string.rea_screen_rea_s_phone_tools_installed_apps_pulling))
             val device = adb.connectedDevice
-            if (device != null) Mono("adb connected: ${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text("Set up ADB Connect") }
+            if (device != null) Mono("adb connected: ${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_dev_screen_set_up_adb_connect)) }
         }
 
         WebsitesCard(state, cardBg, cardBorder)
@@ -220,9 +222,9 @@ fun ReaScreen(
             title = { Text(title) },
             text = { Text(text) },
             confirmButton = {
-                TextButton(onClick = { action(); confirm = null }) { Text(if (what == "uninstall") "Remove" else "Delete", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = { action(); confirm = null }) { Text(if (what == "uninstall") stringResource(R.string.browser_screen_remove) else stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirm = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirm = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -235,17 +237,17 @@ private fun ReaIntroCard(state: ReaManager.State, cardBg: Color, cardBorder: Bor
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.BugReport, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("Reverse engineering with REA", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.rea_screen_reverse_engineering_with_rea), fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 when {
-                    state.usable && state.requiredDone -> Pill("Ready", QuotaGreen)
-                    state.installed.isNotEmpty() -> Pill("Partly set up", Amber)
-                    else -> Pill("Not set up", MaterialTheme.colorScheme.primary)
+                    state.usable && state.requiredDone -> Pill(stringResource(R.string.android_dev_screen_ready), QuotaGreen)
+                    state.installed.isNotEmpty() -> Pill(stringResource(R.string.android_dev_screen_partly_set_up), Amber)
+                    else -> Pill(stringResource(R.string.android_dev_screen_not_set_up), MaterialTheme.colorScheme.primary)
                 }
             }
-            Hint("Let agents take apart Android apps (APK, Flutter, React Native) and native code: decompile classes, read manifests and resources, inspect .so libraries, look at installed apps. REA is an open-source MCP server; AntiGem runs it in an Ubuntu container (proot-distro) inside the terminal.")
-            Hint("Install only the parts you need. Everything for APK analysis takes about 1 GB.")
+            Hint(stringResource(R.string.rea_screen_let_agents_take_apart_android_apps_apk))
+            Hint(stringResource(R.string.rea_screen_install_only_the_parts_you_need_everything))
             TextButton(onClick = { openReaUrl(context, ReaManager.REA_HOMEPAGE) }, contentPadding = PaddingValues(0.dp)) {
-                Text("About REA (github.com/morluto/rea)", fontSize = 12.5.sp)
+                Text(stringResource(R.string.rea_screen_about_rea_github_com_morluto_rea), fontSize = 12.5.sp)
             }
         }
     }
@@ -258,15 +260,15 @@ private fun SourceRow(source: String, enabled: Boolean) {
     var error by remember { mutableStateOf<String?>(null) }
     if (!editing) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("From $source", fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
-            TextButton(enabled = enabled, onClick = { editing = true }) { Text("Change", fontSize = 12.sp) }
+            Text(stringResource(R.string.android_dev_screen_from, source.toString()), fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
+            TextButton(enabled = enabled, onClick = { editing = true }) { Text(stringResource(R.string.android_dev_screen_change), fontSize = 12.sp) }
         }
         return
     }
     OutlinedTextField(
         value = text, onValueChange = { text = it; error = null }, singleLine = true,
-        label = { Text("owner/repo@branch") }, isError = error != null,
-        supportingText = { Text(error ?: "A fork of the AntiGem plugins repository, for testing changes to the setup.") },
+        label = { Text(stringResource(R.string.android_dev_screen_owner_repo_branch)) }, isError = error != null,
+        supportingText = { Text(error ?: stringResource(R.string.android_dev_screen_a_fork_of_the_antigem_plugins_repository)) },
         modifier = Modifier.fillMaxWidth()
     )
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -274,9 +276,9 @@ private fun SourceRow(source: String, enabled: Boolean) {
             runCatching { ReaManager.setSource(text) }
                 .onSuccess { editing = false; ReaManager.checkForUpdate() }
                 .onFailure { error = it.message }
-        }) { Text("Save") }
-        TextButton(onClick = { text = ReaManager.DEFAULT_SOURCE }) { Text("Default") }
-        TextButton(onClick = { editing = false; text = source }) { Text("Cancel") }
+        }) { Text(stringResource(R.string.claude_providers_page_save)) }
+        TextButton(onClick = { text = ReaManager.DEFAULT_SOURCE }) { Text(stringResource(R.string.android_dev_screen_default)) }
+        TextButton(onClick = { editing = false; text = source }) { Text(stringResource(R.string.accounts_ui_cancel)) }
     }
 }
 
@@ -301,16 +303,16 @@ private fun InstallStep(state: ReaManager.State, cardBg: Color, cardBorder: Bord
     val plan = ReaManager.plan(selected.toList())
 
     StepCard(
-        2, "Install",
+        2, stringResource(R.string.claude_settings_screen_install),
         when {
-            state.requiredDone -> "$installedCount of $total"
-            installedCount > 0 -> "$installedCount of $total"
+            state.requiredDone -> stringResource(R.string.agent_question_panel_of, installedCount.toString(), total.toString())
+            installedCount > 0 -> stringResource(R.string.agent_question_panel_of, installedCount.toString(), total.toString())
             else -> null
         },
         cardBg, cardBorder,
         badgeColor = if (state.requiredDone) QuotaGreen else Amber
     ) {
-        Hint("Pick the parts you need and install them together, or install them one at a time with the button on each. Anything a part needs is added for you.")
+        Hint(stringResource(R.string.rea_screen_pick_the_parts_you_need_and_install))
         val facts = listOfNotNull(
             state.containerName?.let { "Container: $it" },
             state.nodeVersion?.let { "Node.js $it" },
@@ -318,9 +320,9 @@ private fun InstallStep(state: ReaManager.State, cardBg: Color, cardBorder: Bord
         )
         if (facts.isNotEmpty()) Mono(facts.joinToString("\n"))
 
-        Text("Needed for APK analysis", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.rea_screen_needed_for_apk_analysis), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         Component.entries.filter { it.required }.forEach { c -> ComponentRow(c, state, c in selected, busy) { on -> if (on) selected.add(c) else selected.remove(c) } }
-        Text("Optional", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
+        Text(stringResource(R.string.android_automation_screen_optional), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
         Component.entries.filter { !it.required }.forEach { c -> ComponentRow(c, state, c in selected, busy) { on -> if (on) selected.add(c) else selected.remove(c) } }
 
         if (isInstallTask(state.task) || isInstallTask(state.logTask)) BatchProgress(state)
@@ -335,18 +337,18 @@ private fun InstallStep(state: ReaManager.State, cardBg: Color, cardBorder: Bord
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(enabled = plan.isNotEmpty(), onClick = { ReaManager.installAll(plan) }) {
                     Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                    Text(if (plan.isEmpty()) "Nothing to install" else "Install selected (${plan.size})")
+                    Text(if (plan.isEmpty()) stringResource(R.string.android_dev_screen_nothing_to_install) else stringResource(R.string.android_dev_screen_install_selected, plan.size.toString()))
                 }
                 TextButton(onClick = {
                     selected.clear(); selected.addAll(Component.entries.filter { it !in state.installed })
-                }) { Text("Select all") }
-                TextButton(onClick = { selected.clear() }) { Text("Clear") }
+                }) { Text(stringResource(R.string.claude_providers_page_select_all)) }
+                TextButton(onClick = { selected.clear() }) { Text(stringResource(R.string.custom_system_prompt_dialog_clear)) }
             }
-            if (!state.filesReady) Hint("The setup files are downloaded first.")
+            if (!state.filesReady) Hint(stringResource(R.string.android_dev_screen_the_setup_files_are_downloaded_first))
         } else {
-            Hint("Keep AntiGem open: the screen stays on while this runs. Stopping half way is safe; install the part again to finish it.")
+            Hint(stringResource(R.string.android_dev_screen_keep_antigem_open_the_screen_stays_on))
             OutlinedButton(onClick = ReaManager::stop, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                Icon(Icons.Outlined.StopCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Stop")
+                Icon(Icons.Outlined.StopCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.chat_input_bar_stop))
             }
         }
     }
@@ -361,7 +363,7 @@ private fun ComponentRow(c: Component, state: ReaManager.State, checked: Boolean
         Column(Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(horizontal = 6.dp, vertical = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (installed) {
-                    Icon(Icons.Outlined.CheckCircle, "Installed", tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
+                    Icon(Icons.Outlined.CheckCircle, stringResource(R.string.claude_settings_screen_installed), tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
                 } else {
                     Checkbox(checked = checked, enabled = !busy, onCheckedChange = onCheck)
                 }
@@ -381,7 +383,7 @@ private fun ComponentRow(c: Component, state: ReaManager.State, checked: Boolean
                     CircularProgressIndicator(Modifier.padding(end = 12.dp).size(18.dp), strokeWidth = 2.dp)
                 } else {
                     TextButton(enabled = !busy, onClick = { ReaManager.install(c) }) {
-                        Text(if (installed) (if (c == Component.REA) "Update" else "Reinstall") else "Install", fontSize = 12.5.sp)
+                        Text(if (installed) (if (c == Component.REA) stringResource(R.string.claude_settings_screen_update) else stringResource(R.string.android_dev_screen_reinstall)) else stringResource(R.string.claude_settings_screen_install), fontSize = 12.5.sp)
                     }
                 }
             }
@@ -389,7 +391,7 @@ private fun ComponentRow(c: Component, state: ReaManager.State, checked: Boolean
                 Text(c.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f), modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp))
                 val missing = c.needs.filter { it !in state.installed }
                 if (missing.isNotEmpty() && !installed) {
-                    Text("Also installs: ${missing.joinToString(", ") { it.label }}", fontSize = 11.5.sp, color = Amber, modifier = Modifier.padding(start = 12.dp, bottom = 8.dp))
+                    Text(stringResource(R.string.android_dev_screen_also_installs, (missing.joinToString(", ") { it.label }).toString()), fontSize = 11.5.sp, color = Amber, modifier = Modifier.padding(start = 12.dp, bottom = 8.dp))
                 }
             }
         }
@@ -409,7 +411,7 @@ private fun BatchProgress(state: ReaManager.State) {
             )
         }
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: "Starting…")
+        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
     }
     if (isInstallTask(state.logTask) && state.log.isNotEmpty()) LogBox(state.log)
 }
@@ -419,8 +421,8 @@ private fun BatchProgress(state: ReaManager.State) {
 private fun ReaTaskOutput(state: ReaManager.State, task: String) {
     if (state.task == task) {
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: "Starting…")
-        OutlinedButton(onClick = ReaManager::stop) { Text("Stop") }
+        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
+        OutlinedButton(onClick = ReaManager::stop) { Text(stringResource(R.string.chat_input_bar_stop)) }
     }
     if (state.logTask == task && state.log.isNotEmpty()) LogBox(state.log)
 }
@@ -431,10 +433,10 @@ private fun ConnectGuide(state: ReaManager.State) {
     val onDemand = state.serverTokens(ReaManager.Mode.ON_DEMAND, listOf("all"), emptyList(), false)
     val directDefault = state.serverTokens(ReaManager.Mode.DIRECT, state.defaultSelection.ifEmpty { listOf("all") }, emptyList(), false)
     val directAll = state.serverTokens(ReaManager.Mode.DIRECT, listOf("all"), emptyList(), false)
-    Hint("REA is not tied to an agent: any agent can use it. Add it where you manage that agent's MCP servers, with the REA preset:")
-    Mono("Antigravity → MCP Servers → REA\nClaude Code → MCP → REA\nOpenCode → MCP servers → REA\nCodex → MCP servers → REA")
-    if (!state.usable) Hint("Install REA and the MCP launcher above first.")
-    Text("The preset asks how the agent should see REA's tools", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+    Hint(stringResource(R.string.rea_screen_rea_is_not_tied_to_an_agent))
+    Mono(stringResource(R.string.rea_screen_antigravity_mcp_servers_rea_claude_code_mcp))
+    if (!state.usable) Hint(stringResource(R.string.rea_screen_install_rea_and_the_mcp_launcher_above))
+    Text(stringResource(R.string.rea_screen_the_preset_asks_how_the_agent_should), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     Text(
         "On demand (recommended): the agent gets 4 small tools. It lists REA's tools by name, reads the ones it needs and runs them; tools that change things run through their own tool. " +
             "≈${formatTokens(onDemand ?: 700)} tokens per request, however many tools you allow.",
@@ -446,9 +448,9 @@ private fun ConnectGuide(state: ReaManager.State) {
             (directAll?.let { ", ≈${formatTokens(it)} for all of REA." } ?: ", ≈75k for all of REA."),
         fontSize = 12.sp
     )
-    Hint("It also asks which tool groups the agent may use (step 3). You can add REA to several agents, each with its own choice.")
-    Text("Another agent, or by hand", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-    Hint("Add a stdio (local command) MCP server with this command and these environment variables. REA_MODE is lazy (on demand) or direct; REA_GROUPS is all or group ids such as core,android.")
+    Hint(stringResource(R.string.rea_screen_it_also_asks_which_tool_groups_the))
+    Text(stringResource(R.string.rea_screen_another_agent_or_by_hand), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+    Hint(stringResource(R.string.rea_screen_add_a_stdio_local_command_mcp_server))
     CopyLine(ReaManager.LAUNCHER, mono = true)
     CopyLine("REA_MODE=lazy\nREA_GROUPS=all", mono = true)
 }
@@ -465,17 +467,17 @@ private fun SkillPluginCard(
         "REA skill for agents (optional)", cardBg, cardBorder,
         pill = if (state.pluginInstalled) "v${state.pluginVersion ?: "?"}" to QuotaGreen else "Optional" to MaterialTheme.colorScheme.primary
     ) {
-        Hint("A skills-only plugin from the AntiGem plugins repository. It teaches agents how to use REA well (installed apps, split APKs, Flutter, React Native, native code), to check that REA works and tell you what to fix, and how to install REA from the terminal if you prefer that to this page.")
+        Hint(stringResource(R.string.rea_screen_a_skills_only_plugin_from_the_antigem))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(enabled = !busy, onClick = ReaManager::installSkillPlugin) {
                 Icon(Icons.Outlined.Extension, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                Text(if (state.pluginInstalled) "Update skill" else "Install skill")
+                Text(if (state.pluginInstalled) stringResource(R.string.android_dev_screen_update_skill) else stringResource(R.string.android_dev_screen_install_skill))
             }
-            TextButton(onClick = onOpenPlugins) { Text("Plugins") }
+            TextButton(onClick = onOpenPlugins) { Text(stringResource(R.string.android_dev_screen_plugins)) }
         }
         ReaTaskOutput(state, "plugin")
         if (state.pluginInstalled) {
-            Hint("To give an agent the skill, type /plu: in its chat and pick REA, or add the plugin in that agent's MCP settings with the Custom Plugin MCP preset → REA.")
+            Hint(stringResource(R.string.rea_screen_to_give_an_agent_the_skill_type))
         }
     }
 }
@@ -497,15 +499,15 @@ private fun WebsitesCard(state: ReaManager.State, cardBg: Color, cardBorder: Bor
             else -> "Off" to MaterialTheme.colorScheme.primary
         }
     ) {
-        Hint("Let agents analyze websites open in AntiGem's browser with REA: page structure, scripts and the APIs they call, libraries and frameworks, network and console errors, accessibility, storage and screenshots. REA only observes; agents open pages and click with the browser MCP.")
+        Hint(stringResource(R.string.rea_screen_let_agents_analyze_websites_open_in_antigem))
         SwitchRow(
             "Website analysis",
             "Adds the Websites tool group and tells agents to analyze sites with REA first, screenshots included, and to use the browser MCP only for what REA cannot do.",
             state.webEnabled, enabled = state.ready
         ) { ReaManager.setWebEnabled(it) }
         if (!state.webEnabled) return@InfoCard
-        if (!state.usable) Hint("Install REA and the MCP launcher above first.")
-        Hint("REA servers you already added only show the Websites group once it is chosen: open the REA preset in the agent's MCP settings, type the server's name, tick Websites and save. New REA servers include it.")
+        if (!state.usable) Hint(stringResource(R.string.rea_screen_install_rea_and_the_mcp_launcher_above))
+        Hint(stringResource(R.string.rea_screen_rea_servers_you_already_added_only_show))
 
         SwitchRow(
             "Browser connection (port ${bridge.port})",
@@ -514,7 +516,7 @@ private fun WebsitesCard(state: ReaManager.State, cardBg: Color, cardBorder: Bor
         ) { ReaManager.setBrowserConnection(context, it) }
         Surface(shape = RoundedCornerShape(10.dp), color = Amber.copy(alpha = 0.12f)) {
             Text(
-                "While this is on, any app on this phone can connect to port ${bridge.port} and read or control the pages open in AntiGem's browser, including sites you are signed in to. Turn it on only while an agent analyzes a site and off when you are done. It also turns off when AntiGem closes.",
+                stringResource(R.string.rea_screen_while_this_is_on_any_app_on, bridge.port.toString()),
                 fontSize = 12.sp, color = Amber, modifier = Modifier.padding(10.dp)
             )
         }
@@ -526,7 +528,7 @@ private fun WebsitesCard(state: ReaManager.State, cardBg: Color, cardBorder: Bor
                     (bridge.lastActivity?.let { "\nLast: $it" } ?: "")
             )
         }
-        Text("Try in chat", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.android_dev_screen_try_in_chat), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         listOf(
             "Open https://example.com in the browser, then analyze it with REA: structure, technologies, scripts and the APIs it calls, and give recommendations.",
             "With REA, check the open browser tab for accessibility problems, console errors and failed requests, with a screenshot.",
@@ -569,18 +571,18 @@ private fun ManualSetupCard(state: ReaManager.State, cardBg: Color, cardBorder: 
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Set up in the terminal", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                TextButton(onClick = { open = !open }) { Text(if (open) "Hide" else "Show", fontSize = 12.5.sp) }
+                Text(stringResource(R.string.android_dev_screen_set_up_in_the_terminal), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) {
-                Hint("Prefer the terminal, or setting up Claude Code, OpenCode or Codex? These are the same steps as commands.")
+                Hint(stringResource(R.string.rea_screen_prefer_the_terminal_or_setting_up_claude))
                 return@Column
             }
             steps.forEach { (label, command) ->
                 Hint(label)
                 CopyLine(command, mono = true)
             }
-            Hint("Each step can be run again to repair or update it. The REA skill plugin gives agents these steps too, so you can also ask an agent to install REA for you.")
+            Hint(stringResource(R.string.rea_screen_each_step_can_be_run_again_to))
         }
     }
 }
@@ -592,18 +594,18 @@ private fun RemoveCard(state: ReaManager.State, busy: Boolean, cardBg: Color, ca
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Remove", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                TextButton(onClick = { open = !open }) { Text(if (open) "Hide" else "Show", fontSize = 12.5.sp) }
+                Text(stringResource(R.string.browser_screen_remove), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) return@Column
-            Hint("Remove REA keeps the Ubuntu container (and Java and Node.js in it) for other uses. Deleting the container frees all the space.")
+            Hint(stringResource(R.string.rea_screen_remove_rea_keeps_the_ubuntu_container_and))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(enabled = !busy && state.filesReady && (Component.REA in state.installed || Component.LAUNCHER in state.installed), onClick = { onConfirm("uninstall") }) { Text("Remove REA") }
+                OutlinedButton(enabled = !busy && state.filesReady && (Component.REA in state.installed || Component.LAUNCHER in state.installed), onClick = { onConfirm("uninstall") }) { Text(stringResource(R.string.rea_screen_remove_rea)) }
                 OutlinedButton(
                     enabled = !busy && state.filesReady && Component.CONTAINER in state.installed,
                     onClick = { onConfirm("remove-container") },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text("Delete container") }
+                ) { Text(stringResource(R.string.rea_screen_delete_container)) }
             }
             ReaTaskOutput(state, "uninstall")
             ReaTaskOutput(state, "remove-container")
@@ -692,7 +694,7 @@ internal fun ReaServerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (current != null && canReplace) "REA server $name · $agent" else "Add REA to $agent") },
+        title = { Text(if (current != null && canReplace) stringResource(R.string.rea_screen_rea_server, name.toString(), agent.toString()) else stringResource(R.string.rea_screen_add_rea_to, agent.toString())) },
         text = {
             // The dialog has more than fits on a screen: a scrollbar, a fade at the bottom and a "More options
             // below" button make that visible, so the choices further down are not missed
@@ -703,26 +705,26 @@ internal fun ReaServerDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 if (!state.usable) {
-                    Text("REA is not installed yet. Set it up first, then add the server.", fontSize = 12.5.sp, color = Amber)
-                    if (onOpenRea != null) OutlinedButton(onClick = onOpenRea) { Text("Open REA setup") }
+                    Text(stringResource(R.string.rea_screen_rea_is_not_installed_yet_set_it), fontSize = 12.5.sp, color = Amber)
+                    if (onOpenRea != null) OutlinedButton(onClick = onOpenRea) { Text(stringResource(R.string.rea_groups_screen_open_rea_setup)) }
                 }
                 if (ai.antigem.data.preferences.AuthPreferences.currentRemoteMode) {
                     Text(
-                        "Server mode is on: agents start MCP servers on the server, where this phone's REA is not installed. REA works when the agent runs on this phone (Settings → Servers & Connectivity).",
+                        stringResource(R.string.rea_screen_server_mode_is_on_agents_start_mcp),
                         fontSize = 12.5.sp, color = Amber
                     )
                 }
                 OutlinedTextField(
                     value = name, onValueChange = { name = it.trim() }, singleLine = true,
-                    label = { Text("Server name") }, isError = nameError != null,
+                    label = { Text(stringResource(R.string.rea_screen_server_name)) }, isError = nameError != null,
                     supportingText = {
-                        Text(nameError ?: if (current != null) "Changes the existing REA server $name." else if (existing.isNotEmpty()) "A new REA server (type an existing name to change that one: ${existing.keys.joinToString()})." else "A new REA server.")
+                        Text(nameError ?: if (current != null) stringResource(R.string.rea_screen_changes_the_existing_rea_server, name.toString()) else if (existing.isNotEmpty()) stringResource(R.string.rea_screen_a_new_rea_server_type_an_existing, (existing.keys.joinToString()).toString()) else stringResource(R.string.rea_screen_a_new_rea_server))
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Text("How the agent sees REA's tools", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.rea_screen_how_the_agent_sees_rea_s_tools), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 ModeCard(
                     selected = mode == ReaManager.Mode.ON_DEMAND,
                     title = "On demand",
@@ -741,16 +743,16 @@ internal fun ReaServerDialog(
                         "allow only a few groups (the default five cost about 24k tokens; all of REA about 75k)."
                 ) { mode = ReaManager.Mode.DIRECT }
 
-                Text("Tools the agent may use", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.rea_screen_tools_the_agent_may_use), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { allTools = false }) {
-                    RadioButton(selected = !allTools, onClick = { allTools = false }); Text("Chosen tool groups", fontSize = 13.sp)
+                    RadioButton(selected = !allTools, onClick = { allTools = false }); Text(stringResource(R.string.rea_screen_chosen_tool_groups), fontSize = 13.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { allTools = true }) {
-                    RadioButton(selected = allTools, onClick = { allTools = true }); Text("All REA tools (${state.allToolNames.size})", fontSize = 13.sp)
+                    RadioButton(selected = allTools, onClick = { allTools = true }); Text(stringResource(R.string.rea_screen_all_rea_tools, state.allToolNames.size.toString()), fontSize = 13.sp)
                 }
                 if (!allTools) {
                     if (state.groups.isEmpty()) {
-                        Hint("No tool groups yet: download the setup files on the REA page.")
+                        Hint(stringResource(R.string.rea_screen_no_tool_groups_yet_download_the_setup))
                     } else {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             state.groups.forEach { g ->
@@ -765,18 +767,18 @@ internal fun ReaServerDialog(
                             }
                         }
                         Hint(
-                            if (mode == ReaManager.Mode.ON_DEMAND) "On demand, allowing more groups costs nothing up front. \"Decompiler session\" needs Ghidra, IDA, Hopper or Kuna, which are not installed."
-                            else "Directly, each group adds its size (tokens shown on the chip) to every request."
+                            if (mode == ReaManager.Mode.ON_DEMAND) stringResource(R.string.rea_screen_on_demand_allowing_more_groups_costs_nothing)
+                            else stringResource(R.string.rea_screen_directly_each_group_adds_its_size_tokens)
                         )
                         val missing = initialGroups.orEmpty().filter { id -> state.groups.none { it.id == id } }
-                        if (missing.isNotEmpty()) Text("Removed groups still named here: ${missing.joinToString()}. Saving drops them.", fontSize = 11.5.sp, color = Amber)
-                        if (onOpenGroups != null) TextButton(onClick = onOpenGroups, contentPadding = PaddingValues(0.dp)) { Text("Edit tool groups", fontSize = 12.5.sp) }
+                        if (missing.isNotEmpty()) Text(stringResource(R.string.rea_screen_removed_groups_still_named_here_saving_drops, (missing.joinToString()).toString()), fontSize = 11.5.sp, color = Amber)
+                        if (onOpenGroups != null) TextButton(onClick = onOpenGroups, contentPadding = PaddingValues(0.dp)) { Text(stringResource(R.string.rea_screen_edit_tool_groups), fontSize = 12.5.sp) }
                     }
                 }
 
                 if (mode == ReaManager.Mode.ON_DEMAND) {
-                    Text("Also offer directly (optional)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    Hint("For groups the agent uses all the time: their tools skip the lookup step, but each adds its size to every request. Usually not needed.")
+                    Text(stringResource(R.string.rea_screen_also_offer_directly_optional), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Hint(stringResource(R.string.rea_screen_for_groups_the_agent_uses_all_the))
                     val offerable = state.groups.filter { allTools || it.id in chosen }
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         offerable.forEach { g ->
@@ -794,29 +796,29 @@ internal fun ReaServerDialog(
 
                 Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)) {
                     Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text("${tk(tokens).replaceFirstChar { it.uppercase() }} of context per request", fontSize = 12.5.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.rea_screen_of_context_per_request, (tk(tokens).replaceFirstChar { it.uppercase() }).toString()), fontSize = 12.5.sp, fontWeight = FontWeight.Medium)
                         Text(
                             if (mode == ReaManager.Mode.ON_DEMAND) "$usable tools usable" + if (directCount > 0) ", $directCount offered directly" else ", all through the 4 gateway tools"
-                            else "$usable tools, each one an MCP tool",
+                            else stringResource(R.string.rea_screen_tools_each_one_an_mcp_tool, usable.toString()),
                             fontSize = 12.sp
                         )
                         if (mode == ReaManager.Mode.ON_DEMAND && directTokens != null) {
-                            Text("Directly, the same tools would cost ${tk(directTokens)}.", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                            Text(stringResource(R.string.rea_screen_directly_the_same_tools_would_cost, (tk(directTokens)).toString()), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                         }
-                        if (tokens != null && tokens > 40_000) Text("That is a lot: agents get slower and use up their context sooner. Use On demand, or fewer groups.", fontSize = 11.5.sp, color = Amber)
+                        if (tokens != null && tokens > 40_000) Text(stringResource(R.string.rea_screen_that_is_a_lot_agents_get_slower), fontSize = 11.5.sp, color = Amber)
                     }
                 }
                 Row(verticalAlignment = Alignment.Top, modifier = Modifier.clickable { fullSchemas = !fullSchemas }) {
                     Checkbox(checked = fullSchemas, onCheckedChange = { fullSchemas = it })
                     Column(Modifier.padding(top = 12.dp)) {
-                        Text("Full output schemas", fontSize = 13.sp)
+                        Text(stringResource(R.string.rea_screen_full_output_schemas), fontSize = 13.sp)
                         Text(
-                            "Describes the shape of every REA result in the tool list: about ${ReaManager.FULL_SCHEMA_FACTOR}× bigger for tools offered directly. Leave off unless your agent needs it.",
+                            stringResource(R.string.rea_screen_describes_the_shape_of_every_rea_result, ReaManager.FULL_SCHEMA_FACTOR.toString()),
                             fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
                 }
-                Hint("Changes apply when the server restarts.")
+                Hint(stringResource(R.string.rea_screen_changes_apply_when_the_server_restarts))
             }
             }
             if (dialogScroll.canScrollForward) {
@@ -825,7 +827,7 @@ internal fun ReaServerDialog(
                     contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
                 ) {
                     Icon(Icons.Outlined.KeyboardDoubleArrowDown, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
-                    Text("More options below", fontSize = 12.5.sp)
+                    Text(stringResource(R.string.rea_screen_more_options_below), fontSize = 12.5.sp)
                 }
             }
             }
@@ -843,9 +845,9 @@ internal fun ReaServerDialog(
                         )
                     )
                 }
-            ) { Text("Save") }
+            ) { Text(stringResource(R.string.claude_providers_page_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -926,7 +928,7 @@ private fun CopyLine(text: String, mono: Boolean = false) {
         Box(Modifier.weight(1f)) {
             if (mono) Mono(text) else Text(text, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
         }
-        IconButton(onClick = { clipboard.setText(AnnotatedString(text)) }) { Icon(Icons.Outlined.ContentCopy, "Copy", Modifier.size(18.dp)) }
+        IconButton(onClick = { clipboard.setText(AnnotatedString(text)) }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.copy_text), Modifier.size(18.dp)) }
     }
 }
 

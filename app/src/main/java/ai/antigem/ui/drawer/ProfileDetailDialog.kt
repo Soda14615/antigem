@@ -1,5 +1,7 @@
 package ai.antigem.ui.drawer
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -90,7 +92,7 @@ fun ProfileDetailDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.accounts_ui_close),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
@@ -102,7 +104,7 @@ fun ProfileDetailDialog(
                         .data(parseProfileAvatarModel(authInfo.profilePictureUrl))
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Profile Picture",
+                    contentDescription = stringResource(R.string.main_ui_profile_picture),
                     modifier = Modifier
                         .size(76.dp)
                         .clip(CircleShape)
@@ -231,14 +233,14 @@ fun ProfileDetailDialog(
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "Prompt Credits",
+                                            text = stringResource(R.string.profile_detail_dialog_prompt_credits),
                                             fontSize = 11.sp,
                                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "${authInfo.availablePromptCredits} Available",
+                                        text = stringResource(R.string.profile_detail_dialog_available, authInfo.availablePromptCredits.toString()),
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -266,14 +268,14 @@ fun ProfileDetailDialog(
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "Flow Credits",
+                                            text = stringResource(R.string.profile_detail_dialog_flow_credits),
                                             fontSize = 11.sp,
                                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "${authInfo.availableFlowCredits} Available",
+                                        text = stringResource(R.string.profile_detail_dialog_available, authInfo.availableFlowCredits.toString()),
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -298,14 +300,14 @@ fun ProfileDetailDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
-                            contentDescription = "Email",
+                            contentDescription = stringResource(R.string.profile_detail_dialog_email),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Account Email",
+                                text = stringResource(R.string.profile_detail_dialog_account_email),
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
@@ -330,19 +332,19 @@ fun ProfileDetailDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.VerifiedUser,
-                        contentDescription = "Status",
+                        contentDescription = stringResource(R.string.profile_detail_dialog_status),
                         tint = ClaudeTerracotta,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "Status",
+                            text = stringResource(R.string.profile_detail_dialog_status),
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
                         Text(
-                            text = if (authInfo.isOffline) "Connected (Offline verification)" else "Active & Authenticated (AGY RPC)",
+                            text = if (authInfo.isOffline) stringResource(R.string.profile_detail_dialog_connected_offline_verification) else stringResource(R.string.profile_detail_dialog_active_authenticated_agy_rpc),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurface
@@ -368,19 +370,19 @@ fun ProfileDetailDialog(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                            contentDescription = "Upgrade",
+                            contentDescription = stringResource(R.string.profile_detail_dialog_upgrade),
                             tint = ClaudeTerracotta,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Subscription",
+                                text = stringResource(R.string.profile_detail_dialog_subscription),
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                             Text(
-                                text = if (authInfo.upgradeSubscriptionText.isNotBlank()) authInfo.upgradeSubscriptionText else "Manage / Upgrade Plan",
+                                text = if (authInfo.upgradeSubscriptionText.isNotBlank()) authInfo.upgradeSubscriptionText else stringResource(R.string.profile_detail_dialog_manage_upgrade_plan),
                                 fontSize = 12.sp,
                                 color = ClaudeTerracotta,
                                 maxLines = 1,
@@ -407,12 +409,12 @@ fun ProfileDetailDialog(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.Logout,
-                        contentDescription = "Sign Out",
+                        contentDescription = stringResource(R.string.profile_detail_dialog_sign_out),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Sign Out",
+                        text = stringResource(R.string.profile_detail_dialog_sign_out),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )

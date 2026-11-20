@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
@@ -54,32 +56,32 @@ fun PluginRepositoriesTab(busy: Boolean, runOperation: (suspend () -> String?) -
         Card(Modifier.fillMaxWidth()) {
             Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Host your own repository", style = MaterialTheme.typography.titleSmall)
-                    Text("How to lay out a GitHub repo and its ${PluginRepositories.INDEX}", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.plugin_repositories_tab_host_your_own_repository), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.plugin_repositories_tab_how_to_lay_out_a_github_repo, PluginRepositories.INDEX.toString()), style = MaterialTheme.typography.bodySmall)
                 }
-                IconButton(onClick = { guide = runCatching { readBundledGuide(context) }.getOrElse { "Guide not found: ${it.message}" } }) { Icon(Icons.Outlined.Visibility, "View guide") }
-                IconButton(onClick = { scope.launch { saveToDownloads(context, "antigem-plugin-repository.md", readBundledGuide(context)) } }) { Icon(Icons.Outlined.Download, "Download guide") }
+                IconButton(onClick = { guide = runCatching { readBundledGuide(context) }.getOrElse { "Guide not found: ${it.message}" } }) { Icon(Icons.Outlined.Visibility, stringResource(R.string.plugin_repositories_tab_view_guide)) }
+                IconButton(onClick = { scope.launch { saveToDownloads(context, "antigem-plugin-repository.md", readBundledGuide(context)) } }) { Icon(Icons.Outlined.Download, stringResource(R.string.plugin_repositories_tab_download_guide)) }
             }
         }
         Card(Modifier.fillMaxWidth()) {
             Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Plugin SDK for PC", style = MaterialTheme.typography.titleSmall)
-                    Text("All plugin docs and examples as a ZIP. Copy it to your PC to build plugins there; start with pc-development.md.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.plugin_repositories_tab_plugin_sdk_for_pc), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.plugin_repositories_tab_all_plugin_docs_and_examples_as_a), style = MaterialTheme.typography.bodySmall)
                 }
-                IconButton(onClick = { scope.launch { saveToDownloads(context, "antigem-plugin-sdk.zip", bundledSdkZip(context), "application/zip") } }) { Icon(Icons.Outlined.FolderZip, "Download plugin SDK ZIP") }
+                IconButton(onClick = { scope.launch { saveToDownloads(context, "antigem-plugin-sdk.zip", bundledSdkZip(context), "application/zip") } }) { Icon(Icons.Outlined.FolderZip, stringResource(R.string.plugin_repositories_tab_download_plugin_sdk_zip)) }
             }
         }
-        OutlinedTextField(value = input, onValueChange = { input = it; addError = null }, label = { Text("GitHub repository") },
-            placeholder = { Text("owner/repo, owner/repo@branch or URL") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-            isError = addError != null, supportingText = { Text(addError ?: "Only add repositories you trust: plugins run code on your device.") })
+        OutlinedTextField(value = input, onValueChange = { input = it; addError = null }, label = { Text(stringResource(R.string.plugin_repositories_tab_github_repository)) },
+            placeholder = { Text(stringResource(R.string.plugin_repositories_tab_owner_repo_owner_repo_branch_or_url)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            isError = addError != null, supportingText = { Text(addError ?: stringResource(R.string.plugin_repositories_tab_only_add_repositories_you_trust_plugins_run)) })
         Button(enabled = input.isNotBlank(), onClick = {
             runCatching { PluginRepositories.parse(input).also { PluginRepositories.add(it) } }
                 .onSuccess { repo -> input = ""; scope.launch { PluginRepositories.refresh(repo) } }
                 .onFailure { addError = it.message }
-        }) { Text("Add repository") }
+        }) { Text(stringResource(R.string.plugin_repositories_tab_add_repository)) }
 
-        if (PluginRepositories.repos.isEmpty()) Text("No repositories added.", style = MaterialTheme.typography.bodySmall)
+        if (PluginRepositories.repos.isEmpty()) Text(stringResource(R.string.plugin_repositories_tab_no_repositories_added), style = MaterialTheme.typography.bodySmall)
         PluginRepositories.repos.forEach { repo ->
             val listing = PluginRepositories.listings[repo.label]
             Card(Modifier.fillMaxWidth()) {
@@ -90,11 +92,11 @@ fun PluginRepositoriesTab(busy: Boolean, runOperation: (suspend () -> String?) -
                             if (listing?.title != null && listing.title != repo.label) Text(repo.label, style = MaterialTheme.typography.bodySmall)
                         }
                         if (repo.label in PluginRepositories.loading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                        else IconButton(onClick = { scope.launch { PluginRepositories.refresh(repo) } }) { Icon(Icons.Outlined.Refresh, "Check for updates") }
-                        IconButton(onClick = { PluginRepositories.remove(repo) }) { Icon(Icons.Outlined.Delete, "Remove repository") }
+                        else IconButton(onClick = { scope.launch { PluginRepositories.refresh(repo) } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.bridge_ui_check_for_updates)) }
+                        IconButton(onClick = { PluginRepositories.remove(repo) }) { Icon(Icons.Outlined.Delete, stringResource(R.string.plugin_repositories_tab_remove_repository)) }
                     }
                     PluginRepositories.errors[repo.label]?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
-                    if (listing != null && listing.plugins.isEmpty()) Text("This repository lists no plugins.", style = MaterialTheme.typography.bodySmall)
+                    if (listing != null && listing.plugins.isEmpty()) Text(stringResource(R.string.plugin_repositories_tab_this_repository_lists_no_plugins), style = MaterialTheme.typography.bodySmall)
                     listing?.plugins?.forEach { plugin -> RepoPluginRow(repo, plugin, busy) { installOrUpdate(repo, plugin) } }
                 }
             }
@@ -105,14 +107,14 @@ fun PluginRepositoriesTab(busy: Boolean, runOperation: (suspend () -> String?) -
     pending?.let { (repo, plugin) ->
         val taken = folderTaken(folder)
         AlertDialog(
-            onDismissRequest = { pending = null }, title = { Text("Install ${plugin.name}") },
+            onDismissRequest = { pending = null }, title = { Text(stringResource(R.string.plugin_repositories_tab_install, plugin.name.toString())) },
             text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("A plugin already uses the folder ${plugin.path.substringAfterLast('/')}. Choose another folder name for this one.")
-                OutlinedTextField(value = folder, onValueChange = { folder = it }, label = { Text("Folder name") }, singleLine = true,
-                    isError = taken, supportingText = if (taken) {{ Text("A plugin already uses this folder name") }} else null)
+                Text(stringResource(R.string.plugin_repositories_tab_a_plugin_already_uses_the_folder_choose, (plugin.path.substringAfterLast('/')).toString()))
+                OutlinedTextField(value = folder, onValueChange = { folder = it }, label = { Text(stringResource(R.string.plugin_repositories_tab_folder_name)) }, singleLine = true,
+                    isError = taken, supportingText = if (taken) {{ Text(stringResource(R.string.plugin_repositories_tab_a_plugin_already_uses_this_folder_name)) }} else null)
             } },
-            confirmButton = { TextButton(enabled = folder.isNotBlank() && !taken, onClick = { val name = folder.trim(); pending = null; install(repo, plugin, name) }) { Text("Install") } },
-            dismissButton = { TextButton(onClick = { pending = null }) { Text("Cancel") } }
+            confirmButton = { TextButton(enabled = folder.isNotBlank() && !taken, onClick = { val name = folder.trim(); pending = null; install(repo, plugin, name) }) { Text(stringResource(R.string.claude_settings_screen_install)) } },
+            dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -128,17 +130,17 @@ private fun RepoPluginRow(repo: PluginRepo, plugin: RepoPlugin, busy: Boolean, o
             Text("${plugin.name} · ${PluginVersions.label(plugin.version)}", style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (plugin.description.isNotBlank()) Text(plugin.description, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (installed != null) Text(when {
-                comparison == null -> "Installed ${PluginVersions.label(installed.version)} as ${installed.folderName}"
-                comparison > 0 -> "Update available: ${PluginVersions.label(installed.version)} → ${PluginVersions.label(plugin.version)}"
-                comparison == 0 -> "Installed · up to date"
-                else -> "Installed ${PluginVersions.label(installed.version)} is newer than this repository's"
+                comparison == null -> stringResource(R.string.plugin_repositories_tab_installed_as, (PluginVersions.label(installed.version)).toString(), installed.folderName.toString())
+                comparison > 0 -> stringResource(R.string.plugin_repositories_tab_update_available, (PluginVersions.label(installed.version)).toString(), (PluginVersions.label(plugin.version)).toString())
+                comparison == 0 -> stringResource(R.string.plugin_repositories_tab_installed_up_to_date)
+                else -> stringResource(R.string.plugin_repositories_tab_installed_is_newer_than_this_repository_s, (PluginVersions.label(installed.version)).toString())
             }, style = MaterialTheme.typography.labelSmall, color = if (comparison != null && comparison > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.width(6.dp))
         when {
-            installed == null -> Button(enabled = !busy, onClick = onInstall, contentPadding = PaddingValues(horizontal = 14.dp)) { Text("Install") }
-            comparison != null && comparison > 0 -> Button(enabled = !busy, onClick = onInstall, contentPadding = PaddingValues(horizontal = 14.dp)) { Text("Update") }
-            else -> TextButton(enabled = !busy, onClick = onInstall) { Text("Reinstall") }
+            installed == null -> Button(enabled = !busy, onClick = onInstall, contentPadding = PaddingValues(horizontal = 14.dp)) { Text(stringResource(R.string.claude_settings_screen_install)) }
+            comparison != null && comparison > 0 -> Button(enabled = !busy, onClick = onInstall, contentPadding = PaddingValues(horizontal = 14.dp)) { Text(stringResource(R.string.claude_settings_screen_update)) }
+            else -> TextButton(enabled = !busy, onClick = onInstall) { Text(stringResource(R.string.android_dev_screen_reinstall)) }
         }
     }
 }

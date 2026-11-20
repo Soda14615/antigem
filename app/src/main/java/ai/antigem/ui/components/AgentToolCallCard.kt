@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -192,7 +194,7 @@ fun AgentToolCallCard(
             // Frontend Expand Chevron (-> / rotating arrow)
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = if (isExpanded) "Collapse" else "Expand",
+                contentDescription = if (isExpanded) stringResource(R.string.agent_tool_call_card_collapse) else stringResource(R.string.agent_tool_call_card_expand),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 modifier = Modifier
                     .size(16.dp)
@@ -220,14 +222,14 @@ fun AgentToolCallCard(
             if (isPendingApproval) {
                 Icon(
                     imageVector = Icons.Default.HourglassEmpty,
-                    contentDescription = "Pending Approval",
+                    contentDescription = stringResource(R.string.agent_tool_call_card_pending_approval),
                     tint = ai.antigem.theme.AppColors.warning,
                     modifier = Modifier.size(14.dp)
                 )
             } else if (isRunning) {
                 Icon(
                     imageVector = toolIcon,
-                    contentDescription = "Running",
+                    contentDescription = stringResource(R.string.agent_tool_call_card_running),
                     tint = ClaudeTerracotta,
                     modifier = Modifier.size(14.dp)
                 )
@@ -241,21 +243,21 @@ fun AgentToolCallCard(
             } else if (isTerminated) {
                 Icon(
                     imageVector = Icons.Default.Cancel,
-                    contentDescription = "Terminated",
+                    contentDescription = stringResource(R.string.agent_tool_call_card_terminated),
                     tint = ai.antigem.theme.AppColors.danger,
                     modifier = Modifier.size(14.dp)
                 )
             } else if (isRejected) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Rejected",
+                    contentDescription = stringResource(R.string.agent_tool_call_card_rejected),
                     tint = Color.Gray,
                     modifier = Modifier.size(14.dp)
                 )
             } else if (isFailed) {
                 Icon(
                     imageVector = Icons.Default.Warning,
-                    contentDescription = "Failed",
+                    contentDescription = stringResource(R.string.agent_tool_call_card_failed),
                     tint = Color.Red,
                     modifier = Modifier.size(14.dp)
                 )
@@ -300,7 +302,7 @@ fun AgentToolCallCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Stop,
-                        contentDescription = "Stop command",
+                        contentDescription = stringResource(R.string.agent_tool_call_card_stop_command),
                         tint = ai.antigem.theme.AppColors.danger,
                         modifier = Modifier.size(12.dp)
                     )
@@ -328,7 +330,7 @@ fun AgentToolCallCard(
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
-                        text = "stopped",
+                        text = stringResource(R.string.agent_tool_call_card_stopped),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red
@@ -342,7 +344,7 @@ fun AgentToolCallCard(
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
-                        text = "exit ${toolCall.exitCode}",
+                        text = stringResource(R.string.agent_tool_call_card_exit, toolCall.exitCode.toString()),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isSuccess) QuotaGreen else Color.Red
@@ -409,7 +411,7 @@ fun AgentToolCallCard(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "Loading image...",
+                                        text = stringResource(R.string.agent_tool_call_card_loading_image),
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -437,7 +439,7 @@ fun AgentToolCallCard(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Tap image to enlarge • Double-tap zoom",
+                                text = stringResource(R.string.agent_tool_call_card_tap_image_to_enlarge_double_tap_zoom),
                                 fontSize = 11.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.weight(1f)
@@ -449,7 +451,7 @@ fun AgentToolCallCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Fullscreen,
-                                    contentDescription = "Full view",
+                                    contentDescription = stringResource(R.string.agent_tool_call_card_full_view),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -471,7 +473,7 @@ fun AgentToolCallCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Download,
-                                    contentDescription = "Download Image",
+                                    contentDescription = stringResource(R.string.agent_tool_call_card_download_image),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -549,7 +551,7 @@ fun AgentToolCallCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ContentCopy,
-                                contentDescription = "Copy Output",
+                                contentDescription = stringResource(R.string.agent_tool_call_card_copy_output),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(13.dp)
                             )

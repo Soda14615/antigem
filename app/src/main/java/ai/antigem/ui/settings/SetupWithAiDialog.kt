@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -172,7 +174,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Outlined.AutoAwesome, null, tint = accent, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Set up with AI", fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(stringResource(R.string.setup_with_ai_dialog_set_up_with_ai), fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(
@@ -182,7 +184,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                 )
 
                 Spacer(Modifier.height(12.dp))
-                Text("Install it for", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.setup_with_ai_dialog_install_it_for), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     AgentKind.entries.forEach { a ->
                         FilterChip(
@@ -191,7 +193,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                         )
                     }
                 }
-                Text("What to install", fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
+                Text(stringResource(R.string.setup_with_ai_dialog_what_to_install), fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     RepoSetupKind.entries.forEach { k ->
                         FilterChip(
@@ -203,7 +205,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
 
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "Copy this and paste it into the AI chat you want to install it with (any agent can do it; it is written for ${agentName(target)}).",
+                    stringResource(R.string.setup_with_ai_dialog_copy_this_and_paste_it_into_the, (agentName(target)).toString()),
                     fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
                 Spacer(Modifier.height(6.dp))
@@ -227,7 +229,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                                 copyText(context, prompt)
                                 copied = true
                             }, modifier = Modifier.size(36.dp)) {
-                                Icon(if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy, "Copy", tint = accent, modifier = Modifier.size(18.dp))
+                                Icon(if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy, stringResource(R.string.copy_text), tint = accent, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -235,7 +237,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
 
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = onDismiss) { Text("Close") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) }
                     Spacer(Modifier.weight(1f))
                     Button(
                         onClick = { copyText(context, prompt); copied = true },
@@ -243,7 +245,7 @@ fun SetupWithAiDialog(source: String, agent: AgentKind, reason: String?, onDismi
                     ) {
                         Icon(if (copied) Icons.Outlined.Check else Icons.Outlined.ContentCopy, null, Modifier.size(16.dp), tint = Color.White)
                         Spacer(Modifier.width(6.dp))
-                        Text(if (copied) "Copied" else "Copy prompt")
+                        Text(if (copied) stringResource(R.string.code_block_copied) else stringResource(R.string.setup_with_ai_dialog_copy_prompt))
                     }
                 }
             }
@@ -262,6 +264,6 @@ fun SetupWithAiLink(accent: Color, onClick: () -> Unit) {
     TextButton(onClick = onClick, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp, vertical = 0.dp)) {
         Icon(Icons.Outlined.AutoAwesome, null, tint = accent, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(6.dp))
-        Text("Set up with AI", fontSize = 12.5.sp, color = accent)
+        Text(stringResource(R.string.setup_with_ai_dialog_set_up_with_ai), fontSize = 12.5.sp, color = accent)
     }
 }

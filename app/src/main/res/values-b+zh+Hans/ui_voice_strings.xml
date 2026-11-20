@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agy_voice_call_ui_minimize">"最小化"</string>
+    <string name="agy_voice_call_ui_call_log">"通话记录"</string>
+    <string name="agy_voice_call_ui_end_call">"结束通话"</string>
+    <string name="agy_voice_call_ui_end">"结束"</string>
+    <string name="agy_voice_call_ui_say_what_you_want_done_the_agent">"说出你想要做的事情：智能体在你说话时在此聊天中工作。"</string>
+    <string name="agy_voice_call_ui_you">"你"</string>
+    <string name="agy_voice_call_ui_the_call_couldn_t_continue">"通话无法继续"</string>
+    <string name="agy_voice_call_ui_something_went_wrong">"出了点问题。"</string>
+    <string name="agy_voice_call_ui_update_agy">"更新 agy"</string>
+    <string name="agy_voice_call_ui_browse_voices">"浏览声音"</string>
+    <string name="agy_voice_call_ui_tap_a_voice_to_hear_it_then">"点击一个语音即可听到它，然后将呼叫切换到该语音。"</string>
+    <string name="agy_voice_call_ui_tap_a_voice_to_hear_it">"点击一个声音即可听到它。"</string>
+    <string name="agy_voice_call_ui_playing">"演奏"</string>
+    <string name="agy_voice_call_ui_in_use_now">"现已使用中"</string>
+    <string name="agy_voice_call_ui_language">"语言"</string>
+    <string name="agy_voice_call_ui_the_language_the_voice_talks_in_phone">"语音通话所用的语言。电话语言使用你电话的语言列表。"</string>
+    <string name="agy_voice_call_ui_speed">"速度"</string>
+    <string name="agy_voice_call_ui_apply_changes">"应用更改"</string>
+    <string name="agy_voice_call_ui_switch_to">"切换至 %1$s"</string>
+    <string name="agy_voice_call_ui_use">"使用 %1$s"</string>
+    <string name="agy_voice_picker_choose_a_voice">"选择声音"</string>
+    <string name="agy_voice_picker_playing">"正在播放…"</string>
+    <string name="agy_voice_picker_play_again">"再玩一次"</string>
+    <string name="agy_voice_picker_previous_voice">"上一个声音"</string>
+    <string name="agy_voice_picker_next_voice">"下一个声音"</string>
+    <string name="agy_voice_transcript_voice_transcript">"语音转录"</string>
+</resources>

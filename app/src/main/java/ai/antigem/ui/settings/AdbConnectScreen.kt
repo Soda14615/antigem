@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import ai.antigem.ui.components.bouncyVerticalScroll
 import android.content.Intent
 import android.os.Build
@@ -76,35 +78,35 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
             ) {
                 Row(Modifier.fillMaxWidth().padding(start = 14.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(msg, fontSize = 12.5.sp, color = if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen, modifier = Modifier.weight(1f))
-                    IconButton(onClick = AdbConnectManager::clearMessage) { Icon(Icons.Default.Close, "Dismiss", Modifier.size(18.dp)) }
+                    IconButton(onClick = AdbConnectManager::clearMessage) { Icon(Icons.Default.Close, stringResource(R.string.browser_screen_dismiss), Modifier.size(18.dp)) }
                 }
             }
         }
 
         // Step 1: adb in the terminal
-        StepCard(1, "Install ADB", if (installed) "Installed" else if (state.adbBroken != null) "Broken" else null, cardBg, cardBorder,
+        StepCard(1, stringResource(R.string.adb_connect_screen_install_adb), if (installed) stringResource(R.string.claude_settings_screen_installed) else if (state.adbBroken != null) stringResource(R.string.adb_connect_screen_broken) else null, cardBg, cardBorder,
             badgeColor = if (installed) QuotaGreen else MaterialTheme.colorScheme.error) {
             when {
-                state.adbInstalled == null -> Hint("Checking the terminal for adb…")
+                state.adbInstalled == null -> Hint(stringResource(R.string.adb_connect_screen_checking_the_terminal_for_adb))
                 installed && !state.installing -> Mono(state.adbVersion ?: "adb")
                 state.adbBroken != null && !state.installing -> {
-                    Text("adb is installed but can't start:", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.adb_connect_screen_adb_is_installed_but_can_t_start), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.error)
                     Mono(state.adbBroken!!)
-                    Hint("Usually a library it needs (such as libprotobuf) is older than adb itself. Repair updates the package lists and upgrades adb and the libraries it uses.")
+                    Hint(stringResource(R.string.adb_connect_screen_usually_a_library_it_needs_such_as))
                     Button(onClick = AdbConnectManager::installAdb) {
-                        Icon(Icons.Outlined.Build, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Repair ADB")
+                        Icon(Icons.Outlined.Build, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.adb_connect_screen_repair_adb))
                     }
                 }
                 !state.installing -> {
-                    Hint("adb isn't installed in the terminal yet. This installs the android-tools package (adb, fastboot).")
+                    Hint(stringResource(R.string.adb_connect_screen_adb_isn_t_installed_in_the_terminal))
                     Button(onClick = AdbConnectManager::installAdb) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Install android-tools")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.adb_connect_screen_install_android_tools))
                     }
                 }
             }
             if (state.installing) {
                 LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-                Hint(state.installLog.lastOrNull { !it.startsWith("$") } ?: "Starting…")
+                Hint(state.installLog.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
             }
             if (state.installLog.isNotEmpty()) LogBox(state.installLog)
             state.installError?.let { Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
@@ -112,38 +114,38 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
 
         // Step 2: Wireless debugging
         val wirelessReady = devOptionsOn && wirelessOn
-        StepCard(2, "Turn on Wireless debugging", if (wirelessReady) "On" else null, cardBg, cardBorder) {
+        StepCard(2, stringResource(R.string.adb_connect_screen_turn_on_wireless_debugging), if (wirelessReady) "On" else null, cardBg, cardBorder) {
             if (!AdbConnectManager.isWirelessDebuggingSupported()) {
-                Hint("Wireless debugging needs Android 11 or newer. On this phone, run \"adb tcpip 5555\" from a computer once, then connect to localhost port 5555 below.")
+                Hint(stringResource(R.string.adb_connect_screen_wireless_debugging_needs_android_11_or_newer))
                 return@StepCard
             }
             CheckRow("Developer options", devOptionsOn)
             CheckRow("Wireless debugging", wirelessOn)
             Hint(
                 when {
-                    !devOptionsOn -> "Open About phone and tap Build number 7 times to unlock Developer options."
-                    !wirelessOn -> "In Developer options, turn on Wireless debugging. Your phone must be on Wi-Fi."
-                    else -> "Ready. Wireless debugging uses a new port each time it turns on; AntiGem finds it for you."
+                    !devOptionsOn -> stringResource(R.string.adb_connect_screen_open_about_phone_and_tap_build_number)
+                    !wirelessOn -> stringResource(R.string.adb_connect_screen_in_developer_options_turn_on_wireless_debugging)
+                    else -> stringResource(R.string.adb_connect_screen_ready_wireless_debugging_uses_a_new_port)
                 }
             )
             if (!wirelessReady) OutlinedButton(onClick = { AdbConnectManager.openWirelessDebuggingSettings(context) }) {
-                Text(if (devOptionsOn) "Open Wireless debugging" else "Open About phone")
+                Text(if (devOptionsOn) stringResource(R.string.adb_connect_screen_open_wireless_debugging) else stringResource(R.string.adb_connect_screen_open_about_phone))
             }
         }
 
         // Step 3: one-time pairing through the notification
-        StepCard(3, "Pair this device", if (state.pairedOnce) "Paired" else "Once", cardBg, cardBorder, badgeColor = if (state.pairedOnce) QuotaGreen else Amber) {
+        StepCard(3, stringResource(R.string.adb_connect_screen_pair_this_device), if (state.pairedOnce) stringResource(R.string.adb_connect_screen_paired) else stringResource(R.string.adb_connect_screen_once), cardBg, cardBorder, badgeColor = if (state.pairedOnce) QuotaGreen else Amber) {
             PairingSteps()
             if (!notificationsOn) {
                 Surface(shape = RoundedCornerShape(10.dp), color = Amber.copy(alpha = 0.12f)) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Notifications are off for AntiGem. The pairing code is entered in a notification, so allow them first.", fontSize = 12.sp)
+                        Text(stringResource(R.string.adb_connect_screen_notifications_are_off_for_antigem_the_pairing), fontSize = 12.sp)
                         TextButton(onClick = {
                             val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                 Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                             else Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.fromParts("package", context.packageName, null))
                             runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                        }, contentPadding = PaddingValues(0.dp)) { Text("Allow notifications") }
+                        }, contentPadding = PaddingValues(0.dp)) { Text(stringResource(R.string.adb_connect_screen_allow_notifications)) }
                     }
                 }
             }
@@ -151,8 +153,8 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
             val pairingActive = state.pairing !is Pairing.Idle && state.pairing !is Pairing.Paired
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (pairingActive) {
-                    OutlinedButton(onClick = { AdbConnectManager.stopPairing(context) }) { Text("Stop") }
-                    Button(onClick = { AdbConnectManager.openWirelessDebuggingSettings(context) }) { Text("Open Wireless debugging") }
+                    OutlinedButton(onClick = { AdbConnectManager.stopPairing(context) }) { Text(stringResource(R.string.chat_input_bar_stop)) }
+                    Button(onClick = { AdbConnectManager.openWirelessDebuggingSettings(context) }) { Text(stringResource(R.string.adb_connect_screen_open_wireless_debugging)) }
                 } else {
                     Button(
                         enabled = installed && wirelessReady,
@@ -160,15 +162,15 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
                             AdbConnectManager.startPairing(context)
                             AdbConnectManager.openWirelessDebuggingSettings(context)
                         }
-                    ) { Text(if (state.pairedOnce) "Pair again" else "Start pairing") }
+                    ) { Text(if (state.pairedOnce) stringResource(R.string.adb_connect_screen_pair_again) else stringResource(R.string.adb_connect_screen_start_pairing)) }
                 }
             }
-            if (!installed || !wirelessReady) Hint("Finish the steps above first.")
+            if (!installed || !wirelessReady) Hint(stringResource(R.string.adb_connect_screen_finish_the_steps_above_first))
             ManualPairing(enabled = installed && state.pairing !is Pairing.InProgress)
         }
 
         // Step 4: connect
-        StepCard(4, "Connect", if (connected != null) "Connected" else null, cardBg, cardBorder) {
+        StepCard(4, stringResource(R.string.agy_cloud_ui_connect), if (connected != null) stringResource(R.string.network_inspector_dialog_connected) else null, cardBg, cardBorder) {
             var host by remember(state.host) { mutableStateOf(state.host) }
             var port by remember { mutableStateOf("") }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -177,21 +179,21 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
                     modifier = Modifier.weight(1.4f)
                 )
                 OutlinedTextField(
-                    value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, label = { Text("Port") },
-                    placeholder = { Text("Auto") }, singleLine = true, modifier = Modifier.weight(1f),
+                    value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, label = { Text(stringResource(R.string.cloud_preview_port)) },
+                    placeholder = { Text(stringResource(R.string.adb_connect_screen_auto)) }, singleLine = true, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
-            Hint("Leave the port empty to find it automatically (this phone only). For another device, enter its IP and port.")
+            Hint(stringResource(R.string.adb_connect_screen_leave_the_port_empty_to_find_it))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
                     enabled = installed && state.busy == null,
                     onClick = { AdbConnectManager.setHost(host); AdbConnectManager.connect(port.toIntOrNull()) }
-                ) { Text("Connect") }
+                ) { Text(stringResource(R.string.agy_cloud_ui_connect)) }
                 if (state.busy != null) {
-                    OutlinedButton(onClick = AdbConnectManager::cancelConnect) { Text("Cancel") }
+                    OutlinedButton(onClick = AdbConnectManager::cancelConnect) { Text(stringResource(R.string.accounts_ui_cancel)) }
                 } else if (connected != null) {
-                    OutlinedButton(onClick = AdbConnectManager::disconnectAll) { Text("Disconnect") }
+                    OutlinedButton(onClick = AdbConnectManager::disconnectAll) { Text(stringResource(R.string.agy_cloud_ui_disconnect)) }
                 }
                 if (state.busy != null) {
                     CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
@@ -201,21 +203,21 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Reconnect automatically", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold)
-                    Hint("When Wireless debugging turns on again, for example after Wi-Fi reconnects, AntiGem finds the new port and connects while it's running.")
+                    Text(stringResource(R.string.adb_connect_screen_reconnect_automatically), fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold)
+                    Hint(stringResource(R.string.adb_connect_screen_when_wireless_debugging_turns_on_again_for))
                 }
                 Spacer(Modifier.width(8.dp))
                 Switch(checked = state.autoReconnect, onCheckedChange = AdbConnectManager::setAutoReconnect)
             }
             if (state.devices.isNotEmpty()) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-                Text("Devices", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(stringResource(R.string.adb_connect_screen_devices), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 state.devices.forEach { device ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(device.serial, fontFamily = FontFamily.Monospace, fontSize = 12.5.sp, modifier = Modifier.weight(1f))
                         Pill(device.state, if (device.state == "device") QuotaGreen else Amber)
                         IconButton(onClick = { AdbConnectManager.disconnect(device.serial) }) {
-                            Icon(Icons.Outlined.LinkOff, "Disconnect", Modifier.size(18.dp))
+                            Icon(Icons.Outlined.LinkOff, stringResource(R.string.agy_cloud_ui_disconnect), Modifier.size(18.dp))
                         }
                     }
                 }
@@ -225,7 +227,7 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
         if (connected != null) {
             Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Use it in the terminal", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.adb_connect_screen_use_it_in_the_terminal), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     Mono("adb devices\nadb shell\nadb install app.apk")
                 }
             }
@@ -256,7 +258,7 @@ private fun StatusCard(state: AdbConnectManager.State, cardBg: Color, cardBorder
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             }
             if (state.refreshing) CircularProgressIndicator(Modifier.padding(12.dp).size(24.dp), strokeWidth = 2.dp)
-            else IconButton(onClick = { AdbConnectManager.refresh() }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+            else IconButton(onClick = { AdbConnectManager.refresh() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
         }
     }
 }
@@ -303,7 +305,7 @@ private fun PairingSteps() {
             "Pull down the notification shade and type the 6-digit code into the AntiGem notification.",
         ).forEachIndexed { i, text -> Hint("${i + 1}. $text") }
         Text(
-            "Stay in Settings while you do this. Android closes the pairing dialog as soon as you leave it.",
+            stringResource(R.string.adb_connect_screen_stay_in_settings_while_you_do_this),
             fontSize = 12.sp, color = Amber, fontWeight = FontWeight.Medium
         )
     }
@@ -337,24 +339,24 @@ private fun ManualPairing(enabled: Boolean) {
     var port by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
     TextButton(onClick = { open = !open }, contentPadding = PaddingValues(0.dp)) {
-        Text(if (open) "Hide manual pairing" else "Pair manually instead", fontSize = 12.5.sp)
+        Text(if (open) stringResource(R.string.adb_connect_screen_hide_manual_pairing) else stringResource(R.string.adb_connect_screen_pair_manually_instead), fontSize = 12.5.sp)
     }
     if (!open) return
-    Hint("Use this on a split screen, or for another device: enter the port and code shown in the pairing dialog.")
+    Hint(stringResource(R.string.adb_connect_screen_use_this_on_a_split_screen_or))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
-            value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, label = { Text("Port") }, singleLine = true,
+            value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, label = { Text(stringResource(R.string.cloud_preview_port)) }, singleLine = true,
             modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         OutlinedTextField(
-            value = code, onValueChange = { code = it.filter(Char::isDigit).take(6) }, label = { Text("Code") }, singleLine = true,
+            value = code, onValueChange = { code = it.filter(Char::isDigit).take(6) }, label = { Text(stringResource(R.string.code_block_code)) }, singleLine = true,
             modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
     Button(
         enabled = enabled && port.isNotEmpty() && code.length == 6,
         onClick = { AdbConnectManager.pairManually(context, port.toInt(), code) }
-    ) { Text("Pair") }
+    ) { Text(stringResource(R.string.connect_pc_screen_pair)) }
 }
 
 @Composable
@@ -366,7 +368,7 @@ internal fun CheckRow(label: String, on: Boolean) {
         )
         Spacer(Modifier.width(8.dp))
         Text(label, fontSize = 13.sp, modifier = Modifier.weight(1f))
-        Text(if (on) "On" else "Off", fontSize = 12.sp, color = if (on) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+        Text(if (on) "On" else stringResource(R.string.adb_connect_screen_off), fontSize = 12.sp, color = if (on) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
     }
 }
 

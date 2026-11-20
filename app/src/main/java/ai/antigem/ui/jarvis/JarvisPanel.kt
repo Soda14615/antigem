@@ -1,5 +1,7 @@
 package ai.antigem.ui.jarvis
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -144,9 +146,9 @@ fun JarvisPanel(onTalk: () -> Unit, onNoticeAction: (String) -> Unit) {
                 if (shownTasks.isNotEmpty()) {
                     item(key = "tasks_head") {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            SectionTitle("Tasks", Modifier.weight(1f))
+                            SectionTitle(stringResource(R.string.jarvis_panel_tasks), Modifier.weight(1f))
                             if (shownTasks.any { !it.active }) {
-                                Text("Clear finished", color = Cyan, fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable { JarvisTasks.clearFinished() }.padding(horizontal = 8.dp, vertical = 4.dp))
+                                Text(stringResource(R.string.jarvis_panel_clear_finished), color = Cyan, fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable { JarvisTasks.clearFinished() }.padding(horizontal = 8.dp, vertical = 4.dp))
                             }
                         }
                     }
@@ -162,16 +164,16 @@ fun JarvisPanel(onTalk: () -> Unit, onNoticeAction: (String) -> Unit) {
                 item(key = "conv_head") {
                     Column(Modifier.padding(top = if (shownTasks.isNotEmpty()) 10.dp else 0.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            SectionTitle("Conversation", Modifier.weight(1f))
+                            SectionTitle(stringResource(R.string.jarvis_panel_conversation), Modifier.weight(1f))
                             if (voiceChat.isNotBlank()) {
-                                Text("Open chat", color = Cyan, fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
+                                Text(stringResource(R.string.jarvis_panel_open_chat), color = Cyan, fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
                                     close()
                                     JarvisController.vm.selectConversation(voiceChat)
                                     JarvisController.vm.requestViewMode("CHAT")
                                 }.padding(horizontal = 8.dp, vertical = 4.dp))
                             }
                             if (log.isNotEmpty()) {
-                                Text("Clear", color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
+                                Text(stringResource(R.string.custom_system_prompt_dialog_clear), color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp, modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
                                     JarvisController.clearHistory()
                                 }.padding(horizontal = 8.dp, vertical = 4.dp))
                             }
@@ -196,7 +198,7 @@ fun JarvisPanel(onTalk: () -> Unit, onNoticeAction: (String) -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = input, onValueChange = { input = it },
-                    placeholder = { Text("Type to Jarvis…", color = Color.White.copy(alpha = 0.4f), fontSize = 14.sp) },
+                    placeholder = { Text(stringResource(R.string.jarvis_panel_type_to_jarvis), color = Color.White.copy(alpha = 0.4f), fontSize = 14.sp) },
                     modifier = Modifier.weight(1f),
                     maxLines = 4,
                     shape = RoundedCornerShape(22.dp),

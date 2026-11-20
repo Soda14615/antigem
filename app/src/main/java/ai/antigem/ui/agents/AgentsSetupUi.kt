@@ -1,5 +1,7 @@
 package ai.antigem.ui.agents
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import ai.antigem.ui.components.bouncyVerticalScroll
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -52,28 +54,28 @@ import ai.antigem.domain.model.AgentKind
 import ai.antigem.ui.components.accent
 import ai.antigem.ui.components.label
 
-private data class AgentOption(val agent: AgentKind, val title: String, val description: String)
+private data class AgentOption(val agent: AgentKind, val title: String, @androidx.annotation.StringRes val description: Int)
 
 private val AGENT_OPTIONS = listOf(
     AgentOption(
         AgentKind.AGY,
         "Antigravity",
-        "Google's coding agent through the agy hub: Gemini and Claude models on your Google plan."
+        R.string.main_ui_google_s_coding_agent_through_the_agy
     ),
     AgentOption(
         AgentKind.CLAUDE,
         "Claude Code",
-        "Anthropic's Claude Code CLI on this device: your Claude subscription or Anthropic Console account."
+        R.string.main_ui_anthropic_s_claude_code_cli_on_this
     ),
     AgentOption(
         AgentKind.OPENCODE,
         "OpenCode",
-        "Open-source coding agent: 200+ providers with your own keys, any OpenAI-compatible API, and free models."
+        R.string.main_ui_open_source_coding_agent_200_providers_with
     ),
     AgentOption(
         AgentKind.CODEX,
         "Codex",
-        "OpenAI's Codex CLI on this device: sign in with your ChatGPT account (or an API key)."
+        R.string.main_ui_openai_s_codex_cli_on_this_device
     )
 )
 
@@ -102,7 +104,7 @@ fun AgentSelector(selected: Set<AgentKind>, onSelect: (Set<AgentKind>) -> Unit, 
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(option.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                        Text(option.description, fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f))
+                        Text(stringResource(option.description), fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f))
                     }
                     Spacer(Modifier.width(10.dp))
                     Box(
@@ -120,7 +122,7 @@ fun AgentSelector(selected: Set<AgentKind>, onSelect: (Set<AgentKind>) -> Unit, 
         }
         if (selected.size > 1) {
             Text(
-                "With several agents on, pick the agent for each new chat on the empty chat screen.",
+                stringResource(R.string.agents_setup_ui_with_several_agents_on_pick_the_agent),
                 fontSize = 11.5.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -149,12 +151,12 @@ fun AgentChoiceDialog(step: Int = 1, total: Int = 1, onConfirm: (Set<AgentKind>)
                 }
             }
         },
-        title = "Choose your agents",
-        subtitle = "Tick the coding agents you want to use. The app runs only the ones you pick; you can change this later in Settings → Agents.",
+        title = stringResource(R.string.main_ui_choose_your_agents),
+        subtitle = stringResource(R.string.main_ui_tick_the_coding_agents_you_want_to),
         primaryLabel = when (selected.size) {
-            0 -> "Pick at least one agent"
-            1 -> "Continue with ${selected.first().label()}"
-            else -> "Continue with ${selected.size} agents"
+            0 -> stringResource(R.string.main_ui_pick_at_least_one_agent)
+            1 -> stringResource(R.string.main_ui_continue_with, selected.first().label())
+            else -> stringResource(R.string.main_ui_continue_with_agents, selected.size)
         },
         primaryEnabled = selected.isNotEmpty(),
         onPrimary = { onConfirm(selected) }
@@ -177,7 +179,7 @@ fun AgentsSettingsPage(
     var confirm by remember { mutableStateOf(false) }
     Column(modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)) {
         Text(
-            "Agents you turn off do not run at all: the local server starts without them and their settings and chats are hidden (chats stay on disk).",
+            stringResource(R.string.agents_setup_ui_agents_you_turn_off_do_not_run),
             fontSize = 12.5.sp,
             lineHeight = 17.sp,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
@@ -195,9 +197,9 @@ fun AgentsSettingsPage(
             if (isApplying) {
                 CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
                 Spacer(Modifier.width(10.dp))
-                Text("Restarting…")
+                Text(stringResource(R.string.agents_setup_ui_restarting))
             } else {
-                Text(if (selected == enabled) "No changes" else "Apply and restart app", fontWeight = FontWeight.SemiBold)
+                Text(if (selected == enabled) stringResource(R.string.agents_setup_ui_no_changes) else stringResource(R.string.agents_setup_ui_apply_and_restart_app), fontWeight = FontWeight.SemiBold)
             }
         }
         if (onOpenGlobalContext != null) {
@@ -217,9 +219,9 @@ fun AgentsSettingsPage(
         ) {
             Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Vibrate when a chat finishes", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.agents_setup_ui_vibrate_when_a_chat_finishes), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                     Text(
-                        "One light buzz when a chat stops running (its dot in the chat list goes away).",
+                        stringResource(R.string.agents_setup_ui_one_light_buzz_when_a_chat_stops),
                         fontSize = 12.5.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -232,11 +234,10 @@ fun AgentsSettingsPage(
     if (confirm) {
         AlertDialog(
             onDismissRequest = { confirm = false },
-            title = { Text("Restart to apply?", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.agents_setup_ui_restart_to_apply), fontWeight = FontWeight.Bold) },
             text = {
                 Text(
-                    "The local server stops and the app restarts with the new agents, so nothing of a turned-off agent keeps running. " +
-                        "Replies in progress stop, and a chat of a turned-off agent is closed.",
+                    stringResource(R.string.main_ui_the_local_server_stops_and_the_app),
                     fontSize = 13.5.sp
                 )
             },
@@ -244,9 +245,9 @@ fun AgentsSettingsPage(
                 Button(onClick = {
                     confirm = false
                     onApply(selected)
-                }) { Text("Restart app") }
+                }) { Text(stringResource(R.string.agents_setup_ui_restart_app)) }
             },
-            dismissButton = { TextButton(onClick = { confirm = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirm = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -260,8 +261,8 @@ fun AgentsApplyingDialog() {
                 CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.5.dp)
                 Spacer(Modifier.width(14.dp))
                 Column {
-                    Text("Applying agents", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                    Text("Stopping the local server, then restarting the app…", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    Text(stringResource(R.string.agents_setup_ui_applying_agents), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text(stringResource(R.string.agents_setup_ui_stopping_the_local_server_then_restarting_the), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
         }

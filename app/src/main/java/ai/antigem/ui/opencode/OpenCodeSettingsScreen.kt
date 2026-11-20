@@ -1,5 +1,7 @@
 package ai.antigem.ui.opencode
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -91,12 +93,12 @@ private fun toast(msg: String, ok: Boolean = true) =
     AppToastHelper.showToast(msg, if (ok) ChatToastType.SUCCESS else ChatToastType.ERROR)
 
 /** The pages of Settings → OpenCode (each opens from the OpenCode row list). */
-enum class OpenCodeSettingsPage(val title: String, val subtitle: String) {
-    SERVER("Server & install", "Install, update and restart OpenCode"),
-    DEFAULTS("Permissions", "What OpenCode asks before acting, and the agent of new chats"),
-    PROVIDERS("Custom providers", "Sign in or add an API key, or add any OpenAI- or Anthropic-compatible API manually"),
-    MCP("MCP servers", "Tools OpenCode can call: presets and your own servers"),
-    SKILLS("Skills", "Add skills from GitHub, update or remove them")
+enum class OpenCodeSettingsPage(val titleRes: Int, val subtitleRes: Int) {
+    SERVER(R.string.codex_settings_screen_server_install, R.string.agent_settings_install_update_and_restart_opencode),
+    DEFAULTS(R.string.app_permissions_dialog_permissions, R.string.agent_settings_what_opencode_asks_before_acting_and_the_agent_of_new_chats),
+    PROVIDERS(R.string.agent_settings_custom_providers, R.string.agent_settings_sign_in_or_add_an_api_key_or_add_any_openai_or_anthropic_com),
+    MCP(R.string.agent_settings_mcp_servers, R.string.agent_settings_tools_opencode_can_call_presets_and_your_own_servers),
+    SKILLS(R.string.agent_settings_skills, R.string.agent_settings_add_skills_from_github_update_or_remove_them)
 }
 
 /** Settings → OpenCode: one row per page, each with its current state. */
@@ -115,8 +117,9 @@ fun OpenCodeSettingsGroup(backend: OpenCodeChatBackend, cardBg: Color, onOpen: (
         backend.client.customProviders().onSuccess { endpoints = it.size }
         backend.client.mcpList().onSuccess { mcp = it.size }
     }
+    @Composable
     fun row(page: OpenCodeSettingsPage, icon: androidx.compose.ui.graphics.vector.ImageVector, value: String? = null, valueColor: Color? = null) =
-        ai.antigem.ui.settings.SettingsRowItem(icon, OpenCodeAccent, page.title, value, valueColor) { onOpen(page) }
+        ai.antigem.ui.settings.SettingsRowItem(icon, OpenCodeAccent, stringResource(page.titleRes), value, valueColor) { onOpen(page) }
     ai.antigem.ui.settings.SettingsRowList(
         cardBg = cardBg,
         groups = listOf(
@@ -217,7 +220,7 @@ fun OpenCodeSettingsScreen(
                     )
                 }
                 if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
             }
             status?.binary?.let {
                 Spacer(Modifier.height(6.dp))
@@ -240,10 +243,10 @@ fun OpenCodeSettingsScreen(
                             enabled = !jobRunning,
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = OpenCodeAccent, contentColor = Color.White)
-                        ) { Text(if (jobRunning) "Installing…" else "Install OpenCode") }
+                        ) { Text(if (jobRunning) stringResource(R.string.claude_settings_screen_installing) else stringResource(R.string.open_code_settings_screen_install_opencode)) }
                     } else {
                         OutlinedButton(onClick = { backend.startCliJob("update") }, enabled = !jobRunning, shape = RoundedCornerShape(12.dp)) {
-                            Text(if (jobRunning) "Checking…" else "Check for updates")
+                            Text(if (jobRunning) stringResource(R.string.bridge_ui_checking) else stringResource(R.string.bridge_ui_check_for_updates))
                         }
                     }
                     if (jobRunning) {
@@ -271,7 +274,7 @@ fun OpenCodeSettingsScreen(
                 }
                 if (state == OpenCodeState.NOT_INSTALLED) {
                     Text(
-                        "Or in a terminal on the server: curl -fsSL https://opencode.ai/v2/install | bash",
+                        stringResource(R.string.open_code_settings_screen_or_in_a_terminal_on_the_server),
                         fontSize = 11.sp, fontFamily = FontFamily.Monospace,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 6.dp)
                     )
@@ -297,10 +300,10 @@ fun OpenCodeSettingsScreen(
                 ) {
                     if (restarting) CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp) else Icon(Icons.Outlined.Refresh, null, Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(if (status?.running == true) "Restart OpenCode" else "Start OpenCode")
+                    Text(if (status?.running == true) stringResource(R.string.open_code_settings_screen_restart_opencode) else stringResource(R.string.open_code_settings_screen_start_opencode))
                 }
                 Text(
-                    "Running replies stop when OpenCode restarts.",
+                    stringResource(R.string.open_code_settings_screen_running_replies_stop_when_opencode_restarts),
                     fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp)
                 )
             }
@@ -308,7 +311,7 @@ fun OpenCodeSettingsScreen(
 
         // ---- defaults
         if (page == OpenCodeSettingsPage.DEFAULTS) {
-        SectionTitle("Approvals")
+        SectionTitle(stringResource(R.string.codex_settings_screen_approvals))
         ClaudeCard {
             listOf(OpenCodePreferences.MODE_ASK, OpenCodePreferences.MODE_AUTO, OpenCodePreferences.MODE_DEFAULT).forEach { m ->
                 Row(
@@ -323,11 +326,11 @@ fun OpenCodeSettingsScreen(
                 }
             }
             Text(
-                "Applies to new chats and to the chat on screen.",
+                stringResource(R.string.open_code_settings_screen_applies_to_new_chats_and_to_the),
                 fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp)
             )
         }
-        SectionTitle("Agent for new chats")
+        SectionTitle(stringResource(R.string.open_code_settings_screen_agent_for_new_chats))
         ClaudeCard {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 agents.ifEmpty {
@@ -337,7 +340,7 @@ fun OpenCodeSettingsScreen(
                 }
             }
             Text(
-                "Build makes changes; Plan only reads and plans. Switch any time from the chip above the message box.",
+                stringResource(R.string.open_code_settings_screen_build_makes_changes_plan_only_reads_and),
                 fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp)
             )
         }
@@ -350,7 +353,7 @@ fun OpenCodeSettingsScreen(
         // ---- custom endpoints
         // ---- manual: any OpenAI- / Anthropic-compatible API by its address (on the same page as the providers)
         if (page == OpenCodeSettingsPage.PROVIDERS) ClaudeCard {
-            Text("Manual", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(stringResource(R.string.open_code_settings_screen_manual), fontWeight = FontWeight.Bold, fontSize = 14.sp)
             Text(
                 "Any OpenAI-compatible API (Ollama, LM Studio, vLLM, LiteLLM, a company gateway…) or an Anthropic-compatible one, " +
                     "added by its address. It must be reachable from the server.",
@@ -370,7 +373,7 @@ fun OpenCodeSettingsScreen(
                         )
                         Text(p.base_url, fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    IconButton(onClick = { editing = p }) { Icon(Icons.Outlined.Edit, "Edit") }
+                    IconButton(onClick = { editing = p }) { Icon(Icons.Outlined.Edit, stringResource(R.string.chat_screen_edit)) }
                     IconButton(onClick = {
                         scope.launch {
                             backend.client.deleteCustomProvider(p.id)
@@ -378,12 +381,12 @@ fun OpenCodeSettingsScreen(
                                 .onFailure { toast("Could not remove: ${it.message}", ok = false) }
                             reload()
                         }
-                    }) { Icon(Icons.Outlined.Delete, "Remove", tint = MaterialTheme.colorScheme.error) }
+                    }) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = MaterialTheme.colorScheme.error) }
                 }
             }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(onClick = { editing = OpenCodeCustomProvider() }, shape = RoundedCornerShape(12.dp)) {
-                Icon(Icons.Outlined.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text("Add manually")
+                Icon(Icons.Outlined.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.open_code_settings_screen_add_manually))
             }
         }
         if (page == OpenCodeSettingsPage.MCP) OpenCodeMcpPage(backend, onOpenRea, onOpenReaGroups)
@@ -429,31 +432,31 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) "Add a custom provider" else "Edit ${initial.name}", fontWeight = FontWeight.Bold) },
+        title = { Text(if (isNew) stringResource(R.string.open_code_settings_screen_add_a_custom_provider) else stringResource(R.string.claude_providers_page_edit, initial.name.toString()), fontWeight = FontWeight.Bold) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                OutlinedTextField(name, { name = it }, label = { Text("Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.browser_screen_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(selected = kind == "openai", onClick = { kind = "openai" }, label = { Text("OpenAI-compatible") })
+                    FilterChip(selected = kind == "openai", onClick = { kind = "openai" }, label = { Text(stringResource(R.string.open_code_settings_screen_openai_compatible)) })
                     FilterChip(selected = kind == "anthropic", onClick = { kind = "anthropic" }, label = { Text("Anthropic") })
                 }
                 Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
-                    baseUrl, { baseUrl = it }, label = { Text("Base URL") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    baseUrl, { baseUrl = it }, label = { Text(stringResource(R.string.claude_providers_page_base_url)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text(if (kind == "anthropic") "https://api.example.com/v1" else "http://localhost:11434/v1") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     apiKey, { apiKey = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                    label = { Text(if (!isNew && initial.has_api_key) "API key (blank keeps ${initial.api_key_hint ?: "the saved one"})" else "API key (optional for local servers)") },
+                    label = { Text(if (!isNew && initial.has_api_key) stringResource(R.string.open_code_settings_screen_api_key_blank_keeps, (initial.api_key_hint ?: "the saved one").toString()) else stringResource(R.string.open_code_settings_screen_api_key_optional_for_local_servers)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
                 Spacer(Modifier.height(12.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Models", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.open_code_providers_page_models), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     TextButton(
                         onClick = {
                             fetching = true
@@ -471,14 +474,14 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
                             }
                         },
                         enabled = baseUrl.isNotBlank() && !fetching
-                    ) { Text(if (fetching) "Fetching…" else "Fetch from endpoint") }
+                    ) { Text(if (fetching) stringResource(R.string.open_code_settings_screen_fetching) else stringResource(R.string.open_code_settings_screen_fetch_from_endpoint)) }
                 }
                 // models from the endpoint are ticked in its list below; here only the ones added by hand
                 val fetchedIds = fetched.orEmpty().map { it.id }.toSet()
                 models.toList().filter { it.id !in fetchedIds }.forEach { m ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(m.id, fontSize = 12.5.sp, fontFamily = FontFamily.Monospace, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        IconButton(onClick = { models.remove(m) }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Delete, "Remove", Modifier.size(16.dp)) }
+                        IconButton(onClick = { models.remove(m) }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), Modifier.size(16.dp)) }
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -487,18 +490,18 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
                         val id = newModel.trim()
                         if (id.isNotBlank() && models.none { it.id == id }) models.add(OpenCodeCustomModel(id))
                         newModel = ""
-                    }) { Icon(Icons.Outlined.Add, "Add model") }
+                    }) { Icon(Icons.Outlined.Add, stringResource(R.string.claude_providers_page_add_model)) }
                 }
                 fetched?.takeIf { it.isNotEmpty() }?.let { list ->
                     Spacer(Modifier.height(6.dp))
                     val chosen = list.count { f -> models.any { it.id == f.id } }
                     val all = chosen == list.size
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("$chosen of ${list.size} found are added:", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.open_code_settings_screen_of_found_are_added, chosen.toString(), list.size.toString()), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
                         TextButton(onClick = {
                             if (all) models.removeAll { m -> list.any { it.id == m.id } }
                             else list.forEach { f -> if (models.none { it.id == f.id }) models.add(f) }
-                        }) { Text(if (all) "Select none" else "Select all", fontSize = 12.sp) }
+                        }) { Text(if (all) stringResource(R.string.open_code_settings_screen_select_none) else stringResource(R.string.claude_providers_page_select_all), fontSize = 12.sp) }
                     }
                     Column(Modifier.heightIn(max = 220.dp).verticalScroll(rememberScrollState())) {
                         list.forEach { m ->
@@ -530,8 +533,8 @@ private fun CustomProviderDialog(backend: OpenCodeChatBackend, initial: OpenCode
                     }
                 },
                 enabled = !saving && name.isNotBlank() && baseUrl.isNotBlank() && models.isNotEmpty()
-            ) { Text(if (saving) "Saving…" else "Save") }
+            ) { Text(if (saving) stringResource(R.string.claude_providers_page_saving) else stringResource(R.string.claude_providers_page_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }

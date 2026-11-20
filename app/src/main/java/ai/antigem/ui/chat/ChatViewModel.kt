@@ -1,5 +1,6 @@
 package ai.antigem.ui.chat
 
+import ai.antigem.R
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -173,15 +174,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             ?: AgentKind.AGY
 
     private fun claudeNotSupported(action: String) {
-        ai.antigem.ui.components.AppToastHelper.showToast("$action is not available in Claude chats yet", ai.antigem.ui.components.ChatToastType.INFO)
+        ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_is_not_available_in_claude_chats_yet, action), ai.antigem.ui.components.ChatToastType.INFO)
     }
 
     private fun openCodeNotSupported(action: String) {
-        ai.antigem.ui.components.AppToastHelper.showToast("$action is not available in OpenCode chats yet", ai.antigem.ui.components.ChatToastType.INFO)
+        ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_is_not_available_in_opencode_chats_yet, action), ai.antigem.ui.components.ChatToastType.INFO)
     }
 
     private fun codexNotSupported(action: String) {
-        ai.antigem.ui.components.AppToastHelper.showToast("$action is not available in Codex chats yet", ai.antigem.ui.components.ChatToastType.INFO)
+        ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_is_not_available_in_codex_chats_yet, action), ai.antigem.ui.components.ChatToastType.INFO)
     }
 
     fun setNewChatAgent(agent: AgentKind) {
@@ -308,37 +309,37 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         ai.antigem.data.jarvis.JarvisTasks.anyActive
     ) { (agyChats, instances), (claudeTurn, current), claudeChats, jarvis, tasks ->
         fun names(titles: List<String>): String {
-            val shown = titles.map { "“${it.ifBlank { "Untitled chat" }.take(40)}”" }.take(2).joinToString(", ")
-            return if (titles.size > 2) "$shown and ${titles.size - 2} more" else shown
+            val shown = titles.map { "“${it.ifBlank { getApplication<Application>().getString(R.string.main_ui_untitled_chat) }.take(40)}”" }.take(2).joinToString(", ")
+            return if (titles.size > 2) getApplication<Application>().getString(R.string.main_ui_and_more, shown, titles.size - 2) else shown
         }
         buildList {
             val agyWorking = agyChats.filter { it.isRunning }
             val agyBackground = agyChats.filter { !it.isRunning && (it.notFullyIdle || it.hasActivity) }
-            if (agyWorking.isNotEmpty()) add("Antigravity is working in ${names(agyWorking.map { it.title })}")
-            if (agyBackground.isNotEmpty()) add("Antigravity has background work in ${names(agyBackground.map { it.title })}")
+            if (agyWorking.isNotEmpty()) add(getApplication<Application>().getString(R.string.main_ui_antigravity_is_working_in, names(agyWorking.map { it.title })))
+            if (agyBackground.isNotEmpty()) add(getApplication<Application>().getString(R.string.main_ui_antigravity_has_background_work_in, names(agyBackground.map { it.title })))
             val listed = (agyWorking + agyBackground).map { it.id }.toSet()
             val otherInstances = instances.count { it.conversationId !in listed }
-            if (otherInstances > 0) add(if (otherInstances == 1) "An Antigravity instance is running" else "$otherInstances Antigravity instances are running")
+            if (otherInstances > 0) add(if (otherInstances == 1) getApplication<Application>().getString(R.string.main_ui_an_antigravity_instance_is_running) else getApplication<Application>().getString(R.string.main_ui_antigravity_instances_are_running, otherInstances))
             val claudeOpen = current?.takeIf { claudeTurn && it.agent == AgentKind.CLAUDE }
-            if (claudeOpen != null) add("Claude is replying in ${names(listOf(claudeOpen.title))}")
+            if (claudeOpen != null) add(getApplication<Application>().getString(R.string.main_ui_claude_is_replying_in, names(listOf(claudeOpen.title))))
             val claudeOthers = claudeChats.filter { it.isRunning && it.id != claudeOpen?.id }
-            if (claudeOthers.isNotEmpty()) add("Claude is working in ${names(claudeOthers.map { it.title })}")
-            if (claudeTurn && claudeOpen == null && claudeOthers.isEmpty()) add("Claude is replying")
+            if (claudeOthers.isNotEmpty()) add(getApplication<Application>().getString(R.string.main_ui_claude_is_working_in, names(claudeOthers.map { it.title })))
+            if (claudeTurn && claudeOpen == null && claudeOthers.isEmpty()) add(getApplication<Application>().getString(R.string.main_ui_claude_is_replying))
             val openCodeChats = openCodeBackend.conversations.value.filter { it.isRunning }
-            if (openCodeChats.isNotEmpty()) add("OpenCode is working in ${names(openCodeChats.map { it.title })}")
-            else if (openCodeBackend.isCurrentChatActivelyRunning.value) add("OpenCode is replying")
+            if (openCodeChats.isNotEmpty()) add(getApplication<Application>().getString(R.string.main_ui_opencode_is_working_in, names(openCodeChats.map { it.title })))
+            else if (openCodeBackend.isCurrentChatActivelyRunning.value) add(getApplication<Application>().getString(R.string.main_ui_opencode_is_replying))
             val codexChats = codexBackend.conversations.value.filter { it.isRunning }
-            if (codexChats.isNotEmpty()) add("Codex is working in ${names(codexChats.map { it.title })}")
-            else if (codexBackend.isCurrentChatActivelyRunning.value) add("Codex is replying")
-            if (tasks) add("A Jarvis task is running")
+            if (codexChats.isNotEmpty()) add(getApplication<Application>().getString(R.string.main_ui_codex_is_working_in, names(codexChats.map { it.title })))
+            else if (codexBackend.isCurrentChatActivelyRunning.value) add(getApplication<Application>().getString(R.string.main_ui_codex_is_replying))
+            if (tasks) add(getApplication<Application>().getString(R.string.main_ui_a_jarvis_task_is_running))
             if (jarvis) add(
                 when (ai.antigem.data.jarvis.JarvisPreferences.keepScreenOn.value) {
-                    "active" -> "Jarvis is active (Jarvis setting: keep the screen on while it's active)"
-                    else -> "Jarvis is on (Jarvis setting: keep the screen on while Jarvis is on)"
+                    "active" -> getApplication<Application>().getString(R.string.main_ui_jarvis_is_active_jarvis_setting_keep_the)
+                    else -> getApplication<Application>().getString(R.string.main_ui_jarvis_is_on_jarvis_setting_keep_the)
                 }
             )
         }
-    }.combine(voiceCallActive) { reasons, call -> if (call) listOf("A voice call with Antigravity is on") + reasons else reasons }
+    }.combine(voiceCallActive) { reasons, call -> if (call) listOf(getApplication<Application>().getString(R.string.main_ui_a_voice_call_with_antigravity_is_on)) + reasons else reasons }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val isCurrentChatActivelyRunning = byAgent(agyBackend.isCurrentChatActivelyRunning, claudeBackend.isCurrentChatActivelyRunning, openCodeBackend.isCurrentChatActivelyRunning, codexBackend.isCurrentChatActivelyRunning)
     val isCurrentChatBackgroundActive = byAgent(agyBackend.isCurrentChatBackgroundActive, alwaysFalse, alwaysFalse, alwaysFalse)
@@ -594,15 +595,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun prepareEditMessage(messageId: String): String? {
         if (isCodexActive) {
-            codexNotSupported("Editing a sent message")
+            codexNotSupported(getApplication<Application>().getString(R.string.main_ui_editing_a_sent_message))
             return null
         }
         if (isOpenCodeActive) {
-            openCodeNotSupported("Editing a sent message")
+            openCodeNotSupported(getApplication<Application>().getString(R.string.main_ui_editing_a_sent_message))
             return null
         }
         if (isClaudeActive) {
-            claudeNotSupported("Editing a sent message")
+            claudeNotSupported(getApplication<Application>().getString(R.string.main_ui_editing_a_sent_message))
             return null
         }
         return agyBackend.prepareEditMessage(messageId)?.let { restoreAttachedFiles(it); editableText(it) }
@@ -984,7 +985,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             if (t is kotlinx.coroutines.CancellationException) throw t
             Log.e("ChatViewModel", "Failed to add attachment from uri $uri: ${t.message}")
             ai.antigem.ui.components.AppToastHelper.showToast(
-                "Could not attach $fileName: ${t.message ?: t.javaClass.simpleName}",
+                getApplication<Application>().getString(R.string.main_ui_could_not_attach, fileName, t.message ?: t.javaClass.simpleName),
                 ai.antigem.ui.components.ChatToastType.ERROR
             )
         }
@@ -1031,7 +1032,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 _attachments.update { list -> list.filter { it.id != id } }
                 uploadFolders.remove(id)?.let { ai.antigem.data.files.FileExplorerApi.delete(listOf(it)) }
                 ai.antigem.ui.components.AppToastHelper.showToast(
-                    "Could not copy $fileName to the agent's machine: ${result.error ?: "unknown error"}",
+                    context.getString(
+                        R.string.main_ui_could_not_copy_to_the_agent_s,
+                        fileName,
+                        result.error ?: context.getString(R.string.main_ui_unknown_error)
+                    ),
                     ai.antigem.ui.components.ChatToastType.ERROR
                 )
             }
@@ -1678,7 +1683,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         if (!told) {
                             told = true
                             withContext(Dispatchers.Main) {
-                                ai.antigem.ui.components.AppToastHelper.showToast("Waiting for the local server to restore the chat…", ai.antigem.ui.components.ChatToastType.INFO)
+                                ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_waiting_for_the_local_server_to_restore), ai.antigem.ui.components.ChatToastType.INFO)
                             }
                         }
                         delay(1_500)
@@ -1698,8 +1703,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         val hubReady = systemConnectionState.value.isReady
                         withContext(Dispatchers.Main) {
                             ai.antigem.ui.components.AppToastHelper.showToast(
-                                if (hubReady) "Chat restored: ${restored.title}"
-                                else "Chat restored: ${restored.title}. It opens once Antigravity has started.",
+                                if (hubReady) getApplication<Application>().getString(R.string.main_ui_chat_restored, restored.title)
+                                else getApplication<Application>().getString(R.string.main_ui_chat_restored_it_opens_once_antigravity_has, restored.title),
                                 ai.antigem.ui.components.ChatToastType.SUCCESS
                             )
                         }
@@ -1712,14 +1717,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     if (!isActive) return@launch
                     _sharedConversationPreview.value = parsed
                     withContext(Dispatchers.Main) {
-                        ai.antigem.ui.components.AppToastHelper.showToast("Loaded shared chat: ${parsed.title}", ai.antigem.ui.components.ChatToastType.SUCCESS)
+                        ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_loaded_shared_chat, parsed.title), ai.antigem.ui.components.ChatToastType.SUCCESS)
                     }
                 }
             } catch (e: Exception) {
                 if (e is kotlinx.coroutines.CancellationException) return@launch
                 Log.e("ChatViewModel", "Failed to load shared conversation from uri $uri: ${e.message}", e)
                 withContext(Dispatchers.Main) {
-                    ai.antigem.ui.components.AppToastHelper.showToast("Failed to load shared chat file", ai.antigem.ui.components.ChatToastType.ERROR)
+                    ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_failed_to_load_shared_chat_file), ai.antigem.ui.components.ChatToastType.ERROR)
                 }
             } finally {
                 _isSharedConversationLoading.value = false
@@ -1736,7 +1741,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val ready = withTimeoutOrNull(180_000) { systemConnectionState.first { it.isReady } } != null
         if (!ready) {
             withContext(Dispatchers.Main) {
-                ai.antigem.ui.components.AppToastHelper.showToast("Antigravity has not started yet: the restored chat is in the chat list.", ai.antigem.ui.components.ChatToastType.INFO)
+                ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_antigravity_has_not_started_yet_the_restored), ai.antigem.ui.components.ChatToastType.INFO)
             }
             return
         }
@@ -1781,12 +1786,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 val content = context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
                 _incomingMarkdownPreview.value = resolvedName to content
                 withContext(Dispatchers.Main) {
-                    ai.antigem.ui.components.AppToastHelper.showToast("Opened $resolvedName", ai.antigem.ui.components.ChatToastType.SUCCESS)
+                    ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_opened, resolvedName), ai.antigem.ui.components.ChatToastType.SUCCESS)
                 }
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "Failed to load markdown from URI $uri: ${e.message}", e)
                 withContext(Dispatchers.Main) {
-                    ai.antigem.ui.components.AppToastHelper.showToast("Failed to load markdown file", ai.antigem.ui.components.ChatToastType.ERROR)
+                    ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_failed_to_load_markdown_file), ai.antigem.ui.components.ChatToastType.ERROR)
                 }
             }
         }
@@ -1820,12 +1825,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 requestViewMode("IDE")
                 withContext(Dispatchers.Main) {
-                    ai.antigem.ui.components.AppToastHelper.showToast("Opened $resolvedName in IDE", ai.antigem.ui.components.ChatToastType.SUCCESS)
+                    ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_opened_in_ide, resolvedName), ai.antigem.ui.components.ChatToastType.SUCCESS)
                 }
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "Failed to open file in IDE from URI $uri: ${e.message}", e)
                 withContext(Dispatchers.Main) {
-                    ai.antigem.ui.components.AppToastHelper.showToast("Failed to open file in IDE", ai.antigem.ui.components.ChatToastType.ERROR)
+                    ai.antigem.ui.components.AppToastHelper.showToast(getApplication<Application>().getString(R.string.main_ui_failed_to_open_file_in_ide), ai.antigem.ui.components.ChatToastType.ERROR)
                 }
             }
         }

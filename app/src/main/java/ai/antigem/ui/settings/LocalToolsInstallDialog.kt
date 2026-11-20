@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -139,10 +141,10 @@ fun LocalToolsInstallDialog(
 
                 Text(
                     text = when (installerState) {
-                        is LocalInstallerState.Success -> "Local Tools Ready!"
-                        is LocalInstallerState.Error -> "Installation Error"
-                        is LocalInstallerState.Idle -> "Install Local Linux Tools"
-                        else -> "Setting Up Local Tools"
+                        is LocalInstallerState.Success -> stringResource(R.string.local_tools_install_dialog_local_tools_ready)
+                        is LocalInstallerState.Error -> stringResource(R.string.local_tools_install_dialog_installation_error)
+                        is LocalInstallerState.Idle -> stringResource(R.string.local_tools_install_dialog_install_local_linux_tools)
+                        else -> stringResource(R.string.local_tools_install_dialog_setting_up_local_tools)
                     },
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
@@ -151,10 +153,10 @@ fun LocalToolsInstallDialog(
 
                 Text(
                     text = when (installerState) {
-                        is LocalInstallerState.Success -> "Termux-compatible shell, coreutils & toolchain are now active."
-                        is LocalInstallerState.Error -> "Failed to configure local environment. You can retry below."
-                        is LocalInstallerState.Idle -> "Select how you would like to download and install the Termux rootfs:"
-                        else -> "Downloading and unpacking native Linux toolchain inside your app sandbox."
+                        is LocalInstallerState.Success -> stringResource(R.string.local_tools_install_dialog_termux_compatible_shell_coreutils_toolchain_are_now)
+                        is LocalInstallerState.Error -> stringResource(R.string.local_tools_install_dialog_failed_to_configure_local_environment_you_can)
+                        is LocalInstallerState.Idle -> stringResource(R.string.local_tools_install_dialog_select_how_you_would_like_to_download)
+                        else -> stringResource(R.string.local_tools_install_dialog_downloading_and_unpacking_native_linux_toolchain_insid)
                     },
                     fontSize = 12.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -187,7 +189,7 @@ fun LocalToolsInstallDialog(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Device Hardware Capabilities",
+                                text = stringResource(R.string.local_tools_install_dialog_device_hardware_capabilities),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -208,7 +210,7 @@ fun LocalToolsInstallDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Arch", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(R.string.local_tools_install_dialog_arch), fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(1.dp))
                                     Text(
                                         hardwareInfo.arch,
@@ -236,12 +238,12 @@ fun LocalToolsInstallDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Address Space", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(R.string.local_tools_install_dialog_address_space), fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(1.dp))
                                     Text(
                                         when (hardwareInfo.vaBits) {
-                                            48 -> "48-bit"
-                                            39 -> "39-bit"
+                                            48 -> stringResource(R.string.local_tools_install_dialog_48_bit)
+                                            39 -> stringResource(R.string.local_tools_install_dialog_39_bit)
                                             else -> "N/A"
                                         },
                                         fontSize = 11.sp,
@@ -271,12 +273,12 @@ fun LocalToolsInstallDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Atomics", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(R.string.local_tools_install_dialog_atomics), fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(1.dp))
                                     Text(
                                         when (hardwareInfo.hasAtomics) {
-                                            true -> "Supported"
-                                            false -> "None"
+                                            true -> stringResource(R.string.local_tools_install_dialog_supported)
+                                            false -> stringResource(R.string.claude_providers_page_none)
                                             else -> "N/A"
                                         },
                                         fontSize = 11.sp,
@@ -325,7 +327,7 @@ fun LocalToolsInstallDialog(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
-                                                text = "Auto Download (GitHub)",
+                                                text = stringResource(R.string.local_tools_install_dialog_auto_download_github),
                                                 fontSize = 13.5.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
@@ -337,11 +339,11 @@ fun LocalToolsInstallDialog(
                                                     .background(QuotaGreen.copy(alpha = 0.15f))
                                                     .padding(horizontal = 5.dp, vertical = 1.dp)
                                             ) {
-                                                Text("Recommended", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = QuotaGreen)
+                                                Text(stringResource(R.string.explorer_dialogs_recommended), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = QuotaGreen)
                                             }
                                         }
                                         Text(
-                                            text = "Auto-downloads verified AntiGem rootfs (~350MB) with preconfigured tools and environment",
+                                            text = stringResource(R.string.local_tools_install_dialog_auto_downloads_verified_antigem_rootfs_350mb_with),
                                             fontSize = 11.5.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -371,13 +373,13 @@ fun LocalToolsInstallDialog(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(
-                                                text = "Local ZIP Archive",
+                                                text = stringResource(R.string.local_tools_install_dialog_local_zip_archive),
                                                 fontSize = 13.5.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
                                             Text(
-                                                text = "Pick an existing bootstrap .zip file from device (Offline)",
+                                                text = stringResource(R.string.local_tools_install_dialog_pick_an_existing_bootstrap_zip_file_from),
                                                 fontSize = 11.5.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -393,13 +395,13 @@ fun LocalToolsInstallDialog(
                                             Icon(imageVector = Icons.Outlined.FolderOpen, contentDescription = null, modifier = Modifier.size(16.dp))
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
-                                                text = if (selectedFileUri != null) "Change Selected ZIP" else "Browse & Select ZIP File",
+                                                text = if (selectedFileUri != null) stringResource(R.string.local_tools_install_dialog_change_selected_zip) else stringResource(R.string.local_tools_install_dialog_browse_select_zip_file),
                                                 fontSize = 12.sp
                                             )
                                         }
                                         if (selectedFileUri != null) {
                                             Text(
-                                                text = "Selected: ${selectedFileUri.toString().substringAfterLast("/")}",
+                                                text = stringResource(R.string.local_tools_install_dialog_selected, (selectedFileUri.toString().substringAfterLast("/")).toString()),
                                                 fontSize = 10.5.sp,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = QuotaGreen,
@@ -435,7 +437,7 @@ fun LocalToolsInstallDialog(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
-                                                text = "Base Minimum Termux",
+                                                text = stringResource(R.string.local_tools_install_dialog_base_minimum_termux),
                                                 fontSize = 13.5.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
@@ -447,11 +449,11 @@ fun LocalToolsInstallDialog(
                                                     .background(ai.antigem.theme.AppColors.accentIndigo.copy(alpha = 0.15f))
                                                     .padding(horizontal = 5.dp, vertical = 1.dp)
                                             ) {
-                                                Text("Minimal (~33MB)", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = ai.antigem.theme.AppColors.accentIndigo)
+                                                Text(stringResource(R.string.local_tools_install_dialog_minimal_33mb), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = ai.antigem.theme.AppColors.accentIndigo)
                                             }
                                         }
                                         Text(
-                                            text = "Downloads clean official Termux base bootstrap (${LocalEnvironmentManager.getBootstrapArch()}) with essential coreutils",
+                                            text = stringResource(R.string.local_tools_install_dialog_downloads_clean_official_termux_base_bootstrap_with, (LocalEnvironmentManager.getBootstrapArch()).toString()),
                                             fontSize = 11.5.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -488,7 +490,7 @@ fun LocalToolsInstallDialog(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             Text(
-                                text = "Found Termux Bootstrap Package",
+                                text = stringResource(R.string.local_tools_install_dialog_found_termux_bootstrap_package),
                                 fontSize = 13.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -508,28 +510,28 @@ fun LocalToolsInstallDialog(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text("Release Tag:", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.local_tools_install_dialog_release_tag), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(info.releaseTag, fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                                     }
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text("Architecture:", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.local_tools_install_dialog_architecture), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(info.arch, fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, color = ClaudeTerracotta)
                                     }
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text("Package Size:", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.local_tools_install_dialog_package_size), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(info.sizeFormatted, fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, color = QuotaGreen)
                                     }
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text("Target Sandbox:", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.local_tools_install_dialog_target_sandbox), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(info.packageName, fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface)
                                     }
                                     HorizontalDivider(
@@ -559,7 +561,7 @@ fun LocalToolsInstallDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Step 1: Downloading / Importing",
+                                    text = stringResource(R.string.local_tools_install_dialog_step_1_downloading_importing),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -620,7 +622,7 @@ fun LocalToolsInstallDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Step 2: Unzipping & Extracting",
+                                    text = stringResource(R.string.local_tools_install_dialog_step_2_unzipping_extracting),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -670,7 +672,7 @@ fun LocalToolsInstallDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Step 3: Configuring Shell & Permissions",
+                                    text = stringResource(R.string.local_tools_install_dialog_step_3_configuring_shell_permissions),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -702,7 +704,7 @@ fun LocalToolsInstallDialog(
                     is LocalInstallerState.Verifying -> {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "Step 4: Verifying Local Environment...",
+                                text = stringResource(R.string.local_tools_install_dialog_step_4_verifying_local_environment),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -743,13 +745,13 @@ fun LocalToolsInstallDialog(
                                 }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "Installed at: ${state.prefixPath}",
+                                    text = stringResource(R.string.local_tools_install_dialog_installed_at, state.prefixPath.toString()),
                                     fontSize = 11.sp,
                                     fontFamily = FontFamily.Monospace,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
                                 Text(
-                                    text = "Disk space: ${state.totalDiskUsageFormatted}",
+                                    text = stringResource(R.string.local_tools_install_dialog_disk_space, state.totalDiskUsageFormatted.toString()),
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
@@ -811,7 +813,7 @@ fun LocalToolsInstallDialog(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "Installation Logs (${installerLogs.size})",
+                                        text = stringResource(R.string.local_tools_install_dialog_installation_logs, installerLogs.size.toString()),
                                         fontSize = 11.5.sp,
                                         fontFamily = FontFamily.Monospace,
                                         fontWeight = FontWeight.SemiBold,
@@ -839,7 +841,7 @@ fun LocalToolsInstallDialog(
                                     if (installerLogs.isEmpty()) {
                                         item {
                                             Text(
-                                                text = "Logs will appear here once installation begins...",
+                                                text = stringResource(R.string.local_tools_install_dialog_logs_will_appear_here_once_installation_begins),
                                                 fontSize = 10.sp,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = Color.Gray
@@ -908,9 +910,9 @@ fun LocalToolsInstallDialog(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = when (selectedSourceType) {
-                                        0 -> "Download & Install AntiGem (~350MB)"
-                                        1 -> "Download Base Termux (~33MB)"
-                                        else -> if (selectedFileUri != null) "Install Local ZIP" else "Choose ZIP"
+                                        0 -> stringResource(R.string.local_tools_install_dialog_download_install_antigem_350mb)
+                                        1 -> stringResource(R.string.local_tools_install_dialog_download_base_termux_33mb)
+                                        else -> if (selectedFileUri != null) stringResource(R.string.local_tools_install_dialog_install_local_zip) else stringResource(R.string.local_tools_install_dialog_choose_zip)
                                     },
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
@@ -921,7 +923,7 @@ fun LocalToolsInstallDialog(
                                 onClick = onDismiss,
                                 shape = RoundedCornerShape(10.dp)
                             ) {
-                                Text("Cancel")
+                                Text(stringResource(R.string.accounts_ui_cancel))
                             }
                         }
                     }
@@ -945,7 +947,7 @@ fun LocalToolsInstallDialog(
                             ) {
                                 Icon(imageVector = Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Confirm & Download", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.local_tools_install_dialog_confirm_download), color = Color.White, fontWeight = FontWeight.Bold)
                             }
 
                             OutlinedButton(
@@ -955,7 +957,7 @@ fun LocalToolsInstallDialog(
                                 modifier = Modifier.weight(0.6f),
                                 shape = RoundedCornerShape(10.dp)
                             ) {
-                                Text("Change")
+                                Text(stringResource(R.string.android_dev_screen_change))
                             }
                         }
                     }
@@ -966,7 +968,7 @@ fun LocalToolsInstallDialog(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("Cancel Search")
+                            Text(stringResource(R.string.local_tools_install_dialog_cancel_search))
                         }
                     }
 
@@ -979,7 +981,7 @@ fun LocalToolsInstallDialog(
                         ) {
                             Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Done", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.browser_screen_done), color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -1006,7 +1008,7 @@ fun LocalToolsInstallDialog(
                                 ) {
                                     Icon(imageVector = Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Retry", color = Color.White, fontSize = 12.5.sp)
+                                    Text(stringResource(R.string.chat_screen_retry), color = Color.White, fontSize = 12.5.sp)
                                 }
 
                                 OutlinedButton(
@@ -1016,7 +1018,7 @@ fun LocalToolsInstallDialog(
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("Change Source", fontSize = 12.sp)
+                                    Text(stringResource(R.string.local_tools_install_dialog_change_source), fontSize = 12.sp)
                                 }
                             }
 
@@ -1040,7 +1042,7 @@ fun LocalToolsInstallDialog(
                                 ) {
                                     Icon(imageVector = Icons.Outlined.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.Red)
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Clear All", fontSize = 12.sp, color = Color.Red)
+                                    Text(stringResource(R.string.browser_screen_clear_all_2), fontSize = 12.sp, color = Color.Red)
                                 }
 
                                 OutlinedButton(
@@ -1048,7 +1050,7 @@ fun LocalToolsInstallDialog(
                                     modifier = Modifier.weight(0.7f),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("Close")
+                                    Text(stringResource(R.string.accounts_ui_close))
                                 }
                             }
                         }
@@ -1060,7 +1062,7 @@ fun LocalToolsInstallDialog(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("Run in Background", color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(R.string.local_tools_install_dialog_run_in_background), color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }

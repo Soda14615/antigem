@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -126,7 +128,7 @@ fun FloatingDiagnosticsOverlay(
                         )
 
                         Text(
-                            text = if (snapshot.ioLagMs >= 0) "${snapshot.ioLagMs}ms" else "ERR",
+                            text = if (snapshot.ioLagMs >= 0) stringResource(R.string.floating_diagnostics_overlay_ms, snapshot.ioLagMs.toString()) else "ERR",
                             fontSize = 10.sp,
                             color = if (snapshot.isLagging) ai.antigem.theme.AppColors.danger else ai.antigem.theme.AppColors.success,
                             fontFamily = FontFamily.Monospace
@@ -145,7 +147,7 @@ fun FloatingDiagnosticsOverlay(
 
                             // Groups
                             Text(
-                                text = "Thread Groups: ${snapshot.threadGroupSummary}",
+                                text = stringResource(R.string.floating_diagnostics_overlay_thread_groups, snapshot.threadGroupSummary.toString()),
                                 fontSize = 10.sp,
                                 color = ai.antigem.theme.AppColors.editorMuted,
                                 fontFamily = FontFamily.Monospace
@@ -157,14 +159,14 @@ fun FloatingDiagnosticsOverlay(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "AgyGrpc Hub:",
+                                    text = stringResource(R.string.floating_diagnostics_overlay_agygrpc_hub),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ai.antigem.theme.AppColors.editorInfoText,
                                     fontFamily = FontFamily.Monospace
                                 )
                                 Text(
-                                    text = "Run=${snapshot.agyRunning} | Q=${snapshot.agyQueued} | Pool=${snapshot.agyConns} (${snapshot.agyIdleConns} idle)",
+                                    text = stringResource(R.string.floating_diagnostics_overlay_run_q_pool_idle, snapshot.agyRunning.toString(), snapshot.agyQueued.toString(), snapshot.agyConns.toString(), snapshot.agyIdleConns.toString()),
                                     fontSize = 10.sp,
                                     color = ai.antigem.theme.AppColors.editorText,
                                     fontFamily = FontFamily.Monospace
@@ -177,14 +179,14 @@ fun FloatingDiagnosticsOverlay(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "IDE Bridge:",
+                                    text = stringResource(R.string.floating_diagnostics_overlay_ide_bridge),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ai.antigem.theme.AppColors.success,
                                     fontFamily = FontFamily.Monospace
                                 )
                                 Text(
-                                    text = "Run=${snapshot.ideRunning} | Q=${snapshot.ideQueued} | Pool=${snapshot.ideConns} (${snapshot.ideIdleConns} idle)",
+                                    text = stringResource(R.string.floating_diagnostics_overlay_run_q_pool_idle, snapshot.ideRunning.toString(), snapshot.ideQueued.toString(), snapshot.ideConns.toString(), snapshot.ideIdleConns.toString()),
                                     fontSize = 10.sp,
                                     color = ai.antigem.theme.AppColors.editorText,
                                     fontFamily = FontFamily.Monospace
@@ -194,7 +196,7 @@ fun FloatingDiagnosticsOverlay(
                             // Blocked Threads breakdown
                             if (snapshot.topBlockedThreads.isNotEmpty()) {
                                 Text(
-                                    text = "Blocked Socket Reads:",
+                                    text = stringResource(R.string.floating_diagnostics_overlay_blocked_socket_reads),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ai.antigem.theme.AppColors.warning,
@@ -222,7 +224,7 @@ fun FloatingDiagnosticsOverlay(
                                     },
                                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                                 ) {
-                                    Text("Hide HUD", fontSize = 10.sp, color = ai.antigem.theme.AppColors.danger)
+                                    Text(stringResource(R.string.floating_diagnostics_overlay_hide_hud), fontSize = 10.sp, color = ai.antigem.theme.AppColors.danger)
                                 }
                             }
                         }

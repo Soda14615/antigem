@@ -1,5 +1,7 @@
 package ai.antigem.ui.cloud
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.webkit.WebResourceRequest
@@ -104,12 +106,12 @@ fun CloudPreviewChooser(
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue) },
-        title = { Text("Preview the cloud VM") },
+        title = { Text(stringResource(R.string.cloud_preview_preview_the_cloud_vm)) },
         text = {
             Column {
                 Text(
-                    if (suggestedPorts.isNotEmpty()) "Ports from the agent's commands are marked with a dot."
-                    else "Pick the port your server listens on (ask the agent to start it on 0.0.0.0).",
+                    if (suggestedPorts.isNotEmpty()) stringResource(R.string.cloud_preview_ports_from_the_agent_s_commands_are)
+                    else stringResource(R.string.cloud_preview_pick_the_port_your_server_listens_on),
                     fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                 )
                 Spacer(Modifier.height(10.dp))
@@ -134,23 +136,23 @@ fun CloudPreviewChooser(
                 OutlinedTextField(
                     value = portText,
                     onValueChange = { v -> portText = v.filter { it.isDigit() }.take(5) },
-                    label = { Text("Port") },
+                    label = { Text(stringResource(R.string.cloud_preview_port)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "In the browser it opens as http://127.0.0.1:… on this phone. Live reload does not work: reload to see changes.",
+                    stringResource(R.string.cloud_preview_in_the_browser_it_opens_as_http),
                     fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
             }
         },
         confirmButton = {
-            androidx.compose.material3.TextButton(enabled = port != null, onClick = { port?.let(onOpenInApp) }) { Text("Open in app") }
+            androidx.compose.material3.TextButton(enabled = port != null, onClick = { port?.let(onOpenInApp) }) { Text(stringResource(R.string.cloud_preview_open_in_app)) }
         },
         dismissButton = {
-            androidx.compose.material3.TextButton(enabled = port != null, onClick = { port?.let(onOpenInBrowser) }) { Text("Open in browser") }
+            androidx.compose.material3.TextButton(enabled = port != null, onClick = { port?.let(onOpenInBrowser) }) { Text(stringResource(R.string.cloud_preview_open_in_browser)) }
         }
     )
 }
@@ -178,22 +180,22 @@ fun CloudPreviewDialog(conversationId: String, suggestedPorts: List<Int>, initia
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(Modifier.systemBarsPadding()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, "Close") }
+                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close)) }
                     Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Preview", fontSize = 16.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.cloud_preview_preview), fontSize = 16.sp, modifier = Modifier.weight(1f))
                     // the same page in the system browser (served on this phone through the hub)
                     IconButton(onClick = {
                         val p = path.trim().ifBlank { "/" }.removePrefix("/")
                         uriHandler.openUri(ai.antigem.data.agent.agy.CloudPreviewServer.urlFor(conversationId, port) + p)
-                    }) { Icon(Icons.Outlined.OpenInBrowser, "Open in browser") }
-                    IconButton(onClick = { reloadKey++; open() }) { Icon(Icons.Outlined.Refresh, "Reload") }
+                    }) { Icon(Icons.Outlined.OpenInBrowser, stringResource(R.string.cloud_preview_open_in_browser)) }
+                    IconButton(onClick = { reloadKey++; open() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.browser_screen_reload)) }
                 }
                 Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = portText,
                         onValueChange = { v -> portText = v.filter { it.isDigit() }.take(5) },
-                        label = { Text("Port") },
+                        label = { Text(stringResource(R.string.cloud_preview_port)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Go),
                         keyboardActions = KeyboardActions(onGo = { portText.toIntOrNull()?.let { port = it; client.port = it; open() } }),
@@ -202,7 +204,7 @@ fun CloudPreviewDialog(conversationId: String, suggestedPorts: List<Int>, initia
                     OutlinedTextField(
                         value = path,
                         onValueChange = { path = it },
-                        label = { Text("Path") },
+                        label = { Text(stringResource(R.string.cloud_preview_path)) },
                         singleLine = true,
                         textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),

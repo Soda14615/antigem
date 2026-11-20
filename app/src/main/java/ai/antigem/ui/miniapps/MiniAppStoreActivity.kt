@@ -1,5 +1,7 @@
 package ai.antigem.ui.miniapps
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -137,16 +139,16 @@ private fun StoreScreen(catalogUrl: String, onBack: () -> Unit) {
             TopAppBar(
                 title = {
                     Column {
-                        Text("Get mini apps")
+                        Text(stringResource(R.string.mini_app_store_activity_get_mini_apps))
                         Text(catalog?.name ?: MiniAppStore.REPO, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.agent_approval_panel_back)) } },
                 actions = {
                     IconButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(MiniAppStore.PAGE))) } }) {
-                        Icon(Icons.AutoMirrored.Outlined.OpenInNew, "Open the repository")
+                        Icon(Icons.AutoMirrored.Outlined.OpenInNew, stringResource(R.string.mini_app_store_activity_open_the_repository))
                     }
-                    IconButton(enabled = !loading, onClick = { load() }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                    IconButton(enabled = !loading, onClick = { load() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
@@ -161,13 +163,13 @@ private fun StoreScreen(catalogUrl: String, onBack: () -> Unit) {
                 verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(Icons.Outlined.CloudOff, null, Modifier.size(40.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("Couldn't load the apps", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 12.dp))
+                Text(stringResource(R.string.mini_app_store_activity_couldn_t_load_the_apps), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 12.dp))
                 Text(error.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center, modifier = Modifier.padding(top = 8.dp))
-                Button(onClick = { load() }, modifier = Modifier.padding(top = 16.dp)) { Text("Try again") }
+                Button(onClick = { load() }, modifier = Modifier.padding(top = 16.dp)) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
             }
             c.apps.isEmpty() -> Box(Modifier.fillMaxSize().padding(pad).padding(32.dp), contentAlignment = Alignment.Center) {
-                Text("No apps in this catalog yet", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.mini_app_store_activity_no_apps_in_this_catalog_yet), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             else -> LazyColumn(
                 contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = pad.calculateTopPadding() + 4.dp, bottom = pad.calculateBottomPadding() + 24.dp),
@@ -189,7 +191,7 @@ private fun StoreScreen(catalogUrl: String, onBack: () -> Unit) {
     replace?.let { (e, folder) ->
         AlertDialog(
             onDismissRequest = { replace = null },
-            title = { Text("Replace the development copy?") },
+            title = { Text(stringResource(R.string.mini_app_store_activity_replace_the_development_copy)) },
             text = {
                 Text("~/mini-apps/$folder has the same id (${e.id}), so the published ${e.name} can't be installed next to it. " +
                     "Delete that folder and its data, then install the published app?")
@@ -202,9 +204,9 @@ private fun StoreScreen(catalogUrl: String, onBack: () -> Unit) {
                         tick++
                         installing = InstallSource.FromStore(e)
                     }
-                }) { Text("Delete and install", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.mini_app_store_activity_delete_and_install), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { replace = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { replace = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } },
         )
     }
 }
@@ -227,10 +229,10 @@ private fun StoreCard(e: MiniAppStore.Entry, state: MiniAppStore.State, detail: 
                 }
                 Box(Modifier.padding(start = 8.dp)) {
                     when (state) {
-                        MiniAppStore.State.INSTALL -> FilledTonalButton(onClick = onInstall) { Text("Install") }
-                        MiniAppStore.State.UPDATE -> Button(onClick = onInstall) { Text("Update") }
-                        MiniAppStore.State.OPEN -> OutlinedButton(onClick = onOpen) { Text("Open") }
-                        MiniAppStore.State.DEV_COPY -> OutlinedButton(onClick = onReplace) { Text("Replace") }
+                        MiniAppStore.State.INSTALL -> FilledTonalButton(onClick = onInstall) { Text(stringResource(R.string.claude_settings_screen_install)) }
+                        MiniAppStore.State.UPDATE -> Button(onClick = onInstall) { Text(stringResource(R.string.claude_settings_screen_update)) }
+                        MiniAppStore.State.OPEN -> OutlinedButton(onClick = onOpen) { Text(stringResource(R.string.jarvis_overlay_open)) }
+                        MiniAppStore.State.DEV_COPY -> OutlinedButton(onClick = onReplace) { Text(stringResource(R.string.file_explorer_replace_2)) }
                         MiniAppStore.State.OTHER_DEVELOPER -> {}
                     }
                 }

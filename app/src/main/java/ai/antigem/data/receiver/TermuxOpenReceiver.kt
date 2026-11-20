@@ -62,7 +62,7 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
                     urlIntent
                 }
 
-                launchSafely(context, finalIntent, "Open Link", data.toString())
+                launchSafely(context, finalIntent, context.getString(R.string.notification_terminal_open_link), data.toString())
                 return
             }
 
@@ -76,7 +76,7 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
             val fileToShare = File(rawPath)
             if (!fileToShare.exists() || !fileToShare.canRead()) {
                 Log.w(TAG, "Not a readable file: ${fileToShare.absolutePath}")
-                Toast.makeText(context, "File not found or unreadable: ${fileToShare.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.notification_unreadable_file, fileToShare.name), Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -116,7 +116,7 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
                 openIntent
             }
 
-            launchSafely(context, finalIntent, "Open File: ${fileToShare.name}", fileToShare.absolutePath)
+            launchSafely(context, finalIntent, context.getString(R.string.notification_terminal_open_file, fileToShare.name), fileToShare.absolutePath)
         }
 
         private fun launchSafely(context: Context, intent: Intent, title: String, description: String) {
@@ -128,7 +128,7 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
                     return
                 } catch (e: ActivityNotFoundException) {
                     Log.w(TAG, "No app handles intent: ${e.message}")
-                    Toast.makeText(foregroundActivity, "No application found to handle this request", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(foregroundActivity, R.string.notification_activity_not_found, Toast.LENGTH_SHORT).show()
                     return
                 } catch (e: Exception) {
                     Log.w(TAG, "Activity.startActivity failed: ${e.message}")
@@ -168,7 +168,7 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
                     context.startActivity(intent, optionsBundle)
                 } catch (e: ActivityNotFoundException) {
                     Log.w(TAG, "No app handles intent: ${e.message}")
-                    Toast.makeText(context, "No application found to handle this request", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.notification_activity_not_found, Toast.LENGTH_SHORT).show()
                     return
                 } catch (e: Exception) {
                     Log.w(TAG, "Direct startActivity failed: ${e.message}")
@@ -182,10 +182,10 @@ open class TermuxOpenReceiver : BroadcastReceiver() {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         val channel = NotificationChannel(
                             CHANNEL_ID,
-                            "Termux Open",
+                            context.getString(R.string.notification_terminal_open_channel),
                             NotificationManager.IMPORTANCE_HIGH
                         ).apply {
-                            this.description = "Terminal open requests"
+                            this.description = context.getString(R.string.notification_terminal_open_channel_description)
                             enableLights(true)
                             enableVibration(true)
                         }

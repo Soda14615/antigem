@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,7 +70,7 @@ fun StemRenderingScreen() {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Offline bundle", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.stem_rendering_screen_offline_bundle), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         Text(
                             "${RenderBundle.BUNDLE_TAG} · ${mb(RenderBundle.BUNDLE_SIZE)} download" + if (installed) " · installed" else "",
                             fontSize = 12.sp, color = if (installed) QuotaGreen else muted
@@ -109,14 +111,14 @@ fun StemRenderingScreen() {
                         LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(6.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Downloading ${mb(s.done)} of ${mb(s.total)}", fontSize = 12.sp, color = muted, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { RenderBundle.cancel() }) { Text("Cancel") }
+                            Text(stringResource(R.string.stem_rendering_screen_downloading_of, (mb(s.done)).toString(), (mb(s.total)).toString()), fontSize = 12.sp, color = muted, modifier = Modifier.weight(1f))
+                            TextButton(onClick = { RenderBundle.cancel() }) { Text(stringResource(R.string.accounts_ui_cancel)) }
                         }
                     }
                     RenderBundle.Status.Extracting -> {
                         LinearProgressIndicator(Modifier.fillMaxWidth())
                         Spacer(Modifier.height(6.dp))
-                        Text("Unpacking…", fontSize = 12.sp, color = muted)
+                        Text(stringResource(R.string.stem_rendering_screen_unpacking), fontSize = 12.sp, color = muted)
                     }
                     else -> {
                         if (s is RenderBundle.Status.Failed) {
@@ -125,18 +127,18 @@ fun StemRenderingScreen() {
                         }
                         if (installed) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                OutlinedButton(onClick = { confirmRemove = true }) { Text("Remove") }
+                                OutlinedButton(onClick = { confirmRemove = true }) { Text(stringResource(R.string.browser_screen_remove)) }
                                 Spacer(Modifier.width(8.dp))
                                 TextButton(
                                     onClick = { RenderBundle.clearCache(); cacheTick++ },
                                     enabled = cacheBytes > 0
-                                ) { Text("Clear TikZ cache (${mb(cacheBytes)})") }
+                                ) { Text(stringResource(R.string.stem_rendering_screen_clear_tikz_cache, (mb(cacheBytes)).toString())) }
                             }
                         } else {
                             Button(onClick = { RenderBundle.download(context) }) {
                                 Icon(Icons.Outlined.CloudDownload, null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text(if (s is RenderBundle.Status.Failed) "Try again" else "Download bundle")
+                                Text(if (s is RenderBundle.Status.Failed) stringResource(R.string.checkpoint_restore_sheet_try_again) else stringResource(R.string.stem_rendering_screen_download_bundle))
                             }
                         }
                     }
@@ -146,7 +148,7 @@ fun StemRenderingScreen() {
 
         // ----- what to use -----
         Spacer(Modifier.height(22.dp))
-        Text("What to use", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.stem_rendering_screen_what_to_use), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         Text(
             "All off at first. Switched off: the block shows as code, and agents aren't told about it." +
                 if (installed) "" else " Download the bundle to switch on the parts that need it.",
@@ -186,8 +188,8 @@ fun StemRenderingScreen() {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Tell agents about these blocks", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                        Text("Global context · first message of each chat", fontSize = 12.sp, color = muted)
+                        Text(stringResource(R.string.stem_rendering_screen_tell_agents_about_these_blocks), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.stem_rendering_screen_global_context_first_message_of_each_chat), fontSize = 12.sp, color = muted)
                     }
                     Switch(checked = tellAgents, onCheckedChange = { RenderBundle.setTellAgents(it) })
                 }
@@ -199,7 +201,7 @@ fun StemRenderingScreen() {
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
                 TextButton(onClick = { showPrompt = !showPrompt }, contentPadding = PaddingValues(horizontal = 0.dp)) {
-                    Text(if (showPrompt) "Hide the text" else "Show exactly what is sent")
+                    Text(if (showPrompt) stringResource(R.string.global_context_screen_hide_the_text) else stringResource(R.string.global_context_screen_show_exactly_what_is_sent))
                 }
                 if (showPrompt) {
                     val text = remember(active, tellAgents, installed) {
@@ -226,7 +228,7 @@ fun StemRenderingScreen() {
         FilledTonalButton(onClick = { showGuide = true }, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.AutoMirrored.Outlined.MenuBook, null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
-            Text("Guide: syntax and live examples")
+            Text(stringResource(R.string.stem_rendering_screen_guide_syntax_and_live_examples))
         }
         Spacer(Modifier.height(24.dp))
     }
@@ -234,12 +236,12 @@ fun StemRenderingScreen() {
     if (confirmRemove) {
         AlertDialog(
             onDismissRequest = { confirmRemove = false },
-            title = { Text("Remove the bundle?") },
-            text = { Text("Blocks that need it show as code until you download it again. Compiled TikZ pictures are removed too.") },
+            title = { Text(stringResource(R.string.stem_rendering_screen_remove_the_bundle)) },
+            text = { Text(stringResource(R.string.stem_rendering_screen_blocks_that_need_it_show_as_code)) },
             confirmButton = {
-                TextButton(onClick = { RenderBundle.remove(); confirmRemove = false; cacheTick++ }) { Text("Remove") }
+                TextButton(onClick = { RenderBundle.remove(); confirmRemove = false; cacheTick++ }) { Text(stringResource(R.string.browser_screen_remove)) }
             },
-            dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
     if (showGuide) StemGuideDialog(onDismiss = { showGuide = false })
@@ -259,9 +261,9 @@ private fun StemGuideDialog(onDismiss: () -> Unit) {
                     Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Close, "Close") }
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Close, stringResource(R.string.accounts_ui_close)) }
                     Spacer(Modifier.width(6.dp))
-                    Text("STEM & diagrams guide", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.stem_rendering_screen_stem_diagrams_guide), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                 LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)) {

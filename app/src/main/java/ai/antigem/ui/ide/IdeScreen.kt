@@ -1,5 +1,7 @@
 package ai.antigem.ui.ide
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -445,13 +447,13 @@ fun IdeScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Toggle Sidebar"
+                                contentDescription = stringResource(R.string.ide_screen_toggle_sidebar)
                             )
                         }
                     },
                     title = {
                         Text(
-                            text = activeProject?.name ?: "antiGem IDE",
+                            text = activeProject?.name ?: stringResource(R.string.ide_screen_antigem_ide),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -473,7 +475,7 @@ fun IdeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "More editor options",
+                                        contentDescription = stringResource(R.string.ide_screen_more_editor_options),
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -484,7 +486,7 @@ fun IdeScreen(
                                 ) {
                                     // Word Wrap with Checkbox
                                     DropdownMenuItem(
-                                        text = { Text("Word Wrap", fontSize = 13.sp) },
+                                        text = { Text(stringResource(R.string.ide_screen_word_wrap), fontSize = 13.sp) },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.AutoMirrored.Filled.WrapText,
@@ -506,7 +508,7 @@ fun IdeScreen(
 
                                     // Find / Search in File
                                     DropdownMenuItem(
-                                        text = { Text("Find in File", fontSize = 13.sp) },
+                                        text = { Text(stringResource(R.string.ide_screen_find_in_file), fontSize = 13.sp) },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Search,
@@ -525,7 +527,7 @@ fun IdeScreen(
                                         DropdownMenuItem(
                                             text = {
                                                 Text(
-                                                    text = if (showSvgSource) "Preview SVG Graphic" else "Edit SVG XML Source",
+                                                    text = if (showSvgSource) stringResource(R.string.ide_screen_preview_svg_graphic) else stringResource(R.string.ide_screen_edit_svg_xml_source),
                                                     fontSize = 13.sp
                                                 )
                                             },
@@ -555,7 +557,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Undo,
-                                    contentDescription = "Undo",
+                                    contentDescription = stringResource(R.string.browser_screen_undo),
                                     tint = if (canUndo && isTextEditable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -568,7 +570,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Redo,
-                                    contentDescription = "Redo",
+                                    contentDescription = stringResource(R.string.ide_screen_redo),
                                     tint = if (canRedo && isTextEditable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -616,7 +618,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Save,
-                                    contentDescription = if (isExternal) "Save As..." else "Save File",
+                                    contentDescription = if (isExternal) stringResource(R.string.ide_screen_save_as) else stringResource(R.string.ide_screen_save_file),
                                     tint = if (activeTab.isModified || isExternal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -667,7 +669,7 @@ fun IdeScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.PlayArrow,
-                                            contentDescription = if (isCustomMode) "Run Profile: $selectedProfileName" else "Run Active File",
+                                            contentDescription = if (isCustomMode) stringResource(R.string.ide_screen_run_profile, selectedProfileName.toString()) else stringResource(R.string.ide_screen_run_active_file),
                                             tint = if (isCustomMode) GeminiBlue else ai.antigem.theme.AppColors.success,
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -694,7 +696,7 @@ fun IdeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ArrowDropDown,
-                                        contentDescription = "Run Configurations",
+                                        contentDescription = stringResource(R.string.ide_screen_run_configurations),
                                         tint = if (isCustomMode) GeminiBlue else ai.antigem.theme.AppColors.success,
                                         modifier = Modifier.size(18.dp)
                                     )
@@ -715,12 +717,12 @@ fun IdeScreen(
                                     text = {
                                         Column {
                                             Text(
-                                                text = "Auto: Run Active File",
+                                                text = stringResource(R.string.ide_screen_auto_run_active_file),
                                                 fontWeight = if (isAutoMode) FontWeight.Bold else FontWeight.Normal,
                                                 fontSize = 13.sp
                                             )
                                             Text(
-                                                text = if (activeFile != null) activeFile.name else "(No file open)",
+                                                text = if (activeFile != null) activeFile.name else stringResource(R.string.ide_screen_no_file_open),
                                                 fontSize = 11.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -738,7 +740,7 @@ fun IdeScreen(
                                         if (isAutoMode) {
                                             Icon(
                                                 Icons.Default.Check,
-                                                contentDescription = "Selected",
+                                                contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected),
                                                 tint = ai.antigem.theme.AppColors.success,
                                                 modifier = Modifier.size(16.dp)
                                             )
@@ -766,7 +768,7 @@ fun IdeScreen(
 
                                 // Mode 2: Project Configurations (Custom Mode)
                                 Text(
-                                    text = "PROJECT PROFILES (CUSTOM MODE)",
+                                    text = stringResource(R.string.ide_screen_project_profiles_custom_mode),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -814,7 +816,7 @@ fun IdeScreen(
                                                 if (isSelected) {
                                                     Icon(
                                                         Icons.Default.Check,
-                                                        contentDescription = "Selected",
+                                                        contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected),
                                                         tint = GeminiBlue,
                                                         modifier = Modifier.size(16.dp)
                                                     )
@@ -831,7 +833,7 @@ fun IdeScreen(
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                "No custom profiles configured",
+                                                stringResource(R.string.ide_screen_no_custom_profiles_configured),
                                                 fontSize = 12.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                             )
@@ -844,7 +846,7 @@ fun IdeScreen(
                                 if (suggestedRuns.isNotEmpty()) {
                                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                                     Text(
-                                        text = "SUGGESTED FOR THIS PROJECT",
+                                        text = stringResource(R.string.ide_screen_suggested_for_this_project),
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
@@ -879,7 +881,7 @@ fun IdeScreen(
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                                 DropdownMenuItem(
-                                    text = { Text("Open Run screen", fontSize = 13.sp) },
+                                    text = { Text(stringResource(R.string.ide_screen_open_run_screen), fontSize = 13.sp) },
                                     leadingIcon = {
                                         Icon(Icons.Default.PlayCircle, contentDescription = null, modifier = Modifier.size(18.dp))
                                     },
@@ -890,7 +892,7 @@ fun IdeScreen(
                                 )
 
                                 DropdownMenuItem(
-                                    text = { Text("Add Run Configuration...", fontSize = 13.sp) },
+                                    text = { Text(stringResource(R.string.ide_screen_add_run_configuration), fontSize = 13.sp) },
                                     leadingIcon = {
                                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                                     },
@@ -906,7 +908,7 @@ fun IdeScreen(
                                 )
 
                                 DropdownMenuItem(
-                                    text = { Text("Edit run.json in Editor", fontSize = 13.sp) },
+                                    text = { Text(stringResource(R.string.ide_screen_edit_run_json_in_editor), fontSize = 13.sp) },
                                     leadingIcon = {
                                         Icon(Icons.Default.Code, contentDescription = null, modifier = Modifier.size(18.dp))
                                     },
@@ -932,7 +934,7 @@ fun IdeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
-                                contentDescription = "AI Chat",
+                                contentDescription = stringResource(R.string.ide_screen_ai_chat),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -991,7 +993,7 @@ fun IdeScreen(
                                 } else if (tab.isReadOnly) {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Read-Only",
+                                        contentDescription = stringResource(R.string.ide_screen_read_only),
                                         tint = ai.antigem.theme.AppColors.warning.copy(alpha = 0.85f),
                                         modifier = Modifier.size(12.dp)
                                     )
@@ -1006,7 +1008,7 @@ fun IdeScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Close Tab",
+                                    contentDescription = stringResource(R.string.floating_terminal_inspector_close_tab),
                                     tint = Color.Gray,
                                     modifier = Modifier
                                         .size(14.dp)
@@ -1101,7 +1103,7 @@ fun IdeScreen(
                                         decorationBox = { innerTextField ->
                                             if (findQuery.isEmpty()) {
                                                 Text(
-                                                    text = "Find in file...",
+                                                    text = stringResource(R.string.ide_screen_find_in_file_2),
                                                     color = ai.antigem.theme.AppColors.editorMuted,
                                                     fontSize = 13.sp,
                                                     fontFamily = FontFamily.Monospace
@@ -1122,7 +1124,7 @@ fun IdeScreen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Clear",
+                                                contentDescription = stringResource(R.string.custom_system_prompt_dialog_clear),
                                                 tint = Color.LightGray,
                                                 modifier = Modifier.size(14.dp)
                                             )
@@ -1155,7 +1157,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowUp,
-                                    contentDescription = "Previous Match",
+                                    contentDescription = stringResource(R.string.ide_screen_previous_match),
                                     tint = if (searchMatchCount > 0) Color.White else Color.DarkGray,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -1169,7 +1171,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = "Next Match",
+                                    contentDescription = stringResource(R.string.ide_screen_next_match),
                                     tint = if (searchMatchCount > 0) Color.White else Color.DarkGray,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -1206,7 +1208,7 @@ fun IdeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Close Find",
+                                    contentDescription = stringResource(R.string.ide_screen_close_find),
                                     tint = Color.Gray,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -1264,7 +1266,7 @@ fun IdeScreen(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Historical Revision • Read-Only",
+                                text = stringResource(R.string.ide_screen_historical_revision_read_only),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.5.sp,
                                 color = ai.antigem.theme.AppColors.editorText,
@@ -1294,7 +1296,7 @@ fun IdeScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "File modified on disk externally",
+                                text = stringResource(R.string.ide_screen_file_modified_on_disk_externally),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = ai.antigem.theme.AppColors.warning,
                                 modifier = Modifier.weight(1f)
@@ -1303,7 +1305,7 @@ fun IdeScreen(
                                 onClick = { conflictDialogTab = activeTab },
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                             ) {
-                                Text("Resolve", color = ai.antigem.theme.AppColors.warning, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.ide_screen_resolve), color = ai.antigem.theme.AppColors.warning, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -1478,7 +1480,7 @@ fun IdeScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Select a file from the sidebar to start editing",
+                                text = stringResource(R.string.ide_screen_select_a_file_from_the_sidebar_to),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.Gray
                             )
@@ -1493,8 +1495,8 @@ fun IdeScreen(
                 AlertDialog(
                     onDismissRequest = { tabToClose = null },
                     icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = ClaudeTerracotta) },
-                    title = { Text("Unsaved Changes", fontWeight = FontWeight.Bold) },
-                    text = { Text("Do you want to save the changes made to '${closingTarget.name}' before closing?") },
+                    title = { Text(stringResource(R.string.ide_screen_unsaved_changes), fontWeight = FontWeight.Bold) },
+                    text = { Text(stringResource(R.string.ide_screen_do_you_want_to_save_the_changes, closingTarget.name.toString())) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -1519,7 +1521,7 @@ fun IdeScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
                         ) {
-                            Text("Save & Close")
+                            Text(stringResource(R.string.ide_screen_save_close))
                         }
                     },
                     dismissButton = {
@@ -1530,7 +1532,7 @@ fun IdeScreen(
                                 IdeDaemonManager.closeTab(target.path)
                             }
                         ) {
-                            Text("Don't Save", color = ai.antigem.theme.AppColors.danger)
+                            Text(stringResource(R.string.ide_screen_don_t_save), color = ai.antigem.theme.AppColors.danger)
                         }
                     }
                 )
@@ -1542,13 +1544,13 @@ fun IdeScreen(
                 AlertDialog(
                     onDismissRequest = { conflictDialogTab = null },
                     icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = ai.antigem.theme.AppColors.warning) },
-                    title = { Text("File Conflict Detected", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.ide_screen_file_conflict_detected), fontWeight = FontWeight.Bold) },
                     text = {
                         Column {
-                            Text("The file '${conflictingTarget.name}' has been modified on disk or by AI.")
+                            Text(stringResource(R.string.ide_screen_the_file_has_been_modified_on_disk, conflictingTarget.name.toString()))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "Choose whether to overwrite the disk version with your editor changes or reload the version from disk.",
+                                stringResource(R.string.ide_screen_choose_whether_to_overwrite_the_disk_version),
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
@@ -1575,7 +1577,7 @@ fun IdeScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
                         ) {
-                            Text("Overwrite Disk (Keep Mine)")
+                            Text(stringResource(R.string.ide_screen_overwrite_disk_keep_mine))
                         }
                     },
                     dismissButton = {
@@ -1587,7 +1589,7 @@ fun IdeScreen(
                                 Toast.makeText(context, "Reverted to disk version", Toast.LENGTH_SHORT).show()
                             }
                         ) {
-                            Text("Revert to Disk", color = ai.antigem.theme.AppColors.danger)
+                            Text(stringResource(R.string.ide_screen_revert_to_disk), color = ai.antigem.theme.AppColors.danger)
                         }
                     }
                 )
@@ -1605,7 +1607,7 @@ fun IdeScreen(
                 ai.antigem.ui.files.FileExplorerDialog(
                     stateKey = "ide_projects",
                     initialPath = initialBrowsePath,
-                    title = "Open a project or file",
+                    title = stringResource(R.string.workspace_ide_open_project_or_file),
                     confirmLabel = "Open as project",
                     onConfirmFolder = { folder ->
                         showFileManager = false
@@ -1639,7 +1641,7 @@ fun IdeScreen(
                 ai.antigem.ui.files.FileExplorerDialog(
                     stateKey = "ide_save_as",
                     initialPath = initialSavePath,
-                    title = "Save \"${tabToSave.name}\" as",
+                    title = stringResource(R.string.workspace_ide_save_as, tabToSave.name),
                     saveFileName = tabToSave.name,
                     onSave = { folderPath, fileName ->
                         val cleanFolder = folderPath.trim().trimEnd('/')
@@ -1691,17 +1693,17 @@ fun IdeScreen(
                         )
                     },
                     title = {
-                        Text("Non-Text File Warning", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.ide_screen_non_text_file_warning), fontWeight = FontWeight.Bold)
                     },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "\"${tabInfo.name}\" appears to be a non-text / binary file (${tabInfo.mimeType}).",
+                                text = stringResource(R.string.ide_screen_appears_to_be_a_non_text_binary, tabInfo.name.toString(), tabInfo.mimeType.toString()),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "Opening it in the text editor may display garbled characters, cause lag, or corrupt the file if saved.",
+                                text = stringResource(R.string.ide_screen_opening_it_in_the_text_editor_may),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -1716,12 +1718,12 @@ fun IdeScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = ai.antigem.theme.AppColors.warning)
                         ) {
-                            Text("Open Anyway", color = Color.Black, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.ide_screen_open_anyway), color = Color.Black, fontWeight = FontWeight.Bold)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { binaryWarningDialog = null }) {
-                            Text("Cancel")
+                            Text(stringResource(R.string.accounts_ui_cancel))
                         }
                     }
                 )
@@ -1842,7 +1844,7 @@ private fun AddRunProfileDialog(
             Icon(Icons.Default.Tune, contentDescription = null, tint = ai.antigem.theme.AppColors.success, modifier = Modifier.size(28.dp))
         },
         title = {
-            Text("Add Run Configuration", fontWeight = FontWeight.Bold, fontSize = 17.sp)
+            Text(stringResource(R.string.ide_screen_add_run_configuration_2), fontWeight = FontWeight.Bold, fontSize = 17.sp)
         },
         text = {
             Column(
@@ -1852,13 +1854,13 @@ private fun AddRunProfileDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = "Saved into .antigem/run.json in your workspace root.",
+                    text = stringResource(R.string.ide_screen_saved_into_antigem_run_json_in_your),
                     fontSize = 11.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 // Presets row
-                Text("Quick Presets:", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.ide_screen_quick_presets), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -1878,7 +1880,7 @@ private fun AddRunProfileDialog(
                 OutlinedTextField(
                     value = profileName,
                     onValueChange = { profileName = it },
-                    label = { Text("Profile Name") },
+                    label = { Text(stringResource(R.string.ide_screen_profile_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -1886,8 +1888,8 @@ private fun AddRunProfileDialog(
                 OutlinedTextField(
                     value = commandInput,
                     onValueChange = { commandInput = it },
-                    label = { Text("Command to Execute") },
-                    placeholder = { Text("python3 \"\${file}\"") },
+                    label = { Text(stringResource(R.string.ide_screen_command_to_execute)) },
+                    placeholder = { Text(stringResource(R.string.ide_screen_python3_file)) },
                     minLines = 2,
                     maxLines = 4,
                     modifier = Modifier.fillMaxWidth()
@@ -1896,8 +1898,8 @@ private fun AddRunProfileDialog(
                 OutlinedTextField(
                     value = cwdInput,
                     onValueChange = { cwdInput = it },
-                    label = { Text("Working Directory (CWD)") },
-                    placeholder = { Text("\${workspaceFolder}") },
+                    label = { Text(stringResource(R.string.ide_screen_working_directory_cwd)) },
+                    placeholder = { Text(stringResource(R.string.ide_screen_workspacefolder)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -1908,7 +1910,7 @@ private fun AddRunProfileDialog(
                 ) {
                     Checkbox(checked = isDefault, onCheckedChange = { isDefault = it })
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Set as default run profile", fontSize = 12.5.sp)
+                    Text(stringResource(R.string.ide_screen_set_as_default_run_profile), fontSize = 12.5.sp)
                 }
 
                 Surface(
@@ -1917,8 +1919,8 @@ private fun AddRunProfileDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(8.dp)) {
-                        Text("Supported Variables:", fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                        Text("\${file} • \${fileBasename} • \${fileBasenameNoExtension} • \${fileDirname} • \${workspaceFolder}", fontSize = 9.5.sp, fontFamily = FontFamily.Monospace)
+                        Text(stringResource(R.string.ide_screen_supported_variables), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.ide_screen_file_filebasename_filebasenamenoextension_filedirname), fontSize = 9.5.sp, fontFamily = FontFamily.Monospace)
                     }
                 }
             }
@@ -1937,12 +1939,12 @@ private fun AddRunProfileDialog(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = ai.antigem.theme.AppColors.success)
             ) {
-                Text("Save Profile", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ide_screen_save_profile), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.accounts_ui_cancel))
             }
         }
     )

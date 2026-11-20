@@ -1,5 +1,7 @@
 package ai.antigem.ui.drawer
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
@@ -87,7 +89,7 @@ fun ArtifactsDrawerContent(
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Artifacts",
+                        text = stringResource(R.string.artifacts_drawer_content_artifacts),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -108,7 +110,7 @@ fun ArtifactsDrawerContent(
                     }
                 }
                 Text(
-                    text = "Generated files, plans & media",
+                    text = stringResource(R.string.artifacts_drawer_content_generated_files_plans_media),
                     fontSize = 11.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -120,7 +122,7 @@ fun ArtifactsDrawerContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
+                    contentDescription = stringResource(R.string.accounts_ui_close),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
@@ -153,14 +155,14 @@ fun ArtifactsDrawerContent(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "No artifacts generated yet",
+                        text = stringResource(R.string.artifacts_drawer_content_no_artifacts_generated_yet),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Plans, walkthroughs, and generated images will appear here.",
+                        text = stringResource(R.string.artifacts_drawer_content_plans_walkthroughs_and_generated_images_will_appear),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -222,9 +224,9 @@ private fun ArtifactCardItem(
     val isWalkthrough = artifact.name.contains("walkthrough", ignoreCase = true) || artifact.absoluteUri.contains("walkthrough", ignoreCase = true)
 
     val displayTitle = if (isPlan) {
-        "Implementation Plan"
+        stringResource(R.string.main_ui_implementation_plan)
     } else if (isWalkthrough) {
-        "Walkthrough"
+        stringResource(R.string.main_ui_walkthrough)
     } else if (artifact.name.isNotBlank()) {
         val clean = artifact.name.substringAfterLast("/").replace("_", " ").replace("-", " ")
         clean.split(" ").filter { it.isNotBlank() }.joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
@@ -333,7 +335,7 @@ private fun ArtifactCardItem(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Download,
-                        contentDescription = "Download to Downloads/AntiGem",
+                        contentDescription = stringResource(R.string.artifacts_drawer_content_download_to_downloads_antigem),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(17.dp)
                     )

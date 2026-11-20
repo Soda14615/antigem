@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.app.ActivityManager
 import android.app.usage.StorageStatsManager
 import android.content.ComponentName
@@ -248,18 +250,18 @@ private fun ManageSpaceScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.agent_approval_panel_back))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
-                        text = "AntiGem Space Manager",
+                        text = stringResource(R.string.manage_space_activity_antigem_space_manager),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "Safe storage and data loss protection",
+                        text = stringResource(R.string.manage_space_activity_safe_storage_and_data_loss_protection),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
@@ -288,9 +290,9 @@ private fun ManageSpaceScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text("Total App Footprint", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.manage_space_activity_total_app_footprint), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                             Text(
-                                if (isCalculating) "Calculating storage..." else Formatter.formatFileSize(context, totalDataBytes),
+                                if (isCalculating) stringResource(R.string.manage_space_activity_calculating_storage) else Formatter.formatFileSize(context, totalDataBytes),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ClaudeTerracotta
@@ -300,7 +302,7 @@ private fun ManageSpaceScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(
-                        text = "This includes your Termux Linux packages, AI configuration, and local SQLite data.",
+                        text = stringResource(R.string.manage_space_activity_this_includes_your_termux_linux_packages_ai),
                         fontSize = 11.5.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
                         lineHeight = 16.sp
@@ -322,9 +324,9 @@ private fun ManageSpaceScreen(
                         Icon(Icons.Default.CleaningServices, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Temporary Cache", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.manage_space_activity_temporary_cache), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                             Text(
-                                text = "Size: ${Formatter.formatFileSize(context, cacheBytes)}",
+                                text = stringResource(R.string.manage_space_activity_size, (Formatter.formatFileSize(context, cacheBytes)).toString()),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
@@ -332,7 +334,7 @@ private fun ManageSpaceScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Safe to clear. Removes temporary logs and cached assets without touching your code or database.",
+                        text = stringResource(R.string.manage_space_activity_safe_to_clear_removes_temporary_logs_and),
                         fontSize = 11.5.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -350,7 +352,7 @@ private fun ManageSpaceScreen(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Clear Temporary Cache")
+                        Text(stringResource(R.string.manage_space_activity_clear_temporary_cache))
                     }
                 }
             }
@@ -369,7 +371,7 @@ private fun ManageSpaceScreen(
                         Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(22.dp))
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Danger Zone: Factory Reset",
+                            text = stringResource(R.string.manage_space_activity_danger_zone_factory_reset),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error
@@ -377,7 +379,7 @@ private fun ManageSpaceScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Performs a complete wipe of all app data, removing Linux packages, accounts, and chats.",
+                        text = stringResource(R.string.manage_space_activity_performs_a_complete_wipe_of_all_app),
                         fontSize = 11.5.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -390,7 +392,7 @@ private fun ManageSpaceScreen(
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Wipe All App Data")
+                        Text(stringResource(R.string.manage_space_activity_wipe_all_app_data))
                     }
                 }
             }
@@ -401,8 +403,8 @@ private fun ManageSpaceScreen(
         AlertDialog(
             onDismissRequest = { showResetConfirmation = false },
             icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Confirm Full Reset", fontWeight = FontWeight.Bold) },
-            text = { Text("Are you sure you want to wipe all AntiGem data? This will permanently delete all Linux packages, workspaces, accounts, and chats.") },
+            title = { Text(stringResource(R.string.manage_space_activity_confirm_full_reset), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.manage_space_activity_are_you_sure_you_want_to_wipe)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -412,12 +414,12 @@ private fun ManageSpaceScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Proceed to Confirmation")
+                    Text(stringResource(R.string.manage_space_activity_proceed_to_confirmation))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showResetConfirmation = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -440,7 +442,7 @@ private fun ManageSpaceScreen(
             },
             title = {
                 Text(
-                    text = "Confirm Destruction",
+                    text = stringResource(R.string.manage_space_activity_confirm_destruction),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -449,7 +451,7 @@ private fun ManageSpaceScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        text = "To confirm and permanently wipe all app data and local Linux storage, type the confirmation phrase exactly as shown below:",
+                        text = stringResource(R.string.manage_space_activity_to_confirm_and_permanently_wipe_all_app),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -492,7 +494,7 @@ private fun ManageSpaceScreen(
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Delete Everything", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(stringResource(R.string.manage_space_activity_delete_everything), fontWeight = FontWeight.Bold, color = Color.White)
                 }
             },
             dismissButton = {
@@ -503,7 +505,7 @@ private fun ManageSpaceScreen(
                     },
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             },
             shape = RoundedCornerShape(16.dp),

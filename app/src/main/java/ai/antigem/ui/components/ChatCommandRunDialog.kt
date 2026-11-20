@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -106,8 +108,8 @@ private fun CommandConfirmCard(initial: String, onCancel: () -> Unit, onRun: (St
                 }
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text("Run in terminal", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text("Opens a new terminal session. Edit the command if needed.", fontSize = 12.sp, color = ai.antigem.theme.AppColors.editorMuted)
+                    Text(stringResource(R.string.chat_command_run_dialog_run_in_terminal), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(stringResource(R.string.chat_command_run_dialog_opens_a_new_terminal_session_edit_the), fontSize = 12.sp, color = ai.antigem.theme.AppColors.editorMuted)
                 }
             }
 
@@ -144,14 +146,14 @@ private fun CommandConfirmCard(initial: String, onCancel: () -> Unit, onRun: (St
             }
 
             Text(
-                if (singleLine) "Press Enter to run · closing the terminal stops everything in it"
-                else "Shift+Enter or Run to start · closing the terminal stops everything in it",
+                if (singleLine) stringResource(R.string.chat_command_run_dialog_press_enter_to_run_closing_the_terminal)
+                else stringResource(R.string.chat_command_run_dialog_shift_enter_or_run_to_start_closing),
                 fontSize = 11.sp,
                 color = ai.antigem.theme.AppColors.editorMuted
             )
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onCancel) { Text("Cancel", color = ai.antigem.theme.AppColors.editorMuted) }
+                TextButton(onClick = onCancel) { Text(stringResource(R.string.accounts_ui_cancel), color = ai.antigem.theme.AppColors.editorMuted) }
                 Spacer(Modifier.width(6.dp))
                 Button(
                     onClick = run,
@@ -161,7 +163,7 @@ private fun CommandConfirmCard(initial: String, onCancel: () -> Unit, onRun: (St
                 ) {
                     Icon(Icons.Filled.PlayArrow, null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Run")
+                    Text(stringResource(R.string.agy_cloud_ui_run))
                 }
             }
         }

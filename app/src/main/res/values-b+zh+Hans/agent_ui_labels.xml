@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_settings_account_cli">"账号与 CLI"</string>
+    <string name="agent_settings_sign_in_plan_usage_install_and_update_claude_code">"登录、套餐用量、安装与更新 Claude Code"</string>
+    <string name="agent_settings_chat_defaults">"聊天默认设置"</string>
+    <string name="agent_settings_model_effort_thinking_permission_mode_output_style">"模型、推理强度、思考、权限模式和输出风格"</string>
+    <string name="agent_settings_custom_providers">"自定义提供商"</string>
+    <string name="agent_settings_openrouter_kimi_and_other_anthropic_compatible_apis">"OpenRouter、Kimi 及其他兼容 Anthropic 的 API"</string>
+    <string name="agent_settings_permission_rules">"权限规则"</string>
+    <string name="agent_settings_what_claude_may_do_without_asking">"Claude 无需询问即可执行的操作"</string>
+    <string name="agent_settings_mcp_servers">"MCP 服务器"</string>
+    <string name="agent_settings_installed_plugins_catalog_and_marketplaces">"已安装的插件、目录和市场"</string>
+    <string name="agent_settings_skills">"技能"</string>
+    <string name="agent_settings_add_skills_from_github_update_or_remove_them">"从 GitHub 添加技能，以及更新或移除技能"</string>
+    <string name="agent_settings_memory">"记忆"</string>
+    <string name="agent_settings_instructions_claude_md_and_the_notes_claude_saved">"指令（CLAUDE.md）和 Claude 保存的笔记"</string>
+    <string name="agent_settings_advanced">"高级"</string>
+    <string name="agent_settings_edit_claude_settings_json_directly">"直接编辑 ~/.claude/settings.json"</string>
+    <string name="agent_settings_sign_in_with_chatgpt_or_sign_out">"使用 ChatGPT 登录或退出登录"</string>
+    <string name="agent_settings_how_much_of_your_plan_s_limits_is_used_and_when_they_reset">"查看套餐已使用的配额及重置时间"</string>
+    <string name="agent_settings_what_codex_asks_before_acting_in_new_chats">"Codex 在新聊天中执行哪些操作前会征求确认"</string>
+    <string name="agent_settings_tools_codex_can_call_presets_and_your_own_servers">"Codex 可以调用的工具，包括预设和自建服务器"</string>
+    <string name="agent_settings_install_plugins_from_codex_catalog_or_any_github_marketplace">"从 Codex 目录或 GitHub 市场安装插件"</string>
+    <string name="agent_settings_install_update_and_restart_codex">"安装、更新和重启 Codex"</string>
+    <string name="agent_permission_read_only">"只读"</string>
+    <string name="agent_permission_ask_first">"先询问"</string>
+    <string name="agent_permission_full_access">"完全访问"</string>
+    <string name="agent_permission_reads_the_project_asks_before_changing_files_or_running_an">"可读取项目。修改文件或执行需要更多权限的操作前会询问。"</string>
+    <string name="agent_permission_edits_files_in_the_project_asks_before_running_commands_ex">"可编辑项目文件。除已知安全的命令外，运行命令前会询问。"</string>
+    <string name="agent_permission_no_sandbox_and_no_questions_codex_can_change_anything_and">"Codex 可修改任意内容及访问网络，无需确认且不受沙盒限制。"</string>
+    <string name="agent_permission_codex_s_default_edits_and_runs_commands_inside_the_project">"Codex 的默认模式。可以在项目内编辑和运行命令，访问项目外的内容或网络前会询问。"</string>
+    <string name="agent_settings_install_update_and_restart_opencode">"安装、更新和重启 OpenCode"</string>
+    <string name="agent_settings_what_opencode_asks_before_acting_and_the_agent_of_new_chats">"设置 OpenCode 的操作确认规则和新聊天使用的智能体"</string>
+    <string name="agent_settings_sign_in_or_add_an_api_key_or_add_any_openai_or_anthropic_com">"登录、添加 API 密钥，或手动添加兼容 OpenAI 或 Anthropic 的 API"</string>
+    <string name="agent_settings_tools_opencode_can_call_presets_and_your_own_servers">"OpenCode 可以调用的工具，包括预设和自建服务器"</string>
+    <string name="agent_permission_allow_all">"全部允许"</string>
+    <string name="agent_permission_opencode_rules">"OpenCode 规则"</string>
+    <string name="agent_permission_commands_edits_and_web_access_run_without_asking">"无需确认即可运行命令、编辑文件和访问网络。"</string>
+    <string name="agent_permission_opencode_s_own_rules_from_its_config_by_default_most_tools">"使用 OpenCode 配置中的权限规则。默认情况下，大多数工具无需确认。"</string>
+    <string name="agent_permission_ask_before_commands_file_changes_and_web_access_reading_th">"运行命令、修改文件或访问网络前需要确认。可以直接读取项目。"</string>
+</resources>

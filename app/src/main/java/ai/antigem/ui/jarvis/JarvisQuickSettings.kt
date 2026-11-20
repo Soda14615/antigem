@@ -1,5 +1,7 @@
 package ai.antigem.ui.jarvis
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -191,11 +193,11 @@ fun JarvisQuickSettings(onClose: () -> Unit) {
                 JarvisBotIcon(28.dp, Cyan)
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Quick settings", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                    Text("Applies from the next time the microphone opens", color = Color.White.copy(alpha = 0.5f), fontSize = 11.5.sp)
+                    Text(stringResource(R.string.jarvis_overlay_quick_settings), color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.jarvis_quick_settings_applies_from_the_next_time_the_microphone), color = Color.White.copy(alpha = 0.5f), fontSize = 11.5.sp)
                 }
                 Box(Modifier.size(40.dp).clip(CircleShape).clickable { onClose() }, contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Close, "Close", tint = Color.White.copy(alpha = 0.7f))
+                    Icon(Icons.Filled.Close, stringResource(R.string.accounts_ui_close), tint = Color.White.copy(alpha = 0.7f))
                 }
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 6.dp)) {
@@ -206,7 +208,7 @@ fun JarvisQuickSettings(onClose: () -> Unit) {
                 QsSlider("Pause before sending", silence / 1000f, 0.6f..4f, "%.1f s".format(silence / 1000f)) { P.silenceMs.set((it * 1000).toInt()) }
                 QsChoice(listOf("smart" to "Smart pause", "pause" to "Exact pause"), if (sendMode == "pause") "pause" else "smart") { P.sendMode.set(it) }
                 QsHint(if (sendMode == "pause") "Always exactly this pause." else "Longer when you sound unfinished (“…and”), shorter for short answers.")
-                Text("Answers to Jarvis' questions", color = Color.White.copy(alpha = 0.8f), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
+                Text(stringResource(R.string.jarvis_quick_settings_answers_to_jarvis_questions), color = Color.White.copy(alpha = 0.8f), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
                 QsChoice(listOf("same" to "Like everything else", "auto" to "Send on pause"), answers) { P.answerSend.set(it) }
 
                 QsTitle("After Jarvis speaks")

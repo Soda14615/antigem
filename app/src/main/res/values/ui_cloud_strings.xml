@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agy_cloud_ui_cloud_agents">"Cloud agents"</string>
+    <string name="agy_cloud_ui_off_the_app_does_not_ask_the">"Off: the app does not ask the Antigravity server for cloud projects or cloud chats."</string>
+    <string name="agy_cloud_ui_antigravity_remote_agents_google_ai_pro_ultra">"Antigravity Remote Agents · Google AI Pro / Ultra"</string>
+    <string name="agy_cloud_ui_projects">"Projects"</string>
+    <string name="agy_cloud_ui_connections">"Connections"</string>
+    <string name="agy_cloud_ui_new_cloud_project">"New cloud project"</string>
+    <string name="agy_cloud_ui_rename_project">"Rename project"</string>
+    <string name="agy_cloud_ui_rename">"Rename"</string>
+    <string name="agy_cloud_ui_the_cloud_project_and_its_cloud_chats">"The cloud project and its cloud chats are deleted in Google's cloud. Your GitHub repos are not touched."</string>
+    <string name="agy_cloud_ui_no_repos_the_agent_starts_in_an">"No repos: the agent starts in an empty folder."</string>
+    <string name="agy_cloud_ui_private">"Private"</string>
+    <string name="agy_cloud_ui_new_chat_here">"New chat here"</string>
+    <string name="agy_cloud_ui_repos">"Repos"</string>
+    <string name="agy_cloud_ui_project_name">"Project name"</string>
+    <string name="agy_cloud_ui_github_repos">"GitHub repos"</string>
+    <string name="agy_cloud_ui_connect_github">"Connect GitHub"</string>
+    <string name="agy_cloud_ui_loading_your_repos">"Loading your repos…"</string>
+    <string name="agy_cloud_ui_no_repos_are_shared_with_antigravity_add">"No repos are shared with Antigravity. Add some in GitHub's settings for the Antigravity app."</string>
+    <string name="agy_cloud_ui_private_2">"private"</string>
+    <string name="agy_cloud_ui_private_repos_in_one_project_must_have">"Private repos in one project must have the same owner."</string>
+    <string name="agy_cloud_ui_connect_opens_antigravity_s_page_for_it">"Connect opens Antigravity's page for it in your browser, as your Antigravity Google account. Connect it there, then come back here."</string>
+    <string name="agy_cloud_ui_expired_connect_again">"Expired: connect again"</string>
+    <string name="agy_cloud_ui_not_connected">"Not connected"</string>
+    <string name="agy_cloud_ui_disconnect">"Disconnect"</string>
+    <string name="agy_cloud_ui_connect">"Connect"</string>
+    <string name="agy_cloud_ui_disconnect_2">"Disconnect %1$s?"</string>
+    <string name="agy_cloud_ui_cloud_agents_can_no_longer_use_until">"Cloud agents can no longer use %1$s until you connect it again."</string>
+    <string name="agy_cloud_ui_cloud">"Cloud"</string>
+    <string name="agy_cloud_ui_run_a_command_in_the_cloud_vm">"Run a command in the cloud VM"</string>
+    <string name="agy_cloud_ui_command">"Command"</string>
+    <string name="agy_cloud_ui_the_agent_runs_it_and_the_output">"The agent runs it and the output shows in the chat."</string>
+    <string name="agy_cloud_ui_run">"Run"</string>
+    <string name="cloud_preview_preview_the_cloud_vm">"Preview the cloud VM"</string>
+    <string name="cloud_preview_ports_from_the_agent_s_commands_are">"Ports from the agent's commands are marked with a dot."</string>
+    <string name="cloud_preview_pick_the_port_your_server_listens_on">"Pick the port your server listens on (ask the agent to start it on 0.0.0.0)."</string>
+    <string name="cloud_preview_port">"Port"</string>
+    <string name="cloud_preview_in_the_browser_it_opens_as_http">"In the browser it opens as http://127.0.0.1:… on this phone. Live reload does not work: reload to see changes."</string>
+    <string name="cloud_preview_open_in_app">"Open in app"</string>
+    <string name="cloud_preview_open_in_browser">"Open in browser"</string>
+    <string name="cloud_preview_preview">"Preview"</string>
+    <string name="cloud_preview_path">"Path"</string>
+</resources>

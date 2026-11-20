@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.expandVertically
@@ -75,7 +77,7 @@ fun ThinkingAccordion(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = if (isExpanded) "Collapse" else "Expand",
+                contentDescription = if (isExpanded) stringResource(R.string.agent_tool_call_card_collapse) else stringResource(R.string.agent_tool_call_card_expand),
                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                 modifier = Modifier
                     .size(15.dp)
@@ -86,7 +88,7 @@ fun ThinkingAccordion(
 
             Icon(
                 imageVector = Icons.Outlined.Psychology,
-                contentDescription = "Thinking",
+                contentDescription = stringResource(R.string.claude_chat_controls_thinking),
                 tint = ClaudeTerracotta.copy(alpha = 0.85f),
                 modifier = Modifier.size(15.dp)
             )
@@ -102,7 +104,7 @@ fun ThinkingAccordion(
                 )
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(
-                    text = "Thinking...",
+                    text = stringResource(R.string.thinking_accordion_thinking),
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.Medium,
                     color = ClaudeTerracotta
@@ -171,7 +173,7 @@ fun ThinkingAccordion(
                     if (!isStreaming && durationMs != null && durationMs > 0) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "⏱️ Thought for ${formatDuration(durationMs)}",
+                            text = stringResource(R.string.thinking_accordion_thought_for, (formatDuration(durationMs)).toString()),
                             fontSize = 11.5.sp,
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Medium,

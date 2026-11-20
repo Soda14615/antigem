@@ -1,5 +1,7 @@
 package ai.antigem.ui.opencode
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -150,7 +152,7 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
     ClaudeCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Your providers", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(stringResource(R.string.open_code_providers_page_your_providers), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text(
                     "Sign in with a subscription (ChatGPT, GitHub Copilot, SuperGrok, Claude…) or an API key. " +
                         "Their models then show in the model picker; ${models.size} are available now.",
@@ -158,20 +160,20 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
                 )
             }
             if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = OpenCodeAccent)
-            else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+            else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
         }
         error?.let { Text(it, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 4.dp)) }
 
         val connected = integrations.filter { it.connected }
         if (connected.isEmpty() && error == null && !loading) {
-            Text("Nothing connected yet: OpenCode's free models work without an account.", fontSize = 12.sp,
+            Text(stringResource(R.string.open_code_providers_page_nothing_connected_yet_opencode_s_free_models), fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 8.dp))
         }
         connected.forEach { integ ->
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(integ.name, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp, modifier = Modifier.weight(1f))
-                TextButton(onClick = { signingIn = integ }) { Text("Add account", fontSize = 12.sp) }
+                TextButton(onClick = { signingIn = integ }) { Text(stringResource(R.string.open_code_providers_page_add_account), fontSize = 12.sp) }
             }
             val creds = credentials.filter { it.integrationId == integ.id }
             integ.connections.forEach { conn ->
@@ -199,7 +201,7 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
                                     .onFailure { toast("Could not switch: ${it.message}", ok = false) }
                                 reload()
                             }
-                        }) { Text("Use this", fontSize = 12.sp) }
+                        }) { Text(stringResource(R.string.open_code_providers_page_use_this), fontSize = 12.sp) }
                     }
                     if (conn.id.startsWith("cred")) {
                         TextButton(onClick = {
@@ -209,7 +211,7 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
                                     .onFailure { toast("Could not disconnect: ${it.message}", ok = false) }
                                 reload()
                             }
-                        }) { Text("Disconnect", fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
+                        }) { Text(stringResource(R.string.agy_cloud_ui_disconnect), fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
                     }
                 }
             }
@@ -219,7 +221,7 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
     ModelsCard(backend)
 
     ClaudeCard {
-        Text("Connect", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(stringResource(R.string.agy_cloud_ui_connect), fontWeight = FontWeight.Bold, fontSize = 14.sp)
         Spacer(Modifier.height(8.dp))
         val tiles = QUICK.filter { byId.containsKey(it.first) }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -246,7 +248,7 @@ fun OpenCodeProvidersPage(backend: OpenCodeChatBackend) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(Icons.Outlined.Search, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
-            Text("All ${integrations.size.takeIf { it > 0 } ?: ""} providers")
+            Text(stringResource(R.string.open_code_providers_page_all_providers, (integrations.size.takeIf { it > 0 } ?: "").toString()))
         }
     }
 
@@ -282,9 +284,9 @@ private fun ModelsCard(backend: OpenCodeChatBackend) {
     val dim = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
 
     ClaudeCard {
-        Text("Models", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(stringResource(R.string.open_code_providers_page_models), fontWeight = FontWeight.Bold, fontSize = 14.sp)
         Text(
-            "Turn providers or single models off to keep them out of the model picker. Tap a provider to see its models.",
+            stringResource(R.string.open_code_providers_page_turn_providers_or_single_models_off_to),
             fontSize = 11.5.sp, lineHeight = 15.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
         groups.forEach { (providerId, models) ->
@@ -304,7 +306,7 @@ private fun ModelsCard(backend: OpenCodeChatBackend) {
                 Column(Modifier.weight(1f)) {
                     Text(models.first().baseName, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
-                        if (providerOn) "$onCount of ${models.size} models on" else "Off · ${models.size} models",
+                        if (providerOn) stringResource(R.string.open_code_providers_page_of_models_on, onCount.toString(), models.size.toString()) else stringResource(R.string.open_code_providers_page_off_models, models.size.toString()),
                         fontSize = 10.5.sp, color = dim
                     )
                 }
@@ -314,14 +316,14 @@ private fun ModelsCard(backend: OpenCodeChatBackend) {
                 var query by remember(providerId) { mutableStateOf("") }
                 Column(Modifier.padding(start = 24.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        TextButton(onClick = { backend.setProviderModelsEnabled(providerId, true) }, enabled = providerOn) { Text("All on", fontSize = 12.sp) }
-                        TextButton(onClick = { backend.setProviderModelsEnabled(providerId, false) }, enabled = providerOn) { Text("All off", fontSize = 12.sp) }
+                        TextButton(onClick = { backend.setProviderModelsEnabled(providerId, true) }, enabled = providerOn) { Text(stringResource(R.string.open_code_providers_page_all_on), fontSize = 12.sp) }
+                        TextButton(onClick = { backend.setProviderModelsEnabled(providerId, false) }, enabled = providerOn) { Text(stringResource(R.string.open_code_providers_page_all_off), fontSize = 12.sp) }
                     }
                     if (models.size > 12) {
                         OutlinedTextField(
                             value = query, onValueChange = { query = it }, singleLine = true, shape = RoundedCornerShape(12.dp),
                             leadingIcon = { Icon(Icons.Outlined.Search, null, Modifier.size(18.dp)) },
-                            placeholder = { Text("Search ${models.size} models", fontSize = 13.sp) },
+                            placeholder = { Text(stringResource(R.string.open_code_providers_page_search_models, models.size.toString()), fontSize = 13.sp) },
                             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
                         )
                     }
@@ -357,11 +359,11 @@ private fun AllProvidersSheet(list: List<OpenCodeAuth.Integration>, onDismiss: (
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 16.dp).navigationBarsPadding()) {
-            Text("Connect a provider", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.open_code_providers_page_connect_a_provider), fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(10.dp))
             OutlinedTextField(
                 value = query, onValueChange = { query = it }, singleLine = true, shape = RoundedCornerShape(14.dp),
-                leadingIcon = { Icon(Icons.Outlined.Search, null) }, placeholder = { Text("Search ${list.size} providers") },
+                leadingIcon = { Icon(Icons.Outlined.Search, null) }, placeholder = { Text(stringResource(R.string.open_code_providers_page_search_providers, list.size.toString())) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
@@ -381,7 +383,7 @@ private fun AllProvidersSheet(list: List<OpenCodeAuth.Integration>, onDismiss: (
                                 fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         }
-                        if (integ.connected) Text("connected", fontSize = 11.sp, color = OpenCodeAccent)
+                        if (integ.connected) Text(stringResource(R.string.open_code_providers_page_connected), fontSize = 11.sp, color = OpenCodeAccent)
                     }
                 }
             }
@@ -453,7 +455,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(integ.name, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                    Text(if (integ.connected) "Add another account" else "Connect your account", fontSize = 12.sp, color = OpenCodeAccent)
+                    Text(if (integ.connected) stringResource(R.string.open_code_providers_page_add_another_account) else stringResource(R.string.open_code_providers_page_connect_your_account), fontSize = 12.sp, color = OpenCodeAccent)
                 }
             }
             Spacer(Modifier.height(14.dp))
@@ -462,7 +464,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
             when {
                 // ---- pick a method
                 m == null -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (methods.isEmpty()) Text("This provider has no way to sign in from the app.", fontSize = 13.sp)
+                    if (methods.isEmpty()) Text(stringResource(R.string.open_code_providers_page_this_provider_has_no_way_to_sign), fontSize = 13.sp)
                     methods.forEach { opt ->
                         Surface(
                             onClick = { method = opt; failed = null },
@@ -492,7 +494,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                     Text(OpenCodeAuth.methodTitle(m), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Spacer(Modifier.height(10.dp))
                     if (code != null) {
-                        Text("Enter this code on the sign-in page:", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                        Text(stringResource(R.string.open_code_providers_page_enter_this_code_on_the_sign_in), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                         Spacer(Modifier.height(6.dp))
                         Surface(
                             shape = RoundedCornerShape(14.dp), color = OpenCodeAccent.copy(alpha = 0.1f),
@@ -504,7 +506,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                                 IconButton(onClick = {
                                     (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("Code", code))
                                     toast("Code copied")
-                                }) { Icon(Icons.Outlined.ContentCopy, "Copy code", tint = OpenCodeAccent) }
+                                }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.code_block_copy_code), tint = OpenCodeAccent) }
                             }
                         }
                         Spacer(Modifier.height(10.dp))
@@ -523,7 +525,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
                         Icon(Icons.AutoMirrored.Outlined.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp))
-                        Text(if (code != null) "Copy code & open sign-in page" else "Open sign-in page")
+                        Text(if (code != null) stringResource(R.string.open_code_providers_page_copy_code_open_sign_in_page) else stringResource(R.string.codex_settings_screen_open_sign_in_page))
                     }
                     Spacer(Modifier.height(10.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -538,7 +540,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                     // the provider shows a code to paste back
                     if (a.mode == "code" || a.paste) {
                         Spacer(Modifier.height(12.dp))
-                        OutlinedTextField(pasted, { pasted = it }, label = { Text("Code from the provider") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(pasted, { pasted = it }, label = { Text(stringResource(R.string.open_code_providers_page_code_from_the_provider)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(6.dp))
                         OutlinedButton(onClick = {
                             busy = true
@@ -546,13 +548,13 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                                 backend.client.completeOAuth(integ.id, a.id, pasted.trim()).onFailure { failed = it.message }
                                 busy = false
                             }
-                        }, enabled = pasted.isNotBlank() && !busy, shape = RoundedCornerShape(12.dp)) { Text("Submit code") }
+                        }, enabled = pasted.isNotBlank() && !busy, shape = RoundedCornerShape(12.dp)) { Text(stringResource(R.string.claude_login_dialog_submit_code)) }
                     } else if (a.returnsToLoopback && remote) {
                         // server mode: the browser lands on this phone's 127.0.0.1; its address goes to the server
                         Spacer(Modifier.height(12.dp))
                         Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f), modifier = Modifier.fillMaxWidth()) {
                             Column(Modifier.padding(12.dp)) {
-                                Text("After you sign in", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                Text(stringResource(R.string.open_code_providers_page_after_you_sign_in), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                                 Text(
                                     "The browser ends on a page that can't load (an address starting with http://127.0.0.1 or http://localhost). " +
                                         "That's expected with a server: copy that whole address from the address bar and paste it here.",
@@ -570,7 +572,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                                             .onFailure { failed = it.message }
                                         busy = false
                                     }
-                                }, enabled = pasted.isNotBlank() && !busy, shape = RoundedCornerShape(12.dp)) { Text("Finish sign-in") }
+                                }, enabled = pasted.isNotBlank() && !busy, shape = RoundedCornerShape(12.dp)) { Text(stringResource(R.string.open_code_providers_page_finish_sign_in)) }
                             }
                         }
                     }
@@ -578,7 +580,7 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                     TextButton(onClick = {
                         scope.launch { backend.client.cancelOAuth(integ.id, a.id) }
                         attempt = null
-                    }) { Text("Cancel") }
+                    }) { Text(stringResource(R.string.accounts_ui_cancel)) }
                 }
 
                 // ---- the chosen method: its form, then the action
@@ -587,20 +589,20 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                         Icon(methodIcon(m), null, tint = OpenCodeAccent, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(OpenCodeAuth.methodTitle(m), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                        if (methods.size > 1) TextButton(onClick = { method = null; failed = null }) { Text("Other ways") }
+                        if (methods.size > 1) TextButton(onClick = { method = null; failed = null }) { Text(stringResource(R.string.open_code_providers_page_other_ways)) }
                     }
                     Text(methodHint(m, remote), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Spacer(Modifier.height(10.dp))
                     AuthForm(m.form, answers)
                     if (m.isKey) {
                         OutlinedTextField(
-                            key, { key = it }, label = { Text("API key") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                            key, { key = it }, label = { Text(stringResource(R.string.claude_providers_page_api_key)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            if (integ.connections.any { it.method == "key" }) "Saved by OpenCode on the server. It replaces the key saved for ${integ.name} now (one key per provider)."
-                            else "Saved by OpenCode on the server.",
+                            if (integ.connections.any { it.method == "key" }) stringResource(R.string.open_code_providers_page_saved_by_opencode_on_the_server_it, integ.name.toString())
+                            else stringResource(R.string.open_code_providers_page_saved_by_opencode_on_the_server),
                             fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
                     }
@@ -639,9 +641,9 @@ private fun ProviderSignInSheet(backend: OpenCodeChatBackend, integ: OpenCodeAut
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
                         if (busy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
-                        else Text(when { m.isKey -> "Connect"; m.isExternal -> "Use the server's login"; else -> "Start sign-in" })
+                        else Text(when { m.isKey -> stringResource(R.string.agy_cloud_ui_connect); m.isExternal -> stringResource(R.string.open_code_providers_page_use_the_server_s_login); else -> stringResource(R.string.open_code_providers_page_start_sign_in) })
                     }
-                    if (missing != null) Text("Fill in: $missing", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp))
+                    if (missing != null) Text(stringResource(R.string.open_code_providers_page_fill_in, missing.toString()), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp))
                 }
             }
         }
@@ -665,11 +667,11 @@ private fun AuthForm(form: List<OpenCodeAuth.Field>, answers: MutableMap<String,
                 }
             }
             if (f.custom) {
-                OutlinedTextField(value, { answers[f.key] = it }, placeholder = { Text(f.placeholder ?: "Or type it") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value, { answers[f.key] = it }, placeholder = { Text(f.placeholder ?: stringResource(R.string.open_code_providers_page_or_type_it)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
         } else if (f.type == "boolean") {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                FilterChip(selected = value == "true", onClick = { answers[f.key] = "true" }, label = { Text("Yes") })
+                FilterChip(selected = value == "true", onClick = { answers[f.key] = "true" }, label = { Text(stringResource(R.string.open_code_providers_page_yes)) })
                 FilterChip(selected = value == "false", onClick = { answers[f.key] = "false" }, label = { Text("No") })
             }
         } else {

@@ -1,5 +1,7 @@
 package ai.antigem.ui.files
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -130,8 +132,8 @@ private fun nextTabId() = ++tabIds
 val LocalExplorerSide = staticCompositionLocalOf { ExplorerSide.BRIDGE }
 
 /** The bridge's machine as the tab names it: the PC in use (Connect to PC), or the server. */
-private fun bridgeTabName(): String =
-    ai.antigem.data.preferences.AuthPreferences.pcOverride?.pcName?.takeIf { it.isNotBlank() } ?: "Server"
+private fun bridgeTabName(context: Context): String =
+    ai.antigem.data.preferences.AuthPreferences.pcOverride?.pcName?.takeIf { it.isNotBlank() } ?: context.getString(R.string.git_hub_screen_server)
 
 private data class PendingConflict(val names: List<String>, val move: Boolean, val run: (ConflictPolicy) -> Unit)
 
@@ -153,11 +155,11 @@ fun FileExplorer(
     isVisible: Boolean = true,
     inDialog: Boolean = false,
     title: String? = null,
-    confirmLabel: String = "Choose this folder",
+    confirmLabel: String = stringResource(R.string.workspace_file_choose_folder),
     onConfirmFolder: ((String) -> Unit)? = null,
     onPickFile: ((ExplorerEntry) -> Unit)? = null,
     onPickFiles: ((List<ExplorerEntry>) -> Unit)? = null,
-    pickFilesLabel: String = "Pick",
+    pickFilesLabel: String = stringResource(R.string.workspace_file_pick),
     saveFileName: String? = null,
     onSave: ((folder: String, name: String) -> Unit)? = null,
     onOpenedInIde: (() -> Unit)? = null,
@@ -284,7 +286,7 @@ fun FileExplorer(
             }
             ExplorerPrefs.addRecentFolder(l.path)
         }.onFailure {
-            if (!loaded) loadError = it.message else snack(it.message ?: "Cannot open folder")
+            if (!loaded) loadError = it.message else snack(it.message ?: context.getString(R.string.workspace_file_cannot_open_folder))
         }
         return res.isSuccess
     }
@@ -304,7 +306,7 @@ fun FileExplorer(
                 loadError = null
                 loaded = true
                 selected.keys.retainAll(keep.intersect(l.entries.map { it.path }.toSet()))
-            }.onFailure { if (!silent) snack(it.message ?: "Refresh failed") }
+            }.onFailure { if (!silent) snack(it.message ?: context.getString(R.string.workspace_file_refresh_failed)) }
             refreshing = false
         }
     }
@@ -376,7 +378,7 @@ fun FileExplorer(
             if (!load(path, null) && path != "~") {
                 // the remembered folder is gone: start at home and say why
                 val missing = path
-                if (load("~", null)) snack("\"$missing\" is not available. Showing Home.")
+                if (load("~", null)) snack(context.getString(R.string.workspace_file_missing_home, missing))
             }
         } else {
             reload()
@@ -400,7 +402,7 @@ fun FileExplorer(
         // consume() just changed navRequest, which cancels this effect: load in the explorer's own scope
         scope.launch {
             if (load(target, pushFrom = from)) return@launch
-            snack("Cannot open $target")
+            snack(context.getString(R.string.workspace_file_cannot_open, target))
             // nothing shown yet: fall back to home instead of an empty screen
             if (!loaded && target != "~") load("~", null)
         }
@@ -424,12 +426,12 @@ fun FileExplorer(
     fun openExternal(e: ExplorerEntry, chooser: Boolean = false) {
         if (busy != null) return
         scope.launch {
-            busy = "Preparing ${e.name}…"
+            busy = context.getString(R.string.workspace_file_prepare, e.name)
             busyProgress = null
             val uri = FileOpener.uriFor(context, e.path, e.size, local = side == ExplorerSide.PHONE) { busyProgress = it }
             busy = null
             uri.onSuccess { FileOpener.view(context, it, e.name, chooser)?.let(::snack) }
-                .onFailure { snack(it.message ?: "Could not open ${e.name}") }
+                .onFailure { snack(it.message ?: context.getString(R.string.workspace_file_could_not_open, e.name)) }
         }
     }
 
@@ -437,18 +439,18 @@ fun FileExplorer(
     fun shareOne(e: ExplorerEntry) {
         if (busy != null) return
         scope.launch {
-            busy = "Preparing ${e.name}…"
+            busy = context.getString(R.string.workspace_file_prepare, e.name)
             busyProgress = null
             val uri = FileOpener.uriFor(context, e.path, e.size, local = side == ExplorerSide.PHONE) { busyProgress = it }
             busy = null
             uri.onSuccess { FileOpener.share(context, listOf(it to e.name))?.let(::snack) }
-                .onFailure { snack(it.message ?: "Could not share ${e.name}") }
+                .onFailure { snack(it.message ?: context.getString(R.string.workspace_file_could_not_share, e.name)) }
         }
     }
 
     fun openInIde(e: ExplorerEntry, force: Boolean = false) {
         scope.launch {
-            busy = "Opening ${e.name}…"
+            busy = context.getString(R.string.workspace_file_opening, e.name)
             val r = IdeFileLauncher.open(e.path, e.name, e.size, force)
             busy = null
             when (r) {
@@ -466,11 +468,11 @@ fun FileExplorer(
             imageView = e
         } else if (e.kind == FileKind.MARKDOWN) {
             scope.launch {
-                busy = "Opening ${e.name}…"
+                busy = context.getString(R.string.workspace_file_opening, e.name)
                 val content = if (side == ExplorerSide.PHONE) runCatching { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { java.io.File(e.path).readText() } }.getOrNull()
                     else IdeApiClient.readFile(e.path)
                 busy = null
-                if (content == null) snack("Cannot read ${e.name}") else markdownDoc = e.path to content
+                if (content == null) snack(context.getString(R.string.workspace_file_cannot_read, e.name)) else markdownDoc = e.path to content
             }
         } else {
             archiveFor = e
@@ -524,18 +526,25 @@ fun FileExplorer(
                 }
             }
             val n = items.size
-            val noun = if (n == 1) "\"${items.first().name}\"" else "$n items"
-            val where = if (!across) "" else if (to == ExplorerSide.PHONE) " to this phone" else " to ${bridgeTabName()}"
-            runOp(if (move) "Moving $noun$where…" else "Copying $noun$where…", {
+            val noun = if (n == 1) "\"${items.first().name}\"" else context.getString(R.string.workspace_file_items, n)
+            val where = if (!across) "" else if (to == ExplorerSide.PHONE) context.getString(R.string.workspace_file_to_phone) else context.getString(R.string.workspace_file_to_bridge, bridgeTabName(context))
+            runOp(if (move) context.getString(R.string.workspace_file_moving, noun, where) else context.getString(R.string.workspace_file_copying, noun, where), {
                 if (across) CrossTransfer.run(from, items, dest, move, policy ?: ConflictPolicy.RENAME) { busyProgress = it }
                 else ExplorerSource.of(to).transfer(items.map { it.path }, dest, move, policy ?: ConflictPolicy.RENAME)
             }) { r ->
                 if (r.ok) {
                     if (ExplorerClipboard.entries.map { it.path }.toSet() == items.map { it.path }.toSet()) ExplorerClipboard.clear()
-                    val place = if (dest == path && to == side) "here" else "to ${dest.trimEnd('/').substringAfterLast('/')}"
-                    snack("${if (move) "Moved" else "Copied"} $noun $place" + if (across) (if (to == ExplorerSide.PHONE) " on this phone" else " on ${bridgeTabName()}") else "")
+                    val place = if (dest == path && to == side) context.getString(R.string.workspace_file_here)
+                    else context.getString(R.string.workspace_file_to_folder, dest.trimEnd('/').substringAfterLast('/'))
+                    val device = when {
+                        !across -> ""
+                        to == ExplorerSide.PHONE -> context.getString(R.string.workspace_file_on_this_phone)
+                        else -> context.getString(R.string.workspace_file_on_bridge, bridgeTabName(context))
+                    }
+                    val message = if (move) R.string.workspace_file_move_here_complete else R.string.workspace_file_copy_here_complete
+                    snack(context.getString(message, noun, place, device))
                 } else if (r.count > 0) {
-                    snack("${r.count} done, ${r.failed} failed: ${r.error ?: ""}")
+                    snack(context.getString(R.string.workspace_file_partial_operation, r.count, r.failed, r.error ?: ""))
                 }
             }
         }
@@ -543,19 +552,19 @@ fun FileExplorer(
 
     fun shareEntries(items: List<ExplorerEntry>) {
         val files = items.filter { !it.isDir }
-        if (files.isEmpty()) { snack("Folders cannot be shared. Compress them to ZIP first."); return }
+        if (files.isEmpty()) { snack(context.getString(R.string.workspace_file_folder_share)); return }
         scope.launch {
-            busy = "Preparing to share…"
+            busy = context.getString(R.string.workspace_file_preparing_share)
             val uris = files.mapNotNull { f -> FileOpener.uriFor(context, f.path, f.size, local = side == ExplorerSide.PHONE).getOrNull()?.let { it to f.name } }
             busy = null
-            if (uris.isEmpty()) snack("Could not prepare files to share") else FileOpener.share(context, uris)?.let(::snack)
+            if (uris.isEmpty()) snack(context.getString(R.string.workspace_file_share_prepare_failed)) else FileOpener.share(context, uris)?.let(::snack)
         }
     }
 
     fun extract(e: ExplorerEntry, targetDir: String?) {
-        runOp("Extracting ${e.name}…", { src().extract(e.path, targetDir) }) { r ->
+        runOp(context.getString(R.string.workspace_file_extracting, e.name), { src().extract(e.path, targetDir) }) { r ->
             if (r.ok && r.path != null) {
-                val res = snackbar.showSnackbar("Extracted ${r.count} files", actionLabel = "Open", withDismissAction = true, duration = SnackbarDuration.Long)
+                val res = snackbar.showSnackbar(context.getString(R.string.workspace_file_extracted, r.count), actionLabel = context.getString(R.string.workspace_file_snackbar_open), withDismissAction = true, duration = SnackbarDuration.Long)
                 if (res == SnackbarResult.ActionPerformed) go(r.path)
             }
         }
@@ -608,23 +617,23 @@ fun FileExplorer(
                             allSelected = selected.size == visible.size && visible.isNotEmpty(),
                             onClear = { selected.clear() },
                             onSelectAll = { if (selected.size == visible.size) selected.clear() else visible.forEach { selected[it.path] = it } },
-                            onCopy = { ExplorerClipboard.set(selected.values.toList(), move = false, side); selected.clear(); snack(if (phoneTab) "Copied. Open a folder (either tab) and tap Paste." else "Copied. Open a folder and tap Paste.") },
-                            onCut = { ExplorerClipboard.set(selected.values.toList(), move = true, side); selected.clear(); snack(if (phoneTab) "Cut. Open a folder (either tab) and tap Paste." else "Cut. Open a folder and tap Paste.") },
+                            onCopy = { ExplorerClipboard.set(selected.values.toList(), move = false, side); selected.clear(); snack(if (phoneTab) context.getString(R.string.workspace_file_copied_tabs) else context.getString(R.string.workspace_file_copied)) },
+                            onCut = { ExplorerClipboard.set(selected.values.toList(), move = true, side); selected.clear(); snack(if (phoneTab) context.getString(R.string.workspace_file_cut_tabs) else context.getString(R.string.workspace_file_cut)) },
                             onDelete = { deleteTargets = selected.values.toList() },
                             menuOpen = selMenuOpen,
                             onMenu = { selMenuOpen = it },
                             menu = {
                                 val sel = selected.values.toList()
-                                DropdownMenuItem(text = { Text("Share") }, leadingIcon = { Icon(Icons.Outlined.Share, null) }, onClick = { selMenuOpen = false; shareEntries(sel) })
-                                DropdownMenuItem(text = { Text("Compress to ZIP") }, leadingIcon = { Icon(Icons.Outlined.FolderZip, null) }, onClick = { selMenuOpen = false; compressTargets = sel })
-                                DropdownMenuItem(text = { Text("Copy to…") }, leadingIcon = { Icon(Icons.Outlined.FileCopy, null) }, onClick = { selMenuOpen = false; destRequest = DestRequest(DestOp.COPY, sel, side) })
-                                DropdownMenuItem(text = { Text("Move to…") }, leadingIcon = { Icon(Icons.AutoMirrored.Outlined.DriveFileMove, null) }, onClick = { selMenuOpen = false; destRequest = DestRequest(DestOp.MOVE, sel, side) })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.share_text)) }, leadingIcon = { Icon(Icons.Outlined.Share, null) }, onClick = { selMenuOpen = false; shareEntries(sel) })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.explorer_dialogs_compress_to_zip)) }, leadingIcon = { Icon(Icons.Outlined.FolderZip, null) }, onClick = { selMenuOpen = false; compressTargets = sel })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.explorer_dialogs_copy_to)) }, leadingIcon = { Icon(Icons.Outlined.FileCopy, null) }, onClick = { selMenuOpen = false; destRequest = DestRequest(DestOp.COPY, sel, side) })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.explorer_dialogs_move_to)) }, leadingIcon = { Icon(Icons.AutoMirrored.Outlined.DriveFileMove, null) }, onClick = { selMenuOpen = false; destRequest = DestRequest(DestOp.MOVE, sel, side) })
                                 if (sel.size == 1) {
-                                    DropdownMenuItem(text = { Text("Rename") }, leadingIcon = { Icon(Icons.Outlined.DriveFileRenameOutline, null) }, onClick = { selMenuOpen = false; renameTarget = sel.first() })
-                                    DropdownMenuItem(text = { Text("Details") }, leadingIcon = { Icon(Icons.Outlined.Info, null) }, onClick = { selMenuOpen = false; detailsFor = sel.first() })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.agy_cloud_ui_rename)) }, leadingIcon = { Icon(Icons.Outlined.DriveFileRenameOutline, null) }, onClick = { selMenuOpen = false; renameTarget = sel.first() })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.explorer_dialogs_details)) }, leadingIcon = { Icon(Icons.Outlined.Info, null) }, onClick = { selMenuOpen = false; detailsFor = sel.first() })
                                 }
-                                DropdownMenuItem(text = { Text("Copy paths") }, leadingIcon = { Icon(Icons.Outlined.Link, null) }, onClick = {
-                                    selMenuOpen = false; copyText(context, sel.joinToString("\n") { it.path }); snack("Paths copied")
+                                DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_copy_paths)) }, leadingIcon = { Icon(Icons.Outlined.Link, null) }, onClick = {
+                                    selMenuOpen = false; copyText(context, sel.joinToString("\n") { it.path }); snack(context.getString(R.string.workspace_file_paths_copied))
                                 })
                             }
                         )
@@ -642,7 +651,7 @@ fun FileExplorer(
                                         deepLoading = true
                                         src().search(path, query.trim(), settings.showHidden)
                                             .onSuccess { deepResults = it.first; deepTruncated = it.second }
-                                            .onFailure { snack(it.message ?: "Search failed") }
+                                            .onFailure { snack(it.message ?: context.getString(R.string.workspace_file_search_failed)) }
                                         deepLoading = false
                                     }
                                 }
@@ -655,7 +664,7 @@ fun FileExplorer(
                                         deepLoading = true
                                         src().search(path, query.trim(), settings.showHidden)
                                             .onSuccess { deepResults = it.first; deepTruncated = it.second }
-                                            .onFailure { snack(it.message ?: "Search failed") }
+                                            .onFailure { snack(it.message ?: context.getString(R.string.workspace_file_search_failed)) }
                                         deepLoading = false
                                     }
                                 }
@@ -663,44 +672,44 @@ fun FileExplorer(
                         )
                         else -> Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             IconButton(onClick = { if (!goBack()) onClose() }) {
-                                Icon(if (inDialog && history.isEmpty()) Icons.Outlined.Close else Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                Icon(if (inDialog && history.isEmpty()) Icons.Outlined.Close else Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.agent_approval_panel_back))
                             }
                             Column(Modifier.weight(1f).padding(start = 2.dp)) {
                                 if (title != null) Text(title, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(folderName, fontSize = if (title != null) 18.sp else 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
-                            IconButton(onClick = { searching = true }) { Icon(Icons.Outlined.Search, contentDescription = "Search") }
+                            IconButton(onClick = { searching = true }) { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.browser_screen_search)) }
                             // phone-only mode: tabs on demand (server / PC mode always shows them)
                             if (multiTab && !phoneTab) {
                                 IconButton(onClick = { setTabsOn(!tabMode) }) {
-                                    Icon(Icons.Outlined.Tab, contentDescription = if (tabMode) "Turn off tabs" else "Open folders in tabs",
+                                    Icon(Icons.Outlined.Tab, contentDescription = if (tabMode) stringResource(R.string.file_explorer_turn_off_tabs) else stringResource(R.string.file_explorer_open_folders_in_tabs),
                                         tint = if (tabMode) MaterialTheme.colorScheme.primary else LocalContentColor.current)
                                 }
                             }
                             IconButton(onClick = { ExplorerPrefs.update { it.copy(grid = !it.grid) } }) {
-                                Icon(if (settings.grid) Icons.AutoMirrored.Outlined.ViewList else Icons.Outlined.GridView, contentDescription = if (settings.grid) "List view" else "Grid view")
+                                Icon(if (settings.grid) Icons.AutoMirrored.Outlined.ViewList else Icons.Outlined.GridView, contentDescription = if (settings.grid) stringResource(R.string.file_explorer_list_view) else stringResource(R.string.file_explorer_grid_view))
                             }
                             Box {
-                                IconButton(onClick = { menuOpen = true }) { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
+                                IconButton(onClick = { menuOpen = true }) { Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.text_selection_more)) }
                                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }, shape = RoundedCornerShape(14.dp)) {
-                                    DropdownMenuItem(text = { Text("New folder") }, leadingIcon = { Icon(Icons.Outlined.CreateNewFolder, null) }, onClick = { menuOpen = false; newIsDir = true })
-                                    DropdownMenuItem(text = { Text("New file") }, leadingIcon = { Icon(Icons.Outlined.NoteAdd, null) }, onClick = { menuOpen = false; newIsDir = false })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_new_folder)) }, leadingIcon = { Icon(Icons.Outlined.CreateNewFolder, null) }, onClick = { menuOpen = false; newIsDir = true })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_new_file)) }, leadingIcon = { Icon(Icons.Outlined.NoteAdd, null) }, onClick = { menuOpen = false; newIsDir = false })
                                     HorizontalDivider()
-                                    DropdownMenuItem(text = { Text("Select all") }, leadingIcon = { Icon(Icons.Outlined.SelectAll, null) }, onClick = { menuOpen = false; visible.forEach { selected[it.path] = it } })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.claude_providers_page_select_all)) }, leadingIcon = { Icon(Icons.Outlined.SelectAll, null) }, onClick = { menuOpen = false; visible.forEach { selected[it.path] = it } })
                                     DropdownMenuItem(
-                                        text = { Text("Show hidden files") },
+                                        text = { Text(stringResource(R.string.file_explorer_show_hidden_files)) },
                                         leadingIcon = { Icon(if (settings.showHidden) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff, null) },
                                         trailingIcon = { Checkbox(checked = settings.showHidden, onCheckedChange = null) },
                                         onClick = { ExplorerPrefs.update { it.copy(showHidden = !it.showHidden) } }
                                     )
-                                    DropdownMenuItem(text = { Text("Sort & view…") }, leadingIcon = { Icon(Icons.Outlined.Sort, null) }, onClick = { menuOpen = false; viewOptionsOpen = true })
-                                    DropdownMenuItem(text = { Text("Refresh") }, leadingIcon = { Icon(Icons.Outlined.Refresh, null) }, onClick = { menuOpen = false; reload(silent = false) })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_sort_view)) }, leadingIcon = { Icon(Icons.Outlined.Sort, null) }, onClick = { menuOpen = false; viewOptionsOpen = true })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.agent_sheet_ui_refresh)) }, leadingIcon = { Icon(Icons.Outlined.Refresh, null) }, onClick = { menuOpen = false; reload(silent = false) })
                                     HorizontalDivider()
                                     if (onOpenFolderInIde != null && side == ExplorerSide.BRIDGE) {
-                                        DropdownMenuItem(text = { Text("Open this folder in IDE") }, leadingIcon = { Icon(Icons.Outlined.Code, null) }, onClick = { menuOpen = false; onOpenFolderInIde(path) })
+                                        DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_open_this_folder_in_ide)) }, leadingIcon = { Icon(Icons.Outlined.Code, null) }, onClick = { menuOpen = false; onOpenFolderInIde(path) })
                                     }
-                                    DropdownMenuItem(text = { Text("Copy folder path") }, leadingIcon = { Icon(Icons.Outlined.Link, null) }, onClick = { menuOpen = false; copyText(context, path); snack("Path copied") })
-                                    DropdownMenuItem(text = { Text("Folder details") }, leadingIcon = { Icon(Icons.Outlined.Info, null) }, onClick = {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_copy_folder_path)) }, leadingIcon = { Icon(Icons.Outlined.Link, null) }, onClick = { menuOpen = false; copyText(context, path); snack(context.getString(R.string.workspace_file_path_copied)) })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_folder_details)) }, leadingIcon = { Icon(Icons.Outlined.Info, null) }, onClick = {
                                         menuOpen = false
                                         detailsFor = ExplorerEntry(name = path.trimEnd('/').substringAfterLast('/').ifBlank { "/" }, path = path, isDir = true, childCount = entries.size)
                                     })
@@ -712,21 +721,21 @@ fun FileExplorer(
                         FolderTabs(
                             tabs = tabs.map { t ->
                                 val label = when {
-                                    t.path == "~" -> if (t.side == ExplorerSide.PHONE) "Phone" else "Home"
-                                    t.side == ExplorerSide.PHONE && t.path.trimEnd('/') == PhoneSource.home -> "Internal storage"
+                                    t.path == "~" -> if (t.side == ExplorerSide.PHONE) stringResource(R.string.workspace_file_phone) else stringResource(R.string.workspace_file_home)
+                                    t.side == ExplorerSide.PHONE && t.path.trimEnd('/') == PhoneSource.home -> stringResource(R.string.workspace_file_internal_storage)
                                     else -> t.path.trimEnd('/').substringAfterLast('/').ifBlank { "/" }
                                 }
                                 FolderTab(t.id, label, t.side)
                             },
                             active = activeTab,
                             showSides = phoneTab,
-                            bridgeName = bridgeTabName(),
+                            bridgeName = bridgeTabName(context),
                             onOpen = ::openTab,
                             onClose = ::closeTab,
                             onAdd = ::addTab
                         )
                     } else if (phoneTab && !multiTab && !selecting && !searching) {
-                        SideTabs(side, bridgeTabName(), enabled = busy == null) { switchSide(it) }
+                        SideTabs(side, bridgeTabName(context), enabled = busy == null) { switchSide(it) }
                     }
                     if (!searching) {
                         BreadcrumbBar(
@@ -736,7 +745,7 @@ fun FileExplorer(
                                 scope.launch { roots = src().roots().second }
                             },
                             onCrumb = { c -> if (c.path != path) go(c.path) },
-                            onCopyPath = { copyText(context, path); snack("Path copied") }
+                            onCopyPath = { copyText(context, path); snack(context.getString(R.string.workspace_file_path_copied)) }
                         )
                     }
                     if (busy != null || loading || deepLoading) {
@@ -776,7 +785,7 @@ fun FileExplorer(
                         firstName = ExplorerClipboard.entries.first().name,
                         move = ExplorerClipboard.move,
                         enabled = busy == null && loaded && pasteable,
-                        fromLabel = if (clipSide == side) null else if (clipSide == ExplorerSide.PHONE) "from this phone" else "from ${bridgeTabName()}",
+                        fromLabel = if (clipSide == side) null else if (clipSide == ExplorerSide.PHONE) stringResource(R.string.workspace_file_from_phone) else stringResource(R.string.workspace_file_from_bridge, bridgeTabName(context)),
                         onPaste = { transfer(ExplorerClipboard.entries.toList(), path, ExplorerClipboard.move, null, from = clipSide, to = side) },
                         onCancel = { ExplorerClipboard.clear() }
                     )
@@ -812,7 +821,7 @@ fun FileExplorer(
                     shape = RoundedCornerShape(18.dp),
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                ) { Icon(Icons.Outlined.Add, contentDescription = "Create") }
+                ) { Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.workspace_folder_browser_dialog_create)) }
             }
         }
     ) { padding ->
@@ -833,20 +842,20 @@ fun FileExplorer(
                     Icons.Outlined.PhoneAndroid, "Allow access to this phone's files",
                     "AntiGem needs \"All files access\" to show and copy this phone's storage."
                 ) {
-                    Button(onClick = { ai.antigem.data.local.TermuxStorageSetupManager.requestStoragePermission(context) }) { Text("Allow") }
+                    Button(onClick = { ai.antigem.data.local.TermuxStorageSetupManager.requestStoragePermission(context) }) { Text(stringResource(R.string.app_permissions_dialog_allow)) }
                 }
                 !loaded && loadError == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 !loaded -> EmptyState(Icons.Outlined.CloudOff, "Files are not available", loadError ?: "") {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = { scope.launch { loadError = null; load(path, null) } }) { Text("Retry") }
-                        OutlinedButton(onClick = { scope.launch { loadError = null; load("~", null) } }) { Text("Go home") }
+                        Button(onClick = { scope.launch { loadError = null; load(path, null) } }) { Text(stringResource(R.string.chat_screen_retry)) }
+                        OutlinedButton(onClick = { scope.launch { loadError = null; load("~", null) } }) { Text(stringResource(R.string.file_explorer_go_home)) }
                     }
                 }
                 searching && deep && deepLoading && deepResults == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(12.dp))
-                        Text("Searching all subfolders of $folderName…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.file_explorer_searching_all_subfolders_of, folderName.toString()), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 searching && visible.isEmpty() && query.isNotBlank() -> EmptyState(
@@ -921,7 +930,7 @@ fun FileExplorer(
                                 EntryRow(
                                     e, selected.containsKey(e.path), selecting, settings.thumbnails,
                                     dimmed = pickingFolder && !e.isDir, cut = e.path in cutPaths,
-                                    subtitleOverride = if (searching && deep) e.path.removePrefix(path).trim('/').substringBeforeLast('/', "").let { rel -> if (rel.isBlank()) entrySubtitle(e) else "in $rel" } else null,
+                                    subtitleOverride = if (searching && deep) e.path.removePrefix(path).trim('/').substringBeforeLast('/', "").let { rel -> if (rel.isBlank()) entrySubtitle(e) else stringResource(R.string.workspace_file_search_in, rel) } else null,
                                     onClick = { rowClick(e) }, onLongClick = { rowLong(e) }, onMore = { actionsFor = e }
                                 )
                             }
@@ -985,7 +994,7 @@ fun FileExplorer(
             settings = settings,
             onChange = { ExplorerPrefs.update(it) },
             rememberedCount = remembered,
-            onForgetChoices = { ExplorerPrefs.forgetChoices(); remembered = 0; snack("\"Always open with\" choices cleared") },
+            onForgetChoices = { ExplorerPrefs.forgetChoices(); remembered = 0; snack(context.getString(R.string.workspace_file_open_with_cleared)) },
             onDismiss = { viewOptionsOpen = false }
         )
     }
@@ -1002,26 +1011,26 @@ fun FileExplorer(
 
     newIsDir?.let { isDir ->
         NameDialog(
-            title = if (isDir) "New folder" else "New file",
+            title = if (isDir) stringResource(R.string.workspace_file_new_folder) else stringResource(R.string.workspace_file_new_file),
             icon = if (isDir) Icons.Outlined.CreateNewFolder else Icons.Outlined.NoteAdd,
             initial = "",
-            confirmLabel = "Create",
+            confirmLabel = stringResource(R.string.workspace_file_create),
             selectStem = false,
             existingNames = existingNames,
-            helper = if (isDir) "Created in $folderName" else "Include the extension, e.g. main.py",
+            helper = if (isDir) stringResource(R.string.workspace_file_created_in_folder, folderName) else stringResource(R.string.workspace_file_needs_extension),
             onConfirm = { name ->
                 val r = src().create(path, name, isDir)
                 if (r.ok) {
                     newIsDir = null
                     reload()
                     if (isDir) {
-                        snack("Created folder $name")
+                        snack(context.getString(R.string.workspace_file_folder_created, name))
                     } else if (ideAvailable && onSave == null && onPickFile == null) {
                         scope.launch {
-                            val res = snackbar.showSnackbar("Created $name", actionLabel = "Edit", withDismissAction = true)
+                            val res = snackbar.showSnackbar(context.getString(R.string.workspace_file_created, name), actionLabel = context.getString(R.string.workspace_file_snackbar_edit), withDismissAction = true)
                             if (res == SnackbarResult.ActionPerformed) openInIde(ExplorerEntry(name, r.path ?: "$path/$name", false))
                         }
-                    } else snack("Created $name")
+                    } else snack(context.getString(R.string.workspace_file_created, name))
                     null
                 } else r.error
             },
@@ -1037,7 +1046,7 @@ fun FileExplorer(
                     newProjectOpen = false
                     onProjectCreated(created)
                     null
-                } else "Could not create the project (does it already exist?)"
+                } else context.getString(R.string.workspace_file_create_project_failed)
             },
             onDismiss = { newProjectOpen = false }
         )
@@ -1054,8 +1063,8 @@ fun FileExplorer(
             onOpenInIde = { close(); openInIde(e) },
             onOpenFolderInIde = { close(); onOpenFolderInIde?.invoke(e.path) },
             onShare = { close(); shareEntries(listOf(e)) },
-            onCopy = { close(); ExplorerClipboard.set(listOf(e), move = false, side); snack(if (phoneTab) "Copied. Open a folder (either tab) and tap Paste." else "Copied. Open a folder and tap Paste.") },
-            onCut = { close(); ExplorerClipboard.set(listOf(e), move = true, side); snack(if (phoneTab) "Cut. Open a folder (either tab) and tap Paste." else "Cut. Open a folder and tap Paste.") },
+            onCopy = { close(); ExplorerClipboard.set(listOf(e), move = false, side); snack(if (phoneTab) context.getString(R.string.workspace_file_copied_tabs) else context.getString(R.string.workspace_file_copied)) },
+            onCut = { close(); ExplorerClipboard.set(listOf(e), move = true, side); snack(if (phoneTab) context.getString(R.string.workspace_file_cut_tabs) else context.getString(R.string.workspace_file_cut)) },
             onCopyTo = { close(); destRequest = DestRequest(DestOp.COPY, listOf(e), side) },
             onMoveTo = { close(); destRequest = DestRequest(DestOp.MOVE, listOf(e), side) },
             onRename = { close(); renameTarget = e },
@@ -1064,7 +1073,7 @@ fun FileExplorer(
             onExtractHere = { close(); extract(e, null) },
             onExtractTo = { close(); destRequest = DestRequest(DestOp.EXTRACT, listOf(e)) },
             onViewArchive = { close(); archiveFor = e },
-            onCopyPath = { close(); copyText(context, e.path); snack("Path copied") },
+            onCopyPath = { close(); copyText(context, e.path); snack(context.getString(R.string.workspace_file_path_copied)) },
             onDetails = { close(); detailsFor = e },
             onDelete = { close(); deleteTargets = listOf(e) }
         )
@@ -1096,15 +1105,15 @@ fun FileExplorer(
             onDismiss = { deleteTargets = null },
             onConfirm = {
                 deleteTargets = null
-                val noun = if (targets.size == 1) "\"${targets.first().name}\"" else "${targets.size} items"
-                runOp("Deleting $noun…", { src().delete(targets.map { it.path }) }) { r ->
+                val noun = if (targets.size == 1) "\"${targets.first().name}\"" else context.getString(R.string.workspace_file_items, targets.size)
+                runOp(context.getString(R.string.workspace_file_delete_progress, noun), { src().delete(targets.map { it.path }) }) { r ->
                     // close editor tabs of deleted files, including files inside deleted folders
                     val gone = IdeDaemonManager.openTabs.value.map { it.path }
                         .filter { tab -> targets.any { t -> tab == t.path || (t.isDir && tab.startsWith(t.path.trimEnd('/') + "/")) } }
                     gone.forEach { IdeDaemonManager.closeTab(it) }
                     ExplorerClipboard.entries.removeAll { c -> targets.any { c.path == it.path || c.path.startsWith(it.path + "/") } }
-                    if (r.ok) snack("Deleted $noun")
-                    else if (r.count > 0) snack("Deleted ${r.count}, ${r.failed} failed: ${r.error}")
+                    if (r.ok) snack(context.getString(R.string.workspace_file_deleted, noun))
+                    else if (r.count > 0) snack(context.getString(R.string.workspace_file_delete_partial, r.count, r.failed, r.error))
                 }
             }
         )
@@ -1112,10 +1121,10 @@ fun FileExplorer(
 
     renameTarget?.let { e ->
         NameDialog(
-            title = "Rename",
+            title = stringResource(R.string.workspace_file_rename),
             icon = Icons.Outlined.DriveFileRenameOutline,
             initial = e.name,
-            confirmLabel = "Rename",
+            confirmLabel = stringResource(R.string.workspace_file_rename),
             selectStem = !e.isDir,
             existingNames = existingNames,
             onConfirm = { name ->
@@ -1126,7 +1135,7 @@ fun FileExplorer(
                         val newPath = r.path ?: "${parentOf(e.path)}/$name"
                         if (!e.isDir) IdeDaemonManager.renameTab(e.path, newPath, name)
                         reload()
-                        snack("Renamed to $name")
+                        snack(context.getString(R.string.workspace_file_renamed, name))
                         null
                     } else r.error
                 }
@@ -1138,17 +1147,17 @@ fun FileExplorer(
     compressTargets?.let { targets ->
         val suggested = if (targets.size == 1) targets.first().name.substringBeforeLast('.').ifBlank { targets.first().name } + ".zip" else "$folderName.zip"
         NameDialog(
-            title = if (targets.size == 1) "Compress \"${targets.first().name}\"" else "Compress ${targets.size} items",
+            title = if (targets.size == 1) stringResource(R.string.workspace_file_compress_one, targets.first().name) else stringResource(R.string.workspace_file_compress_multiple, targets.size),
             icon = Icons.Outlined.FolderZip,
             initial = suggested,
-            confirmLabel = "Compress",
+            confirmLabel = stringResource(R.string.workspace_file_compress),
             selectStem = true,
             existingNames = emptySet(),
-            helper = "Saved in $folderName (renamed if the name is taken)",
+            helper = stringResource(R.string.workspace_file_archive_saved_location, folderName),
             onConfirm = { name ->
                 compressTargets = null
-                runOp("Compressing…", { src().compress(targets.map { it.path }, "$path/$name") }) { r ->
-                    if (r.ok) snack("Created ${r.path?.substringAfterLast('/') ?: name} (${r.count} files)")
+                runOp(context.getString(R.string.workspace_file_compressing), { src().compress(targets.map { it.path }, "$path/$name") }) { r ->
+                    if (r.ok) snack(context.getString(R.string.workspace_file_archive_created, r.path?.substringAfterLast('/') ?: name, r.count))
                 }
                 null
             },
@@ -1157,7 +1166,7 @@ fun FileExplorer(
     }
 
     detailsFor?.let { e ->
-        DetailsSheet(entry = e, onCopyPath = { copyText(context, it); snack("Path copied") }, onDismiss = { detailsFor = null }, side = side)
+        DetailsSheet(entry = e, onCopyPath = { copyText(context, it); snack(context.getString(R.string.workspace_file_path_copied)) }, onDismiss = { detailsFor = null }, side = side)
     }
 
     archiveFor?.let { e ->
@@ -1199,18 +1208,18 @@ fun FileExplorer(
         AlertDialog(
             onDismissRequest = { confirmOverwrite = null },
             icon = { Icon(Icons.Outlined.WarningAmber, null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Replace \"$name\"?", fontWeight = FontWeight.SemiBold) },
-            text = { Text("A file with this name already exists in $folderName. Saving replaces its contents.") },
+            title = { Text(stringResource(R.string.file_explorer_replace, name.toString()), fontWeight = FontWeight.SemiBold) },
+            text = { Text(stringResource(R.string.file_explorer_a_file_with_this_name_already_exists, folderName.toString())) },
             confirmButton = {
-                TextButton(onClick = { confirmOverwrite = null; onSave?.invoke(path, name) }) { Text("Replace", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = { confirmOverwrite = null; onSave?.invoke(path, name) }) { Text(stringResource(R.string.file_explorer_replace_2), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirmOverwrite = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirmOverwrite = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 
     destRequest?.let { req ->
         val n = req.entries.size
-        val noun = if (n == 1) "\"${req.entries.first().name}\"" else "$n items"
+        val noun = if (n == 1) "\"${req.entries.first().name}\"" else context.getString(R.string.workspace_file_items, n)
         FileExplorerDialog(
             stateKey = "destination",
             initialPath = path,
@@ -1218,14 +1227,14 @@ fun FileExplorer(
             allowPhoneTab = phoneTab && req.op != DestOp.EXTRACT,
             initialSide = req.side,
             title = when (req.op) {
-                DestOp.COPY -> "Copy $noun to"
-                DestOp.MOVE -> "Move $noun to"
-                DestOp.EXTRACT -> "Extract $noun to"
+                DestOp.COPY -> stringResource(R.string.workspace_file_destination_copy, noun)
+                DestOp.MOVE -> stringResource(R.string.workspace_file_destination_move, noun)
+                DestOp.EXTRACT -> stringResource(R.string.workspace_file_destination_extract, noun)
             },
             confirmLabel = when (req.op) {
-                DestOp.COPY -> "Copy here"
-                DestOp.MOVE -> "Move here"
-                DestOp.EXTRACT -> "Extract here"
+                DestOp.COPY -> stringResource(R.string.workspace_file_copy_here)
+                DestOp.MOVE -> stringResource(R.string.workspace_file_move_here)
+                DestOp.EXTRACT -> stringResource(R.string.workspace_file_extract_here)
             },
             showClipboard = false,
             onConfirmFolder = {},
@@ -1249,11 +1258,11 @@ fun FileExplorerDialog(
     onDismiss: () -> Unit,
     initialPath: String? = null,
     title: String? = null,
-    confirmLabel: String = "Choose this folder",
+    confirmLabel: String = stringResource(R.string.workspace_file_choose_folder),
     onConfirmFolder: ((String) -> Unit)? = null,
     onPickFile: ((ExplorerEntry) -> Unit)? = null,
     onPickFiles: ((List<ExplorerEntry>) -> Unit)? = null,
-    pickFilesLabel: String = "Pick",
+    pickFilesLabel: String = stringResource(R.string.workspace_file_pick),
     saveFileName: String? = null,
     onSave: ((folder: String, name: String) -> Unit)? = null,
     onOpenedInIde: (() -> Unit)? = null,
@@ -1307,9 +1316,9 @@ private fun PickSelectionBar(
     onPick: () -> Unit
 ) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onClear) { Icon(Icons.Outlined.Close, contentDescription = "Clear selection") }
-        Text("$count selected", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        IconButton(onClick = onSelectAll) { Icon(if (allSelected) Icons.Outlined.Deselect else Icons.Outlined.SelectAll, contentDescription = "Select all files") }
+        IconButton(onClick = onClear) { Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.file_explorer_clear_selection)) }
+        Text(stringResource(R.string.file_explorer_selected, count.toString()), fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        IconButton(onClick = onSelectAll) { Icon(if (allSelected) Icons.Outlined.Deselect else Icons.Outlined.SelectAll, contentDescription = stringResource(R.string.file_explorer_select_all_files)) }
         Button(onClick = onPick, enabled = count > 0, modifier = Modifier.padding(end = 8.dp)) { Text("$label ($count)") }
     }
 }
@@ -1328,14 +1337,14 @@ private fun SelectionBar(
     menu: @Composable ColumnScope.() -> Unit
 ) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onClear) { Icon(Icons.Outlined.Close, contentDescription = "Clear selection") }
-        Text("$count selected", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        IconButton(onClick = onSelectAll) { Icon(if (allSelected) Icons.Outlined.Deselect else Icons.Outlined.SelectAll, contentDescription = "Select all") }
-        IconButton(onClick = onCopy) { Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy") }
-        IconButton(onClick = onCut) { Icon(Icons.Outlined.ContentCut, contentDescription = "Cut") }
-        IconButton(onClick = onDelete) { Icon(Icons.Outlined.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error) }
+        IconButton(onClick = onClear) { Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.file_explorer_clear_selection)) }
+        Text(stringResource(R.string.file_explorer_selected, count.toString()), fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        IconButton(onClick = onSelectAll) { Icon(if (allSelected) Icons.Outlined.Deselect else Icons.Outlined.SelectAll, contentDescription = stringResource(R.string.claude_providers_page_select_all)) }
+        IconButton(onClick = onCopy) { Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.copy_text)) }
+        IconButton(onClick = onCut) { Icon(Icons.Outlined.ContentCut, contentDescription = stringResource(R.string.file_explorer_cut)) }
+        IconButton(onClick = onDelete) { Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.browser_screen_delete), tint = MaterialTheme.colorScheme.error) }
         Box {
-            IconButton(onClick = { onMenu(true) }) { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
+            IconButton(onClick = { onMenu(true) }) { Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.text_selection_more)) }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { onMenu(false) }, shape = RoundedCornerShape(14.dp), content = menu)
         }
     }
@@ -1355,26 +1364,26 @@ private fun SearchBar(
     LaunchedEffect(Unit) { focus.requestFocus() }
     Column {
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close search") }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.file_explorer_close_search)) }
             TextField(
                 value = query,
                 onValueChange = onQuery,
-                placeholder = { Text("Search in $folderName", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                placeholder = { Text(stringResource(R.string.file_explorer_search_in, folderName.toString()), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                     unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                 ),
-                trailingIcon = if (query.isNotEmpty()) ({ IconButton(onClick = { onQuery("") }) { Icon(Icons.Outlined.Close, "Clear") } }) else null,
+                trailingIcon = if (query.isNotEmpty()) ({ IconButton(onClick = { onQuery("") }) { Icon(Icons.Outlined.Close, stringResource(R.string.custom_system_prompt_dialog_clear)) } }) else null,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { onSubmit() }),
                 modifier = Modifier.weight(1f).padding(end = 8.dp).focusRequester(focus)
             )
         }
         Row(Modifier.padding(start = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = !deep, onClick = { onDeep(false) }, label = { Text("This folder") })
-            FilterChip(selected = deep, onClick = { onDeep(true) }, label = { Text("All subfolders") }, leadingIcon = { Icon(Icons.Outlined.AccountTree, null, Modifier.size(16.dp)) })
+            FilterChip(selected = !deep, onClick = { onDeep(false) }, label = { Text(stringResource(R.string.file_explorer_this_folder)) })
+            FilterChip(selected = deep, onClick = { onDeep(true) }, label = { Text(stringResource(R.string.file_explorer_all_subfolders)) }, leadingIcon = { Icon(Icons.Outlined.AccountTree, null, Modifier.size(16.dp)) })
         }
     }
 }
@@ -1397,13 +1406,13 @@ private fun ClipboardBar(count: Int, firstName: String, move: Boolean, enabled: 
                     fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSecondaryContainer, maxLines = 1, overflow = TextOverflow.MiddleEllipsis
                 )
                 Text(
-                    if (fromLabel != null) "${fromLabel.replaceFirstChar { it.uppercase() }} · open the destination, then paste" else "Open the destination, then paste",
+                    if (fromLabel != null) stringResource(R.string.file_explorer_open_the_destination_then_paste, (fromLabel.replaceFirstChar { it.uppercase() }).toString()) else stringResource(R.string.file_explorer_open_the_destination_then_paste_2),
                     fontSize = 12.sp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis
                 )
             }
-            TextButton(onClick = onCancel) { Text("Cancel") }
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.accounts_ui_cancel)) }
             Button(onClick = onPaste, enabled = enabled, shape = RoundedCornerShape(12.dp)) {
-                Icon(Icons.Outlined.ContentPaste, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Paste")
+                Icon(Icons.Outlined.ContentPaste, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.paste_text))
             }
         }
     }
@@ -1431,14 +1440,14 @@ private fun ConfirmFolderBar(folderName: String, path: String, label: String, en
 private fun SaveBar(name: String, folderName: String, onName: (String) -> Unit, enabled: Boolean, onSave: () -> Unit) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainer, tonalElevation = 2.dp, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-            Text("Save in $folderName", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(stringResource(R.string.file_explorer_save_in, folderName.toString()), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = onName,
                     singleLine = true,
-                    placeholder = { Text("File name") },
+                    placeholder = { Text(stringResource(R.string.file_explorer_file_name)) },
                     leadingIcon = { Icon(Icons.Outlined.Description, null) },
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -1447,7 +1456,7 @@ private fun SaveBar(name: String, folderName: String, onName: (String) -> Unit, 
                 )
                 Spacer(Modifier.width(10.dp))
                 Button(onClick = onSave, enabled = enabled, shape = RoundedCornerShape(12.dp), modifier = Modifier.height(52.dp)) {
-                    Icon(Icons.Outlined.Save, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save")
+                    Icon(Icons.Outlined.Save, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.claude_providers_page_save))
                 }
             }
         }
@@ -1489,7 +1498,7 @@ private fun SideTabs(side: ExplorerSide, bridgeName: String, enabled: Boolean, o
             }
         }
         Tab(ExplorerSide.BRIDGE, bridgeName, Icons.Outlined.Computer, Modifier.weight(1f))
-        Tab(ExplorerSide.PHONE, "This phone", Icons.Outlined.PhoneAndroid, Modifier.weight(1f))
+        Tab(ExplorerSide.PHONE, stringResource(R.string.workspace_file_this_phone), Icons.Outlined.PhoneAndroid, Modifier.weight(1f))
     }
 }
 
@@ -1548,7 +1557,7 @@ private fun FolderTabs(
                         )
                         if (tabs.size > 1) {
                             IconButton(onClick = { onClose(i) }, modifier = Modifier.size(28.dp)) {
-                                Icon(Icons.Outlined.Close, contentDescription = "Close tab", modifier = Modifier.size(14.dp),
+                                Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.browser_screen_close_tab), modifier = Modifier.size(14.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
@@ -1558,12 +1567,12 @@ private fun FolderTabs(
         }
         Box {
             IconButton(onClick = { if (showSides) addMenu = true else onAdd(ExplorerSide.BRIDGE) }) {
-                Icon(Icons.Outlined.Add, contentDescription = "New tab")
+                Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.browser_screen_new_tab_2))
             }
             DropdownMenu(expanded = addMenu, onDismissRequest = { addMenu = false }, shape = RoundedCornerShape(14.dp)) {
-                DropdownMenuItem(text = { Text("New tab on $bridgeName") }, leadingIcon = { Icon(Icons.Outlined.Computer, null) },
+                DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_new_tab_on, bridgeName.toString())) }, leadingIcon = { Icon(Icons.Outlined.Computer, null) },
                     onClick = { addMenu = false; onAdd(ExplorerSide.BRIDGE) })
-                DropdownMenuItem(text = { Text("New tab on this phone") }, leadingIcon = { Icon(Icons.Outlined.PhoneAndroid, null) },
+                DropdownMenuItem(text = { Text(stringResource(R.string.file_explorer_new_tab_on_this_phone)) }, leadingIcon = { Icon(Icons.Outlined.PhoneAndroid, null) },
                     onClick = { addMenu = false; onAdd(ExplorerSide.PHONE) })
             }
         }

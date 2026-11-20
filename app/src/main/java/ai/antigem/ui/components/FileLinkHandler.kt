@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -142,7 +144,7 @@ fun FileDetailsDialog(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = if (details.extension.isNotBlank()) ".${details.extension} file" else "File reference",
+                        text = if (details.extension.isNotBlank()) stringResource(R.string.file_link_handler_file, details.extension.toString()) else stringResource(R.string.file_link_handler_file_reference),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -158,7 +160,7 @@ fun FileDetailsDialog(
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
-                            text = "Full Path:",
+                            text = stringResource(R.string.file_link_handler_full_path),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -180,7 +182,7 @@ fun FileDetailsDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Size", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.file_details_dialog_size), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
                             text = formatFileSize(details.sizeBytes),
                             fontSize = 13.sp,
@@ -189,16 +191,16 @@ fun FileDetailsDialog(
                     }
                     if (details.lineCount != null) {
                         Column {
-                            Text("Lines", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.file_link_handler_lines), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(
-                                text = "${details.lineCount} lines",
+                                text = stringResource(R.string.code_block_lines_2, details.lineCount.toString()),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                     }
                     Column {
-                        Text("Modified", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.file_link_handler_modified), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
                             text = details.lastModified.take(12),
                             fontSize = 13.sp,
@@ -219,7 +221,7 @@ fun FileDetailsDialog(
                 ) {
                     Icon(Icons.Outlined.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Copy Path")
+                    Text(stringResource(R.string.file_link_handler_copy_path))
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Button(
@@ -245,9 +247,9 @@ fun FileDetailsDialog(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         when {
-                            details.isMarkdown -> "Read Markdown"
-                            opensInIde -> "Open in IDE"
-                            else -> "Open with…"
+                            details.isMarkdown -> stringResource(R.string.file_link_handler_read_markdown)
+                            opensInIde -> stringResource(R.string.file_link_handler_open_in_ide)
+                            else -> stringResource(R.string.file_link_handler_open_with)
                         }
                     )
                 }
@@ -255,7 +257,7 @@ fun FileDetailsDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.accounts_ui_close))
             }
         }
     )
@@ -308,7 +310,7 @@ fun MarkdownDocViewerModal(
                     },
                     navigationIcon = {
                         IconButton(onClick = onDismiss) {
-                            Icon(Icons.Default.Close, contentDescription = "Close")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accounts_ui_close))
                         }
                     },
                     actions = {
@@ -319,7 +321,7 @@ fun MarkdownDocViewerModal(
                                 Toast.makeText(context, "Markdown content copied", Toast.LENGTH_SHORT).show()
                             }
                         ) {
-                            Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy Content")
+                            Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.file_link_handler_copy_content))
                         }
                         IconButton(
                             onClick = {
@@ -329,7 +331,7 @@ fun MarkdownDocViewerModal(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Edit,
-                                contentDescription = "Edit in IDE",
+                                contentDescription = stringResource(R.string.file_link_handler_edit_in_ide),
                                 tint = ClaudeTerracotta
                             )
                         }

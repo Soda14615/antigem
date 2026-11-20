@@ -83,8 +83,8 @@ class AgyVoiceCallService : Service() {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = getSystemService(NotificationManager::class.java)
         if (nm.getNotificationChannel(CHANNEL) == null) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Antigravity voice calls", NotificationManager.IMPORTANCE_LOW).apply {
-                description = "Shown while you are on a voice call with Antigravity"
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, getString(R.string.notification_voice_channel), NotificationManager.IMPORTANCE_LOW).apply {
+                description = getString(R.string.notification_voice_channel_description)
                 setShowBadge(false)
             })
         }
@@ -96,18 +96,18 @@ class AgyVoiceCallService : Service() {
             PendingIntent.getService(this, code, Intent(this, AgyVoiceCallService::class.java).setAction(a), flags)
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), flags)
         val text = when (st.phase) {
-            AgyVoiceCall.Phase.CONNECTING -> "Connecting…"
-            AgyVoiceCall.Phase.RECONNECTING -> "Reconnecting…"
-            AgyVoiceCall.Phase.ENDING -> "Ending…"
+            AgyVoiceCall.Phase.CONNECTING -> getString(R.string.notification_connecting)
+            AgyVoiceCall.Phase.RECONNECTING -> getString(R.string.notification_voice_reconnecting)
+            AgyVoiceCall.Phase.ENDING -> getString(R.string.notification_voice_ending)
             else -> when {
-                st.muted -> "Muted"
-                st.agentSpeaking -> "${st.voice} is speaking"
-                else -> "Listening"
+                st.muted -> getString(R.string.notification_voice_muted)
+                st.agentSpeaking -> getString(R.string.notification_voice_speaking, st.voice)
+                else -> getString(R.string.notification_voice_listening)
             }
         }
         val b = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_jarvis_mic)
-            .setContentTitle(st.title.ifBlank { "Antigravity" } + " · voice call")
+            .setContentTitle(getString(R.string.notification_voice_title, st.title.ifBlank { "Antigravity" }))
             .setContentText(text)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -117,8 +117,8 @@ class AgyVoiceCallService : Service() {
             b.setUsesChronometer(true)
             b.setWhen(System.currentTimeMillis() - (SystemClock.elapsedRealtime() - st.connectedAt))
         } else b.setShowWhen(false)
-        b.addAction(0, if (st.muted) "Unmute" else "Mute", action(ACTION_MUTE, 1))
-        b.addAction(0, "End", action(ACTION_END, 2))
+        b.addAction(0, getString(if (st.muted) R.string.notification_voice_unmute else R.string.notification_voice_mute), action(ACTION_MUTE, 1))
+        b.addAction(0, getString(R.string.notification_voice_end), action(ACTION_END, 2))
         return b.build()
     }
 

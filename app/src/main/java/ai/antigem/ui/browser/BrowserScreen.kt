@@ -1,5 +1,7 @@
 package ai.antigem.ui.browser
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
@@ -393,9 +395,9 @@ fun BrowserScreen(
                                     },
                                     contentDescription = when {
                                         !hasActivePage -> null
-                                        isHttps -> "Secure connection"
-                                        isLocal -> "Local server"
-                                        else -> "Not secure"
+                                        isHttps -> stringResource(R.string.browser_screen_secure_connection)
+                                        isLocal -> stringResource(R.string.browser_screen_local_server)
+                                        else -> stringResource(R.string.browser_screen_not_secure)
                                     },
                                     modifier = Modifier.size(if (isAddressFocused || !hasActivePage) 19.dp else 15.dp),
                                     tint = badgeTint
@@ -456,7 +458,7 @@ fun BrowserScreen(
                                     ) {
                                         if (textFieldValue.text.isEmpty() && !isAddressFocused) {
                                             Text(
-                                                text = "Search or type URL",
+                                                text = stringResource(R.string.browser_screen_search_or_type_url),
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 fontSize = 14.5.sp,
                                                 maxLines = 1
@@ -844,7 +846,7 @@ fun BrowserScreen(
                     )
                 }
             },
-            title = { Text("Clear browsing data?", fontWeight = FontWeight.SemiBold) },
+            title = { Text(stringResource(R.string.browser_screen_clear_browsing_data), fontWeight = FontWeight.SemiBold) },
             text = {
                 Text(
                     "This deletes all cookies, site data (local storage, IndexedDB, service workers), cache, " +
@@ -869,12 +871,12 @@ fun BrowserScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Clear all")
+                    Text(stringResource(R.string.browser_screen_clear_all))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showClearDataConfirm = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -996,7 +998,7 @@ private fun BrowserMenuSheet(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (hasActivePage) activeTab?.title?.takeIf { it.isNotBlank() } ?: browserDisplayHost(url) else "New Tab",
+                        text = if (hasActivePage) activeTab?.title?.takeIf { it.isNotBlank() } ?: browserDisplayHost(url) else stringResource(R.string.browser_screen_new_tab),
                         fontSize = 15.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -1004,7 +1006,7 @@ private fun BrowserMenuSheet(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = if (hasActivePage) browserDisplayHost(url) else "Start page",
+                        text = if (hasActivePage) browserDisplayHost(url) else stringResource(R.string.browser_screen_start_page),
                         fontSize = 12.5.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -1022,27 +1024,27 @@ private fun BrowserMenuSheet(
             ) {
                 BrowserMenuTile(
                     icon = Icons.Rounded.Add,
-                    label = "New tab",
+                    label = stringResource(R.string.workspace_browser_new_tab),
                     modifier = Modifier.weight(1f),
                     onClick = { closeThen(onNewTab) }
                 )
                 BrowserMenuTile(
                     icon = Icons.Rounded.Refresh,
-                    label = "Reload",
+                    label = stringResource(R.string.workspace_browser_reload),
                     enabled = hasActivePage,
                     modifier = Modifier.weight(1f),
                     onClick = { closeThen(onReload) }
                 )
                 BrowserMenuTile(
                     icon = Icons.Rounded.DesktopWindows,
-                    label = "Desktop",
+                    label = stringResource(R.string.workspace_browser_desktop),
                     active = activeTab?.isDesktopMode == true,
                     modifier = Modifier.weight(1f),
                     onClick = { closeThen(onToggleDesktop) }
                 )
                 BrowserMenuTile(
                     icon = Icons.Rounded.Code,
-                    label = "DevTools",
+                    label = stringResource(R.string.workspace_browser_devtools),
                     active = activeTab?.isDevToolsEnabled == true,
                     modifier = Modifier.weight(1f),
                     onClick = { closeThen(onToggleDevTools) }
@@ -1059,8 +1061,8 @@ private fun BrowserMenuSheet(
                 Column {
                     BrowserMenuRow(
                         icon = Icons.Rounded.CleaningServices,
-                        title = "Clear tab cache",
-                        subtitle = "Reload this site's files fresh",
+                        title = stringResource(R.string.workspace_browser_clear_tab_cache),
+                        subtitle = stringResource(R.string.workspace_browser_tab_cache_summary),
                         onClick = { closeThen(onClearTabCache) }
                     )
                     HorizontalDivider(
@@ -1070,8 +1072,8 @@ private fun BrowserMenuSheet(
                     )
                     BrowserMenuRow(
                         icon = Icons.Rounded.DeleteForever,
-                        title = "Clear browsing data",
-                        subtitle = "Cookies, logins, history and all tabs",
+                        title = stringResource(R.string.workspace_browser_clear_browsing_data),
+                        subtitle = stringResource(R.string.workspace_browser_clear_browsing_summary),
                         tint = MaterialTheme.colorScheme.error,
                         onClick = { closeThen(onClearBrowsingData) }
                     )
@@ -1087,7 +1089,7 @@ private fun BrowserMenuSheet(
             ) {
                 BrowserMenuRow(
                     icon = Icons.Rounded.PowerSettingsNew,
-                    title = "Close browser",
+                    title = stringResource(R.string.workspace_browser_close),
                     tint = MaterialTheme.colorScheme.error,
                     onClick = { closeThen(onCloseBrowser) }
                 )
@@ -1249,7 +1251,7 @@ private fun SearchHistoryOverlay(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Search Google for \"$trimmed\"",
+                                text = stringResource(R.string.browser_screen_search_google_for, trimmed.toString()),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -1278,7 +1280,7 @@ private fun SearchHistoryOverlay(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "No recent search history",
+                                text = stringResource(R.string.browser_screen_no_recent_search_history),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
@@ -1293,14 +1295,14 @@ private fun SearchHistoryOverlay(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (trimmed.isBlank()) "Recent Searches" else "History Suggestions",
+                            text = if (trimmed.isBlank()) stringResource(R.string.browser_screen_recent_searches) else stringResource(R.string.browser_screen_history_suggestions),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                         )
                         if (trimmed.isBlank() && historyItems.isNotEmpty()) {
                             Text(
-                                text = "Clear All",
+                                text = stringResource(R.string.browser_screen_clear_all_2),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.error,
@@ -1361,7 +1363,7 @@ private fun SearchHistoryOverlay(
                                 ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                        contentDescription = "Insert",
+                                        contentDescription = stringResource(R.string.browser_screen_insert),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                         modifier = Modifier
                                             .size(14.dp)
@@ -1378,7 +1380,7 @@ private fun SearchHistoryOverlay(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Delete",
+                                        contentDescription = stringResource(R.string.browser_screen_delete),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -1456,14 +1458,14 @@ private fun SpeedDialHomeView(
 
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
-            title = { Text("Add Shortcut", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.browser_screen_add_shortcut), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedTextField(
                         value = newTitle,
                         onValueChange = { newTitle = it },
-                        label = { Text("Name") },
-                        placeholder = { Text("e.g. GitHub") },
+                        label = { Text(stringResource(R.string.browser_screen_name)) },
+                        placeholder = { Text(stringResource(R.string.browser_screen_e_g_github)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -1488,12 +1490,12 @@ private fun SpeedDialHomeView(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
                 ) {
-                    Text("Add")
+                    Text(stringResource(R.string.browser_screen_add))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -1503,8 +1505,8 @@ private fun SpeedDialHomeView(
     shortcutToDelete?.let { sc ->
         AlertDialog(
             onDismissRequest = { shortcutToDelete = null },
-            title = { Text("Remove Shortcut") },
-            text = { Text("Remove '${sc.title}' from your home shortcuts?") },
+            title = { Text(stringResource(R.string.browser_screen_remove_shortcut)) },
+            text = { Text(stringResource(R.string.browser_screen_remove_from_your_home_shortcuts, sc.title.toString())) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -1513,12 +1515,12 @@ private fun SpeedDialHomeView(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Remove")
+                    Text(stringResource(R.string.browser_screen_remove))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { shortcutToDelete = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -1631,7 +1633,7 @@ private fun AddShortcutItemView(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add shortcut",
+                contentDescription = stringResource(R.string.browser_screen_add_shortcut_2),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
                 modifier = Modifier.size(22.dp)
             )
@@ -1640,7 +1642,7 @@ private fun AddShortcutItemView(
         Spacer(modifier = Modifier.height(5.dp))
 
         Text(
-            text = "Add",
+            text = stringResource(R.string.browser_screen_add),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Normal,
             fontSize = 11.5.sp,
@@ -1708,7 +1710,7 @@ private fun TabOverviewScreen(
                     IconButton(onClick = onCloseOverview) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.agent_approval_panel_back),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -1734,7 +1736,7 @@ private fun TabOverviewScreen(
                         }
 
                         Text(
-                            text = "Tabs (${tabs.size})",
+                            text = stringResource(R.string.browser_screen_tabs, tabs.size.toString()),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -1742,7 +1744,7 @@ private fun TabOverviewScreen(
                     }
 
                     TextButton(onClick = onCloseOverview) {
-                        Text("Done", fontWeight = FontWeight.Bold, color = ClaudeTerracotta)
+                        Text(stringResource(R.string.browser_screen_done), fontWeight = FontWeight.Bold, color = ClaudeTerracotta)
                     }
                 }
             }
@@ -1772,7 +1774,7 @@ private fun TabOverviewScreen(
                     ) {
                         Icon(Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Delete all", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.browser_screen_delete_all), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
 
                     // "+" New Tab on bottom right
@@ -1787,7 +1789,7 @@ private fun TabOverviewScreen(
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("New tab", fontSize = 13.5.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.browser_screen_new_tab_2), fontSize = 13.5.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -1839,13 +1841,13 @@ private fun TabOverviewScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Tab closed",
+                            text = stringResource(R.string.browser_screen_tab_closed),
                             color = Color.White,
                             fontSize = 13.5.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Undo",
+                            text = stringResource(R.string.browser_screen_undo),
                             color = ClaudeTerracotta,
                             fontSize = 13.5.sp,
                             fontWeight = FontWeight.Bold,
@@ -1875,8 +1877,8 @@ private fun TabOverviewScreen(
     if (showDeleteAllConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteAllConfirm = false },
-            title = { Text("Close All Tabs") },
-            text = { Text("Are you sure you want to close all open tabs and return to chat?") },
+            title = { Text(stringResource(R.string.browser_screen_close_all_tabs)) },
+            text = { Text(stringResource(R.string.browser_screen_are_you_sure_you_want_to_close)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -1885,12 +1887,12 @@ private fun TabOverviewScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Close All")
+                    Text(stringResource(R.string.browser_screen_close_all))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteAllConfirm = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -1967,7 +1969,11 @@ private fun TabCardView(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = tab.title.ifBlank { if (tab.url.isBlank()) "Home" else tab.url },
+                        text = when {
+                            (tab.url.isBlank() || tab.url == "about:blank") && tab.title == "New Tab" -> stringResource(R.string.workspace_browser_default_tab)
+                            tab.url.isBlank() && tab.title.isBlank() -> stringResource(R.string.workspace_browser_home)
+                            else -> tab.title.ifBlank { tab.url }
+                        },
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -1987,7 +1993,7 @@ private fun TabCardView(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.SmartToy,
-                            contentDescription = "Locked by AI",
+                            contentDescription = stringResource(R.string.browser_screen_locked_by_ai),
                             tint = ClaudeTerracotta,
                             modifier = Modifier.size(12.dp)
                         )
@@ -2002,7 +2008,7 @@ private fun TabCardView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close tab",
+                        contentDescription = stringResource(R.string.browser_screen_close_tab),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(15.dp)
                     )
@@ -2039,7 +2045,7 @@ private fun TabCardView(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (tab.url.isBlank() || tab.url == "about:blank") "Home" else tab.url.substringAfter("://").substringBefore("/"),
+                            text = if (tab.url.isBlank() || tab.url == "about:blank") stringResource(R.string.browser_screen_home) else tab.url.substringAfter("://").substringBefore("/"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             maxLines = 1,
@@ -2069,16 +2075,16 @@ fun BrowserDiagnosticOverlay(
     val targetUrl = lastErr?.url ?: tab.url
 
     val title = when {
-        isStalled -> "Page Loading Stalled"
-        lastErr?.description?.contains("SSL", ignoreCase = true) == true -> "SSL Security Warning"
-        lastErr?.errorCode == -1 -> "Renderer Process Crashed"
-        else -> "Unable to Load Page"
+        isStalled -> stringResource(R.string.workspace_browser_loading_stalled)
+        lastErr?.description?.contains("SSL", ignoreCase = true) == true -> stringResource(R.string.workspace_browser_ssl_warning)
+        lastErr?.errorCode == -1 -> stringResource(R.string.workspace_browser_renderer_crashed)
+        else -> stringResource(R.string.workspace_browser_load_error)
     }
 
     val description = when {
-        isStalled -> "The page is taking unusually long to respond (timeout > 15s). The local server or remote site might be unresponsive."
-        !lastErr?.description.isNullOrBlank() -> lastErr?.description ?: "An unexpected network or connection error occurred."
-        else -> "Could not connect to the server or display the requested URL."
+        isStalled -> stringResource(R.string.workspace_browser_timeout)
+        !lastErr?.description.isNullOrBlank() -> lastErr?.description ?: stringResource(R.string.workspace_browser_network_error)
+        else -> stringResource(R.string.workspace_browser_server_error)
     }
 
     Box(
@@ -2189,7 +2195,7 @@ fun BrowserDiagnosticOverlay(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = if (showDetails) "Hide Diagnostic Logs" else "Show Diagnostic Logs (${recentLogs.size})",
+                                text = if (showDetails) stringResource(R.string.browser_screen_hide_diagnostic_logs) else stringResource(R.string.browser_screen_show_diagnostic_logs, recentLogs.size.toString()),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = ClaudeTerracotta
@@ -2249,7 +2255,7 @@ fun BrowserDiagnosticOverlay(
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Reload", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.browser_screen_reload), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
 
                     OutlinedButton(
@@ -2260,7 +2266,7 @@ fun BrowserDiagnosticOverlay(
                     ) {
                         Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Search", fontSize = 13.sp)
+                        Text(stringResource(R.string.browser_screen_search), fontSize = 13.sp)
                     }
                 }
 
@@ -2270,7 +2276,7 @@ fun BrowserDiagnosticOverlay(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Dismiss", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.browser_screen_dismiss), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -2321,7 +2327,7 @@ private fun BrowserAiLockOverlay(busy: Boolean, onUnlock: () -> Unit) {
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Text(
-                    text = if (busy) "AI is working…" else "Controlled by AI",
+                    text = if (busy) stringResource(R.string.browser_screen_ai_is_working) else stringResource(R.string.browser_screen_controlled_by_ai),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
@@ -2333,7 +2339,7 @@ private fun BrowserAiLockOverlay(busy: Boolean, onUnlock: () -> Unit) {
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
                         modifier = Modifier.height(28.dp)
                     ) {
-                        Text("Unlock", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = ai.antigem.theme.AppColors.warning)
+                        Text(stringResource(R.string.browser_screen_unlock), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = ai.antigem.theme.AppColors.warning)
                     }
                 }
             }

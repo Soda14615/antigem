@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -143,7 +145,7 @@ fun FullScreenLocalToolsInstaller(
             ) {
                 if (canSkipTop) {
                     TextButton(onClick = onSkip, colors = ButtonDefaults.textButtonColors(contentColor = AppColors.textSecondary)) {
-                        Text("Skip", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.agent_question_panel_skip), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                     }
                 }
             }
@@ -184,9 +186,9 @@ fun FullScreenLocalToolsInstaller(
                         is LocalInstallerState.AwaitingConfirmation -> {
                             val info = state.packageInfo
                             InstallerCard {
-                                DetailRow("Release", info.releaseTag)
-                                DetailRow("Architecture", info.arch, ClaudeTerracotta)
-                                DetailRow("Download size", info.sizeFormatted, QuotaGreen)
+                                DetailRow(stringResource(R.string.full_screen_local_tools_installer_release), info.releaseTag)
+                                DetailRow(stringResource(R.string.full_screen_local_tools_installer_architecture), info.arch, ClaudeTerracotta)
+                                DetailRow(stringResource(R.string.full_screen_local_tools_installer_download_size), info.sizeFormatted, QuotaGreen)
                                 HorizontalDivider(
                                     modifier = Modifier.padding(vertical = 10.dp),
                                     color = AppColors.border.copy(alpha = 0.5f)
@@ -209,7 +211,7 @@ fun FullScreenLocalToolsInstaller(
 
                         is LocalInstallerState.Success -> InstallerCard(tint = QuotaGreen) {
                             Text(
-                                text = "The terminal, the IDE backend and the Antigravity language server are ready to run.",
+                                text = stringResource(R.string.full_screen_local_tools_installer_the_terminal_the_ide_backend_and_the),
                                 fontSize = 13.5.sp,
                                 lineHeight = 19.sp,
                                 color = AppColors.onBackground
@@ -251,35 +253,35 @@ fun FullScreenLocalToolsInstaller(
                     is LocalInstallerState.Idle -> {
                         PrimaryButton(
                             text = when (selectedSourceType) {
-                                0 -> "Install (~350 MB)"
-                                1 -> "Install minimal (~33 MB)"
-                                else -> if (selectedFileUri != null) "Install from ZIP" else "Choose a ZIP file"
+                                0 -> stringResource(R.string.settings_install_full)
+                                1 -> stringResource(R.string.settings_install_minimal)
+                                else -> if (selectedFileUri != null) stringResource(R.string.settings_install_zip) else stringResource(R.string.settings_choose_zip)
                             },
                             icon = Icons.Default.Download,
                             onClick = { installSelected(fallbackToAuto = false) }
                         )
-                        SecondaryButton("Skip for now", onClick = onSkip)
+                        SecondaryButton(stringResource(R.string.settings_skip_for_now), onClick = onSkip)
                     }
 
                     is LocalInstallerState.AwaitingConfirmation -> {
                         PrimaryButton(
-                            text = "Confirm & install",
+                            text = stringResource(R.string.settings_confirm_install),
                             icon = Icons.Default.Download,
                             onClick = {
                                 LocalEnvironmentManager.launchInstall(context, authPreferences, BootstrapSource.DirectUrl(state.packageInfo.url))
                             }
                         )
-                        SecondaryButton("Change source") { LocalEnvironmentManager.resetState() }
+                        SecondaryButton(stringResource(R.string.settings_change_source)) { LocalEnvironmentManager.resetState() }
                     }
 
-                    is LocalInstallerState.Discovering -> SecondaryButton("Cancel") { LocalEnvironmentManager.resetState() }
+                    is LocalInstallerState.Discovering -> SecondaryButton(stringResource(R.string.accounts_ui_cancel)) { LocalEnvironmentManager.resetState() }
 
                     is LocalInstallerState.Downloading,
                     is LocalInstallerState.Extracting,
                     is LocalInstallerState.Configuring,
-                    is LocalInstallerState.Verifying -> SecondaryButton("Continue in background", onClick = onSkip)
+                    is LocalInstallerState.Verifying -> SecondaryButton(stringResource(R.string.settings_continue_background), onClick = onSkip)
 
-                    is LocalInstallerState.Success -> PrimaryButton("Get started", Icons.Default.Check, onComplete)
+                    is LocalInstallerState.Success -> PrimaryButton(stringResource(R.string.settings_start_using), Icons.Default.Check, onComplete)
 
                     is LocalInstallerState.Error -> {
                         val failedMirror = lastMirror
@@ -287,15 +289,15 @@ fun FullScreenLocalToolsInstaller(
                             // the full rootfs download failed: try the same site again or switch to the other one
                             MirrorChooser(selected = selectedMirror, onSelect = { selectedMirror = it })
                             if (selectedMirror == failedMirror) {
-                                PrimaryButton("Try again (${selectedMirror.label})", Icons.Default.Refresh) { installFull() }
+                                PrimaryButton(stringResource(R.string.settings_retry_mirror, selectedMirror.label), Icons.Default.Refresh) { installFull() }
                             } else {
-                                PrimaryButton("Download from ${selectedMirror.label}", Icons.Default.Download) { installFull() }
+                                PrimaryButton(stringResource(R.string.settings_download_mirror, selectedMirror.label), Icons.Default.Download) { installFull() }
                             }
                         } else {
-                            PrimaryButton("Try again", Icons.Default.Refresh) { installSelected(fallbackToAuto = true) }
+                            PrimaryButton(stringResource(R.string.checkpoint_restore_sheet_try_again), Icons.Default.Refresh) { installSelected(fallbackToAuto = true) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            SecondaryButton("Change source", Modifier.weight(1f)) { LocalEnvironmentManager.resetState() }
+                            SecondaryButton(stringResource(R.string.settings_change_source), Modifier.weight(1f)) { LocalEnvironmentManager.resetState() }
                             SecondaryButton("Skip", Modifier.weight(1f), onSkip)
                         }
                     }
@@ -337,7 +339,7 @@ private fun UnsupportedDeviceScreen(onContinue: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(22.dp))
                 Text(
-                    text = "Not available on this phone",
+                    text = stringResource(R.string.full_screen_local_tools_installer_not_available_on_this_phone),
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.onBackground,
@@ -345,7 +347,7 @@ private fun UnsupportedDeviceScreen(onContinue: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Your phone has a 32-bit processor. The local Linux environment (terminal, IDE backend and agents running on the phone) needs a 64-bit one, so it can't be installed here.",
+                    text = stringResource(R.string.full_screen_local_tools_installer_your_phone_has_a_32_bit_processor),
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     color = AppColors.textSecondary,
@@ -354,7 +356,7 @@ private fun UnsupportedDeviceScreen(onContinue: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(28.dp))
                 InstallerCard {
-                    Text("You can still use AntiGem", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+                    Text(stringResource(R.string.full_screen_local_tools_installer_you_can_still_use_antigem), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
                     Spacer(modifier = Modifier.height(10.dp))
                     listOf(
                         Icons.Outlined.Dns to "Server mode: run the agents on a computer or server and connect to it",
@@ -404,15 +406,15 @@ private fun InstallerHero(state: LocalInstallerState, mirrorChoice: Boolean = fa
     Spacer(modifier = Modifier.height(22.dp))
     Text(
         text = when (state) {
-            is LocalInstallerState.Success -> "You're all set"
-            is LocalInstallerState.Error -> "Setup didn't finish"
-            is LocalInstallerState.Idle -> "Set up your Linux environment"
-            is LocalInstallerState.Discovering -> "Finding the latest release"
-            is LocalInstallerState.AwaitingConfirmation -> "Ready to install"
+            is LocalInstallerState.Success -> stringResource(R.string.full_screen_local_tools_installer_you_re_all_set)
+            is LocalInstallerState.Error -> stringResource(R.string.full_screen_local_tools_installer_setup_didn_t_finish)
+            is LocalInstallerState.Idle -> stringResource(R.string.full_screen_local_tools_installer_set_up_your_linux_environment)
+            is LocalInstallerState.Discovering -> stringResource(R.string.full_screen_local_tools_installer_finding_the_latest_release)
+            is LocalInstallerState.AwaitingConfirmation -> stringResource(R.string.full_screen_local_tools_installer_ready_to_install)
             is LocalInstallerState.Downloading,
             is LocalInstallerState.Extracting,
             is LocalInstallerState.Configuring,
-            is LocalInstallerState.Verifying -> "Installing"
+            is LocalInstallerState.Verifying -> stringResource(R.string.full_screen_local_tools_installer_installing)
         },
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
@@ -422,16 +424,16 @@ private fun InstallerHero(state: LocalInstallerState, mirrorChoice: Boolean = fa
     Spacer(modifier = Modifier.height(8.dp))
     Text(
         text = when (state) {
-            is LocalInstallerState.Success -> "The shell, core tools and AGY tools are installed."
+            is LocalInstallerState.Success -> stringResource(R.string.full_screen_local_tools_installer_the_shell_core_tools_and_agy_tools)
             is LocalInstallerState.Error -> if (mirrorChoice) {
                 "Try again, switch to the other download site, or open its page (↗), download the zip and install it with \"From a ZIP file\"."
             } else {
                 "You can try again, or install from a ZIP file instead."
             }
-            is LocalInstallerState.Idle -> "AntiGem runs its terminal, IDE and agents on a local Linux system. Choose how to install it."
-            is LocalInstallerState.Discovering -> "Checking for the latest verified archive."
-            is LocalInstallerState.AwaitingConfirmation -> "Review the details and confirm."
-            else -> "This takes a few minutes. You can keep using the app meanwhile."
+            is LocalInstallerState.Idle -> stringResource(R.string.full_screen_local_tools_installer_antigem_runs_its_terminal_ide_and_agents)
+            is LocalInstallerState.Discovering -> stringResource(R.string.full_screen_local_tools_installer_checking_for_the_latest_verified_archive)
+            is LocalInstallerState.AwaitingConfirmation -> stringResource(R.string.full_screen_local_tools_installer_review_the_details_and_confirm)
+            else -> stringResource(R.string.full_screen_local_tools_installer_this_takes_a_few_minutes_you_can)
         },
         fontSize = 14.sp,
         lineHeight = 20.sp,
@@ -453,9 +455,9 @@ private fun SourcePicker(
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         SourceOption(
             icon = Icons.Outlined.CloudDownload,
-            title = "Full environment",
-            tag = "Recommended · ~350 MB",
-            description = "Verified rootfs with the tools and environment preconfigured.",
+            title = stringResource(R.string.settings_full_environment),
+            tag = stringResource(R.string.settings_full_environment_size),
+            description = stringResource(R.string.settings_full_environment_desc),
             selected = selected == 0,
             onClick = { onSelect(0) }
         ) {
@@ -467,17 +469,17 @@ private fun SourcePicker(
         }
         SourceOption(
             icon = Icons.Outlined.Bolt,
-            title = "Minimal",
+            title = stringResource(R.string.settings_minimal_environment),
             tag = "~33 MB",
-            description = "Clean Termux base for ${LocalEnvironmentManager.getBootstrapArch()}: core utilities and the package manager.",
+            description = stringResource(R.string.settings_minimal_environment_desc, LocalEnvironmentManager.getBootstrapArch()),
             selected = selected == 1,
             onClick = { onSelect(1) }
         )
         SourceOption(
             icon = Icons.Outlined.FolderOpen,
-            title = "From a ZIP file",
+            title = stringResource(R.string.settings_zip_environment),
             tag = null,
-            description = "A bootstrap backup or custom rootfs on this phone.",
+            description = stringResource(R.string.settings_zip_environment_desc),
             selected = selected == 2,
             onClick = { onSelect(2) }
         ) {
@@ -488,7 +490,7 @@ private fun SourcePicker(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(if (selectedFileName != null) "Choose another file" else "Choose file", fontSize = 13.5.sp)
+                        Text(if (selectedFileName != null) stringResource(R.string.full_screen_local_tools_installer_choose_another_file) else stringResource(R.string.full_screen_local_tools_installer_choose_file), fontSize = 13.5.sp)
                     }
                     if (selectedFileName != null) {
                         Text(
@@ -509,7 +511,7 @@ private fun SourcePicker(
 
 /**
  * GitHub | Hugging Face: where the full rootfs is downloaded from (the same zip on both). The ↗ on each opens that
- * site's page, where the zip can be downloaded by hand and installed with "From a ZIP file".
+ * site's page, where the zip can be downloaded by hand and installed with stringResource(R.string.settings_zip_environment).
  */
 @Composable
 private fun MirrorChooser(selected: RootfsMirror, onSelect: (RootfsMirror) -> Unit) {
@@ -540,7 +542,7 @@ private fun MirrorChooser(selected: RootfsMirror, onSelect: (RootfsMirror) -> Un
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.OpenInNew,
-                            contentDescription = "Open the ${mirror.label} download page",
+                            contentDescription = stringResource(R.string.full_screen_local_tools_installer_open_the_download_page, mirror.label.toString()),
                             tint = if (isSelected) ClaudeTerracotta else AppColors.textSecondary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -610,7 +612,7 @@ private fun SourceOption(
                     contentAlignment = Alignment.Center
                 ) {
                     if (selected) {
-                        Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.White, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.project_picker_bottom_sheet_selected), tint = Color.White, modifier = Modifier.size(14.dp))
                     }
                 }
             }
@@ -638,7 +640,7 @@ private fun InstallSteps(state: LocalInstallerState) {
                         StepProgress(state.progressFraction)
                         Row(modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
                             Text(
-                                "${LocalEnvironmentManager.formatFileSize(state.bytesDownloaded)} of ${LocalEnvironmentManager.formatFileSize(state.totalBytes)}",
+                                stringResource(R.string.agent_question_panel_of, (LocalEnvironmentManager.formatFileSize(state.bytesDownloaded)).toString(), (LocalEnvironmentManager.formatFileSize(state.totalBytes)).toString()),
                                 fontSize = 12.sp,
                                 color = AppColors.textSecondary,
                                 modifier = Modifier.weight(1f)
@@ -823,7 +825,7 @@ private fun InstallerLog(lines: List<String>, expanded: Boolean, onToggle: () ->
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(if (expanded) "Hide details" else "Show details", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondary)
+            Text(if (expanded) stringResource(R.string.full_screen_local_tools_installer_hide_details) else stringResource(R.string.full_screen_local_tools_installer_show_details), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondary)
             Icon(
                 imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                 contentDescription = null,

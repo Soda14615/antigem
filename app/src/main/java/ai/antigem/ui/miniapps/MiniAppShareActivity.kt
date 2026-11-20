@@ -1,5 +1,7 @@
 package ai.antigem.ui.miniapps
 
+import androidx.compose.ui.res.stringResource
+import ai.antigem.R
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -81,7 +83,7 @@ class MiniAppShareActivity : ComponentActivity() {
         setContent {
             MaterialTheme(colorScheme = ThemeManager.schemeOf(ThemeManager.themeFor(dark))) {
                 ActionSheet(
-                    title = "Send to a mini app",
+                    title = stringResource(R.string.workspace_mini_app_send_to),
                     items = targets.map { NativeDialog.SheetItem(it.id, it.name, if (it.signed) "▣" else "◇", false) },
                     onDismiss = { finish() },
                 ) { id -> deliver(targets.first { it.id == id }, type, text, subject, stream) }

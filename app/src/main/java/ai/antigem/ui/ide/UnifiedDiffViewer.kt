@@ -1,5 +1,7 @@
 package ai.antigem.ui.ide
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -113,7 +115,7 @@ fun UnifiedDiffViewer(
                                 text = when {
                                     commitHash != null -> "COMMIT ${commitHash.take(7)}"
                                     isStaged -> "STAGED"
-                                    else -> "WORKING TREE"
+                                    else -> stringResource(R.string.unified_diff_viewer_working_tree)
                                 },
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -159,7 +161,7 @@ fun UnifiedDiffViewer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Open Current File (Editable)",
+                        contentDescription = stringResource(R.string.unified_diff_viewer_open_current_file_editable),
                         tint = ai.antigem.theme.AppColors.success,
                         modifier = Modifier.size(17.dp)
                     )
@@ -172,7 +174,7 @@ fun UnifiedDiffViewer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.History,
-                        contentDescription = "Open Revision File (Read-Only)",
+                        contentDescription = stringResource(R.string.unified_diff_viewer_open_revision_file_read_only),
                         tint = ClaudeTerracotta,
                         modifier = Modifier.size(18.dp)
                     )
@@ -185,7 +187,7 @@ fun UnifiedDiffViewer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close Diff",
+                        contentDescription = stringResource(R.string.unified_diff_viewer_close_diff),
                         tint = ai.antigem.theme.AppColors.editorMuted,
                         modifier = Modifier.size(18.dp)
                     )
@@ -203,7 +205,7 @@ fun UnifiedDiffViewer(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No changes detected or binary file.",
+                    text = stringResource(R.string.unified_diff_viewer_no_changes_detected_or_binary_file),
                     color = Color.Gray,
                     fontSize = 14.sp
                 )

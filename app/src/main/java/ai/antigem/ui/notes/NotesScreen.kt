@@ -1,5 +1,7 @@
 package ai.antigem.ui.notes
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.text.format.DateUtils
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -171,7 +173,7 @@ private fun NotesList(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { if (searching) { searching = false; query = "" } else onClose() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.agent_approval_panel_back))
                     }
                     if (searching) {
                         LaunchedEffect(Unit) { searchFocus.requestFocus() }
@@ -183,10 +185,10 @@ private fun NotesList(
                             singleLine = true,
                             modifier = Modifier.weight(1f).focusRequester(searchFocus)
                         )
-                        if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Outlined.Close, contentDescription = "Clear search") }
+                        if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.notes_screen_clear_search)) }
                     } else {
-                        Text("Notes", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).padding(start = 4.dp))
-                        IconButton(onClick = { searching = true }) { Icon(Icons.Outlined.Search, contentDescription = "Search") }
+                        Text(stringResource(R.string.notes_screen_notes), fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).padding(start = 4.dp))
+                        IconButton(onClick = { searching = true }) { Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.browser_screen_search)) }
                     }
                 }
                 Row(
@@ -242,16 +244,16 @@ private fun NotesList(
 
             Box(Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(20.dp)) {
                 FloatingActionButton(onClick = { showNewMenu = true }, containerColor = ClaudeTerracotta, contentColor = MaterialTheme.colorScheme.onPrimary) {
-                    Icon(Icons.Outlined.Add, contentDescription = "New")
+                    Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.notes_screen_new))
                 }
                 DropdownMenu(expanded = showNewMenu, onDismissRequest = { showNewMenu = false }) {
                     DropdownMenuItem(
-                        text = { Text("Note") },
+                        text = { Text(stringResource(R.string.notes_screen_note)) },
                         leadingIcon = { Icon(Icons.Outlined.EditNote, null) },
                         onClick = { showNewMenu = false; onNew(NoteKind.NOTE) }
                     )
                     DropdownMenuItem(
-                        text = { Text("To-do list") },
+                        text = { Text(stringResource(R.string.notes_screen_to_do_list)) },
                         leadingIcon = { Icon(Icons.Outlined.Checklist, null) },
                         onClick = { showNewMenu = false; onNew(NoteKind.TODO) }
                     )
@@ -285,7 +287,7 @@ private fun EmptyState(message: String) {
         Text(message, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         Spacer(Modifier.height(4.dp))
         Text(
-            "Tap + to add one, or ask an agent with the Notes MCP",
+            stringResource(R.string.notes_screen_tap_to_add_one_or_ask_an),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
         )
@@ -316,7 +318,7 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                if (note.pinned) Icon(Icons.Outlined.PushPin, "Pinned", tint = ClaudeTerracotta, modifier = Modifier.size(16.dp))
+                if (note.pinned) Icon(Icons.Outlined.PushPin, stringResource(R.string.notes_screen_pinned), tint = ClaudeTerracotta, modifier = Modifier.size(16.dp))
             }
             if (note.kind == NoteKind.TODO) {
                 note.items.filter { it.text.isNotBlank() }.take(4).forEach { item ->
@@ -339,7 +341,7 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
                     }
                 }
                 val hidden = note.items.count { it.text.isNotBlank() } - 4
-                if (hidden > 0) Text("+$hidden more", fontSize = 12.sp, color = muted)
+                if (hidden > 0) Text(stringResource(R.string.choice_questionnaire_card_more, hidden.toString()), fontSize = 12.sp, color = muted)
             } else if (note.text.isNotBlank()) {
                 Text(note.text.trim(), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f), maxLines = 4, overflow = TextOverflow.Ellipsis)
             }
@@ -347,7 +349,7 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
                 Text(relativeTime(note.updatedAt), fontSize = 11.sp, color = muted.copy(alpha = 0.5f), modifier = Modifier.weight(1f))
                 if (note.kind == NoteKind.TODO && note.items.isNotEmpty()) {
                     Text(
-                        "${note.doneCount}/${note.items.size} done",
+                        stringResource(R.string.notes_screen_done, note.doneCount.toString(), note.items.size.toString()),
                         fontSize = 11.sp,
                         color = if (note.doneCount == note.items.size) ClaudeTerracotta else muted.copy(alpha = 0.5f)
                     )
@@ -378,31 +380,31 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                 Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.agent_approval_panel_back)) }
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { NotesRepository.update(id) { it.copy(pinned = !it.pinned) } }) {
                     Icon(
                         Icons.Outlined.PushPin,
-                        contentDescription = if (note.pinned) "Unpin" else "Pin",
+                        contentDescription = if (note.pinned) stringResource(R.string.notes_screen_unpin) else stringResource(R.string.notes_screen_pin),
                         tint = if (note.pinned) ClaudeTerracotta else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
                 Box {
-                    IconButton(onClick = { showMenu = true }) { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
+                    IconButton(onClick = { showMenu = true }) { Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.text_selection_more)) }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         if (note.kind == NoteKind.TODO) {
                             DropdownMenuItem(
-                                text = { Text("Check all") },
+                                text = { Text(stringResource(R.string.notes_screen_check_all)) },
                                 leadingIcon = { Icon(Icons.Outlined.DoneAll, null) },
                                 onClick = { showMenu = false; NotesRepository.update(id) { n -> n.copy(items = n.items.map { it.copy(done = true) }) } }
                             )
                             DropdownMenuItem(
-                                text = { Text("Uncheck all") },
+                                text = { Text(stringResource(R.string.notes_screen_uncheck_all)) },
                                 leadingIcon = { Icon(Icons.Outlined.CheckBoxOutlineBlank, null) },
                                 onClick = { showMenu = false; NotesRepository.update(id) { n -> n.copy(items = n.items.map { it.copy(done = false) }) } }
                             )
                             DropdownMenuItem(
-                                text = { Text("Clear completed") },
+                                text = { Text(stringResource(R.string.notes_screen_clear_completed)) },
                                 leadingIcon = { Icon(Icons.Outlined.ClearAll, null) },
                                 enabled = note.doneCount > 0,
                                 onClick = { showMenu = false; NotesRepository.update(id) { n -> n.copy(items = n.items.filterNot { it.done }) } }
@@ -410,7 +412,7 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                             HorizontalDivider()
                         }
                         DropdownMenuItem(
-                            text = { Text(if (note.kind == NoteKind.TODO) "Turn into note" else "Turn into to-do list") },
+                            text = { Text(if (note.kind == NoteKind.TODO) stringResource(R.string.notes_screen_turn_into_note) else stringResource(R.string.notes_screen_turn_into_to_do_list)) },
                             leadingIcon = { Icon(if (note.kind == NoteKind.TODO) Icons.Outlined.EditNote else Icons.Outlined.Checklist, null) },
                             onClick = {
                                 showMenu = false
@@ -430,7 +432,7 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                            text = { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) },
                             leadingIcon = { Icon(Icons.Outlined.Delete, null, tint = MaterialTheme.colorScheme.error) },
                             onClick = { showMenu = false; onDelete() }
                         )
@@ -494,15 +496,15 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Outlined.Add, null, tint = muted, modifier = Modifier.padding(horizontal = 12.dp).size(20.dp))
-                    Text("Add item", fontSize = 15.sp, color = muted)
+                    Text(stringResource(R.string.notes_screen_add_item), fontSize = 15.sp, color = muted)
                 }
                 if (note.items.isNotEmpty()) {
-                    Text("${note.doneCount} of ${note.items.size} done", fontSize = 12.sp, color = muted.copy(alpha = 0.6f), modifier = Modifier.padding(top = 4.dp))
+                    Text(stringResource(R.string.notes_screen_of_done, note.doneCount.toString(), note.items.size.toString()), fontSize = 12.sp, color = muted.copy(alpha = 0.6f), modifier = Modifier.padding(top = 4.dp))
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-            Text("Edited ${relativeTime(note.updatedAt)}", fontSize = 11.sp, color = muted.copy(alpha = 0.5f))
+            Text(stringResource(R.string.notes_screen_edited, (relativeTime(note.updatedAt)).toString()), fontSize = 11.sp, color = muted.copy(alpha = 0.5f))
         }
     }
 }
@@ -551,7 +553,7 @@ private fun TodoRow(
             modifier = Modifier.weight(1f).focusRequester(focusRequester)
         )
         IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
-            Icon(Icons.Outlined.Close, contentDescription = "Remove item", tint = muted, modifier = Modifier.size(18.dp))
+            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.notes_screen_remove_item), tint = muted, modifier = Modifier.size(18.dp))
         }
     }
 }

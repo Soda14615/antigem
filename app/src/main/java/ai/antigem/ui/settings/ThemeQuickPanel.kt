@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -65,15 +67,15 @@ fun ThemeQuickPanel(themeMode: String, onSetThemeMode: (String) -> Unit, onClose
             Row(Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Palette, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(7.dp))
-                Text("Themes", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = onSurface)
+                Text(stringResource(R.string.chat_history_drawer_themes), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = onSurface)
                 Spacer(Modifier.weight(1f))
                 ModeToggle(themeMode, onSetThemeMode)
                 IconButton(onClick = onClose, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Outlined.Close, "Close", tint = onSurface.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+                    Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close), tint = onSurface.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
                 }
             }
             Text(
-                "Tap a theme to try it: the app changes behind this panel.",
+                stringResource(R.string.theme_quick_panel_tap_a_theme_to_try_it_the),
                 fontSize = 11.sp, color = onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp)
             )

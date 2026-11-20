@@ -1,5 +1,7 @@
 package ai.antigem.ui.agents
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -71,7 +73,7 @@ fun AgentSheetHeader(
                     .animateFloat(0f, 360f, infiniteRepeatable(tween(800, easing = LinearEasing), RepeatMode.Restart), label = "sheet_refresh_angle").value
             } else 0f
             IconButton(onClick = onRefresh, enabled = !refreshing, modifier = Modifier.size(38.dp)) {
-                Icon(Icons.Outlined.Refresh, "Refresh", tint = agent.accent(), modifier = Modifier.size(20.dp).rotate(angle))
+                Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh), tint = agent.accent(), modifier = Modifier.size(20.dp).rotate(angle))
             }
         }
     }

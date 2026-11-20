@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="model_selector_bottom_sheet_connect_your_google_account_in_settings_or">"在“设置”中连接你的 Google 帐户或点击“刷新”以加载你的模型。"</string>
+    <string name="quota_group_ui_1_model">"1 型号"</string>
+    <string name="quota_group_ui_models">"%1$s 型号"</string>
+    <string name="quota_group_ui_shown_in_chat">"聊天中显示"</string>
+    <string name="quota_group_ui_share_left_next_to_the_model_name">"在型号名称旁边分享左侧。没有 5h 限制的模型显示 7d。"</string>
+    <string name="quota_group_ui_done_editing_groups">"完成组编辑"</string>
+    <string name="quota_group_ui_edit_quota_groups">"编辑配额组"</string>
+    <string name="quota_group_ui_pick_which_limit_each_model_counts_against">"选择每个模型所依赖的限制。保存在此设备上。"</string>
+    <string name="quota_group_ui_no_group">"无组"</string>
+    <string name="quota_group_ui_moved">"  · 感动"</string>
+    <string name="quota_group_ui_automatic">"自动"</string>
+    <string name="thinking_selector_bottom_sheet_thinking_reasoning_level">"思维与推理水平"</string>
+    <string name="thinking_selector_bottom_sheet_configure_reasoning_depth_and_token_budget">"配置推理深度和令牌预算"</string>
+    <string name="thinking_selector_bottom_sheet_token_budget_1_32_768">"令牌预算 (1 - 32,768)"</string>
+    <string name="thinking_selector_bottom_sheet_e_g_2048">"例如2048"</string>
+    <string name="thinking_selector_bottom_sheet_allocates_characters_of_reasoning_capacity">"分配〜 %1$s 字符的推理能力"</string>
+    <string name="thinking_selector_bottom_sheet_apply_custom_budget">"应用自定义预算"</string>
+</resources>

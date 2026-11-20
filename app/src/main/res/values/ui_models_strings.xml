@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="model_selector_bottom_sheet_connect_your_google_account_in_settings_or">"Connect your Google account in Settings or tap refresh to load your models."</string>
+    <string name="quota_group_ui_1_model">"1 model"</string>
+    <string name="quota_group_ui_models">"%1$s models"</string>
+    <string name="quota_group_ui_shown_in_chat">"Shown in chat"</string>
+    <string name="quota_group_ui_share_left_next_to_the_model_name">"Share left next to the model name. Models with no 5h limit show 7d."</string>
+    <string name="quota_group_ui_done_editing_groups">"Done editing groups"</string>
+    <string name="quota_group_ui_edit_quota_groups">"Edit quota groups"</string>
+    <string name="quota_group_ui_pick_which_limit_each_model_counts_against">"Pick which limit each model counts against. Saved on this device."</string>
+    <string name="quota_group_ui_no_group">"No group"</string>
+    <string name="quota_group_ui_moved">"  · moved"</string>
+    <string name="quota_group_ui_automatic">"Automatic"</string>
+    <string name="thinking_selector_bottom_sheet_thinking_reasoning_level">"Thinking &amp; Reasoning Level"</string>
+    <string name="thinking_selector_bottom_sheet_configure_reasoning_depth_and_token_budget">"Configure reasoning depth and token budget"</string>
+    <string name="thinking_selector_bottom_sheet_token_budget_1_32_768">"Token Budget (1 - 32,768)"</string>
+    <string name="thinking_selector_bottom_sheet_e_g_2048">"e.g. 2048"</string>
+    <string name="thinking_selector_bottom_sheet_allocates_characters_of_reasoning_capacity">"Allocates ~%1$s characters of reasoning capacity"</string>
+    <string name="thinking_selector_bottom_sheet_apply_custom_budget">"Apply Custom Budget"</string>
+</resources>

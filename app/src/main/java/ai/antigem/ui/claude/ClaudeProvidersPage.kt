@@ -1,5 +1,7 @@
 package ai.antigem.ui.claude
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -157,7 +159,7 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
     LaunchedEffect(Unit) { backend.refreshProviders() }
     val muted = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
 
-    Text("Other Anthropic-compatible APIs", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+    Text(stringResource(R.string.claude_providers_page_other_anthropic_compatible_apis), fontWeight = FontWeight.Bold, fontSize = 14.sp)
     Text(
         "OpenRouter, Kimi, DeepSeek, Z.ai… Their models are listed in the chat's model picker under Claude's own. " +
             "A chat on one of them uses its key, headers and limits; your Claude login and other chats stay as they are.",
@@ -167,7 +169,7 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
     val oc = ai.antigem.ui.components.OpenCodeAccent
     Surface(shape = RoundedCornerShape(12.dp), color = oc.copy(alpha = 0.08f), border = BorderStroke(1.dp, oc.copy(alpha = 0.35f))) {
         Column(Modifier.padding(12.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Third-party models work better in OpenCode", fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = oc)
+            Text(stringResource(R.string.claude_providers_page_third_party_models_work_better_in_opencode), fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = oc)
             Text(
                 "Claude Code only speaks Anthropic's API, so a provider here must offer an Anthropic-compatible endpoint, and tools or " +
                     "thinking can break on the way. OpenCode talks to each provider in its own format: 200+ built-in providers, any " +
@@ -181,9 +183,9 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
     settingsEndpoint?.let { endpoint ->
         Surface(shape = RoundedCornerShape(12.dp), color = QuotaAmber.copy(alpha = 0.1f), border = BorderStroke(1.dp, QuotaAmber.copy(alpha = 0.4f))) {
             Column(Modifier.padding(12.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("settings.json sends every chat to $endpoint", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.claude_providers_page_settings_json_sends_every_chat_to, endpoint.toString()), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 Text(
-                    "Then even chats on Claude's models go there. Move it into a provider so only the chats you choose use it.",
+                    stringResource(R.string.claude_providers_page_then_even_chats_on_claude_s_models),
                     fontSize = 11.5.sp, color = muted
                 )
                 TextButton(enabled = !importing, onClick = {
@@ -192,30 +194,30 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
                         importing = false
                         Toast.makeText(context, err ?: "Moved into a provider", Toast.LENGTH_SHORT).show()
                     }
-                }) { Text(if (importing) "Moving…" else "Move into a provider", color = ClaudeAccent) }
+                }) { Text(if (importing) stringResource(R.string.claude_providers_page_moving) else stringResource(R.string.claude_providers_page_move_into_a_provider), color = ClaudeAccent) }
             }
         }
     }
     if (conflicts.isNotEmpty() && providers.isNotEmpty()) {
         Text(
-            "settings.json sets ${conflicts.joinToString(", ")}. Provider chats override these, so they cannot change a provider's model or key.",
+            stringResource(R.string.claude_providers_page_settings_json_sets_provider_chats_override_these, (conflicts.joinToString(", ")).toString()),
             fontSize = 11.sp, color = muted
         )
     }
 
     // quick start
-    Text("Add a provider", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+    Text(stringResource(R.string.claude_providers_page_add_a_provider), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         PRESETS.filter { it.label != "OpenRouter" || providers.none { p -> p.openrouter } }.forEach { preset ->
-            OutlinedButton(onClick = { editing = preset.provider }) { Text(if (preset.label == "Custom") "+ Custom" else "+ ${preset.label}") }
+            OutlinedButton(onClick = { editing = preset.provider }) { Text(if (preset.label == "Custom") stringResource(R.string.claude_providers_page_custom) else "+ ${preset.label}") }
         }
     }
 
     if (providers.isEmpty()) {
         ClaudeCard {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("No custom providers yet", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                Text("Pick a preset or add your own with its base URL and API key, test the connection, then add or fetch its models.", fontSize = 11.5.sp, color = muted)
+                Text(stringResource(R.string.claude_providers_page_no_custom_providers_yet), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(stringResource(R.string.claude_providers_page_pick_a_preset_or_add_your_own), fontSize = 11.5.sp, color = muted)
             }
         }
     }
@@ -255,7 +257,7 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
     savedProvider?.let { p ->
         AlertDialog(
             onDismissRequest = { savedProvider = null },
-            title = { Text("Saved ${p.name}", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.claude_providers_page_saved, p.name.toString()), fontWeight = FontWeight.Bold) },
             text = {
                 Text(
                     "New chats and chats you reopen use these settings right away. Chats that are already running on ${p.name} keep the " +
@@ -275,19 +277,19 @@ fun ProvidersPage(deps: ClaudeSettingsDeps) {
                         }
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                     }
-                }) { Text(if (restarting) "Restarting…" else "Restart idle chats now", color = ClaudeAccent) }
+                }) { Text(if (restarting) stringResource(R.string.agents_setup_ui_restarting) else stringResource(R.string.claude_providers_page_restart_idle_chats_now), color = ClaudeAccent) }
             },
-            dismissButton = { TextButton(onClick = { savedProvider = null }) { Text("Later") } }
+            dismissButton = { TextButton(onClick = { savedProvider = null }) { Text(stringResource(R.string.bridge_ui_later)) } }
         )
     }
 
     toDelete?.let { p ->
         AlertDialog(
             onDismissRequest = { toDelete = null },
-            title = { Text("Remove ${p.name}?", fontWeight = FontWeight.Bold) },
-            text = { Text("Its key, headers and models are removed. Chats on it have to pick another model.", fontSize = 13.5.sp) },
-            confirmButton = { TextButton(onClick = { backend.deleteProvider(p.id); toDelete = null }) { Text("Remove", color = QuotaRed) } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Cancel") } }
+            title = { Text(stringResource(R.string.claude_providers_page_remove, p.name.toString()), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.claude_providers_page_its_key_headers_and_models_are_removed), fontSize = 13.5.sp) },
+            confirmButton = { TextButton(onClick = { backend.deleteProvider(p.id); toDelete = null }) { Text(stringResource(R.string.browser_screen_remove), color = QuotaRed) } },
+            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -310,22 +312,22 @@ private fun ProviderCard(
                 Text(p.name, fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
                 Text(p.base_url, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Outlined.Edit, "Edit") }
-            IconButton(onClick = onDelete) { Icon(Icons.Outlined.Delete, "Remove", tint = QuotaRed.copy(alpha = 0.8f)) }
+            IconButton(onClick = onEdit) { Icon(Icons.Outlined.Edit, stringResource(R.string.chat_screen_edit)) }
+            IconButton(onClick = onDelete) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = QuotaRed.copy(alpha = 0.8f)) }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            p.api_key_hint?.let { Badge("Key $it") }
-            Badge(if (p.auth_mode == "x-api-key") "x-api-key" else "Bearer token")
-            Badge(if (p.thinking_budget > 0) "Thinking ${tokenLabel(p.thinking_budget.toLong())}" else "No thinking budget")
-            if (p.headers.isNotEmpty()) Badge("${p.headers.size} header${if (p.headers.size == 1) "" else "s"}")
-            if (p.extra_env.isNotEmpty()) Badge("${p.extra_env.size} env")
-            if (p.timeout_sec > 0) Badge("${p.timeout_sec}s timeout")
-            if (p.disable_betas) Badge("no betas")
+            p.api_key_hint?.let { Badge(stringResource(R.string.claude_providers_page_key, it.toString())) }
+            Badge(if (p.auth_mode == "x-api-key") "x-api-key" else stringResource(R.string.claude_providers_page_bearer_token))
+            Badge(if (p.thinking_budget > 0) stringResource(R.string.claude_providers_page_thinking, (tokenLabel(p.thinking_budget.toLong())).toString()) else stringResource(R.string.claude_providers_page_no_thinking_budget))
+            if (p.headers.isNotEmpty()) Badge(stringResource(R.string.claude_providers_page_header, p.headers.size.toString(), (if (p.headers.size == 1) "" else "s").toString()))
+            if (p.extra_env.isNotEmpty()) Badge(stringResource(R.string.claude_providers_page_env, p.extra_env.size.toString()))
+            if (p.timeout_sec > 0) Badge(stringResource(R.string.claude_providers_page_s_timeout, p.timeout_sec.toString()))
+            if (p.disable_betas) Badge(stringResource(R.string.claude_providers_page_no_betas))
         }
         Spacer(Modifier.size(8.dp))
-        Text("Models (${p.models.size})", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+        Text(stringResource(R.string.claude_providers_page_models, p.models.size.toString()), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
         if (p.models.isEmpty()) {
-            Text("None yet: open Edit to add model ids or fetch the provider's list.", fontSize = 11.5.sp, color = muted)
+            Text(stringResource(R.string.claude_providers_page_none_yet_open_edit_to_add_model), fontSize = 11.5.sp, color = muted)
         }
         (if (expanded) p.models else p.models.take(5)).forEach { m ->
             Column(Modifier.padding(vertical = 3.dp)) {
@@ -338,14 +340,14 @@ private fun ProviderCard(
         }
         if (p.models.size > 5) {
             TextButton(onClick = { expanded = !expanded }) {
-                Text(if (expanded) "Show fewer" else "Show all ${p.models.size}", color = ClaudeAccent, fontSize = 12.sp)
+                Text(if (expanded) stringResource(R.string.claude_providers_page_show_fewer) else stringResource(R.string.claude_providers_page_show_all, p.models.size.toString()), color = ClaudeAccent, fontSize = 12.sp)
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(enabled = !testing, onClick = onTest) {
                 Icon(Icons.Outlined.NetworkCheck, null, Modifier.size(16.dp), tint = ClaudeAccent)
                 Spacer(Modifier.width(6.dp))
-                Text("Test connection", color = ClaudeAccent)
+                Text(stringResource(R.string.claude_providers_page_test_connection), color = ClaudeAccent)
             }
             if (testing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = ClaudeAccent)
         }
@@ -370,10 +372,10 @@ private fun TestResultView(r: ClaudeProviderTestResult) {
             Spacer(Modifier.width(8.dp))
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 if (r.ok) {
-                    Text("Connected · ${r.latency_ms} ms", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
-                    Text("${r.model} answered${if (r.reply.isNotBlank()) ": \"${r.reply.take(60)}\"" else ""}", fontSize = 11.5.sp)
+                    Text(stringResource(R.string.claude_providers_page_connected_ms, r.latency_ms.toString()), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+                    Text(stringResource(R.string.claude_providers_page_answered, r.model.toString(), (if (r.reply.isNotBlank()) ": \"${r.reply.take(60)}\"" else "").toString()), fontSize = 11.5.sp)
                 } else {
-                    Text("Connection failed", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+                    Text(stringResource(R.string.claude_providers_page_connection_failed), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
                     Text(r.error, fontSize = 11.5.sp)
                     if (r.hint.isNotBlank()) Text(r.hint, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 }
@@ -547,8 +549,8 @@ private fun ProviderEditor(
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, "Close") }
-                    Text(if (isNew) "Add provider" else "Edit ${initial.name}", fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.weight(1f))
+                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, stringResource(R.string.accounts_ui_close)) }
+                    Text(if (isNew) stringResource(R.string.claude_providers_page_add_provider) else stringResource(R.string.claude_providers_page_edit, initial.name.toString()), fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.weight(1f))
                     TextButton(
                         enabled = !saving && name.isNotBlank() && baseUrl.isNotBlank() && (!isNew || key.isNotBlank()),
                         onClick = {
@@ -564,7 +566,7 @@ private fun ProviderEditor(
                                 error = e
                             }
                         }
-                    ) { Text(if (saving) "Saving…" else "Save", color = ClaudeAccent, fontWeight = FontWeight.Bold) }
+                    ) { Text(if (saving) stringResource(R.string.claude_providers_page_saving) else stringResource(R.string.claude_providers_page_save), color = ClaudeAccent, fontWeight = FontWeight.Bold) }
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                 Column(
@@ -576,18 +578,18 @@ private fun ProviderEditor(
 
                     // ---- connection
                     EditorSection("Connection", "Where the chat sends its requests and how it signs them.") {
-                        OutlinedTextField(name, { name = it }, label = { Text("Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.browser_screen_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                         OutlinedTextField(
-                            baseUrl, { baseUrl = it }, label = { Text("Base URL") }, singleLine = true,
+                            baseUrl, { baseUrl = it }, label = { Text(stringResource(R.string.claude_providers_page_base_url)) }, singleLine = true,
                             placeholder = { Text("https://api.example.com/anthropic") }, modifier = Modifier.fillMaxWidth(),
-                            supportingText = { Text("Claude Code calls <base URL>/v1/messages") }
+                            supportingText = { Text(stringResource(R.string.claude_providers_page_claude_code_calls_base_url_v1_messages)) }
                         )
                         OutlinedTextField(
-                            key, { key = it }, label = { Text("API key") }, singleLine = true,
-                            placeholder = { Text(if (isNew) "sk-…" else "unchanged (${initial.api_key_hint ?: "saved"})") },
+                            key, { key = it }, label = { Text(stringResource(R.string.claude_providers_page_api_key)) }, singleLine = true,
+                            placeholder = { Text(if (isNew) "sk-…" else stringResource(R.string.claude_providers_page_unchanged, (initial.api_key_hint ?: "saved").toString())) },
                             visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth()
                         )
-                        Text("How the key is sent", fontSize = 12.sp, color = muted)
+                        Text(stringResource(R.string.claude_providers_page_how_the_key_is_sent), fontSize = 12.sp, color = muted)
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf("bearer" to "Bearer token", "x-api-key" to "x-api-key header").forEach { (mode, label) ->
                                 FilterChip(
@@ -597,21 +599,21 @@ private fun ProviderEditor(
                             }
                         }
                         Text(
-                            if (authMode == "bearer") "Authorization: Bearer <key> (ANTHROPIC_AUTH_TOKEN). Used by most providers."
-                            else "x-api-key: <key> (ANTHROPIC_API_KEY). Used by providers that copy Anthropic's own scheme.",
+                            if (authMode == "bearer") stringResource(R.string.claude_providers_page_authorization_bearer_key_anthropic_auth_token_used)
+                            else stringResource(R.string.claude_providers_page_x_api_key_key_anthropic_api_key),
                             fontSize = 11.sp, color = muted
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             OutlinedButton(enabled = !testing && baseUrl.isNotBlank(), onClick = { runTest(models.firstOrNull()?.id ?: newModel.trim()) }) {
                                 Icon(Icons.Outlined.NetworkCheck, null, Modifier.size(16.dp))
                                 Spacer(Modifier.width(6.dp))
-                                Text("Test connection")
+                                Text(stringResource(R.string.claude_providers_page_test_connection))
                             }
                             Spacer(Modifier.width(10.dp))
                             if (testing) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = ClaudeAccent)
                         }
                         Text(
-                            "Sends one short message to ${models.firstOrNull()?.id ?: "the model id typed below"} with these exact settings.",
+                            stringResource(R.string.claude_providers_page_sends_one_short_message_to_with_these, (models.firstOrNull()?.id ?: "the model id typed below").toString()),
                             fontSize = 11.sp, color = muted
                         )
                         testResult?.let { TestResultView(it) }
@@ -621,14 +623,14 @@ private fun ProviderEditor(
                     EditorSection("Models (${models.size})", "These appear in the chat's model picker. Set the context window so the Context chip and auto-compact are right.") {
                         if (!openRouter) {
                             OutlinedTextField(
-                                modelsUrl, { modelsUrl = it }, label = { Text("Models URL (optional)") }, singleLine = true,
+                                modelsUrl, { modelsUrl = it }, label = { Text(stringResource(R.string.claude_providers_page_models_url_optional)) }, singleLine = true,
                                 placeholder = { Text("https://api.example.com/v1/models") }, modifier = Modifier.fillMaxWidth()
                             )
                         } else {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Switch(checked = freeOnly, onCheckedChange = { freeOnly = it }, colors = SwitchDefaults.colors(checkedTrackColor = ClaudeAccent))
                                 Spacer(Modifier.width(10.dp))
-                                Text("Only free models that can call tools", fontSize = 12.5.sp)
+                                Text(stringResource(R.string.claude_providers_page_only_free_models_that_can_call_tools), fontSize = 12.5.sp)
                             }
                         }
                         val canFetch = openRouter || modelsUrl.isNotBlank()
@@ -636,26 +638,26 @@ private fun ProviderEditor(
                             OutlinedButton(enabled = canFetch && !fetching && baseUrl.isNotBlank(), onClick = { runFetch() }) {
                                 Icon(Icons.Outlined.CloudDownload, null, Modifier.size(16.dp))
                                 Spacer(Modifier.width(6.dp))
-                                Text("Fetch the provider's list")
+                                Text(stringResource(R.string.claude_providers_page_fetch_the_provider_s_list))
                             }
                             Spacer(Modifier.width(4.dp))
                             if (fetching) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = ClaudeAccent)
                             fetchRaw?.let { raw ->
                                 IconButton(onClick = { showRaw = true }) {
-                                    Icon(Icons.Outlined.Code, "Show the raw response", tint = if (raw.status in 200..299) ClaudeAccent else QuotaAmber)
+                                    Icon(Icons.Outlined.Code, stringResource(R.string.claude_providers_page_show_the_raw_response), tint = if (raw.status in 200..299) ClaudeAccent else QuotaAmber)
                                 }
                             }
                         }
                         TextButton(enabled = canFetch, onClick = { showMapping = true }) {
                             Text(
-                                if (mapping == null) "Field mapping & pagination…" else "Field mapping & pagination (customised)…",
+                                if (mapping == null) stringResource(R.string.claude_providers_page_field_mapping_pagination) else stringResource(R.string.claude_providers_page_field_mapping_pagination_customised),
                                 color = ClaudeAccent, fontSize = 12.sp
                             )
                         }
                         fetchError?.let { msg ->
                             Surface(shape = RoundedCornerShape(10.dp), color = QuotaRed.copy(alpha = 0.1f), border = BorderStroke(1.dp, QuotaRed.copy(alpha = 0.35f)), modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    Text("Could not fetch the models", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+                                    Text(stringResource(R.string.claude_providers_page_could_not_fetch_the_models), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
                                     Text(msg, fontSize = 11.5.sp)
                                 }
                             }
@@ -663,13 +665,13 @@ private fun ProviderEditor(
                         fetchNote?.let { msg ->
                             Surface(shape = RoundedCornerShape(10.dp), color = QuotaAmber.copy(alpha = 0.1f), border = BorderStroke(1.dp, QuotaAmber.copy(alpha = 0.4f)), modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    Text("No models to add", fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
+                                    Text(stringResource(R.string.claude_providers_page_no_models_to_add), fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp)
                                     Text(msg, fontSize = 11.5.sp)
                                 }
                             }
                         }
-                        if (!canFetch) Text("Set a models URL to fetch the list; otherwise type model ids below.", fontSize = 11.sp, color = muted)
-                        if (isNew && key.isBlank() && canFetch) Text("Enter the API key first.", fontSize = 11.sp, color = muted)
+                        if (!canFetch) Text(stringResource(R.string.claude_providers_page_set_a_models_url_to_fetch_the), fontSize = 11.sp, color = muted)
+                        if (isNew && key.isBlank() && canFetch) Text(stringResource(R.string.claude_providers_page_enter_the_api_key_first), fontSize = 11.sp, color = muted)
 
                         models.forEach { m ->
                             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -687,10 +689,10 @@ private fun ProviderEditor(
                                     )
                                 }
                                 TextButton(enabled = !testing, onClick = { runTest(m.id) }, contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp)) {
-                                    Text("Test", color = ClaudeAccent, fontSize = 12.sp)
+                                    Text(stringResource(R.string.claude_providers_page_test), color = ClaudeAccent, fontSize = 12.sp)
                                 }
-                                IconButton(onClick = { editingModel = m }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Edit, "Edit model", Modifier.size(16.dp)) }
-                                IconButton(onClick = { models = models - m }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Close, "Remove model", Modifier.size(16.dp)) }
+                                IconButton(onClick = { editingModel = m }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Edit, stringResource(R.string.claude_providers_page_edit_model), Modifier.size(16.dp)) }
+                                IconButton(onClick = { models = models - m }, modifier = Modifier.size(32.dp)) { Icon(Icons.Outlined.Close, stringResource(R.string.claude_providers_page_remove_model), Modifier.size(16.dp)) }
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -705,7 +707,7 @@ private fun ProviderEditor(
                                     models = models + ClaudeProviderModel(newModel.trim())
                                     newModel = ""
                                 }
-                            ) { Icon(Icons.Outlined.Add, "Add model", tint = ClaudeAccent) }
+                            ) { Icon(Icons.Outlined.Add, stringResource(R.string.claude_providers_page_add_model), tint = ClaudeAccent) }
                         }
                     }
 
@@ -716,14 +718,14 @@ private fun ProviderEditor(
                             label = "Background model (optional)", placeholder = "titles & summaries; default: the chat's model"
                         )
                         Text(
-                            "Sonnet, Opus and subagent requests are always mapped to the chat's own model, so the provider never receives a Claude model name.",
+                            stringResource(R.string.claude_providers_page_sonnet_opus_and_subagent_requests_are_always),
                             fontSize = 11.sp, color = muted
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text("Send a thinking budget", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                Text(stringResource(R.string.claude_providers_page_send_a_thinking_budget), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                                 Text(
-                                    "Off: Thinking in the chat never sends a token budget (safest; many providers reject it). On: it sends the budget below.",
+                                    stringResource(R.string.claude_providers_page_off_thinking_in_the_chat_never_sends),
                                     fontSize = 11.sp, color = muted
                                 )
                             }
@@ -731,37 +733,37 @@ private fun ProviderEditor(
                         }
                         if (sendThinking) {
                             OutlinedTextField(
-                                budgetText, { budgetText = it.filter(Char::isDigit) }, label = { Text("Thinking budget (tokens)") }, singleLine = true,
+                                budgetText, { budgetText = it.filter(Char::isDigit) }, label = { Text(stringResource(R.string.claude_providers_page_thinking_budget_tokens)) }, singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth()
                             )
                         }
                         Text(
-                            "This is the provider's default. Any model can override it: tap it in the list above.",
+                            stringResource(R.string.claude_providers_page_this_is_the_provider_s_default_any),
                             fontSize = 11.sp, color = muted
                         )
-                        Text("Defaults for models without their own size", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text(stringResource(R.string.claude_providers_page_defaults_for_models_without_their_own_size), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                         OutlinedTextField(
-                            defaultCtxText, { defaultCtxText = it }, label = { Text("Default context window") }, singleLine = true,
-                            isError = parseTokens(defaultCtxText) == null, placeholder = { Text("e.g. 128k (blank = unknown)") }, modifier = Modifier.fillMaxWidth()
+                            defaultCtxText, { defaultCtxText = it }, label = { Text(stringResource(R.string.claude_providers_page_default_context_window)) }, singleLine = true,
+                            isError = parseTokens(defaultCtxText) == null, placeholder = { Text(stringResource(R.string.claude_providers_page_e_g_128k_blank_unknown)) }, modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
-                            defaultOutText, { defaultOutText = it }, label = { Text("Default max output") }, singleLine = true,
-                            isError = parseTokens(defaultOutText) == null, placeholder = { Text("e.g. 8k (blank = unknown)") }, modifier = Modifier.fillMaxWidth()
+                            defaultOutText, { defaultOutText = it }, label = { Text(stringResource(R.string.claude_providers_page_default_max_output)) }, singleLine = true,
+                            isError = parseTokens(defaultOutText) == null, placeholder = { Text(stringResource(R.string.claude_providers_page_e_g_8k_blank_unknown)) }, modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
-                            timeoutText, { timeoutText = it.filter(Char::isDigit) }, label = { Text("Request timeout, seconds (optional)") }, singleLine = true,
-                            placeholder = { Text("default") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth()
+                            timeoutText, { timeoutText = it.filter(Char::isDigit) }, label = { Text(stringResource(R.string.claude_providers_page_request_timeout_seconds_optional)) }, singleLine = true,
+                            placeholder = { Text(stringResource(R.string.claude_providers_page_default)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
-                            retriesText, { retriesText = it.filter(Char::isDigit) }, label = { Text("Retries when a request fails (0-10)") }, singleLine = true,
-                            placeholder = { Text("default: 3") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            retriesText, { retriesText = it.filter(Char::isDigit) }, label = { Text(stringResource(R.string.claude_providers_page_retries_when_a_request_fails_0_10)) }, singleLine = true,
+                            placeholder = { Text(stringResource(R.string.claude_providers_page_default_3)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth(),
-                            supportingText = { Text("Rate limits, rejected keys and network errors are retried with growing waits. 0 = fail at once.") }
+                            supportingText = { Text(stringResource(R.string.claude_providers_page_rate_limits_rejected_keys_and_network_errors)) }
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text("Disable experimental betas", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                                Text("Turn on if the provider answers 400 about unknown fields or beta headers.", fontSize = 11.sp, color = muted)
+                                Text(stringResource(R.string.claude_providers_page_disable_experimental_betas), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                Text(stringResource(R.string.claude_providers_page_turn_on_if_the_provider_answers_400), fontSize = 11.sp, color = muted)
                             }
                             Switch(checked = disableBetas, onCheckedChange = { disableBetas = it }, colors = SwitchDefaults.colors(checkedTrackColor = ClaudeAccent))
                         }
@@ -770,18 +772,18 @@ private fun ProviderEditor(
                     // ---- advanced
                     EditorSection("Advanced", "Extra request headers and environment variables for this provider's chats.") {
                         OutlinedTextField(
-                            headers, { headers = it }, label = { Text("Headers (one per line)") }, minLines = 2, maxLines = 6,
-                            placeholder = { Text("X-Title: AntiGem\nHTTP-Referer: https://example.com") },
+                            headers, { headers = it }, label = { Text(stringResource(R.string.claude_providers_page_headers_one_per_line)) }, minLines = 2, maxLines = 6,
+                            placeholder = { Text(stringResource(R.string.claude_providers_page_x_title_antigem_http_referer_https_example)) },
                             textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace), modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
-                            env, { env = it }, label = { Text("Environment (NAME=value, one per line)") }, minLines = 2, maxLines = 6,
+                            env, { env = it }, label = { Text(stringResource(R.string.claude_providers_page_environment_name_value_one_per_line)) }, minLines = 2, maxLines = 6,
                             placeholder = { Text("CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192") },
                             textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace), modifier = Modifier.fillMaxWidth()
                         )
-                        Text("These win over everything above, so they can fix a provider's quirks.", fontSize = 11.sp, color = muted)
+                        Text(stringResource(R.string.claude_providers_page_these_win_over_everything_above_so_they), fontSize = 11.sp, color = muted)
                     }
-                    Text("Changes apply the next time a chat's process starts (switch its model or reopen the chat).", fontSize = 11.sp, color = muted)
+                    Text(stringResource(R.string.claude_providers_page_changes_apply_the_next_time_a_chat), fontSize = 11.sp, color = muted)
                 }
             }
         }
@@ -855,20 +857,20 @@ private fun ModelEditDialog(model: ClaudeProviderModel, provider: ClaudeProvider
         title = { Text(model.id, fontWeight = FontWeight.Bold, fontSize = 15.sp, fontFamily = FontFamily.Monospace) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(name, { name = it }, label = { Text("Display name (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.claude_providers_page_display_name_optional)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
-                    ctx, { ctx = it }, label = { Text("Context window (tokens)") }, singleLine = true, isError = ctxValue == null,
-                    placeholder = { Text(if (provider.default_context > 0) "default: ${tokenLabel(provider.default_context)}" else "e.g. 128k, 200000, 1m") },
+                    ctx, { ctx = it }, label = { Text(stringResource(R.string.claude_providers_page_context_window_tokens)) }, singleLine = true, isError = ctxValue == null,
+                    placeholder = { Text(if (provider.default_context > 0) stringResource(R.string.claude_providers_page_default_2, (tokenLabel(provider.default_context)).toString()) else "e.g. 128k, 200000, 1m") },
                     modifier = Modifier.fillMaxWidth(),
-                    supportingText = { Text("Used by the Context chip and for auto-compact. Blank = the provider's default.") }
+                    supportingText = { Text(stringResource(R.string.claude_providers_page_used_by_the_context_chip_and_for)) }
                 )
                 OutlinedTextField(
-                    out, { out = it }, label = { Text("Max output (tokens, optional)") }, singleLine = true, isError = outValue == null,
-                    placeholder = { Text(if (provider.default_max_output > 0) "default: ${tokenLabel(provider.default_max_output)}" else "e.g. 8k") },
+                    out, { out = it }, label = { Text(stringResource(R.string.claude_providers_page_max_output_tokens_optional)) }, singleLine = true, isError = outValue == null,
+                    placeholder = { Text(if (provider.default_max_output > 0) stringResource(R.string.claude_providers_page_default_2, (tokenLabel(provider.default_max_output)).toString()) else stringResource(R.string.claude_providers_page_e_g_8k)) },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text("Thinking", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                if (model.can_think) Text("The provider's model list says this model can reason.", fontSize = 11.sp, color = muted)
+                Text(stringResource(R.string.claude_chat_controls_thinking), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                if (model.can_think) Text(stringResource(R.string.claude_providers_page_the_provider_s_model_list_says_this), fontSize = 11.sp, color = muted)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("" to "Inherit", "off" to "Never send", "budget" to "Custom budget").forEach { (mode, label) ->
                         FilterChip(
@@ -877,13 +879,13 @@ private fun ModelEditDialog(model: ClaudeProviderModel, provider: ClaudeProvider
                         )
                     }
                 }
-                if (thinkMode == "") Text("Inherits the provider: $inherited.", fontSize = 11.sp, color = muted)
-                if (thinkMode == "off") Text("Thinking in the chat never sends a token budget to this model.", fontSize = 11.sp, color = muted)
+                if (thinkMode == "") Text(stringResource(R.string.claude_providers_page_inherits_the_provider, inherited.toString()), fontSize = 11.sp, color = muted)
+                if (thinkMode == "off") Text(stringResource(R.string.claude_providers_page_thinking_in_the_chat_never_sends_a), fontSize = 11.sp, color = muted)
                 if (thinkMode == "budget") {
                     OutlinedTextField(
-                        budgetText, { budgetText = it.filter(Char::isDigit) }, label = { Text("Thinking budget (tokens)") }, singleLine = true,
+                        budgetText, { budgetText = it.filter(Char::isDigit) }, label = { Text(stringResource(R.string.claude_providers_page_thinking_budget_tokens)) }, singleLine = true,
                         isError = !budgetOk, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(),
-                        supportingText = { Text("At least 1024. Sent when Thinking is on in the chat.") }
+                        supportingText = { Text(stringResource(R.string.claude_providers_page_at_least_1024_sent_when_thinking_is)) }
                     )
                 }
             }
@@ -898,7 +900,7 @@ private fun ModelEditDialog(model: ClaudeProviderModel, provider: ClaudeProvider
                 )
             }) { Text("OK", color = ClaudeAccent) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -916,15 +918,15 @@ private fun FetchedModelsDialog(
     val shown = models.filter { query.isBlank() || it.id.contains(query, true) || it.name.orEmpty().contains(query, true) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("$providerName: ${models.size} models", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.claude_providers_page_models_2, providerName.toString(), models.size.toString()), fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (models.size > 8) {
-                    OutlinedTextField(query, { query = it }, placeholder = { Text("Search") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(query, { query = it }, placeholder = { Text(stringResource(R.string.browser_screen_search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 }
                 Row {
-                    TextButton(onClick = { picked = picked + shown.map { it.id }.filter { it !in existing } }) { Text("Select all") }
-                    TextButton(onClick = { picked = picked - shown.map { it.id }.toSet() }) { Text("None") }
+                    TextButton(onClick = { picked = picked + shown.map { it.id }.filter { it !in existing } }) { Text(stringResource(R.string.claude_providers_page_select_all)) }
+                    TextButton(onClick = { picked = picked - shown.map { it.id }.toSet() }) { Text(stringResource(R.string.claude_providers_page_none)) }
                 }
                 LazyColumn(Modifier.heightIn(max = 380.dp)) {
                     items(shown, key = { it.id }) { m ->
@@ -953,10 +955,10 @@ private fun FetchedModelsDialog(
         },
         confirmButton = {
             TextButton(onClick = { onAdd(models.filter { it.id in picked }) }) {
-                Text(if (picked.isEmpty()) "Update sizes" else "Add ${picked.size}", color = ClaudeAccent)
+                Text(if (picked.isEmpty()) stringResource(R.string.claude_providers_page_update_sizes) else stringResource(R.string.claude_providers_page_add, picked.size.toString()), color = ClaudeAccent)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -976,13 +978,13 @@ private fun ModelIdField(
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 if (models.isNotEmpty()) {
-                    IconButton(onClick = { open = !open }) { Icon(Icons.Filled.ArrowDropDown, "Choose from the provider's models") }
+                    IconButton(onClick = { open = !open }) { Icon(Icons.Filled.ArrowDropDown, stringResource(R.string.claude_providers_page_choose_from_the_provider_s_models)) }
                 }
             }
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.heightIn(max = 320.dp)) {
             DropdownMenuItem(
-                text = { Text("Same as the chat's model", fontSize = 13.sp) },
+                text = { Text(stringResource(R.string.claude_providers_page_same_as_the_chat_s_model), fontSize = 13.sp) },
                 onClick = { onValueChange(""); open = false }
             )
             models.forEach { m ->
@@ -1023,22 +1025,22 @@ private fun RawResponseDialog(raw: ClaudeFetchRaw, onDismiss: () -> Unit) {
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Raw response", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.claude_providers_page_raw_response), fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(verdict, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
                 Text("GET ${raw.url}", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
                 raw.request_headers.forEach { Text(it, fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, color = muted) }
                 HorizontalDivider()
-                Text("HTTP ${raw.status}  ·  ${raw.entries} listed  ·  ${raw.kept} kept", fontSize = 11.sp, color = muted)
+                Text(stringResource(R.string.claude_providers_page_http_listed_kept, raw.status.toString(), raw.entries.toString(), raw.kept.toString()), fontSize = 11.sp, color = muted)
                 if (raw.pages > 0) {
                     Text(
-                        "${raw.pages} page${if (raw.pages == 1) "" else "s"} read · pagination: ${raw.pagination.ifBlank { "none" }}",
+                        stringResource(R.string.claude_providers_page_page_read_pagination, raw.pages.toString(), (if (raw.pages == 1) "" else "s").toString(), (raw.pagination.ifBlank { "none" }).toString()),
                         fontSize = 11.sp, color = muted
                     )
                 }
-                if (raw.paging_error.isNotBlank()) Text("Stopped early: ${raw.paging_error}", fontSize = 11.sp, color = QuotaAmber)
-                Text("The body below is the first page only.", fontSize = 10.5.sp, color = muted)
+                if (raw.paging_error.isNotBlank()) Text(stringResource(R.string.claude_providers_page_stopped_early, raw.paging_error.toString()), fontSize = 11.sp, color = QuotaAmber)
+                Text(stringResource(R.string.claude_providers_page_the_body_below_is_the_first_page), fontSize = 10.5.sp, color = muted)
                 Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp)) {
                     Column(Modifier.verticalScroll(rememberScrollState()).horizontalScroll(rememberScrollState()).padding(8.dp)) {
                         Text(raw.body.ifBlank { "(empty body)" } + if (raw.truncated) "\n… (cut)" else "", fontSize = 10.5.sp, fontFamily = FontFamily.Monospace)
@@ -1050,9 +1052,9 @@ private fun RawResponseDialog(raw: ClaudeFetchRaw, onDismiss: () -> Unit) {
             TextButton(onClick = {
                 clipboard.setText(AnnotatedString(text))
                 Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
-            }) { Icon(Icons.Outlined.ContentCopy, null, Modifier.size(14.dp), tint = ClaudeAccent); Spacer(Modifier.width(6.dp)); Text("Copy", color = ClaudeAccent) }
+            }) { Icon(Icons.Outlined.ContentCopy, null, Modifier.size(14.dp), tint = ClaudeAccent); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.copy_text), color = ClaudeAccent) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) } }
     )
 }
 
@@ -1071,7 +1073,7 @@ private fun SuggestField(
         OutlinedTextField(
             value, onValueChange, label = { Text(label) }, singleLine = true, placeholder = { Text(placeholder) },
             modifier = Modifier.fillMaxWidth(),
-            trailingIcon = { IconButton(onClick = { open = !open }) { Icon(Icons.Filled.ArrowDropDown, "Choose") } }
+            trailingIcon = { IconButton(onClick = { open = !open }) { Icon(Icons.Filled.ArrowDropDown, stringResource(R.string.claude_providers_page_choose)) } }
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.heightIn(max = 320.dp)) {
             DropdownMenuItem(text = { Text(autoLabel, fontSize = 13.sp) }, onClick = { onValueChange(""); open = false })
@@ -1112,30 +1114,30 @@ private fun ModelsMappingDialog(
     var sizeText by remember { mutableStateOf(if (initial.page_size > 0) initial.page_size.toString() else "") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Field mapping & pagination", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.claude_providers_page_field_mapping_pagination_2), fontWeight = FontWeight.Bold) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    if (raw == null || lists.isEmpty()) "Fetch once to get suggestions from the provider's answer, or type the paths by hand. Leave a field empty to detect it."
-                    else "Suggestions come from the last answer. Leave a field empty to detect it. Paths use dots, e.g. top_provider.context_length.",
+                    if (raw == null || lists.isEmpty()) stringResource(R.string.claude_providers_page_fetch_once_to_get_suggestions_from_the)
+                    else stringResource(R.string.claude_providers_page_suggestions_come_from_the_last_answer_leave),
                     fontSize = 11.5.sp, color = muted
                 )
-                Text("Where the models are", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.claude_providers_page_where_the_models_are), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 SuggestField(
                     m.list_path, { m = m.copy(list_path = it) }, "List path",
                     lists.map { ClaudeRawKey(it.path, "${it.count} items" + if (it.strings) " (ids as plain text)" else "") }
                 )
-                Text("Fields of one model", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.claude_providers_page_fields_of_one_model), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 SuggestField(m.id_field, { m = m.copy(id_field = it) }, "Id", itemKeys)
                 SuggestField(m.name_field, { m = m.copy(name_field = it) }, "Display name", itemKeys, "none")
                 SuggestField(m.context_field, { m = m.copy(context_field = it) }, "Context window", itemKeys, "none")
                 SuggestField(m.max_output_field, { m = m.copy(max_output_field = it) }, "Max output", itemKeys, "none")
                 OutlinedTextField(
-                    m.strip_prefix, { m = m.copy(strip_prefix = it) }, label = { Text("Remove from the start of every id") },
-                    singleLine = true, placeholder = { Text("e.g. models/") }, modifier = Modifier.fillMaxWidth()
+                    m.strip_prefix, { m = m.copy(strip_prefix = it) }, label = { Text(stringResource(R.string.claude_providers_page_remove_from_the_start_of_every_id)) },
+                    singleLine = true, placeholder = { Text(stringResource(R.string.claude_providers_page_e_g_models)) }, modifier = Modifier.fillMaxWidth()
                 )
 
-                Text("Pagination", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.claude_providers_page_pagination), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("" to "Detect", "none" to "None", "cursor" to "Cursor", "token" to "Page token", "next_url" to "Next URL").forEach { (mode, label) ->
                         FilterChip(
@@ -1148,10 +1150,10 @@ private fun ModelsMappingDialog(
                     when (m.pagination) {
                         "" -> "Detected from the first answer: has_more + last_id (Anthropic), nextPageToken / next_page_token (Google), or a next URL." +
                             (raw?.takeIf { it.pages > 0 }?.let { " Last fetch: ${it.pages} page(s), ${it.pagination.ifBlank { "none" }}." } ?: "")
-                        "none" -> "Only the first page is read."
-                        "cursor" -> "While the flag is true, the next request sends the cursor (default: has_more / last_id → after_id)."
-                        "token" -> "The next request sends the token from the answer (default: next_page_token / nextPageToken → page_token / pageToken)."
-                        else -> "The next request goes to the URL the answer carries (default field: next)."
+                        "none" -> stringResource(R.string.claude_providers_page_only_the_first_page_is_read)
+                        "cursor" -> stringResource(R.string.claude_providers_page_while_the_flag_is_true_the_next)
+                        "token" -> stringResource(R.string.claude_providers_page_the_next_request_sends_the_token_from)
+                        else -> stringResource(R.string.claude_providers_page_the_next_request_goes_to_the_url)
                     },
                     fontSize = 11.sp, color = muted
                 )
@@ -1167,31 +1169,31 @@ private fun ModelsMappingDialog(
                 }
                 if (m.pagination == "cursor" || m.pagination == "token") {
                     OutlinedTextField(
-                        m.page_param, { m = m.copy(page_param = it) }, label = { Text("Query parameter to send it in") },
+                        m.page_param, { m = m.copy(page_param = it) }, label = { Text(stringResource(R.string.claude_providers_page_query_parameter_to_send_it_in)) },
                         singleLine = true, placeholder = { Text(if (m.pagination == "cursor") "after_id" else "page_token") }, modifier = Modifier.fillMaxWidth()
                     )
                 }
                 if (m.pagination != "none") {
                     OutlinedTextField(
                         sizeText, { sizeText = it.filter(Char::isDigit); m = m.copy(page_size = sizeText.toIntOrNull() ?: 0) },
-                        label = { Text("Page size (optional)") }, singleLine = true, placeholder = { Text("provider's default") },
+                        label = { Text(stringResource(R.string.claude_providers_page_page_size_optional)) }, singleLine = true, placeholder = { Text(stringResource(R.string.claude_providers_page_provider_s_default)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth()
                     )
                     if (m.page_size > 0) {
                         OutlinedTextField(
-                            m.limit_param, { m = m.copy(limit_param = it) }, label = { Text("Parameter name for the page size") },
+                            m.limit_param, { m = m.copy(limit_param = it) }, label = { Text(stringResource(R.string.claude_providers_page_parameter_name_for_the_page_size)) },
                             singleLine = true, placeholder = { Text("limit") }, modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
-                Text("At most 100 pages / 20,000 models are read; reading stops early if a page adds nothing new.", fontSize = 10.5.sp, color = muted)
+                Text(stringResource(R.string.claude_providers_page_at_most_100_pages_20_000_models), fontSize = 10.5.sp, color = muted)
             }
         },
-        confirmButton = { TextButton(onClick = { onApply(m) }) { Text("Apply & fetch", color = ClaudeAccent) } },
+        confirmButton = { TextButton(onClick = { onApply(m) }) { Text(stringResource(R.string.claude_providers_page_apply_fetch), color = ClaudeAccent) } },
         dismissButton = {
             Row {
-                TextButton(onClick = { m = ClaudeModelsMapping(); sizeText = "" }) { Text("Reset") }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = { m = ClaudeModelsMapping(); sizeText = "" }) { Text(stringResource(R.string.claude_providers_page_reset)) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) }
             }
         }
     )

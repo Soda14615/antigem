@@ -219,7 +219,8 @@ public class TextSelectionCursorController implements CursorController {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(terminalView.getContext(), "Failed to open URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Context context = terminalView.getContext();
+            Toast.makeText(context, context.getString(R.string.native_failed_to_open_url, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 

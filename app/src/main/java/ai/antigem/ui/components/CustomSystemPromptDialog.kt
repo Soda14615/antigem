@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -170,7 +172,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Chat System Prompt",
+                            text = stringResource(R.string.chat_telemetry_dialog_chat_system_prompt),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -189,7 +191,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ContentCopy,
-                                contentDescription = "Copy Prompt",
+                                contentDescription = stringResource(R.string.custom_system_prompt_dialog_copy_prompt),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -210,7 +212,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         onClick = { selectedTab = 0 },
                         text = {
                             Text(
-                                text = "🧠 Active Prompt",
+                                text = stringResource(R.string.custom_system_prompt_dialog_active_prompt),
                                 fontSize = 12.5.sp,
                                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal
                             )
@@ -221,7 +223,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         onClick = { selectedTab = 1 },
                         text = {
                             Text(
-                                text = "✍️ Custom Override",
+                                text = stringResource(R.string.custom_system_prompt_dialog_custom_override),
                                 fontSize = 12.5.sp,
                                 fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal
                             )
@@ -265,7 +267,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         onValueChange = { promptText = it },
                         placeholder = {
                             Text(
-                                text = "e.g. You are an expert Android Kotlin engineer. Write clean Compose code with 0 bugs...",
+                                text = stringResource(R.string.custom_system_prompt_dialog_e_g_you_are_an_expert_android),
                                 fontSize = 12.5.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                             )
@@ -297,12 +299,12 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                         TextButton(onClick = { promptText = "" }) {
                             Icon(
                                 imageVector = Icons.Outlined.RestartAlt,
-                                contentDescription = "Clear",
+                                contentDescription = stringResource(R.string.custom_system_prompt_dialog_clear),
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.error
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Reset", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.claude_providers_page_reset), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                         }
                     } else {
                         Spacer(modifier = Modifier.width(8.dp))
@@ -310,7 +312,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
 
                     Row {
                         TextButton(onClick = onDismiss) {
-                            Text("Close", fontSize = 13.sp)
+                            Text(stringResource(R.string.accounts_ui_close), fontSize = 13.sp)
                         }
                         if (selectedTab == 1) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -322,7 +324,7 @@ Available slash commands: /goal, /schedule, /browser, /plan, /grill-me, /teamwor
                                 colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text("Save Prompt", fontSize = 13.sp, color = Color.White)
+                                Text(stringResource(R.string.custom_system_prompt_dialog_save_prompt), fontSize = 13.sp, color = Color.White)
                             }
                         }
                     }

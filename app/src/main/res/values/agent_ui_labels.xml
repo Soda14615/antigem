@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_settings_account_cli">"Account &amp; CLI"</string>
+    <string name="agent_settings_sign_in_plan_usage_install_and_update_claude_code">"Sign-in, plan usage, install and update Claude Code"</string>
+    <string name="agent_settings_chat_defaults">"Chat defaults"</string>
+    <string name="agent_settings_model_effort_thinking_permission_mode_output_style">"Model, effort, thinking, permission mode, output style"</string>
+    <string name="agent_settings_custom_providers">"Custom providers"</string>
+    <string name="agent_settings_openrouter_kimi_and_other_anthropic_compatible_apis">"OpenRouter, Kimi and other Anthropic-compatible APIs"</string>
+    <string name="agent_settings_permission_rules">"Permission rules"</string>
+    <string name="agent_settings_what_claude_may_do_without_asking">"What Claude may do without asking"</string>
+    <string name="agent_settings_mcp_servers">"MCP servers"</string>
+    <string name="agent_settings_installed_plugins_catalog_and_marketplaces">"Installed plugins, catalog and marketplaces"</string>
+    <string name="agent_settings_skills">"Skills"</string>
+    <string name="agent_settings_add_skills_from_github_update_or_remove_them">"Add skills from GitHub, update or remove them"</string>
+    <string name="agent_settings_memory">"Memory"</string>
+    <string name="agent_settings_instructions_claude_md_and_the_notes_claude_saved">"Instructions (CLAUDE.md) and the notes Claude saved"</string>
+    <string name="agent_settings_advanced">"Advanced"</string>
+    <string name="agent_settings_edit_claude_settings_json_directly">"Edit ~/.claude/settings.json directly"</string>
+    <string name="agent_settings_sign_in_with_chatgpt_or_sign_out">"Sign in with ChatGPT, or sign out"</string>
+    <string name="agent_settings_how_much_of_your_plan_s_limits_is_used_and_when_they_reset">"How much of your plan's limits is used, and when they reset"</string>
+    <string name="agent_settings_what_codex_asks_before_acting_in_new_chats">"What Codex asks before acting in new chats"</string>
+    <string name="agent_settings_tools_codex_can_call_presets_and_your_own_servers">"Tools Codex can call: presets and your own servers"</string>
+    <string name="agent_settings_install_plugins_from_codex_catalog_or_any_github_marketplace">"Install plugins from Codex' catalog or any GitHub marketplace"</string>
+    <string name="agent_settings_install_update_and_restart_codex">"Install, update and restart Codex"</string>
+    <string name="agent_permission_read_only">"Read only"</string>
+    <string name="agent_permission_ask_first">"Ask first"</string>
+    <string name="agent_permission_full_access">"Full access"</string>
+    <string name="agent_permission_reads_the_project_asks_before_changing_files_or_running_an">"Reads the project. Asks before changing files or running anything that needs more."</string>
+    <string name="agent_permission_edits_files_in_the_project_asks_before_running_commands_ex">"Edits files in the project; asks before running commands (except known safe ones)."</string>
+    <string name="agent_permission_no_sandbox_and_no_questions_codex_can_change_anything_and">"No sandbox and no questions: Codex can change anything and use the network."</string>
+    <string name="agent_permission_codex_s_default_edits_and_runs_commands_inside_the_project">"Codex's default: edits and runs commands inside the project; asks before going outside it or online."</string>
+    <string name="agent_settings_install_update_and_restart_opencode">"Install, update and restart OpenCode"</string>
+    <string name="agent_settings_what_opencode_asks_before_acting_and_the_agent_of_new_chats">"What OpenCode asks before acting, and the agent of new chats"</string>
+    <string name="agent_settings_sign_in_or_add_an_api_key_or_add_any_openai_or_anthropic_com">"Sign in or add an API key, or add any OpenAI- or Anthropic-compatible API manually"</string>
+    <string name="agent_settings_tools_opencode_can_call_presets_and_your_own_servers">"Tools OpenCode can call: presets and your own servers"</string>
+    <string name="agent_permission_allow_all">"Allow all"</string>
+    <string name="agent_permission_opencode_rules">"OpenCode rules"</string>
+    <string name="agent_permission_commands_edits_and_web_access_run_without_asking">"Commands, edits and web access run without asking."</string>
+    <string name="agent_permission_opencode_s_own_rules_from_its_config_by_default_most_tools">"OpenCode's own rules from its config (by default most tools run without asking)."</string>
+    <string name="agent_permission_ask_before_commands_file_changes_and_web_access_reading_th">"Ask before commands, file changes and web access. Reading the project is allowed."</string>
+</resources>

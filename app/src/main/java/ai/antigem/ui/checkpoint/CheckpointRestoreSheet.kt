@@ -1,5 +1,7 @@
 package ai.antigem.ui.checkpoint
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -121,9 +123,9 @@ fun CheckpointRestoreSheet(
                     Notice(Icons.Outlined.ErrorOutline, AppColors.danger, s.message)
                     Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = onDismiss) { Text("Close") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) }
                         Spacer(Modifier.width(6.dp))
-                        FilledTonalButton(onClick = { reload++ }) { Text("Try again") }
+                        FilledTonalButton(onClick = { reload++ }) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
                     }
                 }
                 is SheetState.Ready -> {
@@ -139,7 +141,7 @@ fun CheckpointRestoreSheet(
                     }
                     if (onRestoreChat != null) {
                         Spacer(Modifier.height(16.dp))
-                        Text("What goes back", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.checkpoint_restore_sheet_what_goes_back), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(8.dp))
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             RestoreMode.entries.forEach { m ->
@@ -162,10 +164,10 @@ fun CheckpointRestoreSheet(
                     val nothingToRestore = !mode.chat && pv.files.isEmpty()
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         if (onDelete != null) {
-                            TextButton(onClick = onDelete) { Text("Delete", color = AppColors.danger) }
+                            TextButton(onClick = onDelete) { Text(stringResource(R.string.browser_screen_delete), color = AppColors.danger) }
                         }
                         Spacer(Modifier.weight(1f))
-                        TextButton(onClick = onDismiss) { Text("Cancel") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) }
                         Spacer(Modifier.width(6.dp))
                         Button(
                             enabled = !agentBusy && !nothingToRestore,
@@ -190,9 +192,9 @@ fun CheckpointRestoreSheet(
                             colors = ButtonDefaults.buttonColors(containerColor = accent)
                         ) {
                             Text(when (mode) {
-                                RestoreMode.CHAT_AND_FILES -> "Restore chat & files"
-                                RestoreMode.FILES -> "Restore files"
-                                RestoreMode.CHAT -> "Restore chat"
+                                RestoreMode.CHAT_AND_FILES -> stringResource(R.string.checkpoint_restore_sheet_restore_chat_files)
+                                RestoreMode.FILES -> stringResource(R.string.checkpoint_restore_sheet_restore_files)
+                                RestoreMode.CHAT -> stringResource(R.string.checkpoint_restore_sheet_restore_chat)
                             }, fontWeight = FontWeight.SemiBold)
                         }
                     }
@@ -203,7 +205,7 @@ fun CheckpointRestoreSheet(
                     Notice(Icons.Outlined.CheckCircle, AppColors.success, "Restore undone: the files are as they were right before it.")
                     Spacer(Modifier.height(14.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        Button(onClick = onDismiss) { Text("Done") }
+                        Button(onClick = onDismiss) { Text(stringResource(R.string.browser_screen_done)) }
                     }
                 }
             }
@@ -222,7 +224,7 @@ private fun SheetHeader(cp: CheckpointSummary, fromChat: Boolean) {
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                if (cp.isPreRestore) "Undo that restore" else if (fromChat) "Go back to before this message" else "Restore this checkpoint",
+                if (cp.isPreRestore) stringResource(R.string.checkpoint_restore_sheet_undo_that_restore) else if (fromChat) stringResource(R.string.checkpoint_restore_sheet_go_back_to_before_this_message) else stringResource(R.string.checkpoint_restore_sheet_restore_this_checkpoint),
                 fontSize = 17.sp, fontWeight = FontWeight.Bold
             )
             Text(
@@ -287,7 +289,7 @@ private fun PreviewBody(projectPath: String, cp: CheckpointSummary, pv: Checkpoi
             }
         }
         Spacer(Modifier.height(4.dp))
-        Text("Tap a file to see exactly what changes in it.", fontSize = 11.5.sp, color = muted)
+        Text(stringResource(R.string.checkpoint_restore_sheet_tap_a_file_to_see_exactly_what), fontSize = 11.5.sp, color = muted)
     }
     val shown = pv.warnings.filter { it.kind != "outside" }
     if (shown.isNotEmpty()) {
@@ -301,7 +303,7 @@ private fun PreviewBody(projectPath: String, cp: CheckpointSummary, pv: Checkpoi
                     pv.laterChats.take(5).forEach { lc ->
                         val a = agentOf(lc.agent)
                         Text(
-                            "• ${a?.label() ?: "Chat"}: “${lc.title?.takeIf { it.isNotBlank() } ?: "untitled"}” (${lc.turns} message${if (lc.turns == 1) "" else "s"}, ${formatCheckpointTime(lc.time)})",
+                            stringResource(R.string.checkpoint_restore_sheet_message, (a?.label() ?: "Chat").toString(), (lc.title?.takeIf { it.isNotBlank() } ?: "untitled").toString(), lc.turns.toString(), (if (lc.turns == 1) "" else "s").toString(), (formatCheckpointTime(lc.time)).toString()),
                             fontSize = 12.sp, lineHeight = 16.sp, color = muted, maxLines = 2, overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -361,7 +363,7 @@ private fun FileRow(projectPath: String, checkpointId: String, f: CheckpointFile
             }
             Spacer(Modifier.width(8.dp))
             if (f.binary) {
-                Text("binary", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.checkpoint_restore_sheet_binary), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 if (f.added > 0) Text("+${f.added}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = AppColors.success, fontFamily = FontFamily.Monospace)
                 if (f.added > 0 && f.removed > 0) Spacer(Modifier.width(5.dp))
@@ -373,7 +375,7 @@ private fun FileRow(projectPath: String, checkpointId: String, f: CheckpointFile
         AnimatedVisibility(visible = open, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
             Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 10.dp)) {
                 when {
-                    f.binary -> Text("A binary file: it is put back as it was.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    f.binary -> Text(stringResource(R.string.checkpoint_restore_sheet_a_binary_file_it_is_put_back), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     diffError != null -> Text(diffError!!, fontSize = 12.sp, color = AppColors.danger)
                     diff == null -> LinearProgressIndicator(Modifier.fillMaxWidth().height(2.dp))
                     else -> DiffBlock(diff!!)
@@ -409,7 +411,7 @@ private fun DiffBlock(diff: String) {
             )
         }
         if (lines.size > maxLines) {
-            Text("… ${lines.size - maxLines} more lines", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+            Text(stringResource(R.string.checkpoint_restore_sheet_more_lines, (lines.size - maxLines).toString()), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
         }
     }
 }
@@ -431,14 +433,14 @@ private fun DoneBody(
             Icon(Icons.Outlined.CheckCircle, null, tint = AppColors.success, modifier = Modifier.size(32.dp))
         }
         Spacer(Modifier.height(10.dp))
-        Text(if (r.errors.isEmpty()) "Files restored" else "Files restored, with problems", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(if (r.errors.isEmpty()) stringResource(R.string.checkpoint_restore_sheet_files_restored) else stringResource(R.string.checkpoint_restore_sheet_files_restored_with_problems), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Text(
-            if (parts.isEmpty()) "Nothing had to change." else parts.joinToString(" · "),
+            if (parts.isEmpty()) stringResource(R.string.checkpoint_restore_sheet_nothing_had_to_change) else parts.joinToString(" · "),
             fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (s.mode.chat) {
             Spacer(Modifier.height(4.dp))
-            Text("The chat went back too: the message is in the input box.", fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.checkpoint_restore_sheet_the_chat_went_back_too_the_message), fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
     if (r.errors.isNotEmpty()) {
@@ -457,15 +459,15 @@ private fun DoneBody(
             }) {
                 Icon(Icons.AutoMirrored.Outlined.Undo, null, modifier = Modifier.size(17.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(if (s.mode.chat) "Undo files" else "Undo restore")
+                Text(if (s.mode.chat) stringResource(R.string.checkpoint_restore_sheet_undo_files) else stringResource(R.string.checkpoint_restore_sheet_undo_restore))
             }
         }
         Spacer(Modifier.weight(1f))
-        Button(onClick = onDismiss) { Text("Done") }
+        Button(onClick = onDismiss) { Text(stringResource(R.string.browser_screen_done)) }
     }
     if (s.mode.chat && r.undoId != null) {
         Spacer(Modifier.height(6.dp))
-        Text("Undo brings the files back; the chat part can't be undone.", fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.checkpoint_restore_sheet_undo_brings_the_files_back_the_chat), fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

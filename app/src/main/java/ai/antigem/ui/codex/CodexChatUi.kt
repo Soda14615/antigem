@@ -1,5 +1,7 @@
 package ai.antigem.ui.codex
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -168,18 +170,20 @@ fun codexApprovalItems(pending: List<CodexPending>, backend: CodexChatBackend, m
         }
     }
 
+@Composable
 fun codexModeLabel(mode: String): String = when (mode) {
-    CodexPreferences.MODE_READ_ONLY -> "Read only"
-    CodexPreferences.MODE_ASK -> "Ask first"
-    CodexPreferences.MODE_FULL -> "Full access"
-    else -> "Auto"
+    CodexPreferences.MODE_READ_ONLY -> stringResource(R.string.agent_permission_read_only)
+    CodexPreferences.MODE_ASK -> stringResource(R.string.agent_permission_ask_first)
+    CodexPreferences.MODE_FULL -> stringResource(R.string.agent_permission_full_access)
+    else -> stringResource(R.string.adb_connect_screen_auto)
 }
 
+@Composable
 fun codexModeDescription(mode: String): String = when (mode) {
-    CodexPreferences.MODE_READ_ONLY -> "Reads the project. Asks before changing files or running anything that needs more."
-    CodexPreferences.MODE_ASK -> "Edits files in the project; asks before running commands (except known safe ones)."
-    CodexPreferences.MODE_FULL -> "No sandbox and no questions: Codex can change anything and use the network."
-    else -> "Codex's default: edits and runs commands inside the project; asks before going outside it or online."
+    CodexPreferences.MODE_READ_ONLY -> stringResource(R.string.agent_permission_reads_the_project_asks_before_changing_files_or_running_an)
+    CodexPreferences.MODE_ASK -> stringResource(R.string.agent_permission_edits_files_in_the_project_asks_before_running_commands_ex)
+    CodexPreferences.MODE_FULL -> stringResource(R.string.agent_permission_no_sandbox_and_no_questions_codex_can_change_anything_and)
+    else -> stringResource(R.string.agent_permission_codex_s_default_edits_and_runs_commands_inside_the_project)
 }
 
 @Composable
@@ -224,14 +228,14 @@ fun CodexControlsStrip(backend: CodexChatBackend) {
         }
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (plan && lastPlan != null && !running) ControlChip(
-                text = "Implement plan",
+                text = stringResource(R.string.codex_chat_ui_implement_plan),
                 icon = Icons.Outlined.PlayArrow,
                 color = ai.antigem.theme.AppColors.success,
                 highlighted = true,
                 onClick = { backend.implementPlan() }
             )
             ControlChip(
-                text = if (plan) "Plan mode" else "Plan",
+                text = if (plan) stringResource(R.string.codex_chat_ui_plan_mode) else stringResource(R.string.codex_chat_ui_plan),
                 icon = Icons.Outlined.Lightbulb,
                 color = ai.antigem.theme.AppColors.accentTeal,
                 highlighted = plan,
@@ -387,7 +391,7 @@ fun CodexModelSheet(backend: CodexChatBackend, onOpenSettings: () -> Unit, onDis
             TextButton(onClick = { onDismiss(); onOpenSettings() }) {
                 Icon(Icons.Outlined.Settings, null, Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Codex account and settings")
+                Text(stringResource(R.string.codex_chat_ui_codex_account_and_settings))
             }
         }
     }

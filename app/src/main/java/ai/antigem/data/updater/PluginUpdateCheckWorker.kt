@@ -56,8 +56,8 @@ class PluginUpdateCheckWorker(context: Context, params: WorkerParameters) : Coro
         if (!manager.areNotificationsEnabled()) return false
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Plugin Updates", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Notifies when an installed plugin has a new version in its repository"
+            val channel = NotificationChannel(CHANNEL_ID, context.getString(R.string.notification_plugin_updates_channel), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_plugin_updates_channel_description)
             }
             context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
         }
@@ -72,12 +72,12 @@ class PluginUpdateCheckWorker(context: Context, params: WorkerParameters) : Coro
         val change = "${PluginVersions.label(extension.version)} → ${PluginVersions.label(offered.version)}"
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Plugin update: $name")
-            .setContentText("$change · update it in Settings → Plugins")
+            .setContentTitle(context.getString(R.string.notification_plugin_update_title, name))
+            .setContentText(context.getString(R.string.notification_plugin_update_message, change))
             .setStyle(NotificationCompat.BigTextStyle().bigText(
-                "$change is available from ${extension.source?.repo}." +
+                context.getString(R.string.notification_plugin_update_source, change, extension.source?.repo) +
                     (if (offered.description.isNotBlank()) "\n${offered.description}" else "") +
-                    "\nUpdate it in Settings → Plugins."
+                    context.getString(R.string.notification_plugin_update_instruction)
             ))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

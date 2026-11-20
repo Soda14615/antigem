@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -81,47 +83,47 @@ fun AndroidDevScreen(
             Surface(shape = RoundedCornerShape(12.dp), color = (if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen).copy(alpha = 0.1f)) {
                 Row(Modifier.fillMaxWidth().padding(start = 14.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(msg, fontSize = 12.5.sp, color = if (state.isError) MaterialTheme.colorScheme.error else QuotaGreen, modifier = Modifier.weight(1f))
-                    IconButton(onClick = AndroidDevManager::clearMessage) { Icon(Icons.Default.Close, "Dismiss", Modifier.size(18.dp)) }
+                    IconButton(onClick = AndroidDevManager::clearMessage) { Icon(Icons.Default.Close, stringResource(R.string.browser_screen_dismiss), Modifier.size(18.dp)) }
                 }
             }
         }
 
         if (!state.ready) {
-            Hint("Checking…")
+            Hint(stringResource(R.string.bridge_ui_checking))
             return@Column
         }
         if (!state.bootstrapInstalled) {
             DevInfoCard("Install the terminal first", cardBg, cardBorder) {
-                Hint("The tools install into AntiGem's terminal. Install it in Settings → Terminal & Shell, then come back here.")
+                Hint(stringResource(R.string.android_dev_screen_the_tools_install_into_antigem_s_terminal))
             }
             return@Column
         }
 
         // Step 1: setup files, downloaded on demand (nothing of this ships in the app)
         StepCard(
-            1, "Setup files",
+            1, stringResource(R.string.android_dev_screen_setup_files),
             when {
-                state.filesUpdate != null -> "Update"
+                state.filesUpdate != null -> stringResource(R.string.claude_settings_screen_update)
                 state.filesVersion != null -> "v${state.filesVersion}"
                 else -> null
             },
             cardBg, cardBorder,
             badgeColor = if (state.filesUpdate != null) Amber else QuotaGreen
         ) {
-            Hint("The setup script (android-setup.sh) and the adev commands are not part of the app. They are downloaded from the AntiGem plugins repository when you need them.")
+            Hint(stringResource(R.string.android_dev_screen_the_setup_script_android_setup_sh_and))
             DevSourceRow(state.source, enabled = !busy)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     state.filesVersion == null -> Button(enabled = !busy, onClick = AndroidDevManager::downloadSetupFiles) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Get setup files")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_get_setup_files))
                     }
                     state.filesUpdate != null -> Button(enabled = !busy, onClick = AndroidDevManager::downloadSetupFiles) {
-                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Update to v${state.filesUpdate}")
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_update_to_v, state.filesUpdate.toString()))
                     }
-                    else -> OutlinedButton(enabled = !busy, onClick = AndroidDevManager::downloadSetupFiles) { Text("Download again") }
+                    else -> OutlinedButton(enabled = !busy, onClick = AndroidDevManager::downloadSetupFiles) { Text(stringResource(R.string.android_dev_screen_download_again)) }
                 }
                 if (state.filesVersion != null && state.filesUpdate == null) {
-                    TextButton(enabled = !busy, onClick = AndroidDevManager::checkForUpdate) { Text("Check for update") }
+                    TextButton(enabled = !busy, onClick = AndroidDevManager::checkForUpdate) { Text(stringResource(R.string.android_dev_screen_check_for_update)) }
                 }
             }
             TaskOutput(state, "files")
@@ -131,8 +133,8 @@ fun AndroidDevScreen(
         InstallStep(state, cardBg, cardBorder)
 
         // Step 3: a hello world per framework proves the setup works
-        StepCard(3, "Build a test app", if (state.testApks.isNotEmpty()) "${state.testApks.size} built" else null, cardBg, cardBorder) {
-            Hint("Creates a hello-world app in ~/${AndroidDevManager.PROJECTS_DIR} and builds its debug APK. The first build of each kind downloads Gradle and libraries (several hundred MB) and takes 5–15 minutes; later builds are much faster.")
+        StepCard(3, stringResource(R.string.android_dev_screen_build_a_test_app), if (state.testApks.isNotEmpty()) stringResource(R.string.android_dev_screen_built, state.testApks.size.toString()) else null, cardBg, cardBorder) {
+            Hint(stringResource(R.string.android_dev_screen_creates_a_hello_world_app_in_and, AndroidDevManager.PROJECTS_DIR.toString()))
             Framework.entries.forEach { f -> TestBuildRow(f, state, busy) }
             if (state.task?.startsWith("test-") == true || state.logTask?.startsWith("test-") == true) {
                 TaskOutput(state, state.task ?: state.logTask!!)
@@ -140,23 +142,23 @@ fun AndroidDevScreen(
         }
 
         // Step 4: agents use it from the terminal, the same way whatever the agent
-        StepCard(4, "Use it", null, cardBg, cardBorder) {
+        StepCard(4, stringResource(R.string.android_dev_screen_use_it), null, cardBg, cardBorder) {
             UseGuide(state)
         }
 
         SkillCard(state, busy, cardBg, cardBorder, onOpenPlugins)
 
         DevInfoCard("Install on this phone", cardBg, cardBorder, pill = if (adb.connectedDevice != null) "adb connected" to QuotaGreen else "Optional" to MaterialTheme.colorScheme.primary) {
-            Hint("The Install buttons above open Android's installer. Agents can also install and start apps themselves with adb (and read logcat): install adb below, then connect the terminal's adb to this phone once over Wireless debugging.")
+            Hint(stringResource(R.string.android_dev_screen_the_install_buttons_above_open_android_s))
             val device = adb.connectedDevice
-            if (device != null) Mono("adb connected: ${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text("Set up ADB Connect") }
+            if (device != null) Mono("adb connected: ${device.serial}") else OutlinedButton(onClick = onOpenAdbConnect) { Text(stringResource(R.string.android_dev_screen_set_up_adb_connect)) }
         }
 
         // Check
         DevInfoCard("Check the tools", cardBg, cardBorder) {
-            Hint("Prints the version of every tool in the container: Java, the SDK platforms, aapt2, adb, Node.js, Flutter, CMake.")
+            Hint(stringResource(R.string.android_dev_screen_prints_the_version_of_every_tool_in))
             OutlinedButton(enabled = !busy && Component.CONTAINER in state.installed && state.filesReady, onClick = AndroidDevManager::runDoctor) {
-                Icon(Icons.Outlined.HealthAndSafety, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Check")
+                Icon(Icons.Outlined.HealthAndSafety, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_check))
             }
             TaskOutput(state, "doctor")
         }
@@ -181,9 +183,9 @@ fun AndroidDevScreen(
             title = { Text(title) },
             text = { Text(text) },
             confirmButton = {
-                TextButton(onClick = { action(); confirm = null }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = { action(); confirm = null }) { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirm = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { confirm = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -195,15 +197,15 @@ private fun IntroCard(state: AndroidDevManager.State, cardBg: Color, cardBorder:
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Android, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("Build Android apps on this phone", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.android_dev_screen_build_android_apps_on_this_phone), fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 when {
-                    state.anyReady -> Pill("Ready", QuotaGreen)
-                    state.installed.isNotEmpty() -> Pill("Partly set up", Amber)
-                    else -> Pill("Not set up", MaterialTheme.colorScheme.primary)
+                    state.anyReady -> Pill(stringResource(R.string.android_dev_screen_ready), QuotaGreen)
+                    state.installed.isNotEmpty() -> Pill(stringResource(R.string.android_dev_screen_partly_set_up), Amber)
+                    else -> Pill(stringResource(R.string.android_dev_screen_not_set_up), MaterialTheme.colorScheme.primary)
                 }
             }
-            Hint("Let agents (and you) create, build and install Android apps right here: Kotlin or Java with Jetpack Compose, Flutter, and React Native. Gradle, the Android SDK and Flutter run in an Ubuntu container (proot-distro) inside the terminal, the same container REA uses.")
-            Hint("Install only what you need: Kotlin / Java first (the others build on it), then Flutter or React Native.")
+            Hint(stringResource(R.string.android_dev_screen_let_agents_and_you_create_build_and))
+            Hint(stringResource(R.string.android_dev_screen_install_only_what_you_need_kotlin_java))
         }
     }
 }
@@ -215,15 +217,15 @@ private fun DevSourceRow(source: String, enabled: Boolean) {
     var error by remember { mutableStateOf<String?>(null) }
     if (!editing) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("From $source", fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
-            TextButton(enabled = enabled, onClick = { editing = true }) { Text("Change", fontSize = 12.sp) }
+            Text(stringResource(R.string.android_dev_screen_from, source.toString()), fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.weight(1f))
+            TextButton(enabled = enabled, onClick = { editing = true }) { Text(stringResource(R.string.android_dev_screen_change), fontSize = 12.sp) }
         }
         return
     }
     OutlinedTextField(
         value = text, onValueChange = { text = it; error = null }, singleLine = true,
-        label = { Text("owner/repo@branch") }, isError = error != null,
-        supportingText = { Text(error ?: "A fork of the AntiGem plugins repository, for testing changes to the setup.") },
+        label = { Text(stringResource(R.string.android_dev_screen_owner_repo_branch)) }, isError = error != null,
+        supportingText = { Text(error ?: stringResource(R.string.android_dev_screen_a_fork_of_the_antigem_plugins_repository)) },
         modifier = Modifier.fillMaxWidth()
     )
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -231,9 +233,9 @@ private fun DevSourceRow(source: String, enabled: Boolean) {
             runCatching { AndroidDevManager.setSource(text) }
                 .onSuccess { editing = false; AndroidDevManager.checkForUpdate() }
                 .onFailure { error = it.message }
-        }) { Text("Save") }
-        TextButton(onClick = { text = AndroidDevManager.DEFAULT_SOURCE }) { Text("Default") }
-        TextButton(onClick = { editing = false; text = source }) { Text("Cancel") }
+        }) { Text(stringResource(R.string.claude_providers_page_save)) }
+        TextButton(onClick = { text = AndroidDevManager.DEFAULT_SOURCE }) { Text(stringResource(R.string.android_dev_screen_default)) }
+        TextButton(onClick = { editing = false; text = source }) { Text(stringResource(R.string.accounts_ui_cancel)) }
     }
 }
 
@@ -249,12 +251,12 @@ private fun InstallStep(state: AndroidDevManager.State, cardBg: Color, cardBorde
     val readyCount = Framework.entries.count { state.ready(it) }
 
     StepCard(
-        2, "Install",
-        if (readyCount > 0) "$readyCount of ${Framework.entries.size} ready" else null,
+        2, stringResource(R.string.claude_settings_screen_install),
+        if (readyCount > 0) stringResource(R.string.android_dev_screen_of_ready, readyCount.toString(), Framework.entries.size.toString()) else null,
         cardBg, cardBorder,
         badgeColor = if (readyCount > 0) QuotaGreen else Amber
     ) {
-        Hint("Pick what you want to build. Everything it needs is installed for you, one part after another.")
+        Hint(stringResource(R.string.android_dev_screen_pick_what_you_want_to_build_everything))
         val facts = listOfNotNull(
             state.containerName?.let { "Container: $it" },
             state.platforms.takeIf { it.isNotEmpty() }?.let { "SDK platforms: ${it.joinToString()}" },
@@ -263,37 +265,37 @@ private fun InstallStep(state: AndroidDevManager.State, cardBg: Color, cardBorde
         )
         if (facts.isNotEmpty()) Mono(facts.joinToString("\n"))
 
-        Text("What will you build?", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.android_dev_screen_what_will_you_build), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         Framework.entries.forEach { f ->
             FrameworkRow(f, state, f in frameworks, busy) { on ->
                 if (on) frameworks.add(f) else frameworks.remove(f)
             }
         }
-        Text("Extras", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
+        Text(stringResource(R.string.android_dev_screen_extras), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
         listOf(Component.ADB, Component.NDK).forEach { c ->
             PartRow(c, state, checked = c in extras, busy = busy) { on -> if (on) extras.add(c) else extras.remove(c) }
         }
 
         if (isInstallTask(state.task) || isInstallTask(state.logTask)) BatchProgress(state)
         if (!busy) {
-            if (plan.isNotEmpty()) Hint("Installs ${plan.size} part${if (plan.size == 1) "" else "s"}: ${plan.joinToString(", ") { it.label }}.")
+            if (plan.isNotEmpty()) Hint(stringResource(R.string.android_dev_screen_installs_part, plan.size.toString(), (if (plan.size == 1) "" else "s").toString(), (plan.joinToString(", ") { it.label }).toString()))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(enabled = plan.isNotEmpty(), onClick = { AndroidDevManager.installAll(plan) }) {
                     Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                    Text(if (plan.isEmpty()) "Nothing to install" else "Install selected (${plan.size})")
+                    Text(if (plan.isEmpty()) stringResource(R.string.android_dev_screen_nothing_to_install) else stringResource(R.string.android_dev_screen_install_selected, plan.size.toString()))
                 }
             }
-            if (!state.filesReady) Hint("The setup files are downloaded first.")
+            if (!state.filesReady) Hint(stringResource(R.string.android_dev_screen_the_setup_files_are_downloaded_first))
         } else if (isInstallTask(state.task)) {
-            Hint("Keep AntiGem open: the screen stays on while this runs. Stopping half way is safe; install the part again to finish it.")
+            Hint(stringResource(R.string.android_dev_screen_keep_antigem_open_the_screen_stays_on))
             OutlinedButton(onClick = AndroidDevManager::stop, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                Icon(Icons.Outlined.StopCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Stop")
+                Icon(Icons.Outlined.StopCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.chat_input_bar_stop))
             }
         }
 
         var showParts by remember { mutableStateOf(false) }
         TextButton(onClick = { showParts = !showParts }, contentPadding = PaddingValues(0.dp)) {
-            Text(if (showParts) "Hide the parts" else "All parts (install, repair or update one)", fontSize = 12.5.sp)
+            Text(if (showParts) stringResource(R.string.android_dev_screen_hide_the_parts) else stringResource(R.string.android_dev_screen_all_parts_install_repair_or_update_one), fontSize = 12.5.sp)
         }
         if (showParts) {
             Component.entries.forEach { c -> PartRow(c, state, checked = false, busy = busy, onCheck = null) }
@@ -307,12 +309,12 @@ private fun FrameworkRow(f: Framework, state: AndroidDevManager.State, checked: 
     val missing = AndroidDevManager.componentsFor(f).filter { it !in state.installed }
     Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f)) {
         Row(Modifier.fillMaxWidth().clickable(enabled = !busy && !ready) { onCheck(!checked) }.padding(horizontal = 6.dp, vertical = 6.dp), verticalAlignment = Alignment.Top) {
-            if (ready) Icon(Icons.Outlined.CheckCircle, "Ready", tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
+            if (ready) Icon(Icons.Outlined.CheckCircle, stringResource(R.string.android_dev_screen_ready), tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
             else Checkbox(checked = checked, enabled = !busy, onCheckedChange = onCheck)
             Column(Modifier.weight(1f).padding(top = 10.dp, end = 8.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(f.label, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
                 Text(
-                    if (ready) "Ready" else "${f.size} · needs ${missing.joinToString(", ") { it.label }}",
+                    if (ready) stringResource(R.string.android_dev_screen_ready) else stringResource(R.string.android_dev_screen_needs, f.size.toString(), (missing.joinToString(", ") { it.label }).toString()),
                     fontSize = 11.5.sp, color = if (ready) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
                 Text(f.description, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
@@ -331,9 +333,9 @@ private fun PartRow(c: Component, state: AndroidDevManager.State, checked: Boole
         Column(Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(horizontal = 6.dp, vertical = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when {
-                    installed -> Icon(Icons.Outlined.CheckCircle, "Installed", tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
+                    installed -> Icon(Icons.Outlined.CheckCircle, stringResource(R.string.claude_settings_screen_installed), tint = QuotaGreen, modifier = Modifier.padding(12.dp).size(22.dp))
                     onCheck != null -> Checkbox(checked = checked, enabled = !busy, onCheckedChange = onCheck)
-                    else -> Icon(Icons.Outlined.RadioButtonUnchecked, "Not installed", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f), modifier = Modifier.padding(12.dp).size(22.dp))
+                    else -> Icon(Icons.Outlined.RadioButtonUnchecked, stringResource(R.string.android_dev_screen_not_installed), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f), modifier = Modifier.padding(12.dp).size(22.dp))
                 }
                 Column(Modifier.weight(1f)) {
                     Text(c.label, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
@@ -351,7 +353,7 @@ private fun PartRow(c: Component, state: AndroidDevManager.State, checked: Boole
                     CircularProgressIndicator(Modifier.padding(end = 12.dp).size(18.dp), strokeWidth = 2.dp)
                 } else {
                     TextButton(enabled = !busy, onClick = { AndroidDevManager.install(c) }) {
-                        Text(if (installed) (if (c == Component.FLUTTER) "Update" else "Reinstall") else "Install", fontSize = 12.5.sp)
+                        Text(if (installed) (if (c == Component.FLUTTER) stringResource(R.string.claude_settings_screen_update) else stringResource(R.string.android_dev_screen_reinstall)) else stringResource(R.string.claude_settings_screen_install), fontSize = 12.5.sp)
                     }
                 }
             }
@@ -359,7 +361,7 @@ private fun PartRow(c: Component, state: AndroidDevManager.State, checked: Boole
                 Text(c.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f), modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp))
                 val missing = c.needs.filter { it !in state.installed }
                 if (missing.isNotEmpty() && !installed) {
-                    Text("Also installs: ${missing.joinToString(", ") { it.label }}", fontSize = 11.5.sp, color = Amber, modifier = Modifier.padding(start = 12.dp, bottom = 8.dp))
+                    Text(stringResource(R.string.android_dev_screen_also_installs, (missing.joinToString(", ") { it.label }).toString()), fontSize = 11.5.sp, color = Amber, modifier = Modifier.padding(start = 12.dp, bottom = 8.dp))
                 }
             }
         }
@@ -377,9 +379,9 @@ private fun TestBuildRow(f: Framework, state: AndroidDevManager.State, busy: Boo
                 Text(f.label, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                 Text(
                     when {
-                        running -> "Building…"
-                        apk != null -> "~/${AndroidDevManager.PROJECTS_DIR}/hello-${f.key} · APK built"
-                        !ready -> "Install it first"
+                        running -> stringResource(R.string.android_dev_screen_building)
+                        apk != null -> stringResource(R.string.android_dev_screen_hello_apk_built, AndroidDevManager.PROJECTS_DIR.toString(), f.key.toString())
+                        !ready -> stringResource(R.string.android_dev_screen_install_it_first)
                         else -> "~/${AndroidDevManager.PROJECTS_DIR}/hello-${f.key}"
                     },
                     fontSize = 11.5.sp, color = if (apk != null && !running) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
@@ -388,8 +390,8 @@ private fun TestBuildRow(f: Framework, state: AndroidDevManager.State, busy: Boo
             if (running) {
                 CircularProgressIndicator(Modifier.padding(end = 12.dp).size(18.dp), strokeWidth = 2.dp)
             } else {
-                if (apk != null) TextButton(onClick = { AndroidDevManager.installApk(apk) }) { Text("Install", fontSize = 12.5.sp) }
-                TextButton(enabled = !busy && ready, onClick = { AndroidDevManager.testBuild(f) }) { Text(if (apk != null) "Rebuild" else "Build", fontSize = 12.5.sp) }
+                if (apk != null) TextButton(onClick = { AndroidDevManager.installApk(apk) }) { Text(stringResource(R.string.claude_settings_screen_install), fontSize = 12.5.sp) }
+                TextButton(enabled = !busy && ready, onClick = { AndroidDevManager.testBuild(f) }) { Text(if (apk != null) stringResource(R.string.android_dev_screen_rebuild) else stringResource(R.string.android_dev_screen_build), fontSize = 12.5.sp) }
             }
         }
     }
@@ -408,7 +410,7 @@ private fun BatchProgress(state: AndroidDevManager.State) {
             )
         }
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: "Starting…")
+        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
     }
     if (isInstallTask(state.logTask) && state.log.isNotEmpty()) LogBox(state.log)
 }
@@ -418,8 +420,8 @@ private fun BatchProgress(state: AndroidDevManager.State) {
 private fun TaskOutput(state: AndroidDevManager.State, task: String) {
     if (state.task == task) {
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(CircleShape))
-        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: "Starting…")
-        OutlinedButton(onClick = AndroidDevManager::stop) { Text("Stop") }
+        Hint(state.progress ?: state.log.lastOrNull { !it.startsWith("$") } ?: stringResource(R.string.claude_login_dialog_starting))
+        OutlinedButton(onClick = AndroidDevManager::stop) { Text(stringResource(R.string.chat_input_bar_stop)) }
     }
     if (state.logTask == task && state.log.isNotEmpty()) LogBox(state.log)
 }
@@ -427,12 +429,12 @@ private fun TaskOutput(state: AndroidDevManager.State, task: String) {
 /** How agents (any agent) and the user build: the adev commands in the terminal. */
 @Composable
 private fun UseGuide(state: AndroidDevManager.State) {
-    Hint("Any agent that can run terminal commands can build apps: Antigravity, Claude Code, OpenCode or Codex. Ask it in chat; the Android Development skill (below) tells it the commands. In the terminal yourself:")
-    if (Component.LAUNCHER !in state.installed) Hint("Install Kotlin / Java above first.")
+    Hint(stringResource(R.string.android_dev_screen_any_agent_that_can_run_terminal_commands))
+    if (Component.LAUNCHER !in state.installed) Hint(stringResource(R.string.android_dev_screen_install_kotlin_java_above_first))
     DevCopyLine("adev-new compose ~/${AndroidDevManager.PROJECTS_DIR}/my-app", mono = true)
     DevCopyLine("cd ~/${AndroidDevManager.PROJECTS_DIR}/my-app && adev ./gradlew assembleDebug", mono = true)
-    Hint("adev runs a command in the container with Java, the SDK, Gradle, Flutter and Node.js on PATH, in the current folder. adev-new also makes Flutter (flutter) and React Native (rn) projects. Keep projects in the Termux home, not on shared storage.")
-    Text("Try in chat", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+    Hint(stringResource(R.string.android_dev_screen_adev_runs_a_command_in_the_container))
+    Text(stringResource(R.string.android_dev_screen_try_in_chat), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     listOf(
         "Create a Jetpack Compose app called Notes in ~/AndroidProjects/notes with a list and an add button, build it and give me the APK.",
         "Make a Flutter counter app in ~/AndroidProjects/counter, build the debug APK and install it on this phone.",
@@ -446,17 +448,17 @@ private fun SkillCard(state: AndroidDevManager.State, busy: Boolean, cardBg: Col
         "Android Development skill for agents", cardBg, cardBorder,
         pill = if (state.pluginInstalled) "v${state.pluginVersion ?: "?"}" to QuotaGreen else "Recommended" to MaterialTheme.colorScheme.primary
     ) {
-        Hint("A skills-only plugin from the AntiGem plugins repository. It teaches agents to check the setup, install what is missing (asking you first), create projects with adev-new, build with adev, install the APK and fix the usual errors of building on a phone.")
+        Hint(stringResource(R.string.android_dev_screen_a_skills_only_plugin_from_the_antigem))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(enabled = !busy, onClick = AndroidDevManager::installSkillPlugin) {
                 Icon(Icons.Outlined.Extension, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                Text(if (state.pluginInstalled) "Update skill" else "Install skill")
+                Text(if (state.pluginInstalled) stringResource(R.string.android_dev_screen_update_skill) else stringResource(R.string.android_dev_screen_install_skill))
             }
-            TextButton(onClick = onOpenPlugins) { Text("Plugins") }
+            TextButton(onClick = onOpenPlugins) { Text(stringResource(R.string.android_dev_screen_plugins)) }
         }
         TaskOutput(state, "plugin")
         if (state.pluginInstalled) {
-            Hint("To give an agent the skill, type /plu: in its chat and pick Android Development, or add the plugin in that agent's MCP settings with the Custom Plugin MCP preset.")
+            Hint(stringResource(R.string.android_dev_screen_to_give_an_agent_the_skill_type))
         }
     }
 }
@@ -478,18 +480,18 @@ private fun TerminalCard(state: AndroidDevManager.State, cardBg: Color, cardBord
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Set up in the terminal", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                TextButton(onClick = { open = !open }) { Text(if (open) "Hide" else "Show", fontSize = 12.5.sp) }
+                Text(stringResource(R.string.android_dev_screen_set_up_in_the_terminal), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) {
-                Hint("Prefer the terminal? These are the same steps as commands.")
+                Hint(stringResource(R.string.android_dev_screen_prefer_the_terminal_these_are_the_same))
                 return@Column
             }
             steps.forEach { (label, command) ->
                 Hint(label)
                 DevCopyLine(command, mono = true)
             }
-            Hint("Each step can be run again to repair or update it. The skill gives agents these steps too, so you can also ask an agent to set this up.")
+            Hint(stringResource(R.string.android_dev_screen_each_step_can_be_run_again_to))
         }
     }
 }
@@ -502,19 +504,19 @@ private fun RemoveCard(state: AndroidDevManager.State, busy: Boolean, cardBg: Co
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Free space / remove", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                TextButton(onClick = { open = !open }) { Text(if (open) "Hide" else "Show", fontSize = 12.5.sp) }
+                Text(stringResource(R.string.android_dev_screen_free_space_remove), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) return@Column
-            Hint("Your projects are never deleted. The Ubuntu container itself is removed on the REA page (Delete container), since both use it.")
+            Hint(stringResource(R.string.android_dev_screen_your_projects_are_never_deleted_the_ubuntu))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("clean-cache") }) { Text("Clean Gradle cache") }
-                if (Component.FLUTTER in state.installed) OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("uninstall-flutter") }) { Text("Remove Flutter") }
+                OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("clean-cache") }) { Text(stringResource(R.string.android_dev_screen_clean_gradle_cache)) }
+                if (Component.FLUTTER in state.installed) OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("uninstall-flutter") }) { Text(stringResource(R.string.android_dev_screen_remove_flutter)) }
                 OutlinedButton(
                     enabled = !busy && state.filesReady,
                     onClick = { onConfirm("uninstall") },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text("Remove all") }
+                ) { Text(stringResource(R.string.jarvis_settings_screen_remove_all)) }
             }
             TaskOutput(state, "clean-cache")
             TaskOutput(state, "uninstall-flutter")
@@ -549,6 +551,6 @@ private fun DevCopyLine(text: String, mono: Boolean = false) {
         Box(Modifier.weight(1f)) {
             if (mono) Mono(text) else Text(text, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
         }
-        IconButton(onClick = { clipboard.setText(AnnotatedString(text)) }) { Icon(Icons.Outlined.ContentCopy, "Copy", Modifier.size(18.dp)) }
+        IconButton(onClick = { clipboard.setText(AnnotatedString(text)) }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.copy_text), Modifier.size(18.dp)) }
     }
 }

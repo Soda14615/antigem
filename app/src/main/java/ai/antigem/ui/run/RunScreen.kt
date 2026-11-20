@@ -1,5 +1,7 @@
 package ai.antigem.ui.run
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -301,14 +303,14 @@ private fun PanelHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onClose) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = AppColors.editorText)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.agent_approval_panel_back), tint = AppColors.editorText)
         }
         Box(
             Modifier.size(32.dp).clip(RoundedCornerShape(9.dp)).background(ClaudeTerracotta.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center
         ) { Icon(Icons.Filled.PlayArrow, null, tint = ClaudeTerracotta, modifier = Modifier.size(20.dp)) }
         Spacer(Modifier.width(8.dp))
-        Text("Run", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AppColors.editorText)
+        Text(stringResource(R.string.agy_cloud_ui_run), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AppColors.editorText)
         Spacer(Modifier.width(12.dp))
         Row(
             Modifier.clip(RoundedCornerShape(10.dp)).background(AppColors.editorBg).padding(3.dp),
@@ -428,7 +430,7 @@ private fun CommandsView(
                                 onEdit = { onEdit(cfg, false) }, onDuplicate = { onDuplicate(cfg, false) }, onDelete = { onDelete(cfg, false) })
                         }
                         if (hiddenIdeOnly > 0) {
-                            item { Text("$hiddenIdeOnly IDE-only command(s) hidden (they use the IDE's open file).", fontSize = 11.5.sp, color = AppColors.editorMuted, modifier = Modifier.padding(4.dp)) }
+                            item { Text(stringResource(R.string.run_screen_ide_only_command_s_hidden_they_use, hiddenIdeOnly.toString()), fontSize = 11.5.sp, color = AppColors.editorMuted, modifier = Modifier.padding(4.dp)) }
                         }
                     }
                 }
@@ -465,7 +467,7 @@ private fun CommandsView(
         HorizontalDivider(color = AppColors.editorBorder, thickness = 0.5.dp)
         Row(Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.End) {
             Button(onClick = onNew, colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)) {
-                Icon(Icons.Filled.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("New command")
+                Icon(Icons.Filled.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.run_screen_new_command))
             }
         }
     }
@@ -494,14 +496,14 @@ private fun FolderRow(
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        if (folder.isBlank()) "Choose a folder" else folder.substringAfterLast('/').ifBlank { folder },
+                        if (folder.isBlank()) stringResource(R.string.run_screen_choose_a_folder) else folder.substringAfterLast('/').ifBlank { folder },
                         fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = AppColors.editorText, maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                     if (folder.isNotBlank()) {
                         Text(shortPath(folder), fontSize = 11.sp, color = AppColors.editorMuted, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = FontFamily.Monospace)
                     }
                 }
-                Icon(Icons.Filled.UnfoldMore, "Change folder", tint = AppColors.editorMuted, modifier = Modifier.size(20.dp))
+                Icon(Icons.Filled.UnfoldMore, stringResource(R.string.run_screen_change_folder), tint = AppColors.editorMuted, modifier = Modifier.size(20.dp))
             }
         }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -525,7 +527,7 @@ private fun FolderRow(
             if (choices.isNotEmpty()) HorizontalDivider()
             DropdownMenuItem(
                 leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                text = { Text("Browse…") },
+                text = { Text(stringResource(R.string.run_screen_browse)) },
                 onClick = { menu = false; onBrowse() }
             )
         }
@@ -554,22 +556,22 @@ private fun CommandRow(
         Row(Modifier.padding(start = 6.dp, end = 2.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onRun) {
                 Box(Modifier.size(32.dp).clip(CircleShape).background(ClaudeTerracotta.copy(alpha = 0.15f)), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.PlayArrow, "Run $name", tint = ClaudeTerracotta, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.PlayArrow, stringResource(R.string.run_screen_run, name.toString()), tint = ClaudeTerracotta, modifier = Modifier.size(20.dp))
                 }
             }
             Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                 Text(name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = AppColors.editorText, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(command, fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, color = AppColors.editorMuted, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (!cwd.isNullOrBlank() && cwd != "\${workspaceFolder}") {
-                    Text("in $cwd", fontSize = 10.5.sp, color = AppColors.editorMuted.copy(alpha = 0.8f), maxLines = 1)
+                    Text(stringResource(R.string.run_screen_in, cwd.toString()), fontSize = 10.5.sp, color = AppColors.editorMuted.copy(alpha = 0.8f), maxLines = 1)
                 }
             }
             Box {
-                IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, "More", tint = AppColors.editorMuted) }
+                IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, stringResource(R.string.text_selection_more), tint = AppColors.editorMuted) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.Edit, null) }, text = { Text("Edit") }, onClick = { menu = false; onEdit() })
-                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) }, text = { Text("Duplicate") }, onClick = { menu = false; onDuplicate() })
-                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.Delete, null) }, text = { Text("Delete") }, onClick = { menu = false; confirmDelete = true })
+                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.Edit, null) }, text = { Text(stringResource(R.string.chat_screen_edit)) }, onClick = { menu = false; onEdit() })
+                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) }, text = { Text(stringResource(R.string.explorer_dialogs_duplicate)) }, onClick = { menu = false; onDuplicate() })
+                    DropdownMenuItem(leadingIcon = { Icon(Icons.Outlined.Delete, null) }, text = { Text(stringResource(R.string.browser_screen_delete)) }, onClick = { menu = false; confirmDelete = true })
                 }
             }
         }
@@ -577,9 +579,9 @@ private fun CommandRow(
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
-            title = { Text("Delete \"$name\"?") },
-            confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text("Delete", color = MaterialTheme.colorScheme.error) } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } }
+            title = { Text(stringResource(R.string.run_screen_delete, name.toString())) },
+            confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text(stringResource(R.string.browser_screen_delete), color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -596,7 +598,7 @@ private fun TemplateRow(t: RunTemplate, onRun: () -> Unit, onAdd: (() -> Unit)?)
         Row(Modifier.padding(start = 6.dp, end = 2.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onRun) {
                 Box(Modifier.size(32.dp).clip(CircleShape).background(ClaudeTerracotta.copy(alpha = 0.12f)), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.PlayArrow, "Run ${t.name}", tint = ClaudeTerracotta, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.PlayArrow, stringResource(R.string.run_screen_run, t.name.toString()), tint = ClaudeTerracotta, modifier = Modifier.size(20.dp))
                 }
             }
             Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
@@ -610,7 +612,7 @@ private fun TemplateRow(t: RunTemplate, onRun: () -> Unit, onAdd: (() -> Unit)?)
                 }
             }
             if (onAdd != null) {
-                IconButton(onClick = onAdd) { Icon(Icons.Outlined.BookmarkAdd, "Save to this project", tint = AppColors.editorMuted) }
+                IconButton(onClick = onAdd) { Icon(Icons.Outlined.BookmarkAdd, stringResource(R.string.run_screen_save_to_this_project), tint = AppColors.editorMuted) }
             }
         }
     }
@@ -676,15 +678,15 @@ private fun CommandEditorDialog(
             modifier = Modifier.fillMaxWidth(0.94f).imePadding()
         ) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(if (edit.originalName == null) "New command" else "Edit command", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AppColors.editorText)
+                Text(if (edit.originalName == null) stringResource(R.string.run_screen_new_command) else stringResource(R.string.run_screen_edit_command), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AppColors.editorText)
                 OutlinedTextField(
                     value = name, onValueChange = { name = it }, singleLine = true,
-                    label = { Text("Name") }, placeholder = { Text("Build debug APK") },
+                    label = { Text(stringResource(R.string.browser_screen_name)) }, placeholder = { Text(stringResource(R.string.run_screen_build_debug_apk)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = command, onValueChange = { command = it },
-                    label = { Text("Command") }, placeholder = { Text("adev ./gradlew assembleDebug") },
+                    label = { Text(stringResource(R.string.agy_cloud_ui_command)) }, placeholder = { Text(stringResource(R.string.run_screen_adev_gradlew_assembledebug)) },
                     textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false),
                     minLines = 2, maxLines = 8,
@@ -692,23 +694,23 @@ private fun CommandEditorDialog(
                 )
                 OutlinedTextField(
                     value = cwd, onValueChange = { cwd = it }, singleLine = true,
-                    label = { Text("Folder (optional)") }, placeholder = { Text("android  ·  empty = the project folder") },
+                    label = { Text(stringResource(R.string.run_screen_folder_optional)) }, placeholder = { Text(stringResource(R.string.run_screen_android_empty_the_project_folder)) },
                     textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false),
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text("Save to", fontSize = 12.sp, color = AppColors.editorMuted)
+                Text(stringResource(R.string.run_screen_save_to), fontSize = 12.sp, color = AppColors.editorMuted)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterPill("This project", selected = !global) { if (canSaveToProject) global = false }
                     FilterPill("Global (any folder)", selected = global) { global = true }
                 }
                 Text(
-                    if (global) "Kept in the app's home (~/.antigem/global-run.json); runs in the folder picked in the panel."
-                    else "Saved in the project's .antigem/run.json, which the IDE and the agents use too.",
+                    if (global) stringResource(R.string.run_screen_kept_in_the_app_s_home_antigem)
+                    else stringResource(R.string.run_screen_saved_in_the_project_s_antigem_run),
                     fontSize = 11.5.sp, color = AppColors.editorMuted
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = onDismiss) { Text("Cancel") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) }
                     Spacer(Modifier.width(6.dp))
                     Button(
                         enabled = canSave,
@@ -717,7 +719,7 @@ private fun CommandEditorDialog(
                             val base = edit.config ?: RunConfiguration(name = name.trim())
                             onSave(base.copy(name = name.trim(), type = "terminal", command = command.trim(), cwd = cwd.trim().ifBlank { null }), global)
                         }
-                    ) { Text("Save") }
+                    ) { Text(stringResource(R.string.claude_providers_page_save)) }
                 }
             }
         }
@@ -738,8 +740,8 @@ private fun RunsView(
     if (selected == null) {
         Box(Modifier.fillMaxSize().navigationBarsPadding(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Nothing running.", color = AppColors.editorMuted)
-                TextButton(onClick = onBackToCommands) { Text("Show commands") }
+                Text(stringResource(R.string.run_screen_nothing_running), color = AppColors.editorMuted)
+                TextButton(onClick = onBackToCommands) { Text(stringResource(R.string.run_screen_show_commands)) }
             }
         }
         return
@@ -763,7 +765,7 @@ private fun RunsView(
                         Spacer(Modifier.width(7.dp))
                         Text(run.name, fontSize = 12.5.sp, color = AppColors.editorText, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 160.dp))
                         IconButton(onClick = { RunManager.remove(run.id) }, modifier = Modifier.size(30.dp)) {
-                            Icon(Icons.Filled.Close, if (run.status == RunStatus.RUNNING) "Stop and close" else "Close", tint = AppColors.editorMuted, modifier = Modifier.size(15.dp))
+                            Icon(Icons.Filled.Close, if (run.status == RunStatus.RUNNING) stringResource(R.string.run_screen_stop_and_close) else stringResource(R.string.accounts_ui_close), tint = AppColors.editorMuted, modifier = Modifier.size(15.dp))
                         }
                     }
                 }
@@ -782,15 +784,15 @@ private fun RunsView(
             }
             if (selected.status == RunStatus.RUNNING) {
                 TextButton(onClick = { RunManager.stop(selected.id) }) {
-                    Icon(Icons.Filled.Stop, null, tint = AppColors.danger, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text("Stop", color = AppColors.danger)
+                    Icon(Icons.Filled.Stop, null, tint = AppColors.danger, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.chat_input_bar_stop), color = AppColors.danger)
                 }
             } else {
                 IconButton(onClick = { onSendToChat(selected) }) {
-                    Icon(Icons.Outlined.ForwardToInbox, "Send output to chat", tint = if (selected.status == RunStatus.FAILED) ClaudeTerracotta else AppColors.editorMuted)
+                    Icon(Icons.Outlined.ForwardToInbox, stringResource(R.string.run_screen_send_output_to_chat), tint = if (selected.status == RunStatus.FAILED) ClaudeTerracotta else AppColors.editorMuted)
                 }
             }
             IconButton(onClick = { RunManager.restart(context, selected.id) }) {
-                Icon(Icons.Filled.Refresh, "Run again", tint = AppColors.editorText)
+                Icon(Icons.Filled.Refresh, stringResource(R.string.run_screen_run_again), tint = AppColors.editorText)
             }
         }
         if (selected.status == RunStatus.FAILED) {
@@ -802,7 +804,7 @@ private fun RunsView(
                 Row(Modifier.padding(horizontal = 12.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Outlined.ForwardToInbox, null, tint = AppColors.danger, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Failed. Send the output to the chat so the agent can fix it", fontSize = 12.sp, color = AppColors.danger)
+                    Text(stringResource(R.string.run_screen_failed_send_the_output_to_the_chat), fontSize = 12.sp, color = AppColors.danger)
                 }
             }
         }
@@ -827,9 +829,9 @@ private fun RunsView(
 private fun StatusDot(status: RunStatus, modifier: Modifier = Modifier) {
     when (status) {
         RunStatus.RUNNING -> CircularProgressIndicator(modifier, strokeWidth = 2.dp, color = ClaudeTerracotta)
-        RunStatus.SUCCEEDED -> Icon(Icons.Filled.CheckCircle, "Done", tint = AppColors.success, modifier = modifier)
-        RunStatus.FAILED -> Icon(Icons.Filled.Error, "Failed", tint = AppColors.danger, modifier = modifier)
-        RunStatus.STOPPED -> Icon(Icons.Filled.StopCircle, "Stopped", tint = AppColors.editorMuted, modifier = modifier)
+        RunStatus.SUCCEEDED -> Icon(Icons.Filled.CheckCircle, stringResource(R.string.browser_screen_done), tint = AppColors.success, modifier = modifier)
+        RunStatus.FAILED -> Icon(Icons.Filled.Error, stringResource(R.string.agent_tool_call_card_failed), tint = AppColors.danger, modifier = modifier)
+        RunStatus.STOPPED -> Icon(Icons.Filled.StopCircle, stringResource(R.string.run_screen_stopped), tint = AppColors.editorMuted, modifier = modifier)
     }
 }
 
@@ -899,10 +901,10 @@ private fun RunBubble(runs: List<RunEntry>, seen: Set<String>) {
                     when {
                         running > 0 -> {
                             CircularProgressIndicator(Modifier.size(44.dp), strokeWidth = 2.5.dp, color = ClaudeTerracotta)
-                            Icon(Icons.Filled.PlayArrow, "Runs", tint = ClaudeTerracotta, modifier = Modifier.size(22.dp))
+                            Icon(Icons.Filled.PlayArrow, stringResource(R.string.run_screen_runs), tint = ClaudeTerracotta, modifier = Modifier.size(22.dp))
                         }
-                        failed -> Icon(Icons.Filled.Close, "A run failed", tint = AppColors.danger, modifier = Modifier.size(26.dp))
-                        else -> Icon(Icons.Filled.Check, "Runs finished", tint = AppColors.success, modifier = Modifier.size(26.dp))
+                        failed -> Icon(Icons.Filled.Close, stringResource(R.string.run_screen_a_run_failed), tint = AppColors.danger, modifier = Modifier.size(26.dp))
+                        else -> Icon(Icons.Filled.Check, stringResource(R.string.run_screen_runs_finished), tint = AppColors.success, modifier = Modifier.size(26.dp))
                     }
                 }
             }

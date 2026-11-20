@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -194,18 +196,18 @@ fun GitCloneDialog(
                         }
                         Column {
                             Text(
-                                text = "Clone Git Repository",
+                                text = stringResource(R.string.git_clone_dialog_clone_git_repository),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = when {
-                                    !started -> if (githubSignedIn) "Public and your GitHub repositories, cloned into your home folder"
-                                        else "Public repositories only, cloned into your home folder"
-                                    isRunning -> "Cloning..."
-                                    exitCode == 0 -> "Cloned in ${(durationMs / 1000.0)}s, opening project..."
-                                    else -> "Clone failed (Exit: $exitCode)"
+                                    !started -> if (githubSignedIn) stringResource(R.string.git_clone_dialog_public_and_your_github_repositories_cloned_into)
+                                        else stringResource(R.string.git_clone_dialog_public_repositories_only_cloned_into_your_home)
+                                    isRunning -> stringResource(R.string.git_clone_dialog_cloning)
+                                    exitCode == 0 -> stringResource(R.string.git_clone_dialog_cloned_in_s_opening_project, ((durationMs / 1000.0)).toString())
+                                    else -> stringResource(R.string.git_clone_dialog_clone_failed_exit, exitCode.toString())
                                 },
                                 fontSize = 11.5.sp,
                                 color = when {
@@ -219,7 +221,7 @@ fun GitCloneDialog(
                     }
                     if (!isRunning) {
                         IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
-                            Icon(Icons.Default.Close, contentDescription = "Close", modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accounts_ui_close), modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -230,12 +232,12 @@ fun GitCloneDialog(
                     OutlinedTextField(
                         value = repoUrl,
                         onValueChange = { repoUrl = it },
-                        label = { Text("Repository URL") },
+                        label = { Text(stringResource(R.string.git_clone_dialog_repository_url)) },
                         placeholder = { Text("https://github.com/owner/repo") },
                         singleLine = true,
                         isError = trimmedUrl.isNotEmpty() && !urlValid,
                         supportingText = if (trimmedUrl.isNotEmpty() && !urlValid) {
-                            { Text(if (githubSignedIn) "Paste an https:// repository URL" else "Paste a public https:// repository URL") }
+                            { Text(if (githubSignedIn) stringResource(R.string.git_clone_dialog_paste_an_https_repository_url) else stringResource(R.string.git_clone_dialog_paste_a_public_https_repository_url)) }
                         } else null,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
                         shape = RoundedCornerShape(12.dp),
@@ -246,7 +248,7 @@ fun GitCloneDialog(
                             showRepoPicker = !showRepoPicker
                             if (showRepoPicker && !github.reposLoaded) ai.antigem.data.github.GitHubManager.loadRepos()
                         }, contentPadding = PaddingValues(horizontal = 4.dp)) {
-                            Text(if (showRepoPicker) "Hide my GitHub repositories" else "Choose from my GitHub repositories", fontSize = 12.5.sp)
+                            Text(if (showRepoPicker) stringResource(R.string.git_clone_dialog_hide_my_github_repositories) else stringResource(R.string.git_clone_dialog_choose_from_my_github_repositories), fontSize = 12.5.sp)
                         }
                         if (showRepoPicker) {
                             GitHubRepoPicker(github) { url ->
@@ -259,13 +261,13 @@ fun GitCloneDialog(
                     OutlinedTextField(
                         value = projectName,
                         onValueChange = { projectName = it },
-                        label = { Text("Project name (optional)") },
+                        label = { Text(stringResource(R.string.git_clone_dialog_project_name_optional)) },
                         placeholder = { Text(repoNameOf(trimmedUrl).ifBlank { "Same as the repository" }) },
                         singleLine = true,
                         isError = !nameValid,
                         supportingText = {
                             Text(
-                                if (!nameValid) "Use letters, numbers, '.', '_' or '-'"
+                                if (!nameValid) stringResource(R.string.git_clone_dialog_use_letters_numbers_or)
                                 else "~/${projectName.trim().ifBlank { repoNameOf(trimmedUrl).ifBlank { "<repo>" } }}"
                             )
                         },
@@ -285,7 +287,7 @@ fun GitCloneDialog(
                     ) {
                         Icon(Icons.Outlined.CloudDownload, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Clone", fontSize = 13.5.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.git_clone_dialog_clone), fontSize = 13.5.sp, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     // Terminal output container
@@ -342,14 +344,14 @@ fun GitCloneDialog(
                             ) {
                                 Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Stop", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.chat_input_bar_stop), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         } else if (exitCode != 0) {
                             OutlinedButton(
                                 onClick = { started = false },
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text("Back", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.agent_approval_panel_back), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
@@ -357,7 +359,7 @@ fun GitCloneDialog(
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             ) {
-                                Text("Close", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.accounts_ui_close), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         }
                     }
@@ -378,18 +380,18 @@ private fun GitHubRepoPicker(github: ai.antigem.data.github.GitHubManager.State,
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         OutlinedTextField(
             value = query, onValueChange = { query = it }, singleLine = true,
-            placeholder = { Text("Search repositories") },
+            placeholder = { Text(stringResource(R.string.git_clone_dialog_search_repositories)) },
             shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()
         )
         when {
             github.reposLoading && github.repos.isEmpty() -> Row(verticalAlignment = Alignment.CenterVertically) {
                 CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
-                Text("Loading your repositories…", fontSize = 12.sp)
+                Text(stringResource(R.string.git_clone_dialog_loading_your_repositories), fontSize = 12.sp)
             }
             github.reposError != null && github.repos.isEmpty() ->
                 Text(github.reposError, fontSize = 12.sp, color = ai.antigem.theme.AppColors.danger)
-            matches.isEmpty() -> Text(if (q.isEmpty()) "No repositories." else "No repository matches \"$q\".", fontSize = 12.sp)
+            matches.isEmpty() -> Text(if (q.isEmpty()) stringResource(R.string.git_clone_dialog_no_repositories) else stringResource(R.string.git_clone_dialog_no_repository_matches, q.toString()), fontSize = 12.sp)
         }
         if (matches.isNotEmpty()) {
             Surface(
@@ -409,7 +411,7 @@ private fun GitHubRepoPicker(github: ai.antigem.data.github.GitHubManager.State,
                                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                                 if (repo.isPrivate) {
                                     Spacer(Modifier.width(6.dp))
-                                    Text("Private", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = ai.antigem.theme.AppColors.warning)
+                                    Text(stringResource(R.string.agy_cloud_ui_private), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = ai.antigem.theme.AppColors.warning)
                                 }
                             }
                             repo.description?.let {

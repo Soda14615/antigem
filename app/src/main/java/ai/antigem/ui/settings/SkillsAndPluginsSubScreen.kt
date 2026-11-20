@@ -1,5 +1,7 @@
 package ai.antigem.ui.settings
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -97,7 +99,7 @@ fun SkillsAndPluginsSubScreen(
                         Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                         Text(text = errorMessage, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.weight(1f))
                         IconButton(onClick = onClearStatus, modifier = Modifier.size(24.dp)) {
-                            Icon(Icons.Default.Close, contentDescription = "Dismiss", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.browser_screen_dismiss), modifier = Modifier.size(16.dp))
                         }
                     }
                 }
@@ -120,7 +122,7 @@ fun SkillsAndPluginsSubScreen(
                         Icon(Icons.Default.CheckCircle, contentDescription = null, tint = QuotaGreen, modifier = Modifier.size(18.dp))
                         Text(text = statusMessage, fontSize = 12.5.sp, color = QuotaGreen, modifier = Modifier.weight(1f))
                         IconButton(onClick = onClearStatus, modifier = Modifier.size(24.dp)) {
-                            Icon(Icons.Default.Close, contentDescription = "Dismiss", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.browser_screen_dismiss), modifier = Modifier.size(16.dp))
                         }
                     }
                 }
@@ -139,7 +141,7 @@ fun SkillsAndPluginsSubScreen(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Outlined.Psychology, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Skills (${skills.size})", fontSize = 13.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal)
+                            Text(stringResource(R.string.skills_and_plugins_sub_screen_skills, skills.size.toString()), fontSize = 13.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal)
                         }
                     }
                 )
@@ -149,7 +151,7 @@ fun SkillsAndPluginsSubScreen(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Outlined.Extension, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Plugins (${installedPlugins.size})", fontSize = 13.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal)
+                            Text(stringResource(R.string.skills_and_plugins_sub_screen_plugins, installedPlugins.size.toString()), fontSize = 13.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal)
                         }
                     }
                 )
@@ -159,7 +161,7 @@ fun SkillsAndPluginsSubScreen(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Outlined.Storefront, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Store", fontSize = 13.sp, fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal)
+                            Text(stringResource(R.string.skills_and_plugins_sub_screen_store), fontSize = 13.sp, fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal)
                         }
                     }
                 )
@@ -261,7 +263,7 @@ private fun SkillsTabView(
                 FilterChip(
                     selected = filterScope == "GLOBAL",
                     onClick = { onSetScope("GLOBAL") },
-                    label = { Text("Global (Default)", fontSize = 11.5.sp) },
+                    label = { Text(stringResource(R.string.skills_and_plugins_sub_screen_global_default), fontSize = 11.5.sp) },
                     leadingIcon = if (filterScope == "GLOBAL") {
                         { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp)) }
                     } else null,
@@ -270,7 +272,7 @@ private fun SkillsTabView(
                 FilterChip(
                     selected = filterScope == "WORKSPACE",
                     onClick = { onSetScope("WORKSPACE") },
-                    label = { Text("Project / Workspace", fontSize = 11.5.sp) },
+                    label = { Text(stringResource(R.string.skills_and_plugins_sub_screen_project_workspace), fontSize = 11.5.sp) },
                     leadingIcon = if (filterScope == "WORKSPACE") {
                         { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp)) }
                     } else null,
@@ -279,7 +281,7 @@ private fun SkillsTabView(
                 FilterChip(
                     selected = filterScope == "ALL",
                     onClick = { onSetScope("ALL") },
-                    label = { Text("All", fontSize = 11.5.sp) },
+                    label = { Text(stringResource(R.string.skills_and_plugins_sub_screen_all), fontSize = 11.5.sp) },
                     shape = RoundedCornerShape(8.dp)
                 )
             }
@@ -288,7 +290,7 @@ private fun SkillsTabView(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = GeminiBlue)
                 } else {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.agent_sheet_ui_refresh), modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -300,7 +302,7 @@ private fun SkillsTabView(
         } else if (skills.isEmpty()) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = if (filterScope == "WORKSPACE") "No workspace-scoped skills (.agents/skills/) found for active project." else "No skills discovered.",
+                    text = if (filterScope == "WORKSPACE") stringResource(R.string.skills_and_plugins_sub_screen_no_workspace_scoped_skills_agents_skills_found) else stringResource(R.string.skills_and_plugins_sub_screen_no_skills_discovered),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -403,7 +405,7 @@ private fun SkillItemCard(
                         }
                         if (!skill.pluginName.isNullOrBlank()) {
                             Text(
-                                text = "from ${skill.pluginName}",
+                                text = stringResource(R.string.skills_and_plugins_sub_screen_from, skill.pluginName.toString()),
                                 fontSize = 11.sp,
                                 color = GeminiBlue,
                                 maxLines = 1,
@@ -429,7 +431,7 @@ private fun SkillItemCard(
             }
 
             Text(
-                text = skill.description.ifBlank { "Agent capability instructions and workflows" },
+                text = skill.description.ifBlank { stringResource(R.string.settings_skills_default_description) },
                 fontSize = 12.5.sp,
                 lineHeight = 17.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
@@ -452,7 +454,7 @@ private fun SkillItemCard(
                     modifier = Modifier.weight(1f)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("View SKILL.md", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.skills_and_plugins_sub_screen_view_skill_md), fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium)
                     Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                 }
             }
@@ -481,7 +483,7 @@ private fun InstalledPluginsTabView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Installed Bundles & Extensions",
+                text = stringResource(R.string.skills_and_plugins_sub_screen_installed_bundles_extensions),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
@@ -490,7 +492,7 @@ private fun InstalledPluginsTabView(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = GeminiBlue)
                 } else {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.agent_sheet_ui_refresh), modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -501,7 +503,7 @@ private fun InstalledPluginsTabView(
             }
         } else if (plugins.isEmpty()) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("No plugin bundles installed in ~/.gemini/config/plugins/.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(stringResource(R.string.skills_and_plugins_sub_screen_no_plugin_bundles_installed_in_gemini_config), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             }
         } else {
             val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -538,9 +540,9 @@ private fun InstalledPluginCard(
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
-            title = { Text("Delete Plugin?") },
+            title = { Text(stringResource(R.string.skills_and_plugins_sub_screen_delete_plugin)) },
             text = {
-                Text("Are you sure you want to delete '${plugin.displayName.ifBlank { plugin.name }}' (${plugin.name})? This will remove its bundled skills from ~/.gemini/config/plugins/.")
+                Text(stringResource(R.string.skills_and_plugins_sub_screen_are_you_sure_you_want_to_delete, (plugin.displayName.ifBlank { plugin.name }).toString(), plugin.name.toString()))
             },
             confirmButton = {
                 TextButton(
@@ -550,12 +552,12 @@ private fun InstalledPluginCard(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.browser_screen_delete), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.accounts_ui_cancel))
                 }
             }
         )
@@ -641,7 +643,7 @@ private fun InstalledPluginCard(
                         color = GeminiBlue.copy(alpha = 0.12f)
                     ) {
                         Text(
-                            text = "Global",
+                            text = stringResource(R.string.skills_and_plugins_sub_screen_global),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = GeminiBlue,
@@ -664,7 +666,7 @@ private fun InstalledPluginCard(
                     } else {
                         Icon(
                             Icons.Outlined.Delete,
-                            contentDescription = "Delete Plugin",
+                            contentDescription = stringResource(R.string.skills_and_plugins_sub_screen_delete_plugin_2),
                             tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                             modifier = Modifier.size(18.dp)
                         )
@@ -683,7 +685,7 @@ private fun InstalledPluginCard(
             if (plugin.skills.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = "Bundled Skills (${plugin.skills.size}):",
+                        text = stringResource(R.string.skills_and_plugins_sub_screen_bundled_skills, plugin.skills.size.toString()),
                         fontSize = 11.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -725,7 +727,7 @@ private fun GooglePluginsStoreTabView(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Official 'Build with Google' Plugins",
+                text = stringResource(R.string.skills_and_plugins_sub_screen_official_build_with_google_plugins),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
@@ -734,7 +736,7 @@ private fun GooglePluginsStoreTabView(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = GeminiBlue)
                 } else {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.agent_sheet_ui_refresh), modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -745,7 +747,7 @@ private fun GooglePluginsStoreTabView(
             }
         } else if (catalog.isEmpty()) {
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("No official Google plugins catalog available.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(stringResource(R.string.skills_and_plugins_sub_screen_no_official_google_plugins_catalog_available), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             }
         } else {
             val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -851,7 +853,7 @@ private fun GoogleCatalogPluginCard(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Icon(Icons.Default.Check, contentDescription = null, tint = QuotaGreen, modifier = Modifier.size(14.dp))
-                            Text("Installed", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = QuotaGreen)
+                            Text(stringResource(R.string.claude_settings_screen_installed), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = QuotaGreen)
                         }
                     }
                 } else {
@@ -868,7 +870,7 @@ private fun GoogleCatalogPluginCard(
                         } else {
                             Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Install", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.claude_settings_screen_install), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -888,7 +890,7 @@ private fun GoogleCatalogPluginCard(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "Versions:",
+                        text = stringResource(R.string.skills_and_plugins_sub_screen_versions),
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -961,7 +963,7 @@ fun SkillDetailMarkdownDialog(
                         )
                     }
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accounts_ui_close))
                     }
                 }
 
@@ -983,7 +985,7 @@ fun SkillDetailMarkdownDialog(
                         }
                     } else {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No markdown content found in SKILL.md", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                            Text(stringResource(R.string.skills_and_plugins_sub_screen_no_markdown_content_found_in_skill_md), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                         }
                     }
                 }

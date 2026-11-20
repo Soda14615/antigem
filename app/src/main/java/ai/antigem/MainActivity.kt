@@ -802,7 +802,10 @@ class MainActivity : ComponentActivity() {
                     }
                 } catch (e: Exception) {
                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                        ai.antigem.ui.components.AppToastHelper.showToast("Could not open ${item.name}", ai.antigem.ui.components.ChatToastType.ERROR)
+                        ai.antigem.ui.components.AppToastHelper.showToast(
+                            getString(R.string.native_could_not_open, item.name),
+                            ai.antigem.ui.components.ChatToastType.ERROR
+                        )
                     }
                 }
             }

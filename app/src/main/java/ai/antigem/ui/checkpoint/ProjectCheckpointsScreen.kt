@@ -1,5 +1,7 @@
 package ai.antigem.ui.checkpoint
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -71,24 +73,22 @@ fun ProjectCheckpointsScreen() {
         val muted = MaterialTheme.colorScheme.onSurfaceVariant
         Column(Modifier.fillMaxSize().bouncyVerticalScroll(rememberScrollState()).padding(16.dp)) {
             Text(
-                "Before every message you send (Claude Code, Codex, OpenCode or Antigravity), AntiGem saves a hidden copy of " +
-                    "the project's files. Each message then gets a restore point: go back to before it, with a preview of every " +
-                    "file that changes. Your own git history, branches, staging and stashes are never touched.",
+                stringResource(R.string.workspace_checkpoint_intro),
                 fontSize = 12.5.sp, lineHeight = 17.sp, color = muted
             )
             loadError?.let {
                 Spacer(Modifier.height(12.dp))
                 Notice(Icons.Outlined.WarningAmber, AppColors.danger, it)
-                TextButton(onClick = { refresh++ }) { Text("Try again") }
+                TextButton(onClick = { refresh++ }) { Text(stringResource(R.string.checkpoint_restore_sheet_try_again)) }
             }
 
-            SectionLabel("Checkpoints")
+            SectionLabel(stringResource(R.string.workspace_checkpoint_heading))
             val mode = s?.mode ?: CheckpointSettings.MODE_OFF
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(
-                    Triple(CheckpointSettings.MODE_OFF, "Off", "No checkpoints are made (the default)"),
-                    Triple(CheckpointSettings.MODE_SELECTED, "Projects I choose", "A new chat in a project asks once whether to keep checkpoints for it"),
-                    Triple(CheckpointSettings.MODE_ALL, "All git projects", "Every git project gets checkpoints (turn single projects off below)")
+                    Triple(CheckpointSettings.MODE_OFF, stringResource(R.string.workspace_checkpoint_off), stringResource(R.string.workspace_checkpoint_off_summary)),
+                    Triple(CheckpointSettings.MODE_SELECTED, stringResource(R.string.workspace_checkpoint_selected), stringResource(R.string.workspace_checkpoint_selected_summary)),
+                    Triple(CheckpointSettings.MODE_ALL, stringResource(R.string.workspace_checkpoint_all), stringResource(R.string.workspace_checkpoint_all_summary))
                 ).forEach { (value, title, desc) ->
                     ai.antigem.ui.claude.PickerOption(
                         title = title,
@@ -109,7 +109,7 @@ fun ProjectCheckpointsScreen() {
                 }
             }
             Spacer(Modifier.height(6.dp))
-            Text("Checkpoints work in git projects only (a folder with git init done). Nested repositories inside a project are saved too.",
+            Text(stringResource(R.string.project_checkpoints_screen_checkpoints_work_in_git_projects_only_a),
                 fontSize = 11.5.sp, lineHeight = 15.sp, color = muted)
 
             if (s != null) {
@@ -143,11 +143,11 @@ fun ProjectCheckpointsScreen() {
                 list == null && loadError == null -> Row(Modifier.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(10.dp))
-                    Text("Loading…", fontSize = 13.sp, color = muted)
+                    Text(stringResource(R.string.project_checkpoints_screen_loading), fontSize = 13.sp, color = muted)
                 }
                 list.isNullOrEmpty() -> Text(
-                    if (mode == CheckpointSettings.MODE_OFF) "Turn checkpoints on above, then start a chat in a project."
-                    else "No project has checkpoints yet. They appear here after the first message in a project.",
+                    if (mode == CheckpointSettings.MODE_OFF) stringResource(R.string.project_checkpoints_screen_turn_checkpoints_on_above_then_start_a)
+                    else stringResource(R.string.project_checkpoints_screen_no_project_has_checkpoints_yet_they_appear),
                     fontSize = 12.5.sp, color = muted
                 )
                 else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -164,7 +164,7 @@ fun ProjectCheckpointsScreen() {
                 }
             }
 
-            SectionLabel("Good to know")
+            SectionLabel(stringResource(R.string.workspace_checkpoint_good_to_know))
             Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceContainerLow, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
@@ -203,14 +203,14 @@ fun ProjectCheckpointsScreen() {
             onDismissRequest = { deleteAllFor = null },
             shape = RoundedCornerShape(16.dp),
             containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text("Delete all checkpoints?", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+            title = { Text(stringResource(R.string.project_checkpoints_screen_delete_all_checkpoints), fontWeight = FontWeight.Bold, fontSize = 18.sp) },
             text = {
                 Column {
                     Text("Every checkpoint of ${p.name} is deleted (${formatBytes(p.sizeBytes)} freed). The project's own files and git are not touched. " +
                         "New checkpoints start again with the next message when the project is still on.", fontSize = 14.sp, lineHeight = 20.sp)
                     Row(Modifier.padding(top = 10.dp).clickable { forget = !forget }, verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = forget, onCheckedChange = { forget = it })
-                        Text("Also forget my answer for this project", fontSize = 13.5.sp)
+                        Text(stringResource(R.string.project_checkpoints_screen_also_forget_my_answer_for_this_project), fontSize = 13.5.sp)
                     }
                 }
             },
@@ -223,9 +223,9 @@ fun ProjectCheckpointsScreen() {
                             { AppToastHelper.showToast("All checkpoints of ${p.name} deleted", ChatToastType.SUCCESS) }, ::toastError
                         )
                     }
-                }) { Text("Delete all", color = AppColors.danger, fontWeight = FontWeight.Bold) }
+                }) { Text(stringResource(R.string.browser_screen_delete_all), color = AppColors.danger, fontWeight = FontWeight.Bold) }
             },
-            dismissButton = { TextButton(onClick = { deleteAllFor = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { deleteAllFor = null }) { Text(stringResource(R.string.accounts_ui_cancel)) } }
         )
     }
 }
@@ -300,19 +300,19 @@ private fun ProjectCard(
             }
             if (!p.isGit && p.exists && mode != CheckpointSettings.MODE_OFF) {
                 Spacer(Modifier.height(4.dp))
-                Text("Run git init in this folder to start checkpoints.", fontSize = 11.5.sp, color = muted)
+                Text(stringResource(R.string.project_checkpoints_screen_run_git_init_in_this_folder_to), fontSize = 11.5.sp, color = muted)
             }
             if (p.hasData) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onHistory) {
-                        Icon(Icons.Outlined.History, null, Modifier.size(16.dp)); Spacer(Modifier.width(5.dp)); Text("History")
+                        Icon(Icons.Outlined.History, null, Modifier.size(16.dp)); Spacer(Modifier.width(5.dp)); Text(stringResource(R.string.project_checkpoints_screen_history))
                     }
                     TextButton(onClick = onClean) {
-                        Icon(Icons.Outlined.CleaningServices, null, Modifier.size(16.dp)); Spacer(Modifier.width(5.dp)); Text("Clean old")
+                        Icon(Icons.Outlined.CleaningServices, null, Modifier.size(16.dp)); Spacer(Modifier.width(5.dp)); Text(stringResource(R.string.project_checkpoints_screen_clean_old))
                     }
                     TextButton(onClick = onDeleteAll) {
                         Icon(Icons.Outlined.DeleteOutline, null, Modifier.size(16.dp), tint = AppColors.danger); Spacer(Modifier.width(5.dp))
-                        Text("Delete all", color = AppColors.danger)
+                        Text(stringResource(R.string.browser_screen_delete_all), color = AppColors.danger)
                     }
                 }
             } else Spacer(Modifier.height(6.dp))
@@ -327,10 +327,10 @@ private fun CleanOldDialog(p: CheckpointProjectInfo, onDismiss: () -> Unit, onPi
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(16.dp),
         containerColor = MaterialTheme.colorScheme.surface,
-        title = { Text("Clean old checkpoints", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+        title = { Text(stringResource(R.string.project_checkpoints_screen_clean_old_checkpoints), fontWeight = FontWeight.Bold, fontSize = 18.sp) },
         text = {
             Column {
-                Text("Delete the checkpoints of ${p.name} older than:", fontSize = 14.sp)
+                Text(stringResource(R.string.project_checkpoints_screen_delete_the_checkpoints_of_older_than, p.name.toString()), fontSize = 14.sp)
                 Spacer(Modifier.height(6.dp))
                 listOf(1 to "1 day", 3 to "3 days", 7 to "7 days", 30 to "30 days").forEach { (d, label) ->
                     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { days = d }.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -338,11 +338,11 @@ private fun CleanOldDialog(p: CheckpointProjectInfo, onDismiss: () -> Unit, onPi
                         Text(label, fontSize = 14.sp)
                     }
                 }
-                Text("Newer checkpoints stay and keep working.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.project_checkpoints_screen_newer_checkpoints_stay_and_keep_working), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
-        confirmButton = { TextButton(onClick = { onPick(days) }) { Text("Delete", color = AppColors.danger, fontWeight = FontWeight.Bold) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        confirmButton = { TextButton(onClick = { onPick(days) }) { Text(stringResource(R.string.browser_screen_delete), color = AppColors.danger, fontWeight = FontWeight.Bold) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }
 
@@ -360,20 +360,20 @@ private fun CheckpointHistory(project: CheckpointProjectInfo, onBack: () -> Unit
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back") }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.agent_approval_panel_back)) }
             Column(Modifier.weight(1f)) {
                 Text(project.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${items?.size ?: project.count} checkpoints · ${formatBytes(project.sizeBytes)}", fontSize = 12.sp, color = muted)
+                Text(stringResource(R.string.project_checkpoints_screen_checkpoints, (items?.size ?: project.count).toString(), (formatBytes(project.sizeBytes)).toString()), fontSize = 12.sp, color = muted)
             }
-            IconButton(onClick = onClean) { Icon(Icons.Outlined.CleaningServices, "Clean old") }
-            IconButton(onClick = onDeleteAll) { Icon(Icons.Outlined.DeleteOutline, "Delete all", tint = AppColors.danger) }
+            IconButton(onClick = onClean) { Icon(Icons.Outlined.CleaningServices, stringResource(R.string.project_checkpoints_screen_clean_old)) }
+            IconButton(onClick = onDeleteAll) { Icon(Icons.Outlined.DeleteOutline, stringResource(R.string.browser_screen_delete_all), tint = AppColors.danger) }
         }
         error?.let { Box(Modifier.padding(16.dp)) { Notice(Icons.Outlined.WarningAmber, AppColors.danger, it) } }
         val list = items
         if (list == null && error == null) {
             Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp) }
         } else if (list != null && list.isEmpty()) {
-            Text("No checkpoints left.", fontSize = 13.sp, color = muted, modifier = Modifier.padding(20.dp))
+            Text(stringResource(R.string.project_checkpoints_screen_no_checkpoints_left), fontSize = 13.sp, color = muted, modifier = Modifier.padding(20.dp))
         } else if (list != null) {
             LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(list, key = { it.id }) { cp -> HistoryRow(cp) { open = cp } }
@@ -405,7 +405,7 @@ private fun HistoryRow(cp: CheckpointSummary, onClick: () -> Unit) {
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    cp.title?.takeIf { it.isNotBlank() } ?: if (cp.isPreRestore) "Before a restore" else "Message",
+                    cp.title?.takeIf { it.isNotBlank() } ?: if (cp.isPreRestore) stringResource(R.string.project_checkpoints_screen_before_a_restore) else stringResource(R.string.project_checkpoints_screen_message),
                     fontSize = 13.5.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
                 val flags = listOfNotNull(
@@ -433,7 +433,7 @@ fun TrackProjectDialog(state: CheckpointProjectState, onAnswer: (String?) -> Uni
         shape = RoundedCornerShape(16.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         icon = { Icon(Icons.Outlined.History, null, tint = MaterialTheme.colorScheme.primary) },
-        title = { Text("Keep checkpoints for $name?", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+        title = { Text(stringResource(R.string.project_checkpoints_screen_keep_checkpoints_for, name.toString()), fontWeight = FontWeight.Bold, fontSize = 18.sp) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
@@ -445,12 +445,12 @@ fun TrackProjectDialog(state: CheckpointProjectState, onAnswer: (String?) -> Uni
                     Notice(Icons.Outlined.WarningAmber, AppColors.warning,
                         "This folder is not a git repository. Checkpoints only work in git projects: they start once you run git init here.")
                 }
-                Text("You can change this any time in Settings → Project checkpoints.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.project_checkpoints_screen_you_can_change_this_any_time_in), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         confirmButton = {
-            TextButton(onClick = { onAnswer("on") }) { Text("Keep checkpoints", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) }
+            TextButton(onClick = { onAnswer("on") }) { Text(stringResource(R.string.project_checkpoints_screen_keep_checkpoints), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) }
         },
-        dismissButton = { TextButton(onClick = { onAnswer("off") }) { Text("Not for this project") } }
+        dismissButton = { TextButton(onClick = { onAnswer("off") }) { Text(stringResource(R.string.project_checkpoints_screen_not_for_this_project)) } }
     )
 }

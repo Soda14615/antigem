@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -174,7 +176,7 @@ fun FullScreenImageDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.accounts_ui_close),
                         tint = Color.White
                     )
                 }
@@ -204,7 +206,7 @@ fun FullScreenImageDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Reset Zoom",
+                            contentDescription = stringResource(R.string.full_screen_image_dialog_reset_zoom),
                             tint = Color.White,
                             modifier = Modifier.size(18.dp)
                         )
@@ -229,7 +231,7 @@ fun FullScreenImageDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Download,
-                        contentDescription = "Download",
+                        contentDescription = stringResource(R.string.full_screen_image_dialog_download),
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
                     )

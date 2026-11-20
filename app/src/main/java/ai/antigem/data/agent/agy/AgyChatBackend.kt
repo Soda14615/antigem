@@ -1,5 +1,6 @@
 package ai.antigem.data.agent.agy
 
+import ai.antigem.R
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -1552,13 +1553,13 @@ class AgyChatBackend(
         val state = systemConnectionState.value
         if (!state.canSend) {
             val reason = when (state.status) {
-                ai.antigem.data.remote.SystemStatus.OFFLINE -> "Server is offline. Please start the server."
-                ai.antigem.data.remote.SystemStatus.STARTING -> "Server is starting up. Please wait..."
-                ai.antigem.data.remote.SystemStatus.ACQUIRING_CSRF -> "Acquiring security token. Please wait..."
-                ai.antigem.data.remote.SystemStatus.CHECKING_AUTH -> "Verifying authentication. Please wait..."
-                ai.antigem.data.remote.SystemStatus.UNAUTHENTICATED -> "Please sign in to send messages."
-                ai.antigem.data.remote.SystemStatus.ERROR -> "Server error. Please check server logs."
-                else -> "Cannot send message right now."
+                ai.antigem.data.remote.SystemStatus.OFFLINE -> R.string.native_agy_toast_server_offline
+                ai.antigem.data.remote.SystemStatus.STARTING -> R.string.native_agy_toast_server_starting
+                ai.antigem.data.remote.SystemStatus.ACQUIRING_CSRF -> R.string.native_agy_toast_security_token
+                ai.antigem.data.remote.SystemStatus.CHECKING_AUTH -> R.string.native_agy_toast_verifying_authentication
+                ai.antigem.data.remote.SystemStatus.UNAUTHENTICATED -> R.string.native_agy_toast_sign_in_to_send
+                ai.antigem.data.remote.SystemStatus.ERROR -> R.string.native_agy_toast_send_server_error
+                else -> R.string.native_agy_toast_cannot_send_message
             }
             android.widget.Toast.makeText(application, reason, android.widget.Toast.LENGTH_SHORT).show()
             return
@@ -1729,7 +1730,7 @@ class AgyChatBackend(
                     clearOptimisticSend()
                     hiddenQueuedIds.remove(id)
                     refreshQueuedMessages(conv.id)
-                    android.widget.Toast.makeText(application, "Couldn't send the queued message: ${res.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(application, application.getString(R.string.native_agy_toast_queued_send_failed, res.exceptionOrNull()?.message), android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -1745,7 +1746,7 @@ class AgyChatBackend(
                 withContext(Dispatchers.Main) {
                     hiddenQueuedIds.remove(id)
                     refreshQueuedMessages(conv.id)
-                    android.widget.Toast.makeText(application, "Couldn't delete the queued message: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(application, application.getString(R.string.native_agy_toast_queued_delete_failed, e.message), android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -1947,7 +1948,7 @@ class AgyChatBackend(
         suspend fun failQueued(err: String) = withContext(Dispatchers.Main) {
             localQueued[conv.id]?.let { synchronized(it) { it.remove(clientTag) } }
             refreshQueuedMessages(conv.id)
-            android.widget.Toast.makeText(application, "Couldn't queue the message: $err", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(application, application.getString(R.string.native_agy_toast_queue_failed, err), android.widget.Toast.LENGTH_SHORT).show()
         }
 
         if (queued) {
@@ -2397,13 +2398,13 @@ class AgyChatBackend(
                     withContext(Dispatchers.Main) {
                         if (failureError != null) {
                             val msg = if (failureError.contains("Connect", ignoreCase = true) || failureError.contains("failed to connect", ignoreCase = true)) {
-                                "Failed to refresh: Antigravity Hub (${AuthPreferences.currentHubUrl}) unreachable"
+                                application.getString(R.string.native_agy_toast_hub_unreachable, AuthPreferences.currentHubUrl)
                             } else {
-                                "Failed to refresh: $failureError"
+                                application.getString(R.string.native_agy_toast_quota_refresh_failed, failureError)
                             }
                             android.widget.Toast.makeText(application, msg, android.widget.Toast.LENGTH_LONG).show()
                         } else {
-                            android.widget.Toast.makeText(application, "Quotas & models refreshed", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(application, R.string.native_agy_toast_quota_refreshed, android.widget.Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

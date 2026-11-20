@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -88,7 +90,7 @@ fun SharedChatViewerModal(
                             }
 
                             Text(
-                                text = "${data.messages.size} messages · AntiGem Shared Trajectory",
+                                text = stringResource(R.string.shared_chat_viewer_modal_messages_antigem_shared_trajectory, data.messages.size.toString()),
                                 fontSize = 11.5.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -102,7 +104,7 @@ fun SharedChatViewerModal(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
+                                contentDescription = stringResource(R.string.accounts_ui_close),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(20.dp)
                             )
@@ -120,7 +122,7 @@ fun SharedChatViewerModal(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No messages found in this trajectory",
+                            text = stringResource(R.string.shared_chat_viewer_modal_no_messages_found_in_this_trajectory),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
@@ -192,7 +194,7 @@ fun SharedChatLoadingDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Opening Shared Chat",
+                    text = stringResource(R.string.shared_chat_viewer_modal_opening_shared_chat),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -202,7 +204,7 @@ fun SharedChatLoadingDialog(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Reading trajectory steps and conversation messages...",
+                    text = stringResource(R.string.shared_chat_viewer_modal_reading_trajectory_steps_and_conversation_messages),
                     fontSize = 12.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -218,7 +220,7 @@ fun SharedChatLoadingDialog(
                     contentPadding = PaddingValues(horizontal = 18.dp, vertical = 7.dp)
                 ) {
                     Text(
-                        text = "Don't Open",
+                        text = stringResource(R.string.shared_chat_viewer_modal_don_t_open),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

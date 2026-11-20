@@ -172,8 +172,8 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
 
     private fun setupNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "AntiGem Terminal & Execution Service"
-            val descriptionText = "Terminal sessions and background execution"
+            val name = getString(R.string.notification_terminal_service)
+            val descriptionText = getString(R.string.notification_terminal_service_description)
             val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
@@ -192,9 +192,9 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
     private fun buildNotification(): Notification {
         val wakeLockHeld = wakeLock != null
 
-        val sessionText = "$currentSessionCount " + (if (currentSessionCount == 1) "session" else "sessions") +
-            (if (currentRunCount > 0) " · $currentRunCount running" else "")
-        val notificationText = if (wakeLockHeld) "$sessionText (wake lock held)" else sessionText
+        val sessions = resources.getQuantityString(R.plurals.notification_terminal_sessions, currentSessionCount, currentSessionCount)
+        val sessionText = if (currentRunCount > 0) getString(R.string.notification_terminal_running, sessions, currentRunCount) else sessions
+        val notificationText = if (wakeLockHeld) getString(R.string.notification_terminal_wake_lock, sessionText) else sessionText
 
         val launchIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -230,7 +230,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
             this, 2, toggleWakeLockIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val wakeActionTitle = if (wakeLockHeld) "Release wakelock" else "Acquire wakelock"
+        val wakeActionTitle = getString(if (wakeLockHeld) R.string.notification_release_wake_lock else R.string.notification_acquire_wake_lock)
         val wakeActionIcon = if (wakeLockHeld) android.R.drawable.ic_lock_idle_lock else android.R.drawable.ic_lock_lock
 
         val priority = if (wakeLockHeld) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_LOW
@@ -243,9 +243,9 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
             .setOngoing(true)
             .setShowWhen(false)
             .setPriority(priority)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit", exitPendingIntent)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.notification_terminal_exit), exitPendingIntent)
             .addAction(wakeActionIcon, wakeActionTitle, wakePendingIntent)
-            .addAction(android.R.drawable.ic_menu_view, "Float", floatPendingIntent)
+            .addAction(android.R.drawable.ic_menu_view, getString(R.string.notification_terminal_float), floatPendingIntent)
             .build()
     }
 
@@ -281,7 +281,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
         requestDisableBatteryOptimizations(this)
         updateNotification()
         Handler(Looper.getMainLooper()).post {
-            Toast.makeText(this@AntiGemService, "Wake lock activated for 1 hour", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AntiGemService, R.string.notification_wake_lock_activated, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -312,7 +312,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
         updateNotification()
         Log.d(TAG, "WakeLocks released successfully")
         Handler(Looper.getMainLooper()).post {
-            Toast.makeText(this@AntiGemService, "Wake lock released", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AntiGemService, R.string.notification_wake_lock_released, Toast.LENGTH_SHORT).show()
         }
     }
 

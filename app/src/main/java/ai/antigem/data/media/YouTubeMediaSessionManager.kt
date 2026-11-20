@@ -1,5 +1,6 @@
 package ai.antigem.data.media
 
+import ai.antigem.R
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Notification
@@ -220,7 +221,7 @@ object YouTubeMediaSessionManager {
 
         val appContext = context.applicationContext
         activeVideoId = video.videoId
-        activeTitle = video.title?.takeIf { it.isNotBlank() } ?: "YouTube Video"
+        activeTitle = video.title?.takeIf { it.isNotBlank() } ?: context.getString(R.string.notification_youtube_video)
         activeThumbnailUrl = video.customThumbnailUrl?.takeIf { it.isNotBlank() }
             ?: "https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg"
 
@@ -500,7 +501,7 @@ object YouTubeMediaSessionManager {
 
             val ytVideoId = extractYouTubeVideoId(url)
             activeVideoId = ytVideoId ?: "browser_media"
-            activeTitle = title.takeIf { it.isNotBlank() && it != "New Tab" } ?: "Browser Video"
+            activeTitle = title.takeIf { it.isNotBlank() && it != "New Tab" } ?: appCtx.getString(R.string.notification_browser_video)
             activeThumbnailUrl = if (!ytVideoId.isNullOrBlank()) {
                 "https://img.youtube.com/vi/$ytVideoId/hqdefault.jpg"
             } else null
@@ -619,7 +620,7 @@ object YouTubeMediaSessionManager {
         )
 
         val playPauseIcon = if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
-        val playPauseTitle = if (isPlaying) "Pause" else "Play"
+        val playPauseTitle = if (isPlaying) context.getString(R.string.notification_youtube_button_pause) else context.getString(R.string.notification_youtube_button_play)
 
         val mediaStyle = Notification.MediaStyle()
             .setMediaSession(session.sessionToken)
@@ -628,7 +629,7 @@ object YouTubeMediaSessionManager {
         val builder = Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setContentTitle(activeTitle)
-            .setContentText("YouTube Video")
+            .setContentText(context.getString(R.string.notification_youtube_video))
             .setSubText("Antigravity")
             .setContentIntent(contentIntent)
             .setDeleteIntent(stopIntent)
@@ -645,7 +646,7 @@ object YouTubeMediaSessionManager {
             .addAction(
                 Notification.Action.Builder(
                     android.graphics.drawable.Icon.createWithResource(context, android.R.drawable.ic_menu_close_clear_cancel),
-                    "Close",
+                    context.getString(R.string.notification_youtube_button_close),
                     stopIntent
                 ).build()
             )
@@ -699,10 +700,10 @@ object YouTubeMediaSessionManager {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "YouTube Playback",
+                context.getString(R.string.notification_youtube_channel),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Shows playback controls for videos in chat"
+                description = context.getString(R.string.notification_youtube_channel_description)
                 setShowBadge(false)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             }

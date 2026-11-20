@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="run_screen_ide_only_command_s_hidden_they_use">"%1$s IDE-only command(s) hidden (they use the IDE's open file)."</string>
+    <string name="run_screen_new_command">"New command"</string>
+    <string name="run_screen_choose_a_folder">"Choose a folder"</string>
+    <string name="run_screen_change_folder">"Change folder"</string>
+    <string name="run_screen_browse">"Browse…"</string>
+    <string name="run_screen_run">"Run %1$s"</string>
+    <string name="run_screen_in">"in %1$s"</string>
+    <string name="run_screen_delete">"Delete \"%1$s\"?"</string>
+    <string name="run_screen_save_to_this_project">"Save to this project"</string>
+    <string name="run_screen_edit_command">"Edit command"</string>
+    <string name="run_screen_build_debug_apk">"Build debug APK"</string>
+    <string name="run_screen_adev_gradlew_assembledebug">"adev ./gradlew assembleDebug"</string>
+    <string name="run_screen_folder_optional">"Folder (optional)"</string>
+    <string name="run_screen_android_empty_the_project_folder">"android  ·  empty = the project folder"</string>
+    <string name="run_screen_save_to">"Save to"</string>
+    <string name="run_screen_kept_in_the_app_s_home_antigem">"Kept in the app's home (~/.antigem/global-run.json); runs in the folder picked in the panel."</string>
+    <string name="run_screen_saved_in_the_project_s_antigem_run">"Saved in the project's .antigem/run.json, which the IDE and the agents use too."</string>
+    <string name="run_screen_nothing_running">"Nothing running."</string>
+    <string name="run_screen_show_commands">"Show commands"</string>
+    <string name="run_screen_stop_and_close">"Stop and close"</string>
+    <string name="run_screen_send_output_to_chat">"Send output to chat"</string>
+    <string name="run_screen_run_again">"Run again"</string>
+    <string name="run_screen_failed_send_the_output_to_the_chat">"Failed. Send the output to the chat so the agent can fix it"</string>
+    <string name="run_screen_stopped">"Stopped"</string>
+    <string name="run_screen_runs">"Runs"</string>
+    <string name="run_screen_a_run_failed">"A run failed"</string>
+    <string name="run_screen_runs_finished">"Runs finished"</string>
+</resources>

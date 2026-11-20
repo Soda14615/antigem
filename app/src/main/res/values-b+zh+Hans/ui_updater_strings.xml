@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_update_dialog_new_update_available">"有新更新"</string>
+    <string name="app_update_dialog_critical_release">"关键版本"</string>
+    <string name="app_update_dialog_release_update">"发布更新"</string>
+    <string name="app_update_dialog_what_s_new">"更新内容"</string>
+    <string name="app_update_dialog_downloading">"正在下载…"</string>
+    <string name="app_update_dialog_downloaded_launching_installer">"已下载！正在启动安装程序…"</string>
+    <string name="app_update_dialog_download_failed">"下载失败： %1$s"</string>
+</resources>

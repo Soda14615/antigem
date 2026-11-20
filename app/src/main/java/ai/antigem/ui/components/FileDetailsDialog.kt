@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -182,7 +184,7 @@ fun FileDetailsDialog(
                 // Detail Items
                 DetailRow(
                     icon = Icons.Outlined.Category,
-                    label = "Type",
+                    label = stringResource(R.string.file_details_dialog_type),
                     value = typeName
                 )
 
@@ -190,7 +192,7 @@ fun FileDetailsDialog(
 
                 DetailRow(
                     icon = Icons.Outlined.FolderOpen,
-                    label = "Location",
+                    label = stringResource(R.string.file_details_dialog_location),
                     value = path,
                     isMonospace = true,
                     actionIcon = Icons.Default.ContentCopy,
@@ -206,7 +208,7 @@ fun FileDetailsDialog(
                 val parentPath = remember(path) { File(path).parent ?: "/" }
                 DetailRow(
                     icon = Icons.Outlined.DriveFileMove,
-                    label = "Parent Directory",
+                    label = stringResource(R.string.file_details_dialog_parent_directory),
                     value = parentPath,
                     isMonospace = true
                 )
@@ -224,7 +226,7 @@ fun FileDetailsDialog(
                 }
                 DetailRow(
                     icon = Icons.Outlined.DataUsage,
-                    label = "Size",
+                    label = stringResource(R.string.file_details_dialog_size),
                     value = sizeText
                 )
 
@@ -232,7 +234,7 @@ fun FileDetailsDialog(
 
                 DetailRow(
                     icon = Icons.Outlined.Security,
-                    label = "Permissions",
+                    label = stringResource(R.string.app_permissions_dialog_permissions),
                     value = permissionsInfo,
                     isMonospace = true
                 )
@@ -242,7 +244,7 @@ fun FileDetailsDialog(
                     val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy · hh:mm:ss a", Locale.getDefault()) }
                     DetailRow(
                         icon = Icons.Outlined.Schedule,
-                        label = "Last Modified",
+                        label = stringResource(R.string.file_details_dialog_last_modified),
                         value = dateFormat.format(Date(resolvedModTime))
                     )
                 }
@@ -255,7 +257,7 @@ fun FileDetailsDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Close", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.accounts_ui_close), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }

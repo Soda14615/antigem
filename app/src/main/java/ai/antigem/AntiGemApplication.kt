@@ -65,7 +65,7 @@ class AntiGemApplication : Application(), coil.ImageLoaderFactory {
         if (!BuildConfig.DEBUG && !isOfficialRelease()) {
             Toast.makeText(
                 this,
-                "Unofficial build: analytics disabled. Developer: set your own TelemetryDeck app ID and RELEASE_CERT_SHA256 in AntiGemApplication.kt.",
+                R.string.native_unofficial_build,
                 Toast.LENGTH_LONG
             ).show()
             return

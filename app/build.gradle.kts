@@ -38,7 +38,12 @@ android {
         // The local environment (glibc, proot, IDE bridge, bootstrap) is arm64 only, but armeabi-v7a is kept so 32-bit
         // ARM phones can install the app and use server mode (bridge on a PC). x86/x86_64 copies of dependency
         // libraries stay out of the APK
-        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
+        ndk {
+            abiFilters += "arm64-v8a"
+            if (providers.gradleProperty("antigem.arm64Only").orNull != "true") {
+                abiFilters += "armeabi-v7a"
+            }
+        }
     }
 
     signingConfigs {

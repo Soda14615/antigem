@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_step_step_of">"STEP %1$s OF %2$s"</string>
+    <string name="terminal_launcher_onboarding_dialog_home_screen_preview">"HOME SCREEN PREVIEW"</string>
+    <string name="terminal_launcher_onboarding_dialog_chat_ide">"Chat &amp; IDE"</string>
+    <string name="terminal_launcher_onboarding_dialog_hidden">"Hidden"</string>
+    <string name="terminal_launcher_onboarding_dialog_in_app_only">"In-App only"</string>
+    <string name="terminal_launcher_onboarding_dialog_standalone_terminal_app_icon">"Standalone Terminal App Icon"</string>
+    <string name="terminal_launcher_onboarding_dialog_places_a_dedicated_icon_in_your_app">"Places a dedicated icon in your app launcher for 1-tap terminal access"</string>
+    <string name="terminal_launcher_onboarding_dialog_select_icon_app_name">"Select Icon &amp; App Name:"</string>
+    <string name="terminal_launcher_onboarding_dialog_modern_unified_icon_matching_antigem">"Modern unified icon matching AntiGem"</string>
+    <string name="terminal_launcher_onboarding_dialog_classic_terminal_prompt_icon_familiar_name">"Classic terminal &gt;_ prompt icon &amp; familiar name"</string>
+</resources>

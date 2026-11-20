@@ -1,5 +1,6 @@
 package ai.antigem.ui.miniapps
 
+import androidx.compose.ui.res.stringResource
 import android.app.ActivityManager
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -537,14 +538,14 @@ open class MiniAppActivity : ComponentActivity(), MiniAppHost {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(icon, null, Modifier.size(72.dp).clip(RoundedCornerShape(18.dp)))
-                Text("${app.name} can't open", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 20.dp, bottom = 12.dp))
+                Text(stringResource(R.string.mini_app_activity_can_t_open, app.name.toString()), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 20.dp, bottom = 12.dp))
                 Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 if (app.tampered) androidx.compose.material3.Button(onClick = {
                     runCatching { ai.antigem.data.miniapps.MiniAppInstaller.uninstall(this@MiniAppActivity, app) }
                         .onSuccess { toast("${app.name} uninstalled", false) }.onFailure { toast(it.message ?: "Couldn't uninstall", true) }
                     closeApp()
-                }, modifier = Modifier.padding(top = 24.dp)) { Text("Uninstall") }
-                androidx.compose.material3.TextButton(onClick = { closeApp() }) { Text("Close") }
+                }, modifier = Modifier.padding(top = 24.dp)) { Text(stringResource(R.string.claude_settings_screen_uninstall)) }
+                androidx.compose.material3.TextButton(onClick = { closeApp() }) { Text(stringResource(R.string.accounts_ui_close)) }
             }
         }
     }
@@ -556,14 +557,14 @@ open class MiniAppActivity : ComponentActivity(), MiniAppHost {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(icon, null, Modifier.size(72.dp).clip(RoundedCornerShape(18.dp)))
-                Text("${app.name} can't run without", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 20.dp, bottom = 12.dp))
+                Text(stringResource(R.string.mini_app_activity_can_t_run_without, app.name.toString()), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 20.dp, bottom = 12.dp))
                 missing.forEach { name ->
                     val info = MiniAppPermissions.describe(app, name)
                     Text("• ${info.title}" + if (info.detail.isNotBlank()) ": ${info.detail}" else "", style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 2.dp))
                 }
-                androidx.compose.material3.Button(onClick = { reviewBlocked() }, modifier = Modifier.padding(top = 24.dp)) { Text("Review permissions") }
-                androidx.compose.material3.TextButton(onClick = { closeApp() }) { Text("Close") }
+                androidx.compose.material3.Button(onClick = { reviewBlocked() }, modifier = Modifier.padding(top = 24.dp)) { Text(stringResource(R.string.mini_app_activity_review_permissions)) }
+                androidx.compose.material3.TextButton(onClick = { closeApp() }) { Text(stringResource(R.string.accounts_ui_close)) }
             }
         }
     }
@@ -593,7 +594,7 @@ open class MiniAppActivity : ComponentActivity(), MiniAppHost {
             modifier = Modifier.offset { offset }.size(40.dp).shadow(4.dp, CircleShape)
                 .pointerInput(Unit) { detectDragGestures { change, drag -> change.consume(); offset = IntOffset(offset.x + drag.x.roundToInt(), offset.y + drag.y.roundToInt()) } },
         ) {
-            Box(contentAlignment = Alignment.Center) { Icon(Icons.Filled.MoreHoriz, "Developer menu", tint = MaterialTheme.colorScheme.inverseOnSurface) }
+            Box(contentAlignment = Alignment.Center) { Icon(Icons.Filled.MoreHoriz, stringResource(R.string.mini_app_activity_developer_menu), tint = MaterialTheme.colorScheme.inverseOnSurface) }
         }
     }
 

@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -88,7 +90,7 @@ fun RawPayloadDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Raw Request Payload",
+                            text = stringResource(R.string.raw_payload_dialog_raw_request_payload),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -99,11 +101,11 @@ fun RawPayloadDialog(
                     FilterChip(
                         selected = wrapLines,
                         onClick = { wrapLines = !wrapLines },
-                        label = { Text(if (wrapLines) "Wrap: ON" else "Wrap: OFF", fontSize = 11.5.sp) },
+                        label = { Text(if (wrapLines) stringResource(R.string.raw_payload_dialog_wrap_on) else stringResource(R.string.raw_payload_dialog_wrap_off), fontSize = 11.5.sp) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Outlined.WrapText,
-                                contentDescription = "Toggle Wrap",
+                                contentDescription = stringResource(R.string.raw_payload_dialog_toggle_wrap),
                                 modifier = Modifier.size(14.dp)
                             )
                         },
@@ -120,7 +122,7 @@ fun RawPayloadDialog(
 
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Formatted JSON payload transmitted to Google CloudCode API:",
+                    text = stringResource(R.string.raw_payload_dialog_formatted_json_payload_transmitted_to_google_cloudcode),
                     fontSize = 11.5.sp,
                     color = Color.White.copy(alpha = 0.6f)
                 )
@@ -180,12 +182,12 @@ fun RawPayloadDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ContentCopy,
-                            contentDescription = "Copy",
+                            contentDescription = stringResource(R.string.copy_text),
                             tint = Color.White,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Copy JSON", fontSize = 12.5.sp, color = Color.White)
+                        Text(stringResource(R.string.raw_payload_dialog_copy_json), fontSize = 12.5.sp, color = Color.White)
                     }
 
                     Button(
@@ -193,7 +195,7 @@ fun RawPayloadDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Close", fontSize = 13.sp, color = Color.White)
+                        Text(stringResource(R.string.accounts_ui_close), fontSize = 13.sp, color = Color.White)
                     }
                 }
             }

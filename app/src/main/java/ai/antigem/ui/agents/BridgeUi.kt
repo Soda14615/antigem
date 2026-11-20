@@ -1,5 +1,7 @@
 package ai.antigem.ui.agents
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,20 +64,15 @@ fun BridgeVersionDialog() {
     if (cmp == 0 || snoozed == b) return
 
     val remote = AuthPreferences.currentRemoteMode
-    val where = if (remote) "on your server" else "on this phone"
+    val where = if (remote) stringResource(R.string.main_ui_on_your_server) else stringResource(R.string.main_ui_on_this_phone)
     val text = when {
-        cmp > 0 -> "The IDE bridge $where is version $b, newer than this app (${BridgeInfo.appVersion}). Update the app so they match."
-        remote -> "The IDE bridge $where is version $b, but this app is version ${BridgeInfo.appVersion}.\n\n" +
-            "Update the bridge for better support: newer app features may not work with an older bridge.\n\n" +
-            "Build the bridge from this app version (agy_ide_bridge), copy it to ${RemoteServerManager.bridgeBinaryPath(context)} on the server " +
-            "and chmod +x it, then tap Restart server. Steps: docs/remote-server.md, section Updating."
-        else -> "The IDE bridge $where is version $b, but this app is version ${BridgeInfo.appVersion}.\n\n" +
-            "It is updated together with the app. Tap Restart server to start the bridge that came with this app. " +
-            "If the version still differs, reinstall the app."
+        cmp > 0 -> stringResource(R.string.main_ui_the_ide_bridge_is_version_newer_than, where, b, BridgeInfo.appVersion)
+        remote -> stringResource(R.string.main_ui_the_ide_bridge_is_version_but_this, where, b, BridgeInfo.appVersion, RemoteServerManager.bridgeBinaryPath(context))
+        else -> stringResource(R.string.main_ui_the_ide_bridge_is_version_but_this_2, where, b, BridgeInfo.appVersion)
     }
     AlertDialog(
         onDismissRequest = { BridgeInfo.snooze(b) },
-        title = { Text("Update the IDE bridge", fontWeight = FontWeight.Bold, fontSize = 17.sp) },
+        title = { Text(stringResource(R.string.bridge_ui_update_the_ide_bridge), fontWeight = FontWeight.Bold, fontSize = 17.sp) },
         text = { Text(text, fontSize = 13.sp, lineHeight = 18.sp) },
         confirmButton = {
             if (cmp < 0) {
@@ -83,10 +80,10 @@ fun BridgeVersionDialog() {
                     BridgeInfo.snooze(b)
                     BridgeInfo.reset()
                     LocalServerManager.restartServer(context)
-                }) { Text("Restart server") }
+                }) { Text(stringResource(R.string.agent_status_ui_restart_server)) }
             }
         },
-        dismissButton = { TextButton(onClick = { BridgeInfo.snooze(b) }) { Text("Later") } }
+        dismissButton = { TextButton(onClick = { BridgeInfo.snooze(b) }) { Text(stringResource(R.string.bridge_ui_later)) } }
     )
 }
 
@@ -96,10 +93,10 @@ fun BridgeVersionLine(modifier: Modifier = Modifier) {
     val bridge by BridgeInfo.version.collectAsState()
     val b = bridge
     val (text, color) = when {
-        b == null -> "Bridge version: not connected" to MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
-        BridgeInfo.compareBridgeToApp(b) == 0 -> "Bridge version: $b (matches the app)" to Ok
-        BridgeInfo.compareBridgeToApp(b) < 0 -> "Bridge version: $b, the app is ${BridgeInfo.appVersion}: update the bridge" to Warn
-        else -> "Bridge version: $b, newer than the app (${BridgeInfo.appVersion}): update the app" to Warn
+        b == null -> stringResource(R.string.main_ui_bridge_version_not_connected) to MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+        BridgeInfo.compareBridgeToApp(b) == 0 -> stringResource(R.string.main_ui_bridge_version_matches_the_app, b) to Ok
+        BridgeInfo.compareBridgeToApp(b) < 0 -> stringResource(R.string.main_ui_bridge_version_the_app_is_update_the, b, BridgeInfo.appVersion) to Warn
+        else -> stringResource(R.string.main_ui_bridge_version_newer_than_the_app_update, b, BridgeInfo.appVersion) to Warn
     }
     Text(text, fontSize = 11.5.sp, fontWeight = FontWeight.Medium, color = color, modifier = modifier)
 }
@@ -124,19 +121,19 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Antigravity CLI (agy)", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                 if (checking) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else IconButton(onClick = { BridgeInfo.refreshAgyCli() }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                else IconButton(onClick = { BridgeInfo.refreshAgyCli() }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
             }
             val running = job?.running == true
             when {
                 error != null -> Text(error!!, fontSize = 12.sp, color = Color.Red)
-                cli == null -> Text("Checking…", fontSize = 12.5.sp, color = subtle)
+                cli == null -> Text(stringResource(R.string.bridge_ui_checking), fontSize = 12.5.sp, color = subtle)
                 cli!!.installed -> {
-                    Text(cli!!.version.ifBlank { "Installed (version unknown)" }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(cli!!.version.ifBlank { stringResource(R.string.main_ui_installed_version_unknown) }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     Text(cli!!.path, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = subtle)
                 }
                 else -> {
                     Text(
-                        "agy is not installed on ${if (remote) "the server" else "this device"}.",
+                        stringResource(R.string.bridge_ui_agy_is_not_installed_on, (if (remote) stringResource(R.string.main_ui_the_server) else stringResource(R.string.main_ui_this_device)).toString()),
                         fontSize = 12.5.sp, color = Warn
                     )
                     if (cli!!.path.isNotBlank()) Text(cli!!.path, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = subtle)
@@ -145,7 +142,7 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
             if (cli?.installed == false && error == null) {
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Button(onClick = { BridgeInfo.installAgy() }, enabled = !running) { Text("Install agy") }
+                    Button(onClick = { BridgeInfo.installAgy() }, enabled = !running) { Text(stringResource(R.string.bridge_ui_install_agy)) }
                     if (running) {
                         Spacer(Modifier.width(10.dp))
                         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
@@ -158,7 +155,7 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedButton(onClick = { BridgeInfo.updateAgy(context) }, enabled = !running) {
-                        Text(if (running && job?.kind == "update") "Checking…" else "Check for updates")
+                        Text(if (running && job?.kind == "update") stringResource(R.string.bridge_ui_checking) else stringResource(R.string.bridge_ui_check_for_updates))
                     }
                     if (running) {
                         Spacer(Modifier.width(10.dp))
@@ -168,13 +165,13 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
                 // a newer agy was installed: the server was restarted so the hub runs it
                 updatedTo?.let {
                     Spacer(Modifier.height(6.dp))
-                    Text("Updated to agy $it. The server restarted to use it.", fontSize = 12.sp, color = Ok)
+                    Text(stringResource(R.string.bridge_ui_updated_to_agy_the_server_restarted_to, it.toString()), fontSize = 12.sp, color = Ok)
                 }
             }
             job?.let { j ->
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "${j.kind}: " + if (j.running) "running…" else "finished (exit ${j.exitCode})",
+                    "${j.kind}: " + if (j.running) stringResource(R.string.main_ui_running) else stringResource(R.string.main_ui_finished_exit, j.exitCode.toString()),
                     fontSize = 12.sp,
                     color = if (!j.running && j.exitCode != 0) Color.Red else subtle
                 )
@@ -188,10 +185,7 @@ fun AgyCliCard(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.height(6.dp))
             Text(
-                "Installed with Google's official installer (antigravity.google/cli/install.sh) into ~/.local/bin on " +
-                    (if (remote) "the server" else "this device") + ". agy updates itself when you run it in a terminal; " +
-                    "Check for updates runs `agy update` and, when a newer agy was installed, restarts the server so it is used " +
-                    "(voice calls need agy 1.5 or newer).",
+                stringResource(R.string.main_ui_installed_with_google_s_official_installer_antigravity, if (remote) stringResource(R.string.main_ui_the_server) else stringResource(R.string.main_ui_this_device)),
                 fontSize = 11.sp, color = subtle
             )
         }

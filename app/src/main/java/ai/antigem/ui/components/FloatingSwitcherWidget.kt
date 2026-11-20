@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -269,7 +271,7 @@ fun FloatingSwitcherWidget(
             ) {
                 Icon(
                     imageVector = collapseArrowIcon,
-                    contentDescription = "Collapse Switcher",
+                    contentDescription = stringResource(R.string.floating_switcher_widget_collapse_switcher),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
                     modifier = Modifier.size(18.dp)
                 )
@@ -430,7 +432,7 @@ fun FloatingSwitcherWidget(
                     ) {
                         Icon(
                             imageVector = expandArrowIcon,
-                            contentDescription = "Expand Switcher",
+                            contentDescription = stringResource(R.string.floating_switcher_widget_expand_switcher),
                             tint = ClaudeTerracotta,
                             modifier = Modifier.size(20.dp)
                         )

@@ -1,5 +1,7 @@
 package ai.antigem.ui.voice
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -121,10 +123,10 @@ private fun PickerContent(
     ) {
         Column(Modifier.fillMaxSize().systemBarsPadding().padding(vertical = 12.dp)) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, "Close", tint = Color.White.copy(alpha = 0.8f)) }
+                IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, stringResource(R.string.accounts_ui_close), tint = Color.White.copy(alpha = 0.8f)) }
             }
             Text(
-                "Choose a voice", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                stringResource(R.string.agy_voice_picker_choose_a_voice), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(6.dp))
@@ -169,7 +171,7 @@ private fun PickerContent(
                                 if (loading == v.name) CircularProgressIndicator(Modifier.size(15.dp), strokeWidth = 2.dp, color = Color.White)
                                 else Icon(Icons.Rounded.Replay, null, tint = Color.White, modifier = Modifier.size(16.dp))
                                 Spacer(Modifier.width(6.dp))
-                                Text(if (speaking) "Playing…" else "Play again", color = Color.White, fontSize = 13.sp)
+                                Text(if (speaking) stringResource(R.string.agy_voice_picker_playing) else stringResource(R.string.agy_voice_picker_play_again), color = Color.White, fontSize = 13.sp)
                             }
                         }
                     }
@@ -179,11 +181,11 @@ private fun PickerContent(
                     IconButton(
                         onClick = { scope.launch { pager.animateScrollToPage((pager.currentPage - 1).coerceAtLeast(0)) } },
                         enabled = pager.currentPage > 0
-                    ) { Icon(Icons.Rounded.ChevronLeft, "Previous voice", tint = Color.White.copy(alpha = if (pager.currentPage > 0) 0.7f else 0.2f)) }
+                    ) { Icon(Icons.Rounded.ChevronLeft, stringResource(R.string.agy_voice_picker_previous_voice), tint = Color.White.copy(alpha = if (pager.currentPage > 0) 0.7f else 0.2f)) }
                     IconButton(
                         onClick = { scope.launch { pager.animateScrollToPage((pager.currentPage + 1).coerceAtMost(voices.lastIndex)) } },
                         enabled = pager.currentPage < voices.lastIndex
-                    ) { Icon(Icons.Rounded.ChevronRight, "Next voice", tint = Color.White.copy(alpha = if (pager.currentPage < voices.lastIndex) 0.7f else 0.2f)) }
+                    ) { Icon(Icons.Rounded.ChevronRight, stringResource(R.string.agy_voice_picker_next_voice), tint = Color.White.copy(alpha = if (pager.currentPage < voices.lastIndex) 0.7f else 0.2f)) }
                 }
             }
 

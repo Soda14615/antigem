@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -94,7 +96,7 @@ fun FloatingNetworkInspectorBubble(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Language,
-                            contentDescription = "Network Inspector",
+                            contentDescription = stringResource(R.string.floating_network_inspector_bubble_network_inspector),
                             tint = ai.antigem.theme.AppColors.info,
                             modifier = Modifier.size(14.dp)
                         )
@@ -127,7 +129,7 @@ fun FloatingNetworkInspectorBubble(
                                         .background(ai.antigem.theme.AppColors.success)
                                 )
                                 Text(
-                                    text = "$activeStreams stream",
+                                    text = stringResource(R.string.floating_network_inspector_bubble_stream, activeStreams.toString()),
                                     fontSize = 9.5.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = ai.antigem.theme.AppColors.success
@@ -143,7 +145,7 @@ fun FloatingNetworkInspectorBubble(
                             color = ai.antigem.theme.AppColors.danger.copy(alpha = 0.18f)
                         ) {
                             Text(
-                                text = "$errorCount err",
+                                text = stringResource(R.string.floating_network_inspector_bubble_err, errorCount.toString()),
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ai.antigem.theme.AppColors.danger,

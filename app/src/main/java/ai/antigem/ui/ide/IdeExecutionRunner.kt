@@ -1,5 +1,7 @@
 package ai.antigem.ui.ide
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -186,7 +188,7 @@ fun IdeExecutionRunnerSheet(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = if (!isExited) "Running: ${request.command}" else "Finished / Exited",
+                            text = if (!isExited) stringResource(R.string.ide_execution_runner_running, request.command.toString()) else stringResource(R.string.ide_execution_runner_finished_exited),
                             fontSize = 11.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -209,7 +211,7 @@ fun IdeExecutionRunnerSheet(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Restart",
+                            contentDescription = stringResource(R.string.codex_settings_screen_restart),
                             tint = Color.LightGray,
                             modifier = Modifier.size(18.dp)
                         )
@@ -228,7 +230,7 @@ fun IdeExecutionRunnerSheet(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Stop,
-                            contentDescription = "Stop",
+                            contentDescription = stringResource(R.string.chat_input_bar_stop),
                             tint = if (!isExited) ai.antigem.theme.AppColors.danger else Color.DarkGray,
                             modifier = Modifier.size(18.dp)
                         )
@@ -246,7 +248,7 @@ fun IdeExecutionRunnerSheet(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ClearAll,
-                            contentDescription = "Clear",
+                            contentDescription = stringResource(R.string.custom_system_prompt_dialog_clear),
                             tint = Color.LightGray,
                             modifier = Modifier.size(18.dp)
                         )
@@ -259,7 +261,7 @@ fun IdeExecutionRunnerSheet(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.accounts_ui_close),
                             tint = Color.LightGray,
                             modifier = Modifier.size(19.dp)
                         )

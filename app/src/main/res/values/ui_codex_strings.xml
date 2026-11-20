@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="codex_chat_ui_implement_plan">"Implement plan"</string>
+    <string name="codex_chat_ui_plan_mode">"Plan mode"</string>
+    <string name="codex_chat_ui_plan">"Plan"</string>
+    <string name="codex_chat_ui_codex_account_and_settings">"Codex account and settings"</string>
+    <string name="codex_mcp_page_tools_codex_can_call">"Tools Codex can call"</string>
+    <string name="codex_mcp_page_servers_added_here_go_into_codex_s">"Servers added here go into Codex's own config, so every Codex chat (and the Codex CLI on the server) can use them. They connect when a chat starts."</string>
+    <string name="codex_mcp_page_servers">"Servers (%1$s)"</string>
+    <string name="codex_mcp_page_none_yet_add_one_from_the_presets">"None yet. Add one from the presets above."</string>
+    <string name="codex_mcp_page_add_an_mcp_server">"Add an MCP server"</string>
+    <string name="codex_mcp_page_remote_http">"Remote (HTTP)"</string>
+    <string name="codex_mcp_page_local_command">"Local (command)"</string>
+    <string name="codex_mcp_page_headers_one_per_line_name_value">"Headers (one per line, Name: value)"</string>
+    <string name="codex_mcp_page_environment_one_per_line_key_value">"Environment (one per line, KEY=value)"</string>
+    <string name="codex_mcp_page_it_runs_on_the_server_in_codex">"It runs on the server, in Codex's environment."</string>
+    <string name="codex_plugins_page_loading_plugins">"Loading plugins…"</string>
+    <string name="codex_plugins_page_no_plugins_installed_find_some_in_discover">"No plugins installed. Find some in Discover, or add a marketplace from GitHub."</string>
+    <string name="codex_plugins_page_a_marketplace_is_a_git_repository_with">"A marketplace is a git repository with a plugin catalog. Codex reads its own catalogs and Claude Code's (.claude-plugin/marketplace.json). Tap one to see its plugins and install them here; Discover lists the plugins of every marketplace."</string>
+    <string name="codex_plugins_page_github_owner_repo_owner_repo_branch_or">"GitHub owner/repo, owner/repo@branch, or a git URL"</string>
+    <string name="codex_plugins_page_update_catalog">"Update catalog"</string>
+    <string name="codex_plugins_page_no_plugins_in_this_marketplace_yet_update">"No plugins in this marketplace yet. Update it if it was just added."</string>
+    <string name="codex_plugins_page_plugins_are_loaded_when_a_chat_starts">"Plugins are loaded when a chat starts: start a new chat after installing or removing one."</string>
+    <string name="codex_settings_screen_open_the_link_sign_in_with_your">"Open the link, sign in with your ChatGPT account and enter this code:"</string>
+    <string name="codex_settings_screen_finish_signing_in_in_your_browser_codex">"Finish signing in in your browser. Codex picks it up by itself."</string>
+    <string name="codex_settings_screen_open_sign_in_page">"Open sign-in page"</string>
+    <string name="codex_settings_screen_sign_in_with_the_chatgpt_account_whose">"Sign in with the ChatGPT account whose plan Codex should use (Free, Plus, Pro, Business…)."</string>
+    <string name="codex_settings_screen_sign_in_with_chatgpt">"Sign in with ChatGPT"</string>
+    <string name="codex_settings_screen_use_a_code">"Use a code"</string>
+    <string name="codex_settings_screen_the_server_is_remote_you_get_a">"The server is remote: you get a code to enter on the sign-in page."</string>
+    <string name="codex_settings_screen_use_a_code_works_when_the_browser">"\"Use a code\" works when the browser cannot come back to the app. It may first need to be allowed in ChatGPT → Settings → Security."</string>
+    <string name="codex_settings_screen_usage_limits">"Usage limits"</string>
+    <string name="codex_settings_screen_plan_every_codex_model_counts_toward_the">"%1$s plan · every Codex model counts toward the same limits"</string>
+    <string name="codex_settings_screen_no_usage_information_yet">"No usage information yet."</string>
+    <string name="codex_settings_screen_sign_in_to_codex_to_see_your">"Sign in to Codex to see your limits."</string>
+    <string name="codex_settings_screen_no_limits_reported_for_this_account">"No limits reported for this account."</string>
+    <string name="codex_settings_screen_approvals">"Approvals"</string>
+    <string name="codex_settings_screen_what_codex_asks_before_acting_each_chat">"What Codex asks before acting. Each chat can change it from the chip above the message box."</string>
+    <string name="codex_settings_screen_server_install">"Server &amp; install"</string>
+    <string name="codex_settings_screen_codex_is_not_installed_on_this_phone">"Codex is not installed on this phone. Install it here (the Termux package: pkg install codex)."</string>
+    <string name="codex_settings_screen_codex_is_not_installed_on_the_server">"Codex is not installed on the server. Install it here: the app downloads OpenAI's official Linux build into ~/.local/bin."</string>
+    <string name="codex_settings_screen_install_codex">"Install Codex"</string>
+    <string name="codex_settings_screen_restart">"Restart"</string>
+    <string name="codex_settings_screen_restarting_ends_replies_that_are_running_codex">"Restarting ends replies that are running. Codex keeps its chats and sign-in in ~/.codex on the server."</string>
+    <string name="codex_settings_screen_used">"%1$s%% used"</string>
+</resources>

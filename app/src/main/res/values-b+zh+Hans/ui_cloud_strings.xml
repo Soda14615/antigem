@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agy_cloud_ui_cloud_agents">"云智能体"</string>
+    <string name="agy_cloud_ui_off_the_app_does_not_ask_the">"关闭：应用程序不会向 Antigravity 服务器请求云项目或云聊天。"</string>
+    <string name="agy_cloud_ui_antigravity_remote_agents_google_ai_pro_ultra">"Antigravity 远程智能体· Google AI Pro / Ultra"</string>
+    <string name="agy_cloud_ui_projects">"项目"</string>
+    <string name="agy_cloud_ui_connections">"连接"</string>
+    <string name="agy_cloud_ui_new_cloud_project">"新的云项目"</string>
+    <string name="agy_cloud_ui_rename_project">"重命名项目"</string>
+    <string name="agy_cloud_ui_rename">"重命名"</string>
+    <string name="agy_cloud_ui_the_cloud_project_and_its_cloud_chats">"云项目及其云聊天内容已在 Google 云中删除。你的 GitHub 仓库未被触及。"</string>
+    <string name="agy_cloud_ui_no_repos_the_agent_starts_in_an">"无仓库：智能体在空文件夹中启动。"</string>
+    <string name="agy_cloud_ui_private">"私有"</string>
+    <string name="agy_cloud_ui_new_chat_here">"新聊天在这里"</string>
+    <string name="agy_cloud_ui_repos">"回购协议"</string>
+    <string name="agy_cloud_ui_project_name">"项目名称"</string>
+    <string name="agy_cloud_ui_github_repos">"GitHub 仓库"</string>
+    <string name="agy_cloud_ui_connect_github">"连接 GitHub"</string>
+    <string name="agy_cloud_ui_loading_your_repos">"正在加载你的仓库…"</string>
+    <string name="agy_cloud_ui_no_repos_are_shared_with_antigravity_add">"没有与 Antigravity 共享仓库。在 GitHub 的 Antigravity 应用程序设置中添加一些内容。"</string>
+    <string name="agy_cloud_ui_private_2">"私有"</string>
+    <string name="agy_cloud_ui_private_repos_in_one_project_must_have">"一个项目中的私有仓库必须具有相同的所有者。"</string>
+    <string name="agy_cloud_ui_connect_opens_antigravity_s_page_for_it">"Connect 在你的浏览器中打开 Antigravity 的页面，作为你的 Antigravity Google 帐户。连接到那里，然后回到这里。"</string>
+    <string name="agy_cloud_ui_expired_connect_again">"已过期：重新连接"</string>
+    <string name="agy_cloud_ui_not_connected">"未连接"</string>
+    <string name="agy_cloud_ui_disconnect">"断开连接"</string>
+    <string name="agy_cloud_ui_connect">"连接"</string>
+    <string name="agy_cloud_ui_disconnect_2">"断开 %1$s？"</string>
+    <string name="agy_cloud_ui_cloud_agents_can_no_longer_use_until">"云智能体无法再使用 %1$s，直到再次连接为止。"</string>
+    <string name="agy_cloud_ui_cloud">"云"</string>
+    <string name="agy_cloud_ui_run_a_command_in_the_cloud_vm">"在云虚拟机中运行命令"</string>
+    <string name="agy_cloud_ui_command">"命令"</string>
+    <string name="agy_cloud_ui_the_agent_runs_it_and_the_output">"智能体运行它，输出显示在聊天中。"</string>
+    <string name="agy_cloud_ui_run">"运行"</string>
+    <string name="cloud_preview_preview_the_cloud_vm">"预览云虚拟机"</string>
+    <string name="cloud_preview_ports_from_the_agent_s_commands_are">"来自智能体命令的端口用点标记。"</string>
+    <string name="cloud_preview_pick_the_port_your_server_listens_on">"选择你的服务器侦听的端口（要求智能体在 0.0.0.0 上启动它）。"</string>
+    <string name="cloud_preview_port">"端口"</string>
+    <string name="cloud_preview_in_the_browser_it_opens_as_http">"在浏览器中，它在此手机上打开为 http://127.0.0.1:…。实时重新加载不起作用：重新加载以查看更改。"</string>
+    <string name="cloud_preview_open_in_app">"在应用程序中打开"</string>
+    <string name="cloud_preview_open_in_browser">"在浏览器中打开"</string>
+    <string name="cloud_preview_preview">"预览"</string>
+    <string name="cloud_preview_path">"路径"</string>
+</resources>

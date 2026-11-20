@@ -1,5 +1,7 @@
 package ai.antigem.ui.voice
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -90,7 +92,7 @@ fun AgyVoiceTranscriptSheet(record: VoiceChatRecord, onDismiss: () -> Unit) {
                 Icon(Icons.Rounded.HeadsetMic, null, tint = GeminiBlue, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Voice transcript", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.agy_voice_transcript_voice_transcript), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     if (subtitle.isNotBlank()) Text(subtitle, fontSize = 12.sp, color = subtle)
                 }
                 TextButton(onClick = {
@@ -105,7 +107,7 @@ fun AgyVoiceTranscriptSheet(record: VoiceChatRecord, onDismiss: () -> Unit) {
                     (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
                         .setPrimaryClip(ClipData.newPlainText("Voice transcript", text))
                     ai.antigem.ui.components.AppToastHelper.showToast("Transcript copied", ai.antigem.ui.components.ChatToastType.SUCCESS)
-                }) { Text("Copy") }
+                }) { Text(stringResource(R.string.copy_text)) }
             }
             Spacer(Modifier.height(12.dp))
             LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

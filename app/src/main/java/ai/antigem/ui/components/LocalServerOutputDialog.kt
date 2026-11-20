@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.compose.foundation.BorderStroke
@@ -138,7 +140,7 @@ fun LocalServerOutputDialog(
 
                         Column {
                             Text(
-                                text = if (AuthPreferences.currentRemoteMode) "Server Logs (SSH)" else "Local Server Logs",
+                                text = if (AuthPreferences.currentRemoteMode) stringResource(R.string.local_server_output_dialog_server_logs_ssh) else stringResource(R.string.local_server_output_dialog_local_server_logs),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = textPrimary
@@ -187,7 +189,7 @@ fun LocalServerOutputDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ContentCopy,
-                                contentDescription = "Copy log",
+                                contentDescription = stringResource(R.string.local_server_output_dialog_copy_log),
                                 tint = textPrimary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -202,7 +204,7 @@ fun LocalServerOutputDialog(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = "Start Server",
+                                    contentDescription = stringResource(R.string.local_server_output_dialog_start_server),
                                     tint = if (status is LocalServerStatus.Stopping) Color.Gray else ClaudeTerracotta,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -217,7 +219,7 @@ fun LocalServerOutputDialog(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Stop,
-                                    contentDescription = "Stop Server",
+                                    contentDescription = stringResource(R.string.local_server_output_dialog_stop_server),
                                     tint = ai.antigem.theme.AppColors.danger,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -231,7 +233,7 @@ fun LocalServerOutputDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
+                                contentDescription = stringResource(R.string.accounts_ui_close),
                                 tint = textPrimary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -364,7 +366,7 @@ fun LocalServerOutputDialog(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "No bridge process running.\nTap 'Restart' above to run agy_ide_bridge",
+                                text = stringResource(R.string.local_server_output_dialog_no_bridge_process_running_tap_restart_above),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp,
                                 color = ai.antigem.theme.AppColors.editorMuted,

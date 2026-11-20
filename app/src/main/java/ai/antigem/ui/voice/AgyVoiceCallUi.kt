@@ -1,5 +1,7 @@
 package ai.antigem.ui.voice
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -195,7 +197,7 @@ private fun CallContent(st: AgyVoiceCall.State, agentWorking: Boolean, onOpenAgy
             // ---- top bar
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { if (st.phase == Phase.FAILED) AgyVoiceCall.end() else AgyVoiceCall.setMinimized(true) }) {
-                    Icon(Icons.Rounded.KeyboardArrowDown, "Minimize", tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(28.dp))
+                    Icon(Icons.Rounded.KeyboardArrowDown, stringResource(R.string.agy_voice_call_ui_minimize), tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(28.dp))
                 }
                 Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                     Text(st.title.ifBlank { "Antigravity" }, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -215,7 +217,7 @@ private fun CallContent(st: AgyVoiceCall.State, agentWorking: Boolean, onOpenAgy
                     }
                 }
                 IconButton(onClick = { showLog = true }) {
-                    Icon(Icons.Rounded.Info, "Call log", tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Rounded.Info, stringResource(R.string.agy_voice_call_ui_call_log), tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
                 }
             }
 
@@ -265,10 +267,10 @@ private fun CallContent(st: AgyVoiceCall.State, agentWorking: Boolean, onOpenAgy
                     RoundControl(Icons.Rounded.Tune, "Voice", active = false) { showVoices = true }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Surface(onClick = { AgyVoiceCall.end() }, shape = CircleShape, color = CallRed, modifier = Modifier.size(64.dp)) {
-                            Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.CallEnd, "End call", tint = Color.White, modifier = Modifier.size(30.dp)) }
+                            Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.CallEnd, stringResource(R.string.agy_voice_call_ui_end_call), tint = Color.White, modifier = Modifier.size(30.dp)) }
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text("End", color = Color.White.copy(alpha = 0.7f), fontSize = 11.5.sp)
+                        Text(stringResource(R.string.agy_voice_call_ui_end), color = Color.White.copy(alpha = 0.7f), fontSize = 11.5.sp)
                     }
                 }
             }
@@ -473,7 +475,7 @@ private fun Captions(st: AgyVoiceCall.State, voice: AgyVoice, modifier: Modifier
     if (st.lines.isEmpty()) {
         Box(modifier, contentAlignment = Alignment.Center) {
             Text(
-                if (st.phase == Phase.LIVE) "Say what you want done: the agent works in this chat while you talk." else "",
+                if (st.phase == Phase.LIVE) stringResource(R.string.agy_voice_call_ui_say_what_you_want_done_the_agent) else "",
                 color = Color.White.copy(alpha = 0.45f), fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
@@ -494,7 +496,7 @@ private fun Captions(st: AgyVoiceCall.State, voice: AgyVoice, modifier: Modifier
             val user = line.role == AgyVoiceCall.Role.USER
             Column(Modifier.fillMaxWidth(), horizontalAlignment = if (user) Alignment.End else Alignment.Start) {
                 Text(
-                    if (user) "You" else voice.name,
+                    if (user) stringResource(R.string.agy_voice_call_ui_you) else voice.name,
                     color = if (user) Color.White.copy(alpha = 0.45f) else rgb(voice.glint).copy(alpha = 0.8f),
                     fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold
                 )
@@ -516,26 +518,26 @@ private fun Captions(st: AgyVoiceCall.State, voice: AgyVoice, modifier: Modifier
 private fun FailureCard(st: AgyVoiceCall.State, onRetry: () -> Unit, onUpdate: () -> Unit, onDetails: () -> Unit, onClose: () -> Unit) {
     Surface(shape = RoundedCornerShape(18.dp), color = Color.White.copy(alpha = 0.08f), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Text("The call couldn't continue", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(stringResource(R.string.agy_voice_call_ui_the_call_couldn_t_continue), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(6.dp))
-            Text(st.error ?: "Something went wrong.", color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, lineHeight = 18.sp)
+            Text(st.error ?: stringResource(R.string.agy_voice_call_ui_something_went_wrong), color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, lineHeight = 18.sp)
             Spacer(Modifier.height(14.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (st.problem == AgyVoiceCall.Problem.UPDATE_AGY) {
                     Surface(onClick = onUpdate, shape = RoundedCornerShape(50), color = Color.White) {
-                        Text("Update agy", color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
+                        Text(stringResource(R.string.agy_voice_call_ui_update_agy), color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
                     }
                 } else {
                     Surface(onClick = onRetry, shape = RoundedCornerShape(50), color = Color.White) {
-                        Text("Try again", color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
+                        Text(stringResource(R.string.checkpoint_restore_sheet_try_again), color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
                     }
                 }
                 // the full error, how far the call got and what the hub logged: to copy or screenshot
                 Surface(onClick = onDetails, shape = RoundedCornerShape(50), color = Color.White.copy(alpha = 0.12f)) {
-                    Text("Details", color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
+                    Text(stringResource(R.string.explorer_dialogs_details), color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
                 }
                 Surface(onClick = onClose, shape = RoundedCornerShape(50), color = Color.White.copy(alpha = 0.12f)) {
-                    Text("Close", color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
+                    Text(stringResource(R.string.accounts_ui_close), color = Color.White, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp))
                 }
             }
         }
@@ -563,14 +565,14 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
             Box(Modifier.align(Alignment.CenterHorizontally).size(width = 36.dp, height = 4.dp).clip(RoundedCornerShape(2.dp)).background(Color.White.copy(alpha = 0.2f)))
             Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Voice", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.message_bubble_voice), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
                 Text(
-                    "Browse voices", color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                    stringResource(R.string.agy_voice_call_ui_browse_voices), color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, fontWeight = FontWeight.Medium,
                     modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onBrowse).padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
             Text(
-                if (inCall) "Tap a voice to hear it, then switch the call to it." else "Tap a voice to hear it.",
+                if (inCall) stringResource(R.string.agy_voice_call_ui_tap_a_voice_to_hear_it_then) else stringResource(R.string.agy_voice_call_ui_tap_a_voice_to_hear_it),
                 color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp
             )
             Spacer(Modifier.height(10.dp))
@@ -596,12 +598,12 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
                                     Text(v.name, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp, modifier = Modifier.weight(1f))
                                     when {
                                         sampleLoading == v.name || samplePlaying == v.name ->
-                                            Icon(Icons.Rounded.VolumeUp, "Playing", tint = rgb(v.glint), modifier = Modifier.size(15.dp))
-                                        inUse -> Icon(Icons.Rounded.Check, "In use", tint = Color.White, modifier = Modifier.size(15.dp))
+                                            Icon(Icons.Rounded.VolumeUp, stringResource(R.string.agy_voice_call_ui_playing), tint = rgb(v.glint), modifier = Modifier.size(15.dp))
+                                        inUse -> Icon(Icons.Rounded.Check, stringResource(R.string.theme_gallery_in_use), tint = Color.White, modifier = Modifier.size(15.dp))
                                     }
                                 }
                                 Text(
-                                    if (inUse) "In use now" else v.tone,
+                                    if (inUse) stringResource(R.string.agy_voice_call_ui_in_use_now) else v.tone,
                                     color = Color.White.copy(alpha = if (inUse) 0.8f else 0.55f), fontSize = 10.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis
                                 )
                             }
@@ -611,8 +613,8 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
                 Spacer(Modifier.height(8.dp))
             }
             Spacer(Modifier.height(6.dp))
-            Text("Language", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text("The language the voice talks in. Phone language uses your phone's language list.", color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
+            Text(stringResource(R.string.agy_voice_call_ui_language), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(R.string.agy_voice_call_ui_the_language_the_voice_talks_in_phone), color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
             val languageTags = remember { listOf(AgyVoicePreferences.LANGUAGE_AUTO) + AgyVoicePreferences.languages.map { it.first } }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
@@ -627,7 +629,7 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
                     ) {
                         Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             if (inUse) {
-                                Icon(Icons.Rounded.Check, "In use", tint = if (on) Ink else Color.White, modifier = Modifier.size(13.dp))
+                                Icon(Icons.Rounded.Check, stringResource(R.string.theme_gallery_in_use), tint = if (on) Ink else Color.White, modifier = Modifier.size(13.dp))
                                 Spacer(Modifier.width(4.dp))
                             }
                             Text(
@@ -639,7 +641,7 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
                 }
             }
             Spacer(Modifier.height(14.dp))
-            Text("Speed", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(R.string.agy_voice_call_ui_speed), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 AgyVoicePreferences.speeds.forEach { sp ->
@@ -664,7 +666,7 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
             val changed = voiceChanged || languageChanged
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(onClick = onClose, shape = RoundedCornerShape(50), color = Color.White.copy(alpha = 0.1f), modifier = Modifier.weight(1f)) {
-                    Text(if (changed) "Cancel" else "Done", color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 11.dp))
+                    Text(if (changed) stringResource(R.string.accounts_ui_cancel) else stringResource(R.string.browser_screen_done), color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 11.dp))
                 }
                 if (changed) {
                     // only now the choice is saved and the call reconnects with it (once, for voice and language)
@@ -684,9 +686,9 @@ private fun VoicePanel(callVoice: String, callLanguage: String, inCall: Boolean,
                         }
                         Text(
                             when {
-                                target == null -> "Apply changes"
-                                inCall -> "Switch to $target"
-                                else -> "Use $target"
+                                target == null -> stringResource(R.string.agy_voice_call_ui_apply_changes)
+                                inCall -> stringResource(R.string.agy_voice_call_ui_switch_to, target.toString())
+                                else -> stringResource(R.string.agy_voice_call_ui_use, target.toString())
                             },
                             color = Ink, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1,
                             modifier = Modifier.padding(vertical = 11.dp)
@@ -713,9 +715,9 @@ private fun CallLogPanel(log: List<String>, onClose: () -> Unit) {
     ) {
         Column(Modifier.systemBarsPadding().padding(horizontal = 18.dp, vertical = 14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Call log", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.agy_voice_call_ui_call_log), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
                 Text(
-                    "Copy", color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                    stringResource(R.string.copy_text), color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, fontWeight = FontWeight.Medium,
                     modifier = Modifier.clip(RoundedCornerShape(50)).clickable {
                         val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         cm.setPrimaryClip(android.content.ClipData.newPlainText("Voice call log", "AntiGem voice call log\n" + log.joinToString("\n")))
@@ -739,7 +741,7 @@ private fun CallLogPanel(log: List<String>, onClose: () -> Unit) {
             }
             Spacer(Modifier.height(12.dp))
             Surface(onClick = onClose, shape = RoundedCornerShape(50), color = Color.White.copy(alpha = 0.1f), modifier = Modifier.fillMaxWidth()) {
-                Text("Done", color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 11.dp))
+                Text(stringResource(R.string.browser_screen_done), color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 11.dp))
             }
         }
     }
@@ -784,11 +786,11 @@ fun AgyVoiceCallPill(agentWorking: Boolean, modifier: Modifier = Modifier) {
             }
             if (st.phase != Phase.FAILED) {
                 IconButton(onClick = { AgyVoiceCall.toggleMute() }) {
-                    Icon(if (st.muted) Icons.Rounded.MicOff else Icons.Rounded.Mic, if (st.muted) "Unmute" else "Mute", tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(20.dp))
+                    Icon(if (st.muted) Icons.Rounded.MicOff else Icons.Rounded.Mic, if (st.muted) stringResource(R.string.video_player_ui_unmute) else stringResource(R.string.video_player_ui_mute), tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(20.dp))
                 }
             }
             Surface(onClick = { AgyVoiceCall.end() }, shape = CircleShape, color = CallRed, modifier = Modifier.padding(end = 6.dp).size(34.dp)) {
-                Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.CallEnd, "End call", tint = Color.White, modifier = Modifier.size(18.dp)) }
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.CallEnd, stringResource(R.string.agy_voice_call_ui_end_call), tint = Color.White, modifier = Modifier.size(18.dp)) }
             }
         }
     }

@@ -1,5 +1,7 @@
 package ai.antigem.ui.miniapps
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import android.widget.MediaController
@@ -83,13 +85,13 @@ fun MediaViewerDialog(d: NativeDialog.MediaViewer) {
                         .statusBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    IconButton(onClick = { close() }) { Icon(Icons.Filled.Close, "Close", tint = Color.White) }
+                    IconButton(onClick = { close() }) { Icon(Icons.Filled.Close, stringResource(R.string.accounts_ui_close), tint = Color.White) }
                     val item = d.items.getOrNull(pager.currentPage)
                     Text(
                         (item?.title ?: "") + if (d.items.size > 1) "   ${pager.currentPage + 1} / ${d.items.size}" else "",
                         color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
                     )
-                    if (item != null) IconButton(onClick = { share(context, item) }) { Icon(Icons.Filled.Share, "Share", tint = Color.White) }
+                    if (item != null) IconButton(onClick = { share(context, item) }) { Icon(Icons.Filled.Share, stringResource(R.string.share_text), tint = Color.White) }
                 }
             }
         }

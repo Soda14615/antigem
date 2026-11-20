@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -322,7 +324,7 @@ fun MarkdownBlockView(
             ) {
                 Icon(
                     imageVector = if (block.isChecked) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-                    contentDescription = if (block.isChecked) "Completed" else "Incomplete",
+                    contentDescription = if (block.isChecked) stringResource(R.string.markdown_content_completed) else stringResource(R.string.markdown_content_incomplete),
                     tint = if (block.isChecked) QuotaGreen else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier
                         .padding(top = 1.5.dp, end = 6.dp)
@@ -747,7 +749,7 @@ fun MermaidDiagramView(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "MERMAID DIAGRAM",
+                    text = stringResource(R.string.markdown_content_mermaid_diagram),
                     fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = ClaudeTerracotta,
@@ -771,7 +773,7 @@ fun MermaidDiagramView(
                             .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Text(
-                            text = "Diagram",
+                            text = stringResource(R.string.markdown_content_diagram),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -786,7 +788,7 @@ fun MermaidDiagramView(
                             .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Text(
-                            text = "Code",
+                            text = stringResource(R.string.code_block_code),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -809,14 +811,14 @@ fun MermaidDiagramView(
                     if (isCopied) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Copied",
+                            contentDescription = stringResource(R.string.code_block_copied),
                             tint = QuotaGreen,
                             modifier = Modifier.size(15.dp)
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Outlined.ContentCopy,
-                            contentDescription = "Copy",
+                            contentDescription = stringResource(R.string.copy_text),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             modifier = Modifier.size(15.dp)
                         )
@@ -831,7 +833,7 @@ fun MermaidDiagramView(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.OpenInFull,
-                        contentDescription = "Expand",
+                        contentDescription = stringResource(R.string.agent_tool_call_card_expand),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.size(15.dp)
                     )
@@ -946,7 +948,7 @@ fun MermaidFullscreenDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.accounts_ui_close),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -954,7 +956,7 @@ fun MermaidFullscreenDialog(
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Text(
-                        text = "Mermaid Diagram",
+                        text = stringResource(R.string.markdown_content_mermaid_diagram_2),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -977,7 +979,7 @@ fun MermaidFullscreenDialog(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Diagram",
+                                text = stringResource(R.string.markdown_content_diagram),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -992,7 +994,7 @@ fun MermaidFullscreenDialog(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Code",
+                                text = stringResource(R.string.code_block_code),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -1010,7 +1012,7 @@ fun MermaidFullscreenDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ZoomOut,
-                                contentDescription = "Zoom Out",
+                                contentDescription = stringResource(R.string.markdown_content_zoom_out),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1022,7 +1024,7 @@ fun MermaidFullscreenDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ZoomIn,
-                                contentDescription = "Zoom In",
+                                contentDescription = stringResource(R.string.markdown_content_zoom_in),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1036,7 +1038,7 @@ fun MermaidFullscreenDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.RestartAlt,
-                                contentDescription = "Reset Zoom",
+                                contentDescription = stringResource(R.string.full_screen_image_dialog_reset_zoom),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1059,14 +1061,14 @@ fun MermaidFullscreenDialog(
                         if (isCopied) {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = "Copied",
+                                contentDescription = stringResource(R.string.code_block_copied),
                                 tint = QuotaGreen,
                                 modifier = Modifier.size(18.dp)
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Outlined.ContentCopy,
-                                contentDescription = "Copy",
+                                contentDescription = stringResource(R.string.copy_text),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1320,7 +1322,7 @@ fun MarkdownDetailsView(
             ) {
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    contentDescription = if (isExpanded) stringResource(R.string.agent_tool_call_card_collapse) else stringResource(R.string.agent_tool_call_card_expand),
                     tint = ClaudeTerracotta,
                     modifier = Modifier
                         .size(20.dp)
@@ -1395,7 +1397,7 @@ fun AgentErrorCard(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ErrorOutline,
-                    contentDescription = "Error",
+                    contentDescription = stringResource(R.string.markdown_content_error),
                     tint = errorColor,
                     modifier = Modifier.size(18.dp)
                 )
@@ -1413,7 +1415,7 @@ fun AgentErrorCard(
                         color = errorColor.copy(alpha = 0.15f)
                     ) {
                         Text(
-                            text = "Code: ${error.errorCode}",
+                            text = stringResource(R.string.markdown_content_code, error.errorCode.toString()),
                             fontSize = 10.5.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = errorColor,
@@ -1443,7 +1445,7 @@ fun AgentErrorCard(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ContentCopy,
-                        contentDescription = "Copy Error Details",
+                        contentDescription = stringResource(R.string.markdown_content_copy_error_details),
                         tint = errorColor.copy(alpha = 0.7f),
                         modifier = Modifier.size(14.dp)
                     )
@@ -1479,7 +1481,7 @@ fun AgentErrorCard(
                     onClick = { ai.antigem.ui.opencode.OpenCodeUiEvents.requestProviders() },
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                ) { Text("Reconnect in Settings", fontSize = 12.5.sp) }
+                ) { Text(stringResource(R.string.markdown_content_reconnect_in_settings), fontSize = 12.5.sp) }
             }
 
             // Full Error / Stack Trace / JSON Accordion if present
@@ -1496,7 +1498,7 @@ fun AgentErrorCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ExpandMore,
-                        contentDescription = if (isExpanded) "Collapse" else "Expand",
+                        contentDescription = if (isExpanded) stringResource(R.string.agent_tool_call_card_collapse) else stringResource(R.string.agent_tool_call_card_expand),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier
                             .size(16.dp)
@@ -1504,7 +1506,7 @@ fun AgentErrorCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = if (isExpanded) "Hide Error Details & Stack Trace" else "View Error Details & Stack Trace",
+                        text = if (isExpanded) stringResource(R.string.markdown_content_hide_error_details_stack_trace) else stringResource(R.string.markdown_content_view_error_details_stack_trace),
                         fontSize = 11.5.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -1526,7 +1528,7 @@ fun AgentErrorCard(
                     ) {
                         if (error.errorId.isNotBlank()) {
                             Text(
-                                text = "Error ID: ${error.errorId}",
+                                text = stringResource(R.string.markdown_content_error_id, error.errorId.toString()),
                                 fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
@@ -1635,7 +1637,7 @@ fun MarkdownImageView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.BrokenImage,
-                            contentDescription = "Failed to load image",
+                            contentDescription = stringResource(R.string.markdown_content_failed_to_load_image),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(32.dp)
                         )
@@ -1831,7 +1833,7 @@ fun YouTubeVideoView(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = video.title?.takeIf { it.isNotBlank() } ?: "YouTube Video",
+                        text = video.title?.takeIf { it.isNotBlank() } ?: stringResource(R.string.markdown_content_youtube_video),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -1850,7 +1852,7 @@ fun YouTubeVideoView(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = "Close Player",
+                                contentDescription = stringResource(R.string.markdown_content_close_player),
                                 tint = MaterialTheme.colorScheme.error.copy(alpha = 0.85f),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -1869,7 +1871,7 @@ fun YouTubeVideoView(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.OpenInNew,
-                            contentDescription = "Open in YouTube",
+                            contentDescription = stringResource(R.string.markdown_content_open_in_youtube),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                             modifier = Modifier.size(16.dp)
                         )
@@ -1923,7 +1925,7 @@ fun YouTubeVideoView(
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = Icons.Filled.PlayArrow,
-                                contentDescription = "Play Video",
+                                contentDescription = stringResource(R.string.markdown_content_play_video),
                                 tint = Color.White,
                                 modifier = Modifier.size(26.dp)
                             )

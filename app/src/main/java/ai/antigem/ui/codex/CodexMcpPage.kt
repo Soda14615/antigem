@@ -1,5 +1,7 @@
 package ai.antigem.ui.codex
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -193,17 +195,17 @@ fun CodexMcpPage(backend: CodexChatBackend, onOpenRea: () -> Unit = {}, onOpenRe
         ClaudeCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Tools Codex can call", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text(stringResource(R.string.codex_mcp_page_tools_codex_can_call), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Text(
-                        "Servers added here go into Codex's own config, so every Codex chat (and the Codex CLI on the server) can use them. They connect when a chat starts.",
+                        stringResource(R.string.codex_mcp_page_servers_added_here_go_into_codex_s),
                         fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
                 if (loading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = CodexAccent)
-                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, "Refresh") }
+                else IconButton(onClick = { scope.launch { reload() } }) { Icon(Icons.Outlined.Refresh, stringResource(R.string.agent_sheet_ui_refresh)) }
             }
             Spacer(Modifier.height(10.dp))
-            Text("Quick presets", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            Text(stringResource(R.string.claude_settings_screen_quick_presets), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
             Spacer(Modifier.height(6.dp))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 presets.chunked(2).forEach { row ->
@@ -235,10 +237,10 @@ fun CodexMcpPage(backend: CodexChatBackend, onOpenRea: () -> Unit = {}, onOpenRe
         }
 
         ClaudeCard {
-            Text("Servers (${servers.size})", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(stringResource(R.string.codex_mcp_page_servers, servers.size.toString()), fontWeight = FontWeight.Bold, fontSize = 14.sp)
             error?.let { Text(it, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 4.dp)) }
             if (servers.isEmpty() && error == null) {
-                Text("None yet. Add one from the presets above.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 4.dp))
+                Text(stringResource(R.string.codex_mcp_page_none_yet_add_one_from_the_presets), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 4.dp))
             }
             servers.forEachIndexed { i, srv ->
                 if (i > 0) HorizontalDivider(Modifier.padding(vertical = 6.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
@@ -275,7 +277,7 @@ fun CodexMcpPage(backend: CodexChatBackend, onOpenRea: () -> Unit = {}, onOpenRe
                             headers = stringsOf(c, "http_headers").entries.joinToString("\n") { "${it.key}: ${it.value}" },
                             isNew = false
                         )
-                    }) { Text("Edit") }
+                    }) { Text(stringResource(R.string.chat_screen_edit)) }
                     IconButton(onClick = {
                         scope.launch {
                             backend.removeMcp(srv.name)
@@ -283,7 +285,7 @@ fun CodexMcpPage(backend: CodexChatBackend, onOpenRea: () -> Unit = {}, onOpenRe
                                 .onFailure { AppToastHelper.showToast("Could not remove: ${it.message}", ChatToastType.ERROR) }
                             reload()
                         }
-                    }) { Icon(Icons.Outlined.Delete, "Remove", tint = MaterialTheme.colorScheme.error) }
+                    }) { Icon(Icons.Outlined.Delete, stringResource(R.string.browser_screen_remove), tint = MaterialTheme.colorScheme.error) }
                 }
             }
         }
@@ -313,38 +315,38 @@ private fun McpServerDialog(initial: McpDraft, onDismiss: () -> Unit, onSave: (M
     val ok = nameOk && if (d.remote) d.url.trim().let { it.startsWith("http://") || it.startsWith("https://") } else splitCommand(d.command).isNotEmpty()
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initial.isNew) "Add an MCP server" else "Edit ${initial.name}", fontWeight = FontWeight.Bold) },
+        title = { Text(if (initial.isNew) stringResource(R.string.codex_mcp_page_add_an_mcp_server) else stringResource(R.string.claude_providers_page_edit, initial.name.toString()), fontWeight = FontWeight.Bold) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 OutlinedTextField(
-                    d.name, { d = d.copy(name = it) }, label = { Text("Name") }, singleLine = true, enabled = initial.isNew,
+                    d.name, { d = d.copy(name = it) }, label = { Text(stringResource(R.string.browser_screen_name)) }, singleLine = true, enabled = initial.isNew,
                     isError = d.name.isNotBlank() && !nameOk, modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(selected = d.remote, onClick = { d = d.copy(remote = true) }, label = { Text("Remote (HTTP)") })
-                    FilterChip(selected = !d.remote, onClick = { d = d.copy(remote = false) }, label = { Text("Local (command)") })
+                    FilterChip(selected = d.remote, onClick = { d = d.copy(remote = true) }, label = { Text(stringResource(R.string.codex_mcp_page_remote_http)) })
+                    FilterChip(selected = !d.remote, onClick = { d = d.copy(remote = false) }, label = { Text(stringResource(R.string.codex_mcp_page_local_command)) })
                 }
                 Spacer(Modifier.height(4.dp))
                 if (d.remote) {
                     OutlinedTextField(d.url, { d = d.copy(url = it) }, label = { Text("URL") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("https://example.com/mcp") })
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(d.headers, { d = d.copy(headers = it) }, label = { Text("Headers (one per line, Name: value)") },
+                    OutlinedTextField(d.headers, { d = d.copy(headers = it) }, label = { Text(stringResource(R.string.codex_mcp_page_headers_one_per_line_name_value)) },
                         minLines = 2, modifier = Modifier.fillMaxWidth())
                 } else {
-                    OutlinedTextField(d.command, { d = d.copy(command = it) }, label = { Text("Command") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    OutlinedTextField(d.command, { d = d.copy(command = it) }, label = { Text(stringResource(R.string.agy_cloud_ui_command)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("npx -y @modelcontextprotocol/server-filesystem ~/projects") })
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(d.env, { d = d.copy(env = it) }, label = { Text("Environment (one per line, KEY=value)") },
+                    OutlinedTextField(d.env, { d = d.copy(env = it) }, label = { Text(stringResource(R.string.codex_mcp_page_environment_one_per_line_key_value)) },
                         minLines = 2, modifier = Modifier.fillMaxWidth())
-                    Text("It runs on the server, in Codex's environment.", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f))
+                    Text(stringResource(R.string.codex_mcp_page_it_runs_on_the_server_in_codex), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f))
                 }
             }
         },
         confirmButton = {
-            Button(onClick = { saving = true; onSave(d) { saving = false } }, enabled = ok && !saving) { Text(if (saving) "Saving…" else "Save") }
+            Button(onClick = { saving = true; onSave(d) { saving = false } }, enabled = ok && !saving) { Text(if (saving) stringResource(R.string.claude_providers_page_saving) else stringResource(R.string.claude_providers_page_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_cancel)) } }
     )
 }

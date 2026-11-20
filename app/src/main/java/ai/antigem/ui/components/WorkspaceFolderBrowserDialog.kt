@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -94,7 +96,7 @@ fun WorkspaceFolderBrowserDialog(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Parent Directory",
+                            contentDescription = stringResource(R.string.file_details_dialog_parent_directory),
                             tint = if (parentPath.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                         )
                     }
@@ -105,7 +107,7 @@ fun WorkspaceFolderBrowserDialog(
                             .padding(horizontal = 4.dp)
                     ) {
                         Text(
-                            text = "Browse Folders",
+                            text = stringResource(R.string.workspace_folder_browser_dialog_browse_folders),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -125,7 +127,7 @@ fun WorkspaceFolderBrowserDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Refresh,
-                            contentDescription = "Refresh",
+                            contentDescription = stringResource(R.string.agent_sheet_ui_refresh),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
@@ -139,7 +141,7 @@ fun WorkspaceFolderBrowserDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.CreateNewFolder,
-                            contentDescription = "New Folder",
+                            contentDescription = stringResource(R.string.workspace_folder_browser_dialog_new_folder),
                             tint = ClaudeTerracotta
                         )
                     }
@@ -184,7 +186,7 @@ fun WorkspaceFolderBrowserDialog(
                                     )
                                     Spacer(modifier = Modifier.height(10.dp))
                                     Button(onClick = { loadDir(currentPath) }) {
-                                        Text("Retry")
+                                        Text(stringResource(R.string.chat_screen_retry))
                                     }
                                 }
                             }
@@ -195,7 +197,7 @@ fun WorkspaceFolderBrowserDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "No subfolders found\n(You can select this folder)",
+                                    text = stringResource(R.string.workspace_folder_browser_dialog_no_subfolders_found_you_can_select_this),
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -256,7 +258,7 @@ fun WorkspaceFolderBrowserDialog(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(10.dp)
                     ) {
-                        Text("Cancel", fontSize = 13.sp)
+                        Text(stringResource(R.string.accounts_ui_cancel), fontSize = 13.sp)
                     }
 
                     Button(
@@ -277,7 +279,7 @@ fun WorkspaceFolderBrowserDialog(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Choose This Folder",
+                            text = stringResource(R.string.workspace_folder_browser_dialog_choose_this_folder),
                             color = Color.White,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold
@@ -292,12 +294,12 @@ fun WorkspaceFolderBrowserDialog(
         AlertDialog(
             onDismissRequest = { showNewFolderDialog = false },
             title = {
-                Text("New Folder", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.workspace_folder_browser_dialog_new_folder), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             },
             text = {
                 Column {
                     Text(
-                        text = "Create folder inside: $currentPath",
+                        text = stringResource(R.string.workspace_folder_browser_dialog_create_folder_inside, currentPath.toString()),
                         fontSize = 11.5.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -332,12 +334,12 @@ fun WorkspaceFolderBrowserDialog(
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta),
                     enabled = newFolderName.isNotBlank() && !isCreatingFolder
                 ) {
-                    Text("Create", fontSize = 13.sp)
+                    Text(stringResource(R.string.workspace_folder_browser_dialog_create), fontSize = 13.sp)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showNewFolderDialog = false }) {
-                    Text("Cancel", fontSize = 13.sp)
+                    Text(stringResource(R.string.accounts_ui_cancel), fontSize = 13.sp)
                 }
             }
         )

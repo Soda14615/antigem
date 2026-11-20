@@ -1,5 +1,7 @@
 package ai.antigem.ui.bubble
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -128,7 +130,7 @@ fun FloatingBubbleContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = "AI Assistant Bubble",
+                        contentDescription = stringResource(R.string.floating_bubble_view_ai_assistant_bubble),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )

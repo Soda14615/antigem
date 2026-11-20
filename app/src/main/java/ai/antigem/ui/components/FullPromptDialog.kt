@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -89,10 +91,10 @@ fun FullPromptDialog(prompt: String, attachmentCount: Int = 0, onDismiss: () -> 
             Column(Modifier.padding(start = 18.dp, end = 10.dp, top = 12.dp, bottom = 10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Full prompt", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.full_prompt_dialog_full_prompt), fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                         Text(stats, fontSize = 12.sp, color = muted)
                     }
-                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, contentDescription = "Close") }
+                    IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.accounts_ui_close)) }
                 }
                 Text(
                     "Exactly what was sent to the agent, including the parts the chat hides." +
@@ -127,9 +129,9 @@ fun FullPromptDialog(prompt: String, attachmentCount: Int = 0, onDismiss: () -> 
                         Toast.makeText(context, "Copied the full prompt", Toast.LENGTH_SHORT).show()
                     }) {
                         Icon(Icons.Outlined.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Copy all", modifier = Modifier.padding(start = 6.dp))
+                        Text(stringResource(R.string.full_prompt_dialog_copy_all), modifier = Modifier.padding(start = 6.dp))
                     }
-                    TextButton(onClick = onDismiss) { Text("Close") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.accounts_ui_close)) }
                 }
             }
         }

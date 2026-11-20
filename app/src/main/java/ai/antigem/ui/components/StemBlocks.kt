@@ -1,5 +1,7 @@
 package ai.antigem.ui.components
 
+import ai.antigem.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -342,7 +344,7 @@ private fun TikzBody(code: String, isDark: Boolean, onSvg: (String) -> Unit) {
             StemStatus("Compiling with TeX… (first time takes a few seconds)", Modifier.align(Alignment.BottomCenter))
         }
         "error" -> Column(Modifier.fillMaxWidth().padding(10.dp)) {
-            Text("Couldn't compile this TikZ picture", fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = MaterialTheme.colorScheme.error)
+            Text(stringResource(R.string.stem_blocks_couldn_t_compile_this_tikz_picture), fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = MaterialTheme.colorScheme.error)
             Spacer(Modifier.height(6.dp))
             SelectionContainer {
                 Text(
@@ -356,7 +358,7 @@ private fun TikzBody(code: String, isDark: Boolean, onSvg: (String) -> Unit) {
                         .padding(8.dp)
                 )
             }
-            TextButton(onClick = { retry++ }) { Text("Retry") }
+            TextButton(onClick = { retry++ }) { Text(stringResource(R.string.chat_screen_retry)) }
         }
         "queued" -> StemStatus("Waiting for another TikZ picture to finish…", Modifier.padding(16.dp))
         else -> Spacer(Modifier.height(80.dp))
@@ -614,7 +616,7 @@ private fun StemFullscreenDialog(kind: StemKind, code: String, html: String?, on
                     Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Close, "Close") }
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Close, stringResource(R.string.accounts_ui_close)) }
                     Spacer(Modifier.width(6.dp))
                     Text(kind.component.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                     StemTabs(selectedTab) { selectedTab = it }
@@ -628,7 +630,7 @@ private fun StemFullscreenDialog(kind: StemKind, code: String, html: String?, on
                         StemWebView(html = html, reloadKey = restartKey, interactive = kind.interactive, fill = true)
                     } else {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("The picture is still compiling.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.stem_blocks_the_picture_is_still_compiling), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else {
