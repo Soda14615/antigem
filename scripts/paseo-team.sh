@@ -30,6 +30,13 @@ require_node() {
 require_paseo() {
   [[ -x "$paseo" ]] || fail "尚未安装：请运行 paseo-team install。"
 }
+connection_password() {
+  if [[ -z "${PASEO_PASSWORD:-}" && -t 0 ]]; then
+    read -r -s -p "Paseo 团队访问密码: " PASEO_PASSWORD
+    printf "\n" >&2
+    export PASEO_PASSWORD
+  fi
+}
 init_config() {
   mkdir -p "$team_home"
   node - "$team_home/config.json" "$port" <<\JS
@@ -71,16 +78,19 @@ if (!/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(config.daemon?.auth?.password ?
   process.exit(1);
 }
 JS
+    connection_password
     "$paseo" daemon start --home "$team_home"
     ;;
   status|stop)
     [[ $# -eq 1 ]] || fail "用法：paseo-team $1"
     require_paseo
+    if [[ "$1" == status ]]; then connection_password; fi
     "$paseo" daemon "$1" --home "$team_home"
     ;;
   cli)
     shift; require_paseo
     [[ $# -gt 0 ]] || fail "用法：paseo-team cli <args>"
+    if [[ "$1" != --help && "$1" != -h && "$1" != --version ]]; then connection_password; fi
     exec "$paseo" --home "$team_home" "$@"
     ;;
   url) printf "http://127.0.0.1:%s\n" "$port" ;;
