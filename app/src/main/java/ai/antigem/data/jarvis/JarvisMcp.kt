@@ -139,7 +139,7 @@ object JarvisMcp {
             emptyList(), "include_finished" to prop("boolean", "Also list finished tasks (default true)"),
             "scope" to prop("string", "mine (default: the tasks of your chat) or all", listOf("mine", "all")), limit, managerId))
         put(tool("jarvis_task_get", "One task in detail: goal, state, last note, and its latest reply or progress. Use it for \"how is X going?\" or to understand a failure; not to poll a running task. " +
-            "For a finished task's whole reply use jarvis_read_chat(id, role=\"assistant\", limit=1, max_chars=30000).",
+            "For a finished task's full reply use jarvis_read_chat(id, role=\"assistant\", limit=1, max_chars=30000); continue with next_char_offset when present.",
             listOf("id"), taskId, "messages" to prop("integer", "Also include this many of its newest messages (default 3, 0-10)"),
             "max_chars" to prop("integer", "Cut each of those messages to this length (default 600, up to 30000)"), managerId))
         put(tool("jarvis_task_reply",
@@ -248,7 +248,8 @@ object JarvisMcp {
             "from_end" to prop("boolean", "Count from the newest message (default true)"),
             "role" to prop("string", "Only these messages", listOf("all", "user", "assistant")),
             "include_tools" to prop("boolean", "Include the tool calls each reply made (default false)"),
-            "max_chars" to prop("integer", "Cut each message to this length (default 800, up to 30000)")))
+            "max_chars" to prop("integer", "Characters per message chunk (default 800, up to 30000)"),
+            "char_offset" to prop("integer", "UTF-16 character offset inside each selected message; use next_char_offset to continue")))
         put(tool("jarvis_search_chats",
             "Find chats by title; with deep=true also look inside the most recent chats.",
             listOf("query"),
@@ -1313,12 +1314,17 @@ object JarvisMcp {
         val ordered = if (fromEnd) msgs.reversed() else msgs
         val max = args.optInt("max_chars", 800).coerceIn(100, 30_000)
         val tools = args.optBoolean("include_tools")
+        val charOffset = args.optInt("char_offset", 0).coerceAtLeast(0)
         val items = ordered.map { m ->
             JSONObject().apply {
                 put("role", roleName(m))
                 val whole = JarvisText.report(m.content)
-                put("text", if (whole.length > max) whole.take(max) + "…" else whole)
-                if (whole.length > max) { put("chars", whole.length); put("cut", true) }
+                val start = charOffset.coerceAtMost(whole.length)
+                var end = minOf(start + max, whole.length)
+                if (end < whole.length && end > start && Character.isHighSurrogate(whole[end - 1]) && Character.isLowSurrogate(whole[end])) end--
+                put("text", whole.substring(start, end))
+                put("chars", whole.length); put("char_offset", start)
+                if (end < whole.length) { put("cut", true); put("next_char_offset", end) }
                 if (tools && m.toolCalls.isNotEmpty()) put("tools", JSONArray().apply {
                     m.toolCalls.take(12).forEach { t -> put(JSONObject().put("name", t.name).put("command", t.command.take(160)).put("status", t.status)) }
                 })
