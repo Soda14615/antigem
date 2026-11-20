@@ -103,7 +103,13 @@ class TermuxRelocationTest {
         )
         for ((name, text) in scripts) {
             val f = File(out, name).apply { writeText(text) }
-            for (shell in listOf("sh", "bash")) {
+            // The dispatcher declares Bash and uses arrays. POSIX scripts must still pass both parsers.
+            val shells = when (text.lineSequence().first().substringAfterLast('/')) {
+                "bash" -> listOf("bash")
+                "sh" -> listOf("sh", "bash")
+                else -> error("Unexpected interpreter for $name: ${text.lineSequence().first()}")
+            }
+            for (shell in shells) {
                 val p = ProcessBuilder(shell, "-n", f.absolutePath).redirectErrorStream(true).start()
                 val msg = p.inputStream.bufferedReader().readText()
                 assertEquals("$shell -n $name: $msg", 0, p.waitFor())

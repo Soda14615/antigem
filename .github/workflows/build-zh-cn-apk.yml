@@ -17,12 +17,19 @@ permissions:
 jobs:
   build-zh-cn:
     if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team')
+    name: Build and test (${{ matrix.target }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ github.event_name == 'pull_request' && fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""},{"target":"localized-base","repository":"Soda14615/antigem","ref":"5861fb38744fd199480729023e4e4138ad384ea1"},{"target":"official-upstream","repository":"santoshkurmi/antigem","ref":"c9981af375f0044386677980916c80bf39b95bec"}]') || fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""}]') }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref || github.sha }}
           fetch-depth: 0
 
       - name: Fetch termux-am submodule
@@ -48,10 +55,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Check Paseo team launcher
-        if: github.head_ref == 'chatgpt/paseo-native-team' || github.ref == 'refs/heads/chatgpt/paseo-native-team'
+        if: matrix.target == 'candidate' && (github.head_ref == 'chatgpt/paseo-native-team' || github.ref == 'refs/heads/chatgpt/paseo-native-team')
         run: bash -n scripts/paseo-team.sh
 
       - name: Build ARM64 APK
+        if: matrix.target == 'candidate'
         env:
           RELEASE_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && github.ref != 'refs/heads/chatgpt/paseo-native-team' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
         run: |
@@ -76,6 +84,7 @@ jobs:
           sha256sum "$APK_OUT"
 
       - name: Upload APK Artifact
+        if: matrix.target == 'candidate'
         uses: actions/upload-artifact@v4
         with:
           name: antigem-zh-cn-arm64-apk
@@ -83,8 +92,17 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      # Runs after the APK is uploaded on purpose: the recorded Codex fixtures are not in the
-      # repo and two legacy assertions fail on dash, so a red test task must not swallow the build.
+      # Do not mask failures: the APK is a build artifact, not proof of regression-test success.
       - name: Run Debug Unit Tests
-        continue-on-error: true
         run: ./gradlew :app:testDebugUnitTest -Pantigem.arm64Only=true
+
+      - name: Upload Test Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-${{ matrix.target }}
+          path: |
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/tests/testDebugUnitTest/
+          if-no-files-found: warn
+          retention-days: 7
