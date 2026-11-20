@@ -963,20 +963,7 @@ object JarvisMcp {
         } else existing?.childRoles.orEmpty()
         val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project, effort.orEmpty(), childRoles)
         val all = JarvisManagers.profiles(caller).filterNot { it.name.equals(name, true) } + team
-        val graph = all.associateBy { it.name.lowercase() }
-        val visiting = HashSet<String>()
-        val visited = HashSet<String>()
-        fun validate(key: String): Boolean {
-            if (key in visiting) return false
-            if (key in visited) return true
-            val profile = graph[key] ?: return false
-            visiting += key
-            if (!profile.childRoles.all { validate(it.lowercase()) }) return false
-            visiting -= key
-            visited += key
-            return true
-        }
-        if (!graph.keys.all { validate(it) }) return error("Child roles must exist and the role hierarchy must be acyclic.")
+        if (!JarvisOrchestrationRules.validRoleGraph(all.associate { it.name to it.childRoles })) return error("Child roles must exist and the role hierarchy must be acyclic.")
         JarvisManagers.upsertTeam(caller, team)
         return text("${if (existing != null) "Updated" else "Created"} team $name (${agent.name.lowercase()}${if (model.isNotBlank()) ", $model" else ""}). " +
             "Give it work with jarvis_task_start(team=\"$name\", goal=…).")
