@@ -1378,9 +1378,9 @@ private fun ThemesSubScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val themes = listOf(
-                Triple("SYSTEM", "Auto (System)", Icons.Outlined.BrightnessAuto),
-                Triple("LIGHT", "Light", Icons.Outlined.LightMode),
-                Triple("DARK", "Dark", Icons.Outlined.DarkMode)
+                Triple("SYSTEM", "自动（系统）", Icons.Outlined.BrightnessAuto),
+                Triple("LIGHT", "浅色", Icons.Outlined.LightMode),
+                Triple("DARK", "深色", Icons.Outlined.DarkMode)
             )
 
             themes.forEach { (mode, label, icon) ->
@@ -1750,7 +1750,7 @@ private fun AppearanceSubScreen(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                val timeouts = listOf(0 to "Never", 3 to "3s", 5 to "5s", 10 to "10s", 15 to "15s")
+                val timeouts = listOf(0 to "从不", 3 to "3s", 5 to "5s", 10 to "10s", 15 to "15s")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -1799,13 +1799,13 @@ private fun AppearanceSubScreen(
                 displayedList.forEach { itemId ->
                     val isEnabled = currentItems.contains(itemId)
                     val itemLabel = when (itemId) {
-                        "chat" -> "Chat"
-                        "ide" -> "IDE (Code Editor)"
-                        "terminal" -> "Terminal"
-                        "browser" -> "Web Browser"
-                        "notes" -> "Notes & To-dos"
-                        "files" -> "Files (file explorer)"
-                        "run" -> "Run (build & run commands)"
+                        "chat" -> "对话"
+                        "ide" -> "IDE（代码编辑器）"
+                        "terminal" -> "终端"
+                        "browser" -> "网页浏览器"
+                        "notes" -> "笔记与待办"
+                        "files" -> "文件（文件浏览器）"
+                        "run" -> "运行（构建与执行命令）"
                         else -> itemId
                     }
                     val itemIcon = when (itemId) {
@@ -2319,13 +2319,13 @@ private fun ChatHeaderIconsCard(
             displayedList.forEach { itemId ->
                 val isEnabled = currentItems.contains(itemId)
                 val itemLabel = when (itemId) {
-                    "newchat" -> "New Chat"
-                    "ide" -> "IDE (Code Editor)"
-                    "terminal" -> "Terminal"
-                    "browser" -> "Web Browser"
-                    "notes" -> "Notes & To-dos"
-                    "files" -> "Files (file explorer)"
-                    "run" -> "Run (build & run commands)"
+                    "newchat" -> "新对话"
+                    "ide" -> "IDE（代码编辑器）"
+                    "terminal" -> "终端"
+                    "browser" -> "网页浏览器"
+                    "notes" -> "笔记与待办"
+                    "files" -> "文件（文件浏览器）"
+                    "run" -> "运行（构建与执行命令）"
                     else -> itemId
                 }
                 val itemIcon = when (itemId) {
@@ -3724,7 +3724,7 @@ private fun AddEditMcpServerDialog(
                 onClick = {
                     val cleanName = name.trim()
                     if (cleanName.isBlank()) {
-                        validationError = "Server name is required"
+                        validationError = "请填写服务器名称"
                         return@Button
                     }
 
@@ -3752,7 +3752,7 @@ private fun AddEditMcpServerDialog(
                     } else if (mode == McpEditMode.STDIO) {
                         val cleanCmd = command.trim()
                         if (cleanCmd.isBlank()) {
-                            validationError = "Command is required"
+                            validationError = "请填写命令"
                             return@Button
                         }
                         // Parse arguments, supporting quoted strings
@@ -3783,7 +3783,7 @@ private fun AddEditMcpServerDialog(
                     } else {
                         val cleanUrl = serverUrl.trim()
                         if (cleanUrl.isBlank()) {
-                            validationError = "Server URL is required"
+                            validationError = "请填写服务器 URL"
                             return@Button
                         }
 
@@ -4809,7 +4809,7 @@ private fun BackupsSubScreen(
                         }
                     }
                     if (envBackupIncludeSecrets) {
-                        BackupNote("Never share this backup with anyone: whoever has it can sign in to your accounts and servers. Delete it once you have restored it.")
+                        BackupNote("切勿把此备份分享给任何人：拿到它的人可以登录你的账号和服务器。恢复完成后请立即删除。")
                     }
                 }
             },
@@ -7028,24 +7028,24 @@ private fun CommandsSubScreen(
         val presets = listOf(
             Triple(
                 "DEFAULT",
-                "🛡️ Default Mode",
-                "Terminal commands require confirmation. Files outside workspace require confirmation."
-            ) to ("Recommended" to ai.antigem.theme.AppColors.accentTeal),
+                "🛡️ 默认模式",
+                "终端命令需要确认。工作区之外的文件需要确认。"
+            ) to ("推荐" to ai.antigem.theme.AppColors.accentTeal),
             Triple(
                 "FULL_MACHINE",
-                "💻 Full Machine Mode",
-                "Terminal commands require confirmation. Full read/write access to all files on device."
-            ) to ("Open Files" to ai.antigem.theme.AppColors.warning),
+                "💻 整机模式",
+                "终端命令需要确认。可读写设备上的所有文件。"
+            ) to ("开放文件" to ai.antigem.theme.AppColors.warning),
             Triple(
                 "TURBO",
-                "⚡ Turbo Mode",
-                "Full auto-run: terminal commands execute immediately and all files can be accessed."
-            ) to ("Full Auto" to QuotaGreen),
+                "⚡ 涡轮模式",
+                "全自动运行：终端命令立即执行，所有文件均可访问。"
+            ) to ("全自动" to QuotaGreen),
             Triple(
                 "CUSTOM",
-                "⚙️ Custom Granular Mode",
-                "Configure terminal command execution and external filesystem permissions separately."
-            ) to ("Custom" to ai.antigem.theme.AppColors.accentAlt)
+                "⚙️ 自定义精细模式",
+                "分别配置终端命令执行权限与外部文件系统访问权限。"
+            ) to ("自定义" to ai.antigem.theme.AppColors.accentAlt)
         )
 
         presets.forEach { (presetInfo, badgeInfo) ->
@@ -7741,9 +7741,9 @@ private fun CommandsSubScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val scopes = listOf(
-                Triple("PERMISSION_SCOPE_ONCE", "Run Once", "Single call"),
-                Triple("PERMISSION_SCOPE_CONVERSATION", "This Chat", "Current session"),
-                Triple("PERMISSION_SCOPE_WORKSPACE", "Workspace", "Always")
+                Triple("PERMISSION_SCOPE_ONCE", "仅一次", "单次调用"),
+                Triple("PERMISSION_SCOPE_CONVERSATION", "本次对话", "当前会话"),
+                Triple("PERMISSION_SCOPE_WORKSPACE", "工作区", "始终")
             )
 
             scopes.forEach { (scopeKey, title, subtitle) ->
@@ -7817,10 +7817,10 @@ private data class PermissionGrantRule(
 ) {
     val actionLabel: String
         get() = when (action.lowercase()) {
-            "command" -> "Command"
-            "mcp" -> "MCP Tool"
-            "read_file" -> "Read File"
-            "write_file" -> "Write File"
+            "command" -> "命令"
+            "mcp" -> "MCP 工具"
+            "read_file" -> "读取文件"
+            "write_file" -> "写入文件"
             else -> action
         }
 
@@ -7868,10 +7868,10 @@ private fun AddPermissionRuleDialog(
     }
 
     val actionOptions = listOf(
-        Triple("command", "⌨️ Command", "Terminal bash command pattern"),
-        Triple("mcp", "🔌 MCP Tool", "MCP server or tool pattern"),
-        Triple("read_file", "📖 Read File", "Filesystem directory or file read path"),
-        Triple("write_file", "✏️ Write File", "Filesystem directory or file write path")
+        Triple("command", "⌨️ 命令", "终端 bash 命令匹配"),
+        Triple("mcp", "🔌 MCP 工具", "MCP 服务器或工具匹配"),
+        Triple("read_file", "📖 读取文件", "文件系统目录或文件读取路径"),
+        Triple("write_file", "✏️ 写入文件", "文件系统目录或文件写入路径")
     )
 
     AlertDialog(
