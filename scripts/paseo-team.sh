@@ -38,7 +38,7 @@ const { createRequire } = require("node:module");
 const path = require("node:path");
 const cli = path.join(process.argv[2], "node_modules", "@getpaseo", "cli", "package.json");
 const cliRequire = createRequire(cli);
-const server = cliRequire.resolve("@getpaseo/server/package.json");
+const server = cliRequire.resolve("@getpaseo/server");
 const load = createRequire(server);
 const metadata = load("node-pty/package.json");
 if (process.platform === "android" && metadata.name !== "@mmmbuto/node-pty-android-arm64") throw Error("Android PTY override not resolved: " + metadata.name);
