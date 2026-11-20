@@ -309,6 +309,9 @@ val copyScriptsToAssets = tasks.register<Copy>("copyScriptsToAssets") {
   from(layout.projectDirectory.file("../scripts/git_clone.sh")) {
     rename { "git_clone" }
   }
+  from(layout.projectDirectory.file("../scripts/paseo-team.sh")) {
+    rename { "paseo-team" }
+  }
   into(layout.projectDirectory.dir("src/main/assets/bin"))
 }
 
