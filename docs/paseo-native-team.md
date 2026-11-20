@@ -13,6 +13,8 @@
 
 ## 使用
 
+汉化版聊天侧栏新增「Paseo 团队」入口。首次打开显示安装及启动命令，点击「本地终端」进入既有终端；服务实际就绪后点击「打开团队」，复用 AntiGem 内置浏览器。没有后台自动安装、没有替换 Jarvis，也没有重新开发 Paseo 的 Web UI。
+
 在新版 AntiGem 本地 Bash 中执行（不是 SSH 终端）：
 
 ```bash
@@ -40,4 +42,4 @@ paseo-team stop
 4. 验证 Jarvis 独立启动任务，双方不能互相接管会话；检查并发 CLI、MCP、工作目录、手机休眠与额度。
 5. 用用户原有岗位配置做导入兼容测试。未通过以上步骤前，不宣称具备完整手机团队运行能力。
 
-本分支只提供原版运行入口及 APK 打包接线。尚未进行 Android 编译、npm 实际安装或 Agent 调用。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
+本分支提供原版运行入口、APK 打包接线及侧栏入口。尚未进行 Android 编译、npm 实际安装或 Agent 调用。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
