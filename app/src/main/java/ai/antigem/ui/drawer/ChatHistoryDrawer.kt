@@ -138,7 +138,8 @@ fun ChatHistoryDrawer(
     /** Starts a Jarvis text chat (the command center) with that agent, or Jarvis' own agent for null. */
     onNewJarvisChat: ((ai.antigem.domain.model.AgentKind?) -> Unit)? = null,
     enabledAgents: Set<ai.antigem.domain.model.AgentKind> = emptySet(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOpenPaseoTeam: (() -> Unit)? = null
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -1239,6 +1240,21 @@ fun ChatHistoryDrawer(
                 thickness = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
             )
+
+            if (onOpenPaseoTeam != null) {
+                Surface(
+                    onClick = onOpenPaseoTeam,
+                    color = Color.Transparent,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Apps, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Text(stringResource(R.string.paseo_team_title), style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
 
             // Bottom Bar: Settings (Left) & Profile/Login (Right)
             Row(
