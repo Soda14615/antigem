@@ -900,7 +900,7 @@ object JarvisMcp {
         val projectArg = args.optString("project").trim()
         val project = if (projectArg.isEmpty()) existing?.project.orEmpty()
         else (findProject(projectArg) ?: return error("No project matches \"$projectArg\".")).path
-        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }.take(800), project)
+        val team = JarvisManagers.Team(name, agent, model, args.optString("role").trim().ifBlank { existing?.role.orEmpty() }, project)
         JarvisManagers.upsertTeam(caller, team)
         return text("${if (existing != null) "Updated" else "Created"} team $name (${agent.name.lowercase()}${if (model.isNotBlank()) ", $model" else ""}). " +
             "Give it work with jarvis_task_start(team=\"$name\", goal=…).")
