@@ -48,7 +48,9 @@ object JarvisManagers {
         val role: String = "",
         val project: String = "",
         /** Provider-native thinking level; blank uses the model default. */
-        val effort: String = ""
+        val effort: String = "",
+        /** Explicit profile names this role may delegate to. Empty means a leaf worker. */
+        val childRoles: List<String> = emptyList()
     )
 
     data class Manager(
@@ -63,7 +65,13 @@ object JarvisManagers {
         val bootFor: String = "",
         val createdAt: Long = System.currentTimeMillis(),
         /** Last time a message (the user's or news) was sent to this chat. */
-        val lastSentAt: Long = 0L
+        val lastSentAt: Long = 0L,
+        /** Nonempty only for a manager created as another manager\'s watched task. */
+        val parentKey: String = "",
+        val catalogKey: String = "",
+        val allowedRoles: List<String> = emptyList(),
+        /** Local orchestration capability; never included in public task metadata. */
+        val delegationToken: String = ""
     ) {
         val isVoice: Boolean get() = key == VOICE
         /** Replies are read out loud: the chat's Voice switch, and only while Jarvis' voice side is on (not "chat only"). */
@@ -97,6 +105,51 @@ object JarvisManagers {
     fun isTextManager(id: String?): Boolean = !id.isNullOrBlank() && id != VOICE && _managers.value.containsKey(id)
 
     fun textKeys(): List<String> = _managers.value.keys.filter { it != VOICE }
+
+    fun isDelegated(key: String): Boolean = get(key)?.parentKey?.isNotBlank() == true
+
+    fun profiles(key: String): List<Team> {
+        val m = of(key)
+        if (m.parentKey.isBlank()) return m.teams
+        val allowed = m.allowedRoles
+        return of(m.catalogKey).teams.filter { t -> allowed.any { it.equals(t.name, true) } }
+    }
+
+    fun childProfiles(owner: String, role: Team): List<Team> {
+        val root = of(owner).catalogKey.ifBlank { owner }
+        val catalog = of(root).teams
+        return role.childRoles.map { name ->
+            require(!name.equals(role.name, true)) { "A role cannot delegate to itself." }
+            catalog.firstOrNull { it.name.equals(name, true) } ?: error("Unknown child role: $name")
+        }.distinctBy { it.name.lowercase() }
+    }
+
+    @Synchronized
+    fun registerDelegated(chatId: String, agent: AgentKind, parent: String, roles: List<Team>, goal: String) {
+        require(chatId.isNotBlank() && chatId != VOICE && !isTextManager(chatId)) { "Invalid or duplicate manager ID." }
+        require(parent == VOICE || isTextManager(parent)) { "Unknown parent manager." }
+        require(roles.isNotEmpty()) { "A delegated manager needs at least one permitted role." }
+        val root = of(parent).catalogKey.ifBlank { parent }
+        JarvisPreferences.addChatId(chatId)
+        update(chatId) { Manager(chatId, agent = agent, speak = false,
+            mission = Mission(goal = goal, doneWhen = "Complete the assigned work and report its verified result"),
+            lastSentAt = System.currentTimeMillis(), parentKey = parent, catalogKey = root,
+            allowedRoles = roles.map { it.name }, delegationToken = java.util.UUID.randomUUID().toString()) }
+    }
+
+    fun delegatedNote(key: String): String {
+        val m = of(key)
+        if (m.parentKey.isBlank()) return ""
+        return "You are a delegated team manager, not a global app controller. " +
+            "For every permitted orchestration tool pass manager_id=$key and manager_token=${m.delegationToken}. " +
+            "Keep the token private; do not put it in your reply or a task goal. " +
+            "Use jarvis_team_list to inspect your permitted roles, jarvis_task_start(team=...) to delegate, " +
+            "jarvis_task_get, jarvis_task_reply and jarvis_read_chat for your own tasks. " +
+            "End each turn instead of polling; child results arrive automatically as jarvis_events. " +
+            "When the assignment is actually complete and no children are active, call jarvis_mission_update(status=done), " +
+            "then write the final verified report for your parent. Only the tools in your scope are permitted. " +
+            "Do not act as another manager or copy your capability to other agents."
+    }
 
     /** The manager a chat belongs to: its own key for a text chat, [VOICE] for the voice chat, null otherwise. */
     fun keyForChat(chatId: String?): String? = when {
@@ -278,7 +331,7 @@ object JarvisManagers {
     }
 
     fun team(key: String, name: String?): Team? =
-        name?.trim()?.takeIf { it.isNotEmpty() }?.let { n -> of(key).teams.firstOrNull { it.name.equals(n, ignoreCase = true) } }
+        name?.trim()?.takeIf { it.isNotEmpty() }?.let { n -> profiles(key).firstOrNull { it.name.equals(n, ignoreCase = true) } }
 
     // ------------------------------------------------------------------ what the model is told every time
 
@@ -326,9 +379,10 @@ object JarvisManagers {
                 }
                 if (mi.notes.isNotBlank()) append("notes: ${mi.notes.take(600)}\n")
             }
-            if (m.teams.isNotEmpty()) {
+            val availableProfiles = profiles(key)
+            if (availableProfiles.isNotEmpty()) {
                 append("teams: ")
-                append(m.teams.joinToString(" · ") { t ->
+                append(availableProfiles.joinToString(" · ") { t ->
                     "${t.name} (${t.agent.name.lowercase()}${if (t.model.isNotBlank()) ", ${t.model}" else ""})" + (if (t.role.isNotBlank()) ": ${t.role.take(80)}" else "")
                 })
                 append('\n')
@@ -345,6 +399,7 @@ object JarvisManagers {
                 }
             }
             append("</mission_brief>")
+            delegatedNote(key).takeIf { it.isNotBlank() }?.let { append("\n").append(it) }
         }
     }
 
@@ -356,6 +411,8 @@ object JarvisManagers {
             arr.put(JSONObject().apply {
                 put("key", m.key); put("agent", m.agent?.name ?: ""); put("speak", m.speak); put("boot", m.bootFor)
                 put("created", m.createdAt); put("sent", m.lastSentAt)
+                put("parent_key", m.parentKey); put("catalog_key", m.catalogKey)
+                put("allowed_roles", JSONArray(m.allowedRoles)); put("delegation_token", m.delegationToken)
                 put("mission", JSONObject().apply {
                     put("goal", m.mission.goal); put("done_when", m.mission.doneWhen); put("status", m.mission.status)
                     put("autopilot", m.mission.autopilot); put("notes", m.mission.notes); put("updated", m.mission.updatedAt)
@@ -366,13 +423,16 @@ object JarvisManagers {
                 })
                 put("teams", JSONArray().apply {
                     m.teams.forEach { t ->
-                        put(JSONObject().put("name", t.name).put("agent", t.agent.name).put("model", t.model).put("role", t.role).put("project", t.project).put("effort", t.effort))
+                        put(JSONObject().put("name", t.name).put("agent", t.agent.name).put("model", t.model).put("role", t.role).put("project", t.project).put("effort", t.effort).put("child_roles", JSONArray(t.childRoles)))
                     }
                 })
             })
         }
         sp?.edit()?.putString("all", arr.toString())?.apply()
     }
+
+    private fun stringList(a: JSONArray?): List<String> = if (a == null) emptyList() else
+        (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }
 
     private fun parse(raw: String?): Map<String, Manager> {
         if (raw.isNullOrBlank()) return emptyMap()
@@ -390,7 +450,7 @@ object JarvisManagers {
                 (0 until a.length()).mapNotNull { j ->
                     val t = a.getJSONObject(j)
                     val agent = runCatching { AgentKind.valueOf(t.optString("agent")) }.getOrNull() ?: return@mapNotNull null
-                    Team(t.optString("name"), agent, t.optString("model"), t.optString("role"), t.optString("project"), t.optString("effort"))
+                    Team(t.optString("name"), agent, t.optString("model"), t.optString("role"), t.optString("project"), t.optString("effort"), stringList(t.optJSONArray("child_roles")))
                 }
             }.orEmpty()
             out[key] = Manager(
@@ -405,7 +465,9 @@ object JarvisManagers {
                 teams = teams,
                 bootFor = o.optString("boot"),
                 createdAt = o.optLong("created", System.currentTimeMillis()),
-                lastSentAt = o.optLong("sent")
+                lastSentAt = o.optLong("sent"),
+                parentKey = o.optString("parent_key"), catalogKey = o.optString("catalog_key"),
+                allowedRoles = stringList(o.optJSONArray("allowed_roles")), delegationToken = o.optString("delegation_token")
             )
         }
         return out
