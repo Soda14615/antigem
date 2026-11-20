@@ -43,4 +43,24 @@
     <string name="codex_settings_screen_restart">"重启"</string>
     <string name="codex_settings_screen_restarting_ends_replies_that_are_running_codex">"重新启动会结束正在运行的回复。 Codex 在服务器上保留 ~/.codex 的聊天记录和登录信息。"</string>
     <string name="codex_settings_screen_used">"已使用 %1$s%%"</string>
+    <string name="codex_chat_ui_allow_network_access">"允许网络访问？"</string>
+    <string name="codex_chat_ui_run_command">"运行命令？"</string>
+    <string name="codex_chat_ui_change_files">"修改文件？"</string>
+    <string name="codex_chat_ui_grant_more_access">"授予更多权限？"</string>
+    <string name="codex_chat_ui_mcp_server_default">"某个 MCP 服务器"</string>
+    <string name="codex_chat_ui_mcp_server_asks">"%1$s 请求确认"</string>
+    <string name="codex_chat_ui_allow_this">"允许此操作？"</string>
+    <string name="codex_chat_ui_select_model">"选择模型"</string>
+    <string name="codex_chat_ui_all_models">"全部模型"</string>
+    <string name="codex_chat_ui_default_suffix">" · 默认"</string>
+    <string name="codex_chat_ui_allow">"允许"</string>
+    <string name="codex_chat_ui_allow_for_session">"本次会话始终允许"</string>
+    <string name="codex_chat_ui_asks_again_after_restart">"重启后 Codex 会再次询问"</string>
+    <string name="codex_chat_ui_always_allow_rule">"始终允许 `%1$s`"</string>
+    <string name="codex_chat_ui_saves_this_rule">"Codex 会保存此规则"</string>
+    <string name="codex_chat_ui_deny_placeholder">"告诉 Codex 应该改做什么（可选）"</string>
+    <string name="codex_chat_ui_write_access_to">"写入权限：%1$s"</string>
+    <string name="codex_chat_ui_allow_edits_for_session">"本次会话始终允许编辑"</string>
+    <string name="codex_chat_ui_allow_for_turn">"本轮允许"</string>
+    <string name="codex_chat_ui_continue">"继续"</string>
 </resources>

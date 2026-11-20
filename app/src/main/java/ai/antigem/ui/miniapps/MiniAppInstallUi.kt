@@ -206,7 +206,7 @@ fun PackageInstaller(source: InstallSource, onClose: () -> Unit) {
             icon = { Icon(Icons.Outlined.WarningAmber, null, tint = MaterialTheme.colorScheme.error) },
             title = { Text(stringResource(R.string.mini_app_install_ui_can_t_install)) },
             text = { Text(s.message, style = MaterialTheme.typography.bodyMedium) },
-            confirmButton = { TextButton(onClick = onClose) { Text("OK") } },
+            confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.mini_app_install_ok)) } },
         )
         is InstallStage.Ready -> InstallDialog(s.p) { result ->
             stage = when {

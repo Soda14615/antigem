@@ -19,4 +19,12 @@
     <string name="notes_screen_of_done">"%1$s of %2$s done"</string>
     <string name="notes_screen_edited">"Edited %1$s"</string>
     <string name="notes_screen_remove_item">"Remove item"</string>
+    <string name="notes_screen_todo_deleted">"To-do list deleted"</string>
+    <string name="notes_screen_note_deleted">"Note deleted"</string>
+    <string name="notes_screen_undo">"Undo"</string>
+    <string name="notes_screen_search_notes">"Search notes"</string>
+    <string name="notes_screen_title_placeholder">"Title"</string>
+    <string name="notes_screen_details_placeholder">"Details"</string>
+    <string name="notes_screen_note_placeholder">"Note"</string>
+    <string name="notes_screen_list_item_placeholder">"List item"</string>
 </resources>

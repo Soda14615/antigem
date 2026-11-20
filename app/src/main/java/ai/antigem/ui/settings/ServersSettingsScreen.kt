@@ -483,7 +483,7 @@ internal fun ServersSubScreen(
                                         Text(o.optString("name"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
                                         Spacer(Modifier.width(8.dp))
                                         Surface(shape = RoundedCornerShape(4.dp), color = accent.copy(alpha = 0.15f)) {
-                                            Text(if (r && o.optBoolean("tunnel")) stringResource(R.string.servers_settings_screen_ssh_tunnel) else if (r) "SERVER" else "LOCAL", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = accent,
+                                            Text(if (r && o.optBoolean("tunnel")) stringResource(R.string.servers_settings_screen_ssh_tunnel) else if (r) stringResource(R.string.servers_settings_badge_server) else stringResource(R.string.servers_settings_badge_local), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = accent,
                                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp))
                                         }
                                     }
@@ -698,7 +698,7 @@ internal fun ServersSubScreen(
                     }
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(listenBind, { listenBind = it; saveFeedback = null }, label = { Text(stringResource(R.string.servers_settings_screen_bridge_bind_address)) },
-                        placeholder = { Text("127.0.0.1 behind a proxy, 0.0.0.0 for a direct address") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(10.dp))
+                        placeholder = { Text(stringResource(R.string.servers_settings_bind_placeholder)) }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(10.dp))
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -1263,7 +1263,7 @@ private fun PortForwardsCard(cardBg: Color, cardBorder: BorderStroke, subtle: Co
                     Surface(Modifier.size(8.dp), shape = CircleShape, color = dot) {}
                     Spacer(Modifier.width(8.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(f.name.ifBlank { "Port ${f.serverPort}" }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                        Text(f.name.ifBlank { stringResource(R.string.servers_settings_port_label, f.serverPort) }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
                         Text(stringResource(R.string.servers_settings_screen_server_http_127_0_0_1, f.serverPort.toString(), f.localPort.toString(), state.toString()), fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, color = subtle)
                     }
                     androidx.compose.material3.IconButton(onClick = {
@@ -1288,7 +1288,7 @@ private fun PortForwardsCard(cardBg: Color, cardBorder: BorderStroke, subtle: Co
                     placeholder = { Text("5173") }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(10.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                 OutlinedTextField(localPort, { localPort = it.filter(Char::isDigit).take(5); error = null }, label = { Text(stringResource(R.string.servers_settings_screen_phone_port)) },
-                    placeholder = { Text(serverPort.ifBlank { "same" }) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(10.dp),
+                    placeholder = { Text(serverPort.ifBlank { stringResource(R.string.servers_settings_port_same) }) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(10.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
             }
             Spacer(Modifier.height(8.dp))

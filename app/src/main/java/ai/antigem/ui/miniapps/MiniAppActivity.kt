@@ -166,7 +166,7 @@ open class MiniAppActivity : ComponentActivity(), MiniAppHost {
         val id = intent.getStringExtra(EXTRA_APP_ID) ?: intent.data?.lastPathSegment
         val found = id?.let { MiniApps.find(this, it) }
         if (found == null) {
-            Toast.makeText(this, "Mini app not found: $id", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.mini_app_activity_not_found, id), Toast.LENGTH_SHORT).show()
             finish(); return
         }
         app = found

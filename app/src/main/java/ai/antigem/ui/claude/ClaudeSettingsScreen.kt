@@ -343,13 +343,13 @@ private fun AccountPage(deps: ClaudeSettingsDeps) {
             if (rl == null || !u.rate_limits_available) {
                 Hint(stringResource(R.string.claude_settings_screen_plan_limits_are_not_available_for_this))
             } else {
-                rl.five_hour?.let { UsageBar("5-hour limit", (it.utilization ?: 0.0) / 100.0, formatReset(it.resets_at)) }
+                rl.five_hour?.let { UsageBar(stringResource(R.string.claude_settings_screen_five_hour_limit), (it.utilization ?: 0.0) / 100.0, formatReset(it.resets_at)) }
                 Spacer(Modifier.height(8.dp))
-                rl.seven_day?.let { UsageBar("Weekly limit (all models)", (it.utilization ?: 0.0) / 100.0, formatReset(it.resets_at)) }
+                rl.seven_day?.let { UsageBar(stringResource(R.string.claude_settings_screen_weekly_limit_all), (it.utilization ?: 0.0) / 100.0, formatReset(it.resets_at)) }
                 // a model's own weekly share (Fable on Max), on top of the all-models limit
                 ai.antigem.data.agent.claude.ClaudeQuotaGroups.scopedLimits(rl).forEach {
                     Spacer(Modifier.height(8.dp))
-                    UsageBar("Weekly limit (${it.name})", it.used, formatReset(it.resetsAt))
+                    UsageBar(stringResource(R.string.claude_settings_screen_weekly_limit_scoped, it.name), it.used, formatReset(it.resetsAt))
                 }
             }
         }
@@ -386,7 +386,8 @@ private fun DefaultsPage(deps: ClaudeSettingsDeps) {
         SectionTitle(stringResource(R.string.claude_settings_screen_default_model))
         Spacer(Modifier.height(6.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            val options = models.map { it.value to it.displayName.ifBlank { it.value } }.ifEmpty { listOf("default" to "Default") }
+            val defaultLabel = stringResource(R.string.claude_ui_kit_effort_default)
+            val options = models.map { it.value to it.displayName.ifBlank { it.value } }.ifEmpty { listOf("default" to defaultLabel) }
             options.forEach { (value, label) ->
                 ControlChip(label, highlighted = value == model, color = if (value == model) ClaudeAccent else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                     onClick = { deps.config.setValue("model", if (value == "default") null else JsonPrimitive(value)) })
@@ -419,7 +420,7 @@ private fun DefaultsPage(deps: ClaudeSettingsDeps) {
     ClaudeCard {
         SectionTitle(stringResource(R.string.claude_settings_screen_default_permission_mode))
         Spacer(Modifier.height(6.dp))
-        ClaudeChatBackend.PERMISSION_MODES.forEach { (value, label) ->
+        ClaudeChatBackend.PERMISSION_MODES.forEach { (value, _) ->
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { deps.config.setDefaultMode(value) }
                     .padding(vertical = 6.dp),
@@ -427,7 +428,7 @@ private fun DefaultsPage(deps: ClaudeSettingsDeps) {
             ) {
                 androidx.compose.material3.RadioButton(selected = value == mode, onClick = { deps.config.setDefaultMode(value) })
                 Column {
-                    Text(label, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold)
+                    Text(permissionModeLabel(value), fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold)
                     Hint(permissionModeDescription(value))
                 }
             }

@@ -39,9 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ai.antigem.R
 import ai.antigem.domain.model.AgentKind
 import ai.antigem.ui.agents.AgentSheetHeader
 import ai.antigem.ui.components.ClaudeAccent
@@ -135,10 +137,14 @@ fun ClaudePermissionModeSheet(
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    ClaudePickerSheet("Permission mode", "how Claude asks before acting", onDismiss) {
-        modes.forEach { (value, label) ->
+    ClaudePickerSheet(
+        stringResource(R.string.claude_mode_sheets_permission_mode),
+        stringResource(R.string.claude_mode_sheets_permission_mode_detail),
+        onDismiss
+    ) {
+        modes.forEach { (value, _) ->
             PickerOption(
-                title = label,
+                title = permissionModeLabel(value),
                 description = permissionModeDescription(value),
                 color = permissionModeColor(value).takeIf { value != "default" } ?: ClaudeAccent,
                 selected = value == current,
@@ -159,13 +165,14 @@ fun ClaudePermissionModeSheet(
     }
 }
 
+@Composable
 private fun effortDescription(level: String?): String = when (level) {
-    null -> "The model's own default"
-    "low" -> "Quick answers with light reasoning"
-    "medium" -> "Balanced speed and depth"
-    "high" -> "Thorough work on hard tasks"
-    "xhigh" -> "Extra depth for complex changes"
-    "max" -> "Most thorough; uses plan limits fastest"
+    null -> stringResource(R.string.claude_mode_sheets_effort_default)
+    "low" -> stringResource(R.string.claude_mode_sheets_effort_low)
+    "medium" -> stringResource(R.string.claude_mode_sheets_effort_medium)
+    "high" -> stringResource(R.string.claude_mode_sheets_effort_high)
+    "xhigh" -> stringResource(R.string.claude_mode_sheets_effort_xhigh)
+    "max" -> stringResource(R.string.claude_mode_sheets_effort_max)
     else -> ""
 }
 
@@ -188,7 +195,11 @@ private fun EffortBars(filled: Int, total: Int, color: Color) {
 /** How much work Claude puts into each reply. */
 @Composable
 fun ClaudeEffortSheet(levels: List<String>, current: String?, onSelect: (String?) -> Unit, onDismiss: () -> Unit) {
-    ClaudePickerSheet("Effort", "how much work Claude puts into each reply", onDismiss) {
+    ClaudePickerSheet(
+        stringResource(R.string.claude_mode_sheets_effort),
+        stringResource(R.string.claude_mode_sheets_effort_detail),
+        onDismiss
+    ) {
         (listOf<String?>(null) + levels).forEachIndexed { index, level ->
             PickerOption(
                 title = effortLabel(level),

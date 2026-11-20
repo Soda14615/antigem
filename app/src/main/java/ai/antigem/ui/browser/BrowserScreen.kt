@@ -486,7 +486,7 @@ fun BrowserScreen(
                                 if (textFieldValue.text.isNotEmpty()) {
                                     BrowserBarIconButton(
                                         icon = Icons.Rounded.Cancel,
-                                        contentDescription = "Clear",
+                                        contentDescription = stringResource(R.string.browser_screen_clear),
                                         onClick = {
                                             textFieldValue = TextFieldValue("")
                                             focusRequester.requestFocus()
@@ -500,7 +500,7 @@ fun BrowserScreen(
                                 val loading = activeTab?.isLoading == true
                                 BrowserBarIconButton(
                                     icon = if (loading) Icons.Rounded.Close else Icons.Rounded.Refresh,
-                                    contentDescription = if (loading) "Stop" else "Reload",
+                                    contentDescription = if (loading) stringResource(R.string.browser_screen_stop) else stringResource(R.string.browser_screen_reload),
                                     onClick = {
                                         if (activeTab?.isLoading == true) {
                                             activeTab.stopLoading(sessionManager.getMainHandler())
@@ -547,7 +547,7 @@ fun BrowserScreen(
 
                         BrowserBarIconButton(
                             icon = Icons.Rounded.ChevronLeft,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.browser_screen_back),
                             enabled = canGoBack,
                             iconSize = 30.dp,
                             onClick = {
@@ -559,7 +559,7 @@ fun BrowserScreen(
 
                         BrowserBarIconButton(
                             icon = Icons.Rounded.ChevronRight,
-                            contentDescription = "Forward",
+                            contentDescription = stringResource(R.string.browser_screen_forward),
                             enabled = canGoForward,
                             iconSize = 30.dp,
                             onClick = {
@@ -571,7 +571,7 @@ fun BrowserScreen(
 
                         BrowserBarIconButton(
                             icon = if (isHomePage) Icons.Rounded.Home else Icons.Outlined.Home,
-                            contentDescription = "Home",
+                            contentDescription = stringResource(R.string.browser_screen_home),
                             tint = if (isHomePage) ClaudeTerracotta else null,
                             onClick = {
                                 sessionManager.openUrl("about:blank", tabId = activeTabId, newTab = false)
@@ -611,7 +611,7 @@ fun BrowserScreen(
 
                         BrowserBarIconButton(
                             icon = Icons.Rounded.MoreHoriz,
-                            contentDescription = "More options",
+                            contentDescription = stringResource(R.string.browser_screen_more_options),
                             tint = if (showMoreMenu) ClaudeTerracotta else null,
                             onClick = { showMoreMenu = true }
                         )
@@ -818,7 +818,7 @@ fun BrowserScreen(
             },
             onClearTabCache = {
                 activeTab?.webView?.clearCache(true)
-                android.widget.Toast.makeText(context, "Tab cache cleared", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, context.getString(R.string.browser_screen_tab_cache_cleared), android.widget.Toast.LENGTH_SHORT).show()
             },
             onClearBrowsingData = { showClearDataConfirm = true },
             onCloseBrowser = { onClose() }
@@ -865,7 +865,7 @@ fun BrowserScreen(
                         sessionManager.clearAllBrowsingData(context) {
                             activeTabId = sessionManager.activeTabId
                             textFieldValue = TextFieldValue("")
-                            android.widget.Toast.makeText(context, "Browsing data cleared", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(context, context.getString(R.string.browser_screen_browsing_data_cleared), android.widget.Toast.LENGTH_SHORT).show()
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
@@ -1261,7 +1261,7 @@ private fun SearchHistoryOverlay(
                         }
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Go",
+                            contentDescription = stringResource(R.string.browser_screen_go),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier
                                 .size(16.dp)

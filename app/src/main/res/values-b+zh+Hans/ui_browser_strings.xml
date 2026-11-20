@@ -43,4 +43,25 @@
     <string name="browser_screen_ai_is_working">"AI 正在工作…"</string>
     <string name="browser_screen_controlled_by_ai">"由 AI 控制"</string>
     <string name="browser_screen_unlock">"解锁"</string>
+    <string name="browser_agent_indicator_ai_using_tab">"AI 正在使用此标签页"</string>
+    <string name="browser_agent_lock_drag">"拖动"</string>
+    <string name="browser_agent_lock_ai_controls_tab">"AI 正在控制此标签页"</string>
+    <string name="browser_agent_lock_unlock">"解锁"</string>
+    <string name="browser_agent_lock_page_asks">"此页面询问"</string>
+    <string name="browser_agent_lock_page_asks_input">"此页面请求输入"</string>
+    <string name="browser_agent_lock_leave_page">"要离开此页面吗？"</string>
+    <string name="browser_agent_lock_page_says">"此页面提示"</string>
+    <string name="browser_agent_lock_changes_not_saved">"你所做的更改可能不会保存。"</string>
+    <string name="browser_agent_lock_stay">"留在此页"</string>
+    <string name="browser_agent_lock_cancel">"取消"</string>
+    <string name="browser_agent_lock_leave">"离开"</string>
+    <string name="browser_agent_lock_ok">"确定"</string>
+    <string name="browser_screen_clear">"清除"</string>
+    <string name="browser_screen_stop">"停止"</string>
+    <string name="browser_screen_back">"后退"</string>
+    <string name="browser_screen_forward">"前进"</string>
+    <string name="browser_screen_more_options">"更多选项"</string>
+    <string name="browser_screen_go">"前往"</string>
+    <string name="browser_screen_tab_cache_cleared">"已清除标签页缓存"</string>
+    <string name="browser_screen_browsing_data_cleared">"已清除浏览数据"</string>
 </resources>

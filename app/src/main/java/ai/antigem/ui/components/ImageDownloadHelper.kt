@@ -38,7 +38,7 @@ object ImageDownloadHelper {
         snackbarHostState: SnackbarHostState? = null
     ) {
         if (imageSource.isBlank()) {
-            Toast.makeText(context, "No image to download", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_no_image), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -50,18 +50,18 @@ object ImageDownloadHelper {
             if (savedUri != null) {
                 if (snackbarHostState != null) {
                     val result = snackbarHostState.showSnackbar(
-                        message = "Image saved to Downloads/AntiGem",
-                        actionLabel = "Open",
+                        message = context.getString(ai.antigem.R.string.image_download_saved),
+                        actionLabel = context.getString(ai.antigem.R.string.artifact_download_open),
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
                         openImage(context, savedUri, mimeType)
                     }
                 } else {
-                    Toast.makeText(context, "Image saved to Downloads/AntiGem", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_saved), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -71,16 +71,16 @@ object ImageDownloadHelper {
      */
     fun downloadVideo(context: Context, videoSource: String, title: String, coroutineScope: CoroutineScope) {
         if (videoSource.isBlank()) {
-            Toast.makeText(context, "No video to download", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_no_video), Toast.LENGTH_SHORT).show()
             return
         }
         coroutineScope.launch {
-            Toast.makeText(context, "Saving video…", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_saving_video), Toast.LENGTH_SHORT).show()
             val saved = withContext(Dispatchers.IO) { saveVideoToDownloads(context, videoSource, title) }
             if (saved != null) {
-                Toast.makeText(context, "Video saved to Downloads/AntiGem", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_video_saved), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(context, "Failed to save video", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_video_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -145,9 +145,9 @@ object ImageDownloadHelper {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-            context.startActivity(Intent.createChooser(intent, "Open Image"))
+            context.startActivity(Intent.createChooser(intent, context.getString(ai.antigem.R.string.image_download_open_image)))
         } catch (e: Exception) {
-            Toast.makeText(context, "No app found to open image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.image_download_no_app), Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -163,7 +163,7 @@ fun ClaudeControlsStrip(
         if (levels.isNotEmpty()) {
             ControlChip(
                 // "Default" shows the level the process really runs when the CLI reported it
-                text = "Effort · ${effortLabel(effort)}" + if (effort == null && appliedEffort != null) " (${effortLabel(appliedEffort)})" else "",
+                text = stringResource(R.string.claude_chat_controls_effort_chip, effortLabel(effort)) + if (effort == null && appliedEffort != null) " (${effortLabel(appliedEffort)})" else "",
                 icon = Icons.Outlined.Speed,
                 color = if (effort != null) ClaudeAccent else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                 highlighted = effort != null,
@@ -484,16 +484,21 @@ fun ClaudeModelSheet(
             val info = models.find { it.value == selected }
             val levels = info?.supportedEffortLevels.orEmpty()
             if (levels.isNotEmpty()) {
-                SheetSectionLabel("Effort", trailing = "how hard Claude works on each reply")
+                SheetSectionLabel(
+                    stringResource(R.string.claude_mode_sheets_effort),
+                    trailing = stringResource(R.string.claude_chat_controls_effort_trailing)
+                )
+                val xhighLabel = stringResource(R.string.claude_ui_kit_effort_xhigh)
+                val xhighShort = stringResource(R.string.claude_ui_kit_effort_xhigh_short)
                 SegmentedSelector(
-                    options = (listOf<String?>(null) + levels).map { it to effortLabel(it).replace("Extra high", "X-high") },
+                    options = (listOf<String?>(null) + levels).map { it to effortLabel(it).replace(xhighLabel, xhighShort) },
                     selected = effort,
                     accent = ClaudeAccent,
                     onSelect = { backend.setEffort(it) }
                 )
             }
 
-            SheetSectionLabel("Reasoning")
+            SheetSectionLabel(stringResource(R.string.claude_chat_controls_reasoning))
             Surface(shape = RoundedCornerShape(14.dp), color = cardColor, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -537,7 +542,7 @@ fun ClaudeContextDialog(backend: ClaudeChatBackend, onDismiss: () -> Unit) {
                     Text(stringResource(R.string.claude_chat_controls_context_usage_shows_once_this_chat_has), fontSize = 13.sp)
                 } else {
                     Text(stringResource(R.string.claude_chat_controls_of_tokens_used, (compactTokens(c.totalTokens)).toString(), (compactTokens(c.maxTokens)).toString(), (c.percentage.toInt()).toString()), fontSize = 13.sp)
-                    UsageBar("Used", c.percentage / 100.0, null)
+                    UsageBar(stringResource(R.string.claude_chat_controls_used), c.percentage / 100.0, null)
                     HorizontalDivider(Modifier.padding(vertical = 4.dp))
                     c.categories.forEach { cat ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -574,8 +579,7 @@ fun ClaudeUsageDialog(account: ClaudeAccountManager, backend: ClaudeChatBackend,
             title = { Text(stringResource(R.string.claude_chat_controls_usage), fontWeight = FontWeight.Bold) },
             text = {
                 Text(
-                    "This chat runs on ${backend.modelLabel(selected)}, a custom provider. Plan usage and cost are only shown for " +
-                        "Claude's own models; check the provider's dashboard for this chat's usage.",
+                    stringResource(R.string.claude_chat_controls_custom_provider_usage_note, backend.modelLabel(selected)),
                     fontSize = 13.sp
                 )
             },
@@ -596,7 +600,7 @@ fun ClaudeUsageDialog(account: ClaudeAccountManager, backend: ClaudeChatBackend,
                 Text(stringResource(R.string.claude_chat_controls_usage), fontWeight = FontWeight.Bold)
                 val plan = (usage?.subscription_type ?: status?.auth?.subscriptionType)?.let { ai.antigem.ui.agents.claudePlanLabel(it) }
                 Text(
-                    listOfNotNull("Claude Code", plan?.let { "$it plan" }).joinToString(" · "),
+                    listOfNotNull("Claude Code", plan?.let { stringResource(R.string.claude_chat_controls_plan_suffix, it) }).joinToString(" · "),
                     fontSize = 12.sp,
                     color = ClaudeAccent
                 )
@@ -612,10 +616,10 @@ fun ClaudeUsageDialog(account: ClaudeAccountManager, backend: ClaudeChatBackend,
                     ?: rl?.seven_day?.let { (it.utilization ?: 0.0) / 100.0 to formatReset(it.resets_at) }
                 when {
                     five != null || week != null -> {
-                        five?.let { UsageBar("Current session (5-hour)", it.first, it.second) }
-                        week?.let { UsageBar("This week (all models)", it.first, it.second) }
+                        five?.let { UsageBar(stringResource(R.string.claude_chat_controls_current_session_five_hour), it.first, it.second) }
+                        week?.let { UsageBar(stringResource(R.string.claude_chat_controls_this_week_all_models), it.first, it.second) }
                         // a model's own weekly share (Fable on Max), on top of the all-models limit
-                        ClaudeQuotaGroups.scopedLimits(rl).forEach { UsageBar("This week (${it.name})", it.used, formatReset(it.resetsAt)) }
+                        ClaudeQuotaGroups.scopedLimits(rl).forEach { UsageBar(stringResource(R.string.claude_chat_controls_this_week_scoped, it.name), it.used, formatReset(it.resetsAt)) }
                     }
                     loading -> Row(verticalAlignment = Alignment.CenterVertically) {
                         androidx.compose.material3.CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = ClaudeAccent)

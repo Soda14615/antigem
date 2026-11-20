@@ -324,4 +324,114 @@
     <string name="workspace_folder_browser_dialog_choose_this_folder">"选择该文件夹"</string>
     <string name="workspace_folder_browser_dialog_create_folder_inside">"在 %1$s 中创建文件夹"</string>
     <string name="workspace_folder_browser_dialog_create">"创建"</string>
+    <string name="agent_working_spinner_compacting">"正在压缩"</string>
+    <string-array name="agent_working_spinner_verbs">
+        <item>"思考中"</item>
+        <item>"推敲中"</item>
+        <item>"酝酿中"</item>
+        <item>"构思中"</item>
+        <item>"演算中"</item>
+        <item>"梳理中"</item>
+        <item>"琢磨中"</item>
+        <item>"分析中"</item>
+        <item>"编织中"</item>
+        <item>"打磨中"</item>
+        <item>"雕琢中"</item>
+        <item>"凝聚中"</item>
+        <item>"推理中"</item>
+        <item>"计算中"</item>
+        <item>"拼装中"</item>
+        <item>"调配中"</item>
+        <item>"权衡中"</item>
+        <item>"沉思中"</item>
+        <item>"烹制中"</item>
+        <item>"锻造中"</item>
+        <item>"生成中"</item>
+        <item>"解码中"</item>
+        <item>"思索中"</item>
+        <item>"探寻中"</item>
+        <item>"阐释中"</item>
+        <item>"萌芽中"</item>
+        <item>"孵化中"</item>
+        <item>"汇聚中"</item>
+        <item>"研读中"</item>
+        <item>"沉淀中"</item>
+        <item>"处理中"</item>
+        <item>"整合中"</item>
+        <item>"展开中"</item>
+        <item>"理顺中"</item>
+        <item>"运转中"</item>
+        <item>"处理中"</item>
+    </string-array>
+    <string name="artifact_download_no_file">"没有可下载的产物文件"</string>
+    <string name="artifact_download_saved">"已将 %1$s 保存到 Downloads/AntiGem"</string>
+    <string name="artifact_download_open">"打开"</string>
+    <string name="artifact_download_failed">"下载 %1$s 失败"</string>
+    <string name="artifact_download_open_file">"打开文件"</string>
+    <string name="artifact_download_no_app">"未找到可打开该文件的应用"</string>
+    <string name="image_download_no_image">"没有可下载的图片"</string>
+    <string name="image_download_saved">"图片已保存到 Downloads/AntiGem"</string>
+    <string name="image_download_failed">"保存图片失败"</string>
+    <string name="image_download_no_video">"没有可下载的视频"</string>
+    <string name="image_download_saving_video">"正在保存视频…"</string>
+    <string name="image_download_video_saved">"视频已保存到 Downloads/AntiGem"</string>
+    <string name="image_download_video_failed">"保存视频失败"</string>
+    <string name="image_download_open_image">"打开图片"</string>
+    <string name="image_download_no_app">"未找到可打开图片的应用"</string>
+    <string name="conversation_export_failed_load">"加载对话失败：%1$s"</string>
+    <string name="conversation_export_no_messages">"没有可导出的消息"</string>
+    <string name="conversation_export_saved">"已将 %1$s 保存到 Downloads/AntiGem/Exports"</string>
+    <string name="conversation_export_failed_save">"保存导出文件到下载目录失败"</string>
+    <string name="conversation_export_error">"导出出错：%1$s"</string>
+    <string name="conversation_export_open_title">"打开导出的对话"</string>
+    <string name="conversation_share_no_messages">"没有可分享的消息"</string>
+    <string name="conversation_share_error">"分享出错：%1$s"</string>
+    <string name="conversation_share_chooser_title">"分享 AntiGem 对话"</string>
+    <string name="conversation_share_no_chooser">"无法打开分享菜单"</string>
+    <string name="chat_telemetry_current_chat">"当前聊天"</string>
+    <string name="chat_telemetry_input_tokens">"输入 Token"</string>
+    <string name="chat_telemetry_output_tokens">"输出 Token"</string>
+    <string name="chat_telemetry_cache_read_hits">"缓存读取命中"</string>
+    <string name="chat_telemetry_total_consumption">"总消耗"</string>
+    <string name="chat_telemetry_active_model">"当前模型"</string>
+    <string name="chat_telemetry_default">"默认"</string>
+    <string name="chat_telemetry_user_turns">"用户轮次"</string>
+    <string name="chat_telemetry_turns_count">"%1$d 轮"</string>
+    <string name="chat_telemetry_model_responses">"模型回复"</string>
+    <string name="chat_telemetry_responses_count">"%1$d 条回复"</string>
+    <string name="chat_telemetry_tools_executed">"工具调用"</string>
+    <string name="chat_telemetry_tools_count">"%1$d 次"</string>
+    <string name="chat_telemetry_active_context_summary">"上下文摘要"</string>
+    <string name="chat_telemetry_status_active">"已启用"</string>
+    <string name="chat_telemetry_status_none">"无"</string>
+    <string name="chat_telemetry_custom_system_prompt">"自定义系统提示词"</string>
+    <string name="chat_telemetry_status_configured">"已配置"</string>
+    <string name="app_permissions_notifications_title">"通知"</string>
+    <string name="app_permissions_notifications_subtitle">"保持后台服务运行并显示进度"</string>
+    <string name="app_permissions_files_title">"文件"</string>
+    <string name="app_permissions_files_subtitle">"打开设备存储中的项目和文件"</string>
+    <string name="app_permissions_microphone_title">"麦克风"</string>
+    <string name="app_permissions_microphone_subtitle">"语音输入消息和语音笔记"</string>
+    <string name="attachment_selector_camera_title">"拍照"</string>
+    <string name="attachment_selector_camera_subtitle">"使用相机拍照并直接附加到聊天中。"</string>
+    <string name="attachment_selector_image_title">"照片 / 图片"</string>
+    <string name="attachment_selector_image_subtitle">"模型将直接查看图片，大图会先压缩。"</string>
+    <string name="attachment_selector_document_title">"文档 / 文件"</string>
+    <string name="attachment_selector_document_subtitle">"从手机复制到 Agent 所在环境。大文件不建议走此方式（耗时且占空间），请改用“从文件选择”。"</string>
+    <string name="attachment_selector_from_files_title">"从文件选择"</string>
+    <string name="attachment_selector_from_files_subtitle">"可附加任意大小的文件且不产生副本。Agent 会直接打开原文件（已被告知不要修改，通常不会改动）。"</string>
+    <string name="speech_mode_auto_transcribe_title">"自动转写"</string>
+    <string name="speech_mode_auto_transcribe_subtitle">"录制语音并通过 AGY 转写服务转为文字"</string>
+    <string name="speech_mode_live_dictation_title">"实时听写"</string>
+    <string name="speech_mode_live_dictation_subtitle">"边说边实时将语音流式输入到聊天框中"</string>
+    <string name="message_bubble_copied_prompt">"已复制提示词"</string>
+    <string name="message_bubble_copied_response">"已复制回复"</string>
+    <string name="message_bubble_image_preview">"图片预览"</string>
+    <string name="message_bubble_attachment_unavailable">"%1$s 已不可用"</string>
+    <string name="message_bubble_cannot_open">"无法打开：%1$s"</string>
+    <string name="markdown_content_diagram_copied">"已复制图表代码"</string>
+    <string name="markdown_content_error_details_copied">"错误详情已复制到剪贴板"</string>
+    <string name="markdown_content_youtube_thumbnail">"YouTube 视频缩略图"</string>
+    <string name="markdown_content_agent_execution_error">"Agent 执行错误"</string>
+    <string name="markdown_content_execution_notice">"执行提示"</string>
 </resources>

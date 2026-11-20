@@ -238,7 +238,7 @@ private fun StoreCard(e: MiniAppStore.Entry, state: MiniAppStore.State, detail: 
                 }
             }
             if (e.description.isNotBlank()) Text(e.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 10.dp))
-            if (perms.isNotEmpty()) Text("Asks for: " + perms.joinToString(", "), style = MaterialTheme.typography.labelSmall,
+            if (perms.isNotEmpty()) Text(stringResource(R.string.mini_app_store_asks_for, perms.joinToString(", ")), style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
             val note = when (state) {
                 MiniAppStore.State.UPDATE -> "Installed: $detail → ${e.version}"

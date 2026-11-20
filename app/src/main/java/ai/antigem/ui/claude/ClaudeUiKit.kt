@@ -28,10 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ai.antigem.R
 import ai.antigem.theme.ClaudeDarkSurface
 import ai.antigem.theme.QuotaAmber
 import ai.antigem.theme.QuotaGreen
@@ -109,11 +113,13 @@ fun usageColor(fraction: Double): Color = when {
 @Composable
 fun UsageBar(label: String, usedFraction: Double, resetText: String?, modifier: Modifier = Modifier, compact: Boolean = false) {
     val color = usageColor(usedFraction)
+    val percent = (usedFraction * 100).toInt()
     Column(modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, fontSize = if (compact) 10.5.sp else 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f))
             Text(
-                "${(usedFraction * 100).toInt()}% used" + (resetText?.let { " · resets $it" } ?: ""),
+                if (resetText != null) stringResource(R.string.claude_ui_kit_percent_used_resets, percent, resetText)
+                else stringResource(R.string.claude_ui_kit_percent_used, percent),
                 fontSize = if (compact) 10.sp else 11.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
             )
@@ -158,42 +164,59 @@ fun ControlChip(
 }
 
 /** "in 2h 14m" / "Tue 09:00" for an ISO-8601 or epoch-seconds reset time. */
-fun formatReset(iso: String?, epochSeconds: Long? = null): String? {
+fun formatReset(context: Context, iso: String?, epochSeconds: Long? = null): String? {
     val millis = epochSeconds?.let { it * 1000 } ?: iso?.let { runCatching { java.time.OffsetDateTime.parse(it).toInstant().toEpochMilli() }.getOrNull() }
     ?: return null
     val diff = millis - System.currentTimeMillis()
-    if (diff <= 0) return "now"
+    if (diff <= 0) return context.getString(R.string.claude_ui_kit_reset_now)
     val mins = diff / 60_000
     return when {
-        mins < 60 -> "in ${mins}m"
-        mins < 24 * 60 -> "in ${mins / 60}h ${mins % 60}m"
+        mins < 60 -> context.getString(R.string.claude_ui_kit_reset_in_minutes, mins)
+        mins < 24 * 60 -> context.getString(R.string.claude_ui_kit_reset_in_hours_minutes, mins / 60, mins % 60)
         else -> java.text.SimpleDateFormat("EEE HH:mm", java.util.Locale.getDefault()).format(java.util.Date(millis))
     }
 }
 
+@Composable
+fun formatReset(iso: String?, epochSeconds: Long? = null): String? =
+    formatReset(LocalContext.current, iso, epochSeconds)
+
 /** Human label for a Claude permission mode. */
-fun permissionModeLabel(mode: String): String = when (mode) {
-    "default" -> "Manual"
-    "acceptEdits" -> "Accept edits"
-    "plan" -> "Plan"
-    "auto" -> "Auto"
-    "dontAsk" -> "Don't ask"
-    "bypassPermissions" -> "Bypass"
+fun permissionModeLabel(context: Context, mode: String): String = when (mode) {
+    "default" -> context.getString(R.string.claude_ui_kit_mode_manual)
+    "acceptEdits" -> context.getString(R.string.claude_ui_kit_mode_accept_edits)
+    "plan" -> context.getString(R.string.claude_ui_kit_mode_plan)
+    "auto" -> context.getString(R.string.claude_ui_kit_mode_auto)
+    "dontAsk" -> context.getString(R.string.claude_ui_kit_mode_dont_ask)
+    "bypassPermissions" -> context.getString(R.string.claude_ui_kit_mode_bypass)
     else -> mode
 }
 
-fun permissionModeDescription(mode: String): String = when (mode) {
-    "default" -> "Ask before edits and commands"
-    "acceptEdits" -> "Apply file edits without asking"
-    "plan" -> "Explore and propose a plan, no changes"
-    "auto" -> "Claude decides what is safe to run"
-    "dontAsk" -> "Never ask; deny anything not pre-allowed"
-    "bypassPermissions" -> "Allow everything (sandboxes only)"
+@Composable
+fun permissionModeLabel(mode: String): String = permissionModeLabel(LocalContext.current, mode)
+
+fun permissionModeDescription(context: Context, mode: String): String = when (mode) {
+    "default" -> context.getString(R.string.claude_ui_kit_mode_desc_manual)
+    "acceptEdits" -> context.getString(R.string.claude_ui_kit_mode_desc_accept_edits)
+    "plan" -> context.getString(R.string.claude_ui_kit_mode_desc_plan)
+    "auto" -> context.getString(R.string.claude_ui_kit_mode_desc_auto)
+    "dontAsk" -> context.getString(R.string.claude_ui_kit_mode_desc_dont_ask)
+    "bypassPermissions" -> context.getString(R.string.claude_ui_kit_mode_desc_bypass)
     else -> ""
 }
 
-fun effortLabel(level: String?): String = when (level) {
-    null -> "Default"
-    "xhigh" -> "Extra high"
+@Composable
+fun permissionModeDescription(mode: String): String = permissionModeDescription(LocalContext.current, mode)
+
+fun effortLabel(context: Context, level: String?): String = when (level) {
+    null -> context.getString(R.string.claude_ui_kit_effort_default)
+    "low" -> context.getString(R.string.claude_ui_kit_effort_low)
+    "medium" -> context.getString(R.string.claude_ui_kit_effort_medium)
+    "high" -> context.getString(R.string.claude_ui_kit_effort_high)
+    "xhigh" -> context.getString(R.string.claude_ui_kit_effort_xhigh)
+    "max" -> context.getString(R.string.claude_ui_kit_effort_max)
     else -> level.replaceFirstChar { it.uppercase() }
 }
+
+@Composable
+fun effortLabel(level: String?): String = effortLabel(LocalContext.current, level)

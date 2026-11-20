@@ -43,4 +43,24 @@
     <string name="codex_settings_screen_restart">"Restart"</string>
     <string name="codex_settings_screen_restarting_ends_replies_that_are_running_codex">"Restarting ends replies that are running. Codex keeps its chats and sign-in in ~/.codex on the server."</string>
     <string name="codex_settings_screen_used">"%1$s%% used"</string>
+    <string name="codex_chat_ui_allow_network_access">"Allow network access?"</string>
+    <string name="codex_chat_ui_run_command">"Run a command?"</string>
+    <string name="codex_chat_ui_change_files">"Change files?"</string>
+    <string name="codex_chat_ui_grant_more_access">"Grant more access?"</string>
+    <string name="codex_chat_ui_mcp_server_default">"An MCP server"</string>
+    <string name="codex_chat_ui_mcp_server_asks">"%1$s asks"</string>
+    <string name="codex_chat_ui_allow_this">"Allow this?"</string>
+    <string name="codex_chat_ui_select_model">"Select model"</string>
+    <string name="codex_chat_ui_all_models">"All models"</string>
+    <string name="codex_chat_ui_default_suffix">" · default"</string>
+    <string name="codex_chat_ui_allow">"Allow"</string>
+    <string name="codex_chat_ui_allow_for_session">"Allow for this session"</string>
+    <string name="codex_chat_ui_asks_again_after_restart">"Codex asks again after a restart"</string>
+    <string name="codex_chat_ui_always_allow_rule">"Always allow `%1$s`"</string>
+    <string name="codex_chat_ui_saves_this_rule">"Codex saves this rule"</string>
+    <string name="codex_chat_ui_deny_placeholder">"Tell Codex what to do instead (optional)"</string>
+    <string name="codex_chat_ui_write_access_to">"Write access to %1$s"</string>
+    <string name="codex_chat_ui_allow_edits_for_session">"Allow edits for this session"</string>
+    <string name="codex_chat_ui_allow_for_turn">"Allow for this turn"</string>
+    <string name="codex_chat_ui_continue">"Continue"</string>
 </resources>

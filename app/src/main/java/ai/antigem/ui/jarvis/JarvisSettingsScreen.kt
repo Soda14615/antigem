@@ -190,7 +190,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     var menu by remember { mutableStateOf(false) }
                     Box {
                         OutlinedButton(onClick = { menu = true }) {
-                            val label = models.firstOrNull { it.id == modelId }?.let { it.displayName.ifBlank { it.id } } ?: "Default model"
+                            val label = models.firstOrNull { it.id == modelId }?.let { it.displayName.ifBlank { it.id } } ?: stringResource(R.string.jarvis_settings_default_model)
                             Text(stringResource(R.string.chat_history_drawer_model, label.toString()))
                         }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -280,15 +280,15 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                                 if (mcpAdded) reloadCodexMcp()
                                 else scope.launch {
                                     vm.codexBackend.addRemoteMcp(name, url, headers)
-                                        .onSuccess { reloadCodexMcp(); Toast.makeText(context, "Added to Codex", Toast.LENGTH_SHORT).show() }
-                                        .onFailure { Toast.makeText(context, it.message ?: "Could not add it", Toast.LENGTH_LONG).show() }
+                                        .onSuccess { reloadCodexMcp(); Toast.makeText(context, context.getString(R.string.jarvis_settings_added_to_codex), Toast.LENGTH_SHORT).show() }
+                                        .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.jarvis_settings_could_not_add), Toast.LENGTH_LONG).show() }
                                 }
                             } else if (agent == AgentKind.OPENCODE) {
                                 if (mcpAdded) reloadOpenCodeMcp()
                                 else scope.launch {
                                     vm.openCodeBackend.client.addRemoteMcp(name, url, headers)
-                                        .onSuccess { reloadOpenCodeMcp(); Toast.makeText(context, "Added to OpenCode", Toast.LENGTH_SHORT).show() }
-                                        .onFailure { Toast.makeText(context, it.message ?: "Could not add it", Toast.LENGTH_LONG).show() }
+                                        .onSuccess { reloadOpenCodeMcp(); Toast.makeText(context, context.getString(R.string.jarvis_settings_added_to_opencode), Toast.LENGTH_SHORT).show() }
+                                        .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.jarvis_settings_could_not_add), Toast.LENGTH_LONG).show() }
                                 }
                             } else if (agent == AgentKind.CLAUDE) {
                                 if (mcpAdded) vm.claudeConfig.loadMcp(null)
@@ -330,8 +330,8 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                         ) {
                             scope.launch {
                                 JarvisSkill.install(agent)
-                                    .onSuccess { skillInstalled = true; Toast.makeText(context, "Installed $it", Toast.LENGTH_SHORT).show() }
-                                    .onFailure { Toast.makeText(context, it.message ?: "Install failed", Toast.LENGTH_LONG).show() }
+                                    .onSuccess { skillInstalled = true; Toast.makeText(context, context.getString(R.string.jarvis_settings_installed_item, it), Toast.LENGTH_SHORT).show() }
+                                    .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.jarvis_settings_install_failed), Toast.LENGTH_LONG).show() }
                             }
                         }
                         JHint("The first message of every Jarvis chat carries the whole guide and the list of its tools with their parameters, so the " +
@@ -487,7 +487,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                         var menu by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) { voices = runCatching { JarvisVoice.deviceVoices() }.getOrDefault(emptyList()) }
                         Box {
-                            OutlinedButton(onClick = { menu = true }) { Text("Voice: " + (voices.firstOrNull { it.first == voice }?.second ?: "System default")) }
+                            OutlinedButton(onClick = { menu = true }) { Text(stringResource(R.string.jarvis_settings_voice_prefix, voices.firstOrNull { it.first == voice }?.second ?: stringResource(R.string.jarvis_settings_system_default))) }
                             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                                 DropdownMenuItem(text = { Text(stringResource(R.string.jarvis_settings_screen_system_default)) }, onClick = { P.ttsVoice.set(""); menu = false })
                                 voices.take(80).forEach { (id, label) ->
@@ -649,7 +649,7 @@ fun JarvisSettingsSectionPage(page: JarvisSettingsPage, cardBg: Color, cardBorde
                     JSwitch(stringResource(R.string.jarvis_settings_screen_carry_the_conversation_over), stringResource(R.string.jarvis_settings_screen_a_new_chat_starts_with_the_jarvis), carry) { P.carryOver.set(it) }
                     val count by P.currentChatMessages.state.collectAsState()
                     Text(stringResource(R.string.jarvis_settings_screen_current_chat_message, count.toString(), (if (count == 1) "" else "s").toString()), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                    OutlinedButton(onClick = { JarvisController.newSession(carry = carry); Toast.makeText(context, "The next message starts a new Jarvis chat", Toast.LENGTH_SHORT).show() }) {
+                    OutlinedButton(onClick = { JarvisController.newSession(carry = carry); Toast.makeText(context, context.getString(R.string.jarvis_settings_next_message_new_chat), Toast.LENGTH_SHORT).show() }) {
                         Text(stringResource(R.string.jarvis_settings_screen_start_a_fresh_chat_now))
                     }
                     val memory by P.memory.state.collectAsState()

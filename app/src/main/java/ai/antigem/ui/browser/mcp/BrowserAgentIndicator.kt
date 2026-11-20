@@ -213,7 +213,7 @@ fun BrowserAgentOverlay(tabId: String, modifier: Modifier = Modifier, topInset: 
                     .padding(horizontal = 12.dp, vertical = 5.dp)
             ) {
                 Text(
-                    text = if (label == null) "AI is using this tab" else "AI · $label",
+                    text = if (label == null) androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_indicator_ai_using_tab) else "AI · $label",
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,

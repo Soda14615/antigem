@@ -391,9 +391,9 @@ fun IdeScreen(
                             val ok = IdeApiClient.createFileOrDir(fullPath, isDir)
                             if (ok) {
                                 fileTree = IdeApiClient.getFileTree(activeProject?.path)
-                                Toast.makeText(context, "Created ${if (isDir) "folder" else "file"} '$name'", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(if (isDir) R.string.ide_screen_created_folder else R.string.ide_screen_created_file, name), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "Failed to create ${if (isDir) "folder" else "file"}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(if (isDir) R.string.ide_screen_failed_create_folder else R.string.ide_screen_failed_create_file), Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
@@ -404,9 +404,9 @@ fun IdeScreen(
                                 val newName = File(newPath).name
                                 IdeDaemonManager.renameTab(oldPath, newPath, newName)
                                 fileTree = IdeApiClient.getFileTree(activeProject?.path)
-                                Toast.makeText(context, "Renamed to '$newName'", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_renamed_to, newName), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "Failed to rename", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_failed_rename), Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
@@ -416,9 +416,9 @@ fun IdeScreen(
                             if (ok) {
                                 IdeDaemonManager.closeTab(path)
                                 fileTree = IdeApiClient.getFileTree(activeProject?.path)
-                                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_deleted), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_failed_delete), Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
@@ -598,7 +598,7 @@ fun IdeScreen(
                                             when (result) {
                                                 is FileSaveResult.Success -> {
                                                     IdeDaemonManager.markTabSaved(activeTab.path, result.hash)
-                                                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, context.getString(R.string.ide_screen_saved), Toast.LENGTH_SHORT).show()
                                                 }
                                                 is FileSaveResult.Conflict -> {
                                                     conflictDialogTab = activeTab.copy(
@@ -607,7 +607,7 @@ fun IdeScreen(
                                                     )
                                                 }
                                                 is FileSaveResult.Error -> {
-                                                    Toast.makeText(context, "Save Error: ${result.message}", Toast.LENGTH_LONG).show()
+                                                    Toast.makeText(context, context.getString(R.string.ide_screen_save_error, result.message), Toast.LENGTH_LONG).show()
                                                 }
                                             }
                                         }
@@ -653,11 +653,11 @@ fun IdeScreen(
                                                     }
                                                 } else {
                                                     val ext = File(activePath).extension
-                                                    Toast.makeText(context, "No default runner for '.$ext'. Configure a run profile.", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, context.getString(R.string.ide_screen_no_default_runner, ext), Toast.LENGTH_SHORT).show()
                                                     showAddProfileDialog = true
                                                 }
                                             } else {
-                                                Toast.makeText(context, "Open a file or select a project run profile", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, context.getString(R.string.ide_screen_open_file_or_run_profile), Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     },
@@ -755,11 +755,11 @@ fun IdeScreen(
                                                 if (runner != null) executeRun(runner)
                                             } else {
                                                 val ext = File(activePath).extension
-                                                Toast.makeText(context, "No default runner for '.$ext'. Configure a run profile.", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, context.getString(R.string.ide_screen_no_default_runner, ext), Toast.LENGTH_SHORT).show()
                                                 showAddProfileDialog = true
                                             }
                                         } else {
-                                            Toast.makeText(context, "Open a file to run", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.ide_screen_open_file_to_run), Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 )
@@ -900,7 +900,7 @@ fun IdeScreen(
                                         showRunMenu = false
                                         val projectPath = activeProject?.path ?: ""
                                         if (projectPath.isBlank()) {
-                                            Toast.makeText(context, "Open a project folder first", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.ide_screen_open_project_folder_first), Toast.LENGTH_SHORT).show()
                                         } else {
                                             showAddProfileDialog = true
                                         }
@@ -916,7 +916,7 @@ fun IdeScreen(
                                         showRunMenu = false
                                         val projectPath = activeProject?.path ?: ""
                                         if (projectPath.isBlank()) {
-                                            Toast.makeText(context, "Open a project folder first", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.ide_screen_open_project_folder_first), Toast.LENGTH_SHORT).show()
                                         } else {
                                             val file = RunConfigManager.getOrCreateLaunchJson(projectPath, activeTabPath)
                                             val content = try { file.readText() } catch (_: Exception) { "{}" }
@@ -1511,11 +1511,11 @@ fun IdeScreen(
                                     )
                                     if (res is FileSaveResult.Success) {
                                         IdeDaemonManager.closeTab(target.path)
-                                        Toast.makeText(context, "Saved and closed", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.ide_screen_saved_and_closed), Toast.LENGTH_SHORT).show()
                                     } else if (res is FileSaveResult.Conflict) {
                                         conflictDialogTab = target.copy(diskConflict = true, diskContentOnConflict = res.diskContent)
                                     } else {
-                                        Toast.makeText(context, "Failed to save file", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.ide_screen_failed_save_file), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             },
@@ -1569,9 +1569,9 @@ fun IdeScreen(
                                     )
                                     if (res is FileSaveResult.Success) {
                                         IdeDaemonManager.markTabSaved(target.path, res.hash)
-                                        Toast.makeText(context, "Saved (Overwritten)", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.ide_screen_saved_overwritten), Toast.LENGTH_SHORT).show()
                                     } else {
-                                        Toast.makeText(context, "Failed to overwrite disk", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.ide_screen_failed_overwrite_disk), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             },
@@ -1586,7 +1586,7 @@ fun IdeScreen(
                                 val target = conflictDialogTab ?: return@TextButton
                                 conflictDialogTab = null
                                 IdeDaemonManager.resolveTabConflict(target.path, keepMine = false)
-                                Toast.makeText(context, "Reverted to disk version", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_reverted_to_disk), Toast.LENGTH_SHORT).show()
                             }
                         ) {
                             Text(stringResource(R.string.ide_screen_revert_to_disk), color = ai.antigem.theme.AppColors.danger)
@@ -1670,9 +1670,9 @@ fun IdeScreen(
                                 IdeDaemonManager.markTabSaved(fullPath, res.hash)
                                 saveAsDialogTab = null
                                 refreshProjectsAndTree()
-                                Toast.makeText(context, "Saved to $fullPath", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_saved_to_path, fullPath), Toast.LENGTH_SHORT).show()
                             } else if (res is FileSaveResult.Error) {
-                                Toast.makeText(context, "Save Error: ${res.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(R.string.ide_screen_save_error, res.message), Toast.LENGTH_LONG).show()
                             }
                         }
                     },
@@ -1740,7 +1740,7 @@ fun IdeScreen(
                         RunConfigManager.addConfiguration(projPath, newProfile)
                         refreshRunConfigurations()
                         selectedProfileName = newProfile.name
-                        Toast.makeText(context, "Added run configuration: ${newProfile.name}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.ide_screen_added_run_config, newProfile.name), Toast.LENGTH_SHORT).show()
                     }
                 )
             }

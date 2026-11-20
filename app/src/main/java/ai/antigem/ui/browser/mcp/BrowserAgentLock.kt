@@ -249,14 +249,14 @@ fun BrowserAgentLockOverlay(onUnlock: () -> Unit, modifier: Modifier = Modifier)
                 .background(Color(0xF2202124), RoundedCornerShape(50))
                 .padding(start = 4.dp, end = 4.dp, top = 3.dp, bottom = 3.dp)
         ) {
-            Icon(Icons.Filled.DragIndicator, contentDescription = "Drag", tint = Color.White.copy(alpha = 0.55f), modifier = Modifier.size(18.dp))
+            Icon(Icons.Filled.DragIndicator, contentDescription = androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_drag), tint = Color.White.copy(alpha = 0.55f), modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(2.dp))
             Icon(Icons.Outlined.Lock, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(6.dp))
-            Text("AI controls this tab", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text(androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_ai_controls_tab), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Spacer(Modifier.width(2.dp))
             TextButton(onClick = onUnlock, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp), modifier = Modifier.height(30.dp)) {
-                Text("Unlock", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = ai.antigem.theme.AppColors.warning)
+                Text(androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_unlock), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = ai.antigem.theme.AppColors.warning)
             }
         }
     }
@@ -283,17 +283,17 @@ fun BrowserJsDialogCard(tab: BrowserTabSession, modifier: Modifier = Modifier) {
             Column(Modifier.padding(20.dp)) {
                 Text(
                     when (dialog.type) {
-                        "confirm" -> "This page asks"
-                        "prompt" -> "This page asks for input"
-                        "beforeunload" -> "Leave this page?"
-                        else -> "This page says"
+                        "confirm" -> androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_page_asks)
+                        "prompt" -> androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_page_asks_input)
+                        "beforeunload" -> androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_leave_page)
+                        else -> androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_page_says)
                     },
                     style = MaterialTheme.typography.titleMedium
                 )
                 if (host.isNotEmpty()) Text(host, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(12.dp))
                 Box(Modifier.heightIn(max = 240.dp).verticalScroll(rememberScrollState())) {
-                    Text(dialog.message.ifBlank { if (dialog.type == "beforeunload") "Changes you made may not be saved." else "" }, style = MaterialTheme.typography.bodyMedium)
+                    Text(dialog.message.ifBlank { if (dialog.type == "beforeunload") androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_changes_not_saved) else "" }, style = MaterialTheme.typography.bodyMedium)
                 }
                 if (dialog.type == "prompt") {
                     Spacer(Modifier.height(12.dp))
@@ -301,8 +301,8 @@ fun BrowserJsDialogCard(tab: BrowserTabSession, modifier: Modifier = Modifier) {
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    if (dialog.type != "alert") TextButton(onClick = { answer(false) }) { Text(if (dialog.type == "beforeunload") "Stay" else "Cancel") }
-                    TextButton(onClick = { answer(true) }) { Text(if (dialog.type == "beforeunload") "Leave" else "OK") }
+                    if (dialog.type != "alert") TextButton(onClick = { answer(false) }) { Text(if (dialog.type == "beforeunload") androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_stay) else androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_cancel)) }
+                    TextButton(onClick = { answer(true) }) { Text(if (dialog.type == "beforeunload") androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_leave) else androidx.compose.ui.res.stringResource(ai.antigem.R.string.browser_agent_lock_ok)) }
                 }
             }
         }

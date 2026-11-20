@@ -88,7 +88,7 @@ fun ChatTelemetryDialog(
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(R.string.chat_telemetry_dialog_aggregated_usage_telemetry_for, (conversation?.title ?: "Current Chat").toString()),
+                    text = stringResource(R.string.chat_telemetry_dialog_aggregated_usage_telemetry_for, conversation?.title ?: stringResource(R.string.chat_telemetry_current_chat)),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -113,14 +113,14 @@ fun ChatTelemetryDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         TelemetryMetricCard(
-                            title = "Input Tokens",
+                            title = stringResource(R.string.chat_telemetry_input_tokens),
                             value = numberFormat.format(totalPromptTokens),
                             icon = Icons.Outlined.ArrowDownward,
                             iconColor = inputColor,
                             modifier = Modifier.weight(1f)
                         )
                         TelemetryMetricCard(
-                            title = "Output Tokens",
+                            title = stringResource(R.string.chat_telemetry_output_tokens),
                             value = numberFormat.format(totalOutputTokens),
                             icon = Icons.Outlined.ArrowUpward,
                             iconColor = outputColor,
@@ -133,14 +133,14 @@ fun ChatTelemetryDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         TelemetryMetricCard(
-                            title = "Cache Read Hits",
+                            title = stringResource(R.string.chat_telemetry_cache_read_hits),
                             value = if (totalCachedTokens > 0) "${numberFormat.format(totalCachedTokens)} ($cacheEfficiencyPct%)" else "0",
                             icon = Icons.Outlined.FlashOn,
                             iconColor = cacheColor,
                             modifier = Modifier.weight(1f)
                         )
                         TelemetryMetricCard(
-                            title = "Total Consumption",
+                            title = stringResource(R.string.chat_telemetry_total_consumption),
                             value = numberFormat.format(totalCombinedTokens),
                             icon = Icons.Outlined.Functions,
                             iconColor = ClaudeTerracotta,
@@ -165,12 +165,12 @@ fun ChatTelemetryDialog(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            TelemetryRow(label = "Active Model", value = conversation?.modelId ?: "Default")
-                            TelemetryRow(label = "User Turns", value = "$userMessagesCount turns")
-                            TelemetryRow(label = "Model Responses", value = "$assistantMessagesCount responses")
-                            TelemetryRow(label = "Tools Executed", value = "$toolsExecutedCount tools")
-                            TelemetryRow(label = "Active Context Summary", value = if (!conversation?.summary.isNullOrBlank()) "Active" else "None")
-                            TelemetryRow(label = "Custom System Prompt", value = if (!conversation?.customSystemPrompt.isNullOrBlank()) "Configured" else "Default")
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_active_model), value = conversation?.modelId ?: stringResource(R.string.chat_telemetry_default))
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_user_turns), value = stringResource(R.string.chat_telemetry_turns_count, userMessagesCount))
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_model_responses), value = stringResource(R.string.chat_telemetry_responses_count, assistantMessagesCount))
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_tools_executed), value = stringResource(R.string.chat_telemetry_tools_count, toolsExecutedCount))
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_active_context_summary), value = if (!conversation?.summary.isNullOrBlank()) stringResource(R.string.chat_telemetry_status_active) else stringResource(R.string.chat_telemetry_status_none))
+                            TelemetryRow(label = stringResource(R.string.chat_telemetry_custom_system_prompt), value = if (!conversation?.customSystemPrompt.isNullOrBlank()) stringResource(R.string.chat_telemetry_status_configured) else stringResource(R.string.chat_telemetry_default))
                         }
                     }
 

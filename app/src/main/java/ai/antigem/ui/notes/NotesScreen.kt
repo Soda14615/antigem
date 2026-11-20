@@ -72,8 +72,8 @@ fun NotesScreen(
         if (note.isEmpty) return
         scope.launch {
             snackbar.currentSnackbarData?.dismiss()
-            val label = if (note.kind == NoteKind.TODO) "To-do list deleted" else "Note deleted"
-            if (snackbar.showSnackbar(label, actionLabel = "Undo", duration = SnackbarDuration.Short) == SnackbarResult.ActionPerformed) {
+            val label = context.getString(if (note.kind == NoteKind.TODO) R.string.notes_screen_todo_deleted else R.string.notes_screen_note_deleted)
+            if (snackbar.showSnackbar(label, actionLabel = context.getString(R.string.notes_screen_undo), duration = SnackbarDuration.Short) == SnackbarResult.ActionPerformed) {
                 NotesRepository.restore(note)
             }
         }
@@ -180,7 +180,7 @@ private fun NotesList(
                         PlainField(
                             value = query,
                             onValueChange = { query = it },
-                            placeholder = "Search notes",
+                            placeholder = stringResource(R.string.notes_screen_search_notes),
                             textStyle = TextStyle(fontSize = 16.sp),
                             singleLine = true,
                             modifier = Modifier.weight(1f).focusRequester(searchFocus)
@@ -455,7 +455,7 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                 remoteValue = note.title,
                 currentRemote = { NotesRepository.get(id)?.title },
                 onValueChange = { v -> NotesRepository.update(id) { it.copy(title = v) } },
-                placeholder = "Title",
+                placeholder = stringResource(R.string.notes_screen_title_placeholder),
                 textStyle = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
                 singleLine = true,
                 imeAction = ImeAction.Next,
@@ -468,7 +468,7 @@ private fun NoteEditor(note: Note, onBack: () -> Unit, onDelete: () -> Unit) {
                     remoteValue = note.text,
                     currentRemote = { NotesRepository.get(id)?.text },
                     onValueChange = { v -> NotesRepository.update(id) { it.copy(text = v) } },
-                    placeholder = if (note.kind == NoteKind.TODO) "Details" else "Note",
+                    placeholder = if (note.kind == NoteKind.TODO) stringResource(R.string.notes_screen_details_placeholder) else stringResource(R.string.notes_screen_note_placeholder),
                     textStyle = TextStyle(fontSize = 16.sp, lineHeight = 24.sp),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                 )
@@ -541,7 +541,7 @@ private fun TodoRow(
             onValueChange = { v ->
                 NotesRepository.update(noteId) { n -> n.copy(items = n.items.map { if (it.id == item.id) it.copy(text = v) else it }) }
             },
-            placeholder = "List item",
+            placeholder = stringResource(R.string.notes_screen_list_item_placeholder),
             textStyle = TextStyle(
                 fontSize = 16.sp,
                 textDecoration = if (item.done) TextDecoration.LineThrough else null

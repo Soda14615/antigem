@@ -129,4 +129,13 @@
     <string name="jarvis_settings_screen_add_a_word_or_a_whole_sentence">"Add a word or a whole sentence"</string>
     <string name="jarvis_settings_screen_add_suggestions">"Add suggestions (%1$s)"</string>
     <string name="jarvis_settings_screen_remove_all">"Remove all"</string>
+    <string name="jarvis_settings_default_model">"Default model"</string>
+    <string name="jarvis_settings_added_to_codex">"Added to Codex"</string>
+    <string name="jarvis_settings_added_to_opencode">"Added to OpenCode"</string>
+    <string name="jarvis_settings_could_not_add">"Could not add it"</string>
+    <string name="jarvis_settings_installed_item">"Installed %1$s"</string>
+    <string name="jarvis_settings_install_failed">"Install failed"</string>
+    <string name="jarvis_settings_voice_prefix">"Voice: %1$s"</string>
+    <string name="jarvis_settings_system_default">"System default"</string>
+    <string name="jarvis_settings_next_message_new_chat">"The next message starts a new Jarvis chat"</string>
 </resources>

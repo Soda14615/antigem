@@ -219,9 +219,9 @@ fun GitSourceControlView(
                                             val ok = GitApiClient.checkoutBranch(projPath, b.name, create = false)
                                             if (ok) {
                                                 refreshGitData()
-                                                Toast.makeText(context, "Switched to ${b.name}", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, context.getString(R.string.git_sc_switched_branch, b.name), Toast.LENGTH_SHORT).show()
                                             } else {
-                                                Toast.makeText(context, "Failed to switch branch", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, context.getString(R.string.git_sc_failed_switch_branch), Toast.LENGTH_SHORT).show()
                                             }
                                             isOperating = false
                                         }
@@ -314,7 +314,7 @@ fun GitSourceControlView(
                                             isOperating = true
                                             val ok = GitApiClient.stashPop(projPath)
                                             refreshGitData()
-                                            Toast.makeText(context, if (ok) "Stash applied!" else "Stash pop failed", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(if (ok) R.string.git_sc_stash_applied else R.string.git_sc_stash_pop_failed), Toast.LENGTH_SHORT).show()
                                             isOperating = false
                                         }
                                     }
@@ -406,7 +406,7 @@ fun GitSourceControlView(
                                     isOperating = true
                                     val res = GitApiClient.initRepo(projPath)
                                     if (res.success) {
-                                        Toast.makeText(context, "Git repository initialized!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.git_sc_repo_initialized), Toast.LENGTH_SHORT).show()
                                         refreshGitData()
                                     } else {
                                         executionError = Pair("Initialization Failed", res.error.ifBlank { "Could not initialize Git repository." })
@@ -476,7 +476,7 @@ fun GitSourceControlView(
             Button(
                 onClick = {
                     if (commitMessage.isBlank()) {
-                        Toast.makeText(context, "Please enter a commit message", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.git_sc_enter_commit_message), Toast.LENGTH_SHORT).show()
                         return@Button
                     }
                     val projPath = activeProject?.path ?: return@Button
@@ -928,7 +928,7 @@ fun GitSourceControlView(
                     onClick = {
                         val projPath = activeProject?.path ?: return@Button
                         if (configUserName.trim().isBlank() || configUserEmail.trim().isBlank()) {
-                            Toast.makeText(context, "Author name and email cannot be empty", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.git_sc_author_empty), Toast.LENGTH_SHORT).show()
                             return@Button
                         }
                         scope.launch {
@@ -942,7 +942,7 @@ fun GitSourceControlView(
                                 isGlobal = configIsGlobal
                             )
                             if (res.success) {
-                                Toast.makeText(context, "Git configuration saved!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_config_saved), Toast.LENGTH_SHORT).show()
                                 val wasPromptedForCommit = configPromptReason != null
                                 showConfigDialog = false
                                 configPromptReason = null
@@ -1058,9 +1058,9 @@ fun GitSourceControlView(
                                 val ok = GitApiClient.checkoutBranch(projPath, name, create = true)
                                 if (ok) {
                                     refreshGitData()
-                                    Toast.makeText(context, "Branch $name created & active", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.git_sc_branch_created, name), Toast.LENGTH_SHORT).show()
                                 } else {
-                                    Toast.makeText(context, "Failed to create branch", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.git_sc_failed_create_branch), Toast.LENGTH_SHORT).show()
                                 }
                                 isOperating = false
                             }
@@ -1129,9 +1129,9 @@ fun GitSourceControlView(
                             val ok = GitApiClient.stash(projPath, stashMessage.trim())
                             if (ok) {
                                 refreshGitData()
-                                Toast.makeText(context, "Changes stashed!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_changes_stashed), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "Stash failed", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_stash_failed), Toast.LENGTH_SHORT).show()
                             }
                             isOperating = false
                         }
@@ -1300,7 +1300,7 @@ fun GitSourceControlView(
                             val res = GitApiClient.pullDetailed(projPath)
                             refreshGitData()
                             if (res.success) {
-                                Toast.makeText(context, "Git Pull Successful", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_pull_success), Toast.LENGTH_SHORT).show()
                             } else {
                                 executionError = Pair("Git Pull Failed", (res.error.ifBlank { res.output }).ifBlank { "Git pull failed." })
                             }
@@ -1346,7 +1346,7 @@ fun GitSourceControlView(
                             val res = GitApiClient.pushDetailed(projPath)
                             refreshGitData()
                             if (res.success) {
-                                Toast.makeText(context, "Git Push Successful", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_push_success), Toast.LENGTH_SHORT).show()
                             } else {
                                 executionError = Pair("Git Push Failed", (res.error.ifBlank { res.output }).ifBlank { "Git push failed." })
                             }
@@ -1404,7 +1404,7 @@ fun GitSourceControlView(
                             if (res.success) {
                                 commitMessage = ""
                                 refreshGitData()
-                                Toast.makeText(context, "Committed successfully!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.git_sc_committed_success), Toast.LENGTH_SHORT).show()
                             } else {
                                 val err = res.error.takeIf { it.isNotBlank() } ?: "Commit failed"
                                 Toast.makeText(context, err, Toast.LENGTH_LONG).show()

@@ -94,4 +94,16 @@
     <string name="mini_apps_activity_ask_an_agent_to_build_one_e">"Ask an agent to build one, e.g. \"make me a habit tracker mini app\". Apps live in ~/mini-apps/&lt;name&gt;/ (see ~/mini-apps/README.md)."</string>
     <string name="mini_apps_activity_modified">"modified"</string>
     <string name="mini_apps_activity_dev">"DEV · %1$s"</string>
+    <string name="mini_app_ui_launcher_no_shortcuts">"This launcher can't add shortcuts"</string>
+    <string name="mini_app_ui_create_dev_key_first">"Create a developer key first (Mini Apps → key icon)"</string>
+    <string name="mini_app_ui_signed_dist">"Signed: ~/mini-apps-dist/%1$s"</string>
+    <string name="mini_app_ui_export_failed">"Export failed"</string>
+    <string name="mini_app_ui_package_not_kept">"The package isn't kept for apps installed before sharing existed: install it again to share it"</string>
+    <string name="mini_app_ui_uninstalled">"%1$s uninstalled"</string>
+    <string name="mini_app_ui_could_not_uninstall">"Couldn't uninstall"</string>
+    <string name="mini_app_ui_data_cleared">"Data cleared"</string>
+    <string name="mini_app_ui_running_task">"Running %1$s…"</string>
+    <string name="mini_app_install_ok">"OK"</string>
+    <string name="mini_app_store_asks_for">"Asks for: %1$s"</string>
+    <string name="mini_app_activity_not_found">"Mini app not found: %1$s"</string>
 </resources>

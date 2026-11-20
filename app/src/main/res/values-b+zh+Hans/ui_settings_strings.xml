@@ -939,4 +939,16 @@
     <string name="x11_desktop_screen_the_desktop_runs_inside_antigem_so_android">"桌面在 AntiGem 内运行，因此 Android 在你使用它时不会减慢或停止它。"</string>
     <string name="x11_desktop_screen_set_up_manually">"手动设置"</string>
     <string name="x11_desktop_screen_don_t_install_termux_x11_nightly_from">"不要从 x11 -repo 安装 termux-x11-nightly：它仅适用于官方 Termux： X11，不适用于 AntiGem 的构建。"</string>
+    <string name="github_screen_git_not_installed_remote">"服务器上未安装 git。"</string>
+    <string name="github_screen_git_not_installed_local">"未安装 git。请在终端运行 \"pkg install git\"。"</string>
+    <string name="github_screen_repositories">"仓库"</string>
+    <string name="github_screen_repositories_count">"仓库（%1$d）"</string>
+    <string name="rea_screen_on_demand">"按需加载"</string>
+    <string name="rea_screen_directly">"直接加载"</string>
+    <string name="rea_screen_per_request">"每次请求 %1$s"</string>
+    <string name="servers_settings_badge_server">"远程"</string>
+    <string name="servers_settings_badge_local">"本地"</string>
+    <string name="servers_settings_bind_placeholder">"代理后填 127.0.0.1，直连填 0.0.0.0"</string>
+    <string name="servers_settings_port_label">"端口 %1$d"</string>
+    <string name="servers_settings_port_same">"同上"</string>
 </resources>

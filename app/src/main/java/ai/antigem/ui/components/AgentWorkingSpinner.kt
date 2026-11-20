@@ -64,6 +64,9 @@ private const val WORD_DELAY_MS = 5_000L
 @Composable
 fun AgentWorkingSpinner(color: Color, modifier: Modifier = Modifier, compacting: Boolean = false) {
     val measurer = rememberTextMeasurer(cacheSize = 64)
+    val verbs = androidx.compose.ui.res.stringArrayResource(ai.antigem.R.array.agent_working_spinner_verbs).toList().ifEmpty { VERBS }
+    val compactingWord = androidx.compose.ui.res.stringResource(ai.antigem.R.string.agent_working_spinner_compacting)
+    val textWidth = remember(verbs, compactingWord) { (verbs + compactingWord).maxOf { it.length } + 3 }
     // a quiet status line (like VS Code's softened foreground); the accent-colored star is what draws the eye
     val textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
     val glyphStyle = remember(color) { TextStyle(color = color, fontSize = 21.sp, fontFamily = FontFamily.Monospace) }
@@ -72,9 +75,9 @@ fun AgentWorkingSpinner(color: Color, modifier: Modifier = Modifier, compacting:
 
     // measured once: every glyph, and the widest text the row can show
     val glyphLayouts = remember(measurer, glyphStyle) { GLYPHS.map { measurer.measure(it, glyphStyle) } }
-    val wordRef = remember(measurer, wordStyle) { measurer.measure("Compacting...", wordStyle) }
-    val wordWidth = remember(measurer, wordStyle) {
-        (VERBS + "Compacting").maxOf { measurer.measure("$it...", wordStyle).size.width } + measurer.measure("▌", wordStyle).size.width
+    val wordRef = remember(measurer, wordStyle, compactingWord) { measurer.measure("$compactingWord...", wordStyle) }
+    val wordWidth = remember(measurer, wordStyle, verbs, compactingWord) {
+        (verbs + compactingWord).maxOf { measurer.measure("$it...", wordStyle).size.width } + measurer.measure("▌", wordStyle).size.width
     }
     val glyphBox = remember(glyphLayouts) { glyphLayouts.maxOf { it.size.width } }
     val gapPx = with(density) { 4.dp.roundToPx() }
@@ -83,9 +86,9 @@ fun AgentWorkingSpinner(color: Color, modifier: Modifier = Modifier, compacting:
     val wordBaseline = (heightPx - wordRef.size.height) / 2f + wordRef.firstBaseline
 
     val glyphStep = remember { mutableIntStateOf(0) }
-    val shown = remember { mutableStateOf(" ".repeat(TEXT_WIDTH)) }
+    val shown = remember(textWidth) { mutableStateOf(" ".repeat(textWidth)) }
     GlyphTicker(glyphStep)
-    WordDecoder(shown, compacting)
+    WordDecoder(shown, compacting, verbs, compactingWord, textWidth)
 
     Canvas(
         modifier
@@ -112,22 +115,28 @@ private fun GlyphTicker(step: androidx.compose.runtime.MutableIntState) {
 }
 
 @Composable
-private fun WordDecoder(shown: androidx.compose.runtime.MutableState<String>, compacting: Boolean) {
-    var verb by remember { mutableStateOf(VERBS.random()) }
-    LaunchedEffect(Unit) {
+private fun WordDecoder(
+    shown: androidx.compose.runtime.MutableState<String>,
+    compacting: Boolean,
+    verbs: List<String>,
+    compactingWord: String,
+    textWidth: Int
+) {
+    var verb by remember(verbs) { mutableStateOf(verbs.random()) }
+    LaunchedEffect(verbs) {
         var changes = 0
         while (true) {
             delay(WORD_DELAYS_MS.getOrElse(changes) { WORD_DELAY_MS })
             changes++
-            verb = VERBS.random()
+            verb = verbs.random()
         }
     }
     // A cursor runs over the old text; the three characters behind it flicker through '.' and '_' before settling.
-    LaunchedEffect(verb, compacting) {
-        val target = ((if (compacting) "Compacting" else verb) + "...").padEnd(TEXT_WIDTH)
+    LaunchedEffect(verb, compacting, compactingWord, textWidth) {
+        val target = ((if (compacting) compactingWord else verb) + "...").padEnd(textWidth)
         var cursor = 0
         while (cursor - 3 < target.length) {
-            val next = StringBuilder(shown.value)
+            val next = StringBuilder(shown.value.padEnd(textWidth).take(textWidth))
             for (behind in 0..3) {
                 val k = cursor - behind
                 if (k < 0 || k >= target.length) continue

@@ -324,4 +324,161 @@
     <string name="workspace_folder_browser_dialog_choose_this_folder">"Choose This Folder"</string>
     <string name="workspace_folder_browser_dialog_create_folder_inside">"Create folder inside: %1$s"</string>
     <string name="workspace_folder_browser_dialog_create">"Create"</string>
+    <string name="agent_working_spinner_compacting">"Compacting"</string>
+    <string-array name="agent_working_spinner_verbs">
+        <item>"Accomplishing"</item>
+        <item>"Actioning"</item>
+        <item>"Actualizing"</item>
+        <item>"Baking"</item>
+        <item>"Booping"</item>
+        <item>"Brewing"</item>
+        <item>"Calculating"</item>
+        <item>"Cerebrating"</item>
+        <item>"Channeling"</item>
+        <item>"Churning"</item>
+        <item>"Clauding"</item>
+        <item>"Coalescing"</item>
+        <item>"Cogitating"</item>
+        <item>"Computing"</item>
+        <item>"Combobulating"</item>
+        <item>"Concocting"</item>
+        <item>"Considering"</item>
+        <item>"Contemplating"</item>
+        <item>"Cooking"</item>
+        <item>"Crafting"</item>
+        <item>"Creating"</item>
+        <item>"Crunching"</item>
+        <item>"Deciphering"</item>
+        <item>"Deliberating"</item>
+        <item>"Determining"</item>
+        <item>"Discombobulating"</item>
+        <item>"Doing"</item>
+        <item>"Effecting"</item>
+        <item>"Elucidating"</item>
+        <item>"Enchanting"</item>
+        <item>"Envisioning"</item>
+        <item>"Finagling"</item>
+        <item>"Flibbertigibbeting"</item>
+        <item>"Forging"</item>
+        <item>"Forming"</item>
+        <item>"Frolicking"</item>
+        <item>"Generating"</item>
+        <item>"Germinating"</item>
+        <item>"Hatching"</item>
+        <item>"Herding"</item>
+        <item>"Honking"</item>
+        <item>"Ideating"</item>
+        <item>"Imagining"</item>
+        <item>"Incubating"</item>
+        <item>"Inferring"</item>
+        <item>"Manifesting"</item>
+        <item>"Marinating"</item>
+        <item>"Meandering"</item>
+        <item>"Moseying"</item>
+        <item>"Mulling"</item>
+        <item>"Mustering"</item>
+        <item>"Musing"</item>
+        <item>"Noodling"</item>
+        <item>"Percolating"</item>
+        <item>"Perusing"</item>
+        <item>"Philosophizing"</item>
+        <item>"Pontificating"</item>
+        <item>"Pondering"</item>
+        <item>"Processing"</item>
+        <item>"Puttering"</item>
+        <item>"Puzzling"</item>
+        <item>"Reticulating"</item>
+        <item>"Ruminating"</item>
+        <item>"Schlepping"</item>
+        <item>"Shimmying"</item>
+        <item>"Simmering"</item>
+        <item>"Smooshing"</item>
+        <item>"Spelunking"</item>
+        <item>"Spinning"</item>
+        <item>"Stewing"</item>
+        <item>"Sussing"</item>
+        <item>"Synthesizing"</item>
+        <item>"Thinking"</item>
+        <item>"Tinkering"</item>
+        <item>"Transmuting"</item>
+        <item>"Unfurling"</item>
+        <item>"Unraveling"</item>
+        <item>"Vibing"</item>
+        <item>"Wandering"</item>
+        <item>"Whirring"</item>
+        <item>"Wibbling"</item>
+        <item>"Working"</item>
+        <item>"Wrangling"</item>
+    </string-array>
+    <string name="artifact_download_no_file">"No artifact file to download"</string>
+    <string name="artifact_download_saved">"%1$s saved to Downloads/AntiGem"</string>
+    <string name="artifact_download_open">"Open"</string>
+    <string name="artifact_download_failed">"Failed to download %1$s"</string>
+    <string name="artifact_download_open_file">"Open File"</string>
+    <string name="artifact_download_no_app">"No app found to open file"</string>
+    <string name="image_download_no_image">"No image to download"</string>
+    <string name="image_download_saved">"Image saved to Downloads/AntiGem"</string>
+    <string name="image_download_failed">"Failed to save image"</string>
+    <string name="image_download_no_video">"No video to download"</string>
+    <string name="image_download_saving_video">"Saving video…"</string>
+    <string name="image_download_video_saved">"Video saved to Downloads/AntiGem"</string>
+    <string name="image_download_video_failed">"Failed to save video"</string>
+    <string name="image_download_open_image">"Open Image"</string>
+    <string name="image_download_no_app">"No app found to open image"</string>
+    <string name="conversation_export_failed_load">"Failed to load conversation: %1$s"</string>
+    <string name="conversation_export_no_messages">"No messages to export"</string>
+    <string name="conversation_export_saved">"%1$s saved to Downloads/AntiGem/Exports"</string>
+    <string name="conversation_export_failed_save">"Failed to save export to Downloads"</string>
+    <string name="conversation_export_error">"Export error: %1$s"</string>
+    <string name="conversation_export_open_title">"Open Exported Conversation"</string>
+    <string name="conversation_share_no_messages">"No messages to share"</string>
+    <string name="conversation_share_error">"Share error: %1$s"</string>
+    <string name="conversation_share_chooser_title">"Share AntiGem Chat"</string>
+    <string name="conversation_share_no_chooser">"Could not open share chooser"</string>
+    <string name="chat_telemetry_current_chat">"Current Chat"</string>
+    <string name="chat_telemetry_input_tokens">"Input Tokens"</string>
+    <string name="chat_telemetry_output_tokens">"Output Tokens"</string>
+    <string name="chat_telemetry_cache_read_hits">"Cache Read Hits"</string>
+    <string name="chat_telemetry_total_consumption">"Total Consumption"</string>
+    <string name="chat_telemetry_active_model">"Active Model"</string>
+    <string name="chat_telemetry_default">"Default"</string>
+    <string name="chat_telemetry_user_turns">"User Turns"</string>
+    <string name="chat_telemetry_turns_count">"%1$d turns"</string>
+    <string name="chat_telemetry_model_responses">"Model Responses"</string>
+    <string name="chat_telemetry_responses_count">"%1$d responses"</string>
+    <string name="chat_telemetry_tools_executed">"Tools Executed"</string>
+    <string name="chat_telemetry_tools_count">"%1$d tools"</string>
+    <string name="chat_telemetry_active_context_summary">"Active Context Summary"</string>
+    <string name="chat_telemetry_status_active">"Active"</string>
+    <string name="chat_telemetry_status_none">"None"</string>
+    <string name="chat_telemetry_custom_system_prompt">"Custom System Prompt"</string>
+    <string name="chat_telemetry_status_configured">"Configured"</string>
+    <string name="app_permissions_notifications_title">"Notifications"</string>
+    <string name="app_permissions_notifications_subtitle">"Keeps the background service running and shows progress"</string>
+    <string name="app_permissions_files_title">"Files"</string>
+    <string name="app_permissions_files_subtitle">"Open projects and files on your storage"</string>
+    <string name="app_permissions_microphone_title">"Microphone"</string>
+    <string name="app_permissions_microphone_subtitle">"Dictate messages and voice notes"</string>
+    <string name="attachment_selector_camera_title">"Camera Photo"</string>
+    <string name="attachment_selector_camera_subtitle">"Take a photo with your camera to attach directly to the chat."</string>
+    <string name="attachment_selector_image_title">"Photo / Image"</string>
+    <string name="attachment_selector_image_subtitle">"The model sees the image directly. Big photos are shrunk first."</string>
+    <string name="attachment_selector_document_title">"Document / File"</string>
+    <string name="attachment_selector_document_subtitle">"Copied from your phone to the agent's machine. Avoid large files here: copying takes time and storage. Use \"From Files\" for big files."</string>
+    <string name="attachment_selector_from_files_title">"From Files"</string>
+    <string name="attachment_selector_from_files_subtitle">"Attach any file, any size: nothing is copied. The agent opens the original file, so it could change it (it is told not to, and usually won't)."</string>
+    <string name="speech_mode_auto_transcribe_title">"Auto Transcribe"</string>
+    <string name="speech_mode_auto_transcribe_subtitle">"Record a voice clip and convert it into text using AGY transcription"</string>
+    <string name="speech_mode_live_dictation_title">"Live Dictation"</string>
+    <string name="speech_mode_live_dictation_subtitle">"Stream words in real-time as you speak directly into the chat prompt"</string>
+    <string name="message_bubble_copied_prompt">"Copied prompt"</string>
+    <string name="message_bubble_copied_response">"Copied response"</string>
+    <string name="message_bubble_image_preview">"Image Preview"</string>
+    <string name="message_bubble_attachment_unavailable">"%1$s is no longer available"</string>
+    <string name="message_bubble_cannot_open">"Cannot open: %1$s"</string>
+    <string name="markdown_content_diagram_copied">"Diagram code copied"</string>
+    <string name="markdown_content_error_details_copied">"Error details copied to clipboard"</string>
+    <string name="markdown_content_youtube_thumbnail">"YouTube Video Thumbnail"</string>
+    <string name="markdown_content_agent_execution_error">"Agent Execution Error"</string>
+    <string name="markdown_content_execution_notice">"Execution Notice"</string>
 </resources>

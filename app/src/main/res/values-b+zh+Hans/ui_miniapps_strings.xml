@@ -94,4 +94,16 @@
     <string name="mini_apps_activity_ask_an_agent_to_build_one_e">"要求智能体构建一个，例如“让我成为一个习惯跟踪器小程序”。应用程序位于 ~/mini-apps/ &lt;name&gt;/ 中（请参阅 ~/mini-apps/README.md）。"</string>
     <string name="mini_apps_activity_modified">"已修改"</string>
     <string name="mini_apps_activity_dev">"开发· %1$s"</string>
+    <string name="mini_app_ui_launcher_no_shortcuts">"当前桌面不支持添加快捷方式"</string>
+    <string name="mini_app_ui_create_dev_key_first">"请先创建开发者密钥（小应用 → 密钥图标）"</string>
+    <string name="mini_app_ui_signed_dist">"已签名：~/mini-apps-dist/%1$s"</string>
+    <string name="mini_app_ui_export_failed">"导出失败"</string>
+    <string name="mini_app_ui_package_not_kept">"在分享功能推出前安装的应用未保留安装包：请重新安装后再分享"</string>
+    <string name="mini_app_ui_uninstalled">"已卸载 %1$s"</string>
+    <string name="mini_app_ui_could_not_uninstall">"无法卸载"</string>
+    <string name="mini_app_ui_data_cleared">"已清除数据"</string>
+    <string name="mini_app_ui_running_task">"正在运行 %1$s…"</string>
+    <string name="mini_app_install_ok">"确定"</string>
+    <string name="mini_app_store_asks_for">"请求权限：%1$s"</string>
+    <string name="mini_app_activity_not_found">"未找到小应用：%1$s"</string>
 </resources>

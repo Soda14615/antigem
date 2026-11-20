@@ -727,7 +727,7 @@ internal fun ReaServerDialog(
                 Text(stringResource(R.string.rea_screen_how_the_agent_sees_rea_s_tools), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 ModeCard(
                     selected = mode == ReaManager.Mode.ON_DEMAND,
-                    title = "On demand",
+                    title = stringResource(R.string.rea_screen_on_demand),
                     badge = "Recommended",
                     cost = tk(onDemandTokens),
                     text = "The agent gets 4 small tools: it lists REA's tools by name, reads the details of the ones it needs, then runs them. " +
@@ -736,7 +736,7 @@ internal fun ReaServerDialog(
                 ) { mode = ReaManager.Mode.ON_DEMAND }
                 ModeCard(
                     selected = mode == ReaManager.Mode.DIRECT,
-                    title = "Directly",
+                    title = stringResource(R.string.rea_screen_directly),
                     badge = null,
                     cost = tk(directTokens),
                     text = "Every allowed tool is a normal MCP tool, so the agent uses it straight away. But every tool's description is sent with every request: " +
@@ -867,7 +867,7 @@ private fun ModeCard(selected: Boolean, title: String, badge: String?, cost: Str
                     Text(title, fontSize = 13.5.sp, fontWeight = FontWeight.Bold)
                     badge?.let { Pill(it, QuotaGreen) }
                 }
-                Text(cost + " per request", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.rea_screen_per_request, cost), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
                 Text(text, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
             }
         }

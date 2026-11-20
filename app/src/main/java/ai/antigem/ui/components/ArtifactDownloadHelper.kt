@@ -34,7 +34,7 @@ object ArtifactDownloadHelper {
     ) {
         val targetUri = artifact.absoluteUri.ifBlank { artifact.name }
         if (targetUri.isBlank()) {
-            Toast.makeText(context, "No artifact file to download", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.artifact_download_no_file), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -46,18 +46,18 @@ object ArtifactDownloadHelper {
             if (savedUri != null) {
                 if (snackbarHostState != null) {
                     val result = snackbarHostState.showSnackbar(
-                        message = "$fileName saved to Downloads/AntiGem",
-                        actionLabel = "Open",
+                        message = context.getString(ai.antigem.R.string.artifact_download_saved, fileName),
+                        actionLabel = context.getString(ai.antigem.R.string.artifact_download_open),
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
                         openFile(context, savedUri, mimeType)
                     }
                 } else {
-                    Toast.makeText(context, "$fileName saved to Downloads/AntiGem", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(ai.antigem.R.string.artifact_download_saved, fileName), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(context, "Failed to download $fileName", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(ai.antigem.R.string.artifact_download_failed, fileName), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -69,9 +69,9 @@ object ArtifactDownloadHelper {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-            context.startActivity(Intent.createChooser(intent, "Open File"))
+            context.startActivity(Intent.createChooser(intent, context.getString(ai.antigem.R.string.artifact_download_open_file)))
         } catch (e: Exception) {
-            Toast.makeText(context, "No app found to open file", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(ai.antigem.R.string.artifact_download_no_app), Toast.LENGTH_SHORT).show()
         }
     }
 

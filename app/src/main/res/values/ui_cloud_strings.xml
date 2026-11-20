@@ -41,4 +41,17 @@
     <string name="cloud_preview_open_in_browser">"Open in browser"</string>
     <string name="cloud_preview_preview">"Preview"</string>
     <string name="cloud_preview_path">"Path"</string>
+    <string name="agy_cloud_ui_projects_and_repos">"Cloud projects &amp; repos"</string>
+    <string name="agy_cloud_ui_connections_row">"Connections (GitHub, Drive…)"</string>
+    <string name="agy_cloud_ui_runs_in_google_cloud">"Runs in Google's cloud with your GitHub repos, also while the phone is off"</string>
+    <string name="agy_cloud_ui_manage">"Manage"</string>
+    <string name="agy_cloud_ui_repos_of">"Repos of %1$s"</string>
+    <string name="agy_cloud_ui_loading">"Loading…"</string>
+    <string name="agy_cloud_ui_not_ready">"Not ready"</string>
+    <string name="agy_cloud_ui_one_project">"1 project"</string>
+    <string name="agy_cloud_ui_n_projects">"%1$d projects"</string>
+    <string name="agy_cloud_ui_github_connected">"GitHub connected"</string>
+    <string name="agy_cloud_ui_github_expired">"GitHub expired"</string>
+    <string name="agy_cloud_ui_github_not_connected">"GitHub not connected"</string>
+    <string name="agy_cloud_ui_no_repos">"No repos"</string>
 </resources>

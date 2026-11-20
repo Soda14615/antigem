@@ -71,7 +71,7 @@ object ConversationShareHelper {
                         engine.ingestStepsDirect(steps, conversationId)
                     } else {
                         withContext(Dispatchers.Main) {
-                            AppToastHelper.showToast("Failed to load conversation: ${stepsRes.exceptionOrNull()?.message}", ChatToastType.ERROR)
+                            AppToastHelper.showToast(context.getString(ai.antigem.R.string.conversation_export_failed_load, stepsRes.exceptionOrNull()?.message.orEmpty()), ChatToastType.ERROR)
                         }
                         return@withContext
                     }
@@ -79,7 +79,7 @@ object ConversationShareHelper {
 
                 if (messages.isEmpty()) {
                     withContext(Dispatchers.Main) {
-                        AppToastHelper.showToast("No messages to share", ChatToastType.INFO)
+                        AppToastHelper.showToast(context.getString(ai.antigem.R.string.conversation_share_no_messages), ChatToastType.INFO)
                     }
                     return@withContext
                 }
@@ -113,18 +113,18 @@ object ConversationShareHelper {
                 if (snackbarHostState != null) {
                     kotlinx.coroutines.CoroutineScope(Dispatchers.Main).launch {
                         snackbarHostState.showSnackbar(
-                            message = "$savedFileName saved to Downloads/AntiGem/Exports",
+                            message = context.getString(ai.antigem.R.string.conversation_export_saved, savedFileName),
                             duration = SnackbarDuration.Short
                         )
                     }
                 } else {
-                    AppToastHelper.showToast("$savedFileName saved to Downloads/AntiGem/Exports", ChatToastType.SUCCESS)
+                    AppToastHelper.showToast(context.getString(ai.antigem.R.string.conversation_export_saved, savedFileName), ChatToastType.SUCCESS)
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Share failed: ${e.message}", e)
             withContext(Dispatchers.Main) {
-                AppToastHelper.showToast("Share error: ${e.message}", ChatToastType.ERROR)
+                AppToastHelper.showToast(context.getString(ai.antigem.R.string.conversation_share_error, e.message.orEmpty()), ChatToastType.ERROR)
             }
         }
     }
@@ -139,13 +139,13 @@ object ConversationShareHelper {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-            val chooser = Intent.createChooser(shareIntent, "Share AntiGem Chat").apply {
+            val chooser = Intent.createChooser(shareIntent, context.getString(ai.antigem.R.string.conversation_share_chooser_title)).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(chooser)
         } catch (e: Exception) {
             Log.w(TAG, "Failed to launch share chooser: ${e.message}")
-            AppToastHelper.showToast("Could not open share chooser", ChatToastType.ERROR)
+            AppToastHelper.showToast(context.getString(ai.antigem.R.string.conversation_share_no_chooser), ChatToastType.ERROR)
         }
     }
 

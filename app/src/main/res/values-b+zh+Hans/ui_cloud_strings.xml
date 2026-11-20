@@ -41,4 +41,17 @@
     <string name="cloud_preview_open_in_browser">"在浏览器中打开"</string>
     <string name="cloud_preview_preview">"预览"</string>
     <string name="cloud_preview_path">"路径"</string>
+    <string name="agy_cloud_ui_projects_and_repos">"云端项目与仓库"</string>
+    <string name="agy_cloud_ui_connections_row">"外部连接（GitHub、Drive…）"</string>
+    <string name="agy_cloud_ui_runs_in_google_cloud">"在 Google 云端使用你的 GitHub 仓库运行，手机息屏离线时也可继续"</string>
+    <string name="agy_cloud_ui_manage">"管理"</string>
+    <string name="agy_cloud_ui_repos_of">"%1$s 的仓库"</string>
+    <string name="agy_cloud_ui_loading">"加载中…"</string>
+    <string name="agy_cloud_ui_not_ready">"未就绪"</string>
+    <string name="agy_cloud_ui_one_project">"1 个项目"</string>
+    <string name="agy_cloud_ui_n_projects">"%1$d 个项目"</string>
+    <string name="agy_cloud_ui_github_connected">"GitHub 已连接"</string>
+    <string name="agy_cloud_ui_github_expired">"GitHub 已过期"</string>
+    <string name="agy_cloud_ui_github_not_connected">"GitHub 未连接"</string>
+    <string name="agy_cloud_ui_no_repos">"无仓库"</string>
 </resources>

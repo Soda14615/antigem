@@ -804,7 +804,7 @@ fun MermaidDiagramView(
                         val clip = ClipData.newPlainText("Mermaid Diagram", code)
                         clipboard.setPrimaryClip(clip)
                         isCopied = true
-                        Toast.makeText(context, "Diagram code copied", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.markdown_content_diagram_copied), Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.size(28.dp)
                 ) {
@@ -1054,7 +1054,7 @@ fun MermaidFullscreenDialog(
                             val clip = ClipData.newPlainText("Mermaid Diagram", code)
                             clipboard.setPrimaryClip(clip)
                             isCopied = true
-                            Toast.makeText(context, "Diagram code copied", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.markdown_content_diagram_copied), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.size(36.dp)
                     ) {
@@ -1439,7 +1439,7 @@ fun AgentErrorCard(
                         }.trim()
                         val clip = ClipData.newPlainText("Error Details", copyText)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Error details copied to clipboard", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.markdown_content_error_details_copied), Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.size(24.dp)
                 ) {
@@ -1892,7 +1892,7 @@ fun YouTubeVideoView(
                     // Thumbnail Preview
                     AsyncImage(
                         model = thumbnailRequest,
-                        contentDescription = video.title ?: "YouTube Video Thumbnail",
+                        contentDescription = video.title ?: stringResource(R.string.markdown_content_youtube_thumbnail),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
@@ -3198,7 +3198,7 @@ fun parseMarkdownBlocks(
                     MarkdownBlock.YouTubeVideo(
                         videoId = ytId,
                         originalUrl = if (linkUrl.isNotBlank()) linkUrl else "https://www.youtube.com/watch?v=$ytId",
-                        title = alt.ifBlank { "YouTube Video" },
+                        title = alt.ifBlank { stringResource(R.string.markdown_content_youtube_video) },
                         customThumbnailUrl = imgUrl.takeIf { it.isNotBlank() }
                     )
                 )
@@ -3229,7 +3229,7 @@ fun parseMarkdownBlocks(
                     MarkdownBlock.YouTubeVideo(
                         videoId = ytId,
                         originalUrl = if (url.contains("youtube.com/watch") || url.contains("youtu.be")) url else "https://www.youtube.com/watch?v=$ytId",
-                        title = alt.ifBlank { "YouTube Video" },
+                        title = alt.ifBlank { stringResource(R.string.markdown_content_youtube_video) },
                         customThumbnailUrl = if (url.contains("img.youtube.com")) url else null
                     )
                 )

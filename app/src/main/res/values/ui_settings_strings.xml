@@ -939,4 +939,16 @@
     <string name="x11_desktop_screen_the_desktop_runs_inside_antigem_so_android">"The desktop runs inside AntiGem, so Android won't slow it down or stop it while you use it."</string>
     <string name="x11_desktop_screen_set_up_manually">"Set up manually"</string>
     <string name="x11_desktop_screen_don_t_install_termux_x11_nightly_from">"Don't install termux-x11-nightly from x11-repo: it only works with the official Termux:X11, not AntiGem's build."</string>
+    <string name="github_screen_git_not_installed_remote">"git isn't installed on the server."</string>
+    <string name="github_screen_git_not_installed_local">"git isn't installed. Run \"pkg install git\" in the terminal."</string>
+    <string name="github_screen_repositories">"Repositories"</string>
+    <string name="github_screen_repositories_count">"Repositories (%1$d)"</string>
+    <string name="rea_screen_on_demand">"On demand"</string>
+    <string name="rea_screen_directly">"Directly"</string>
+    <string name="rea_screen_per_request">"%1$s per request"</string>
+    <string name="servers_settings_badge_server">"SERVER"</string>
+    <string name="servers_settings_badge_local">"LOCAL"</string>
+    <string name="servers_settings_bind_placeholder">"127.0.0.1 behind a proxy, 0.0.0.0 for a direct address"</string>
+    <string name="servers_settings_port_label">"Port %1$d"</string>
+    <string name="servers_settings_port_same">"same"</string>
 </resources>

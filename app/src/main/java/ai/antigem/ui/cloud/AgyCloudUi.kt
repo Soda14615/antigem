@@ -181,25 +181,25 @@ fun AgyCloudSettingsCard(modifier: Modifier = Modifier) {
                 Column {
                     CloudSettingsRow(
                         icon = Icons.Outlined.Cloud,
-                        title = "Cloud projects & repos",
+                        title = stringResource(R.string.agy_cloud_ui_projects_and_repos),
                         value = when {
-                            loading && projects.isEmpty() -> "Loading…"
-                            cloudError != null && projects.isEmpty() -> "Not ready"
-                            projects.size == 1 -> "1 project"
-                            else -> "${projects.size} projects"
+                            loading && projects.isEmpty() -> stringResource(R.string.agy_cloud_ui_loading)
+                            cloudError != null && projects.isEmpty() -> stringResource(R.string.agy_cloud_ui_not_ready)
+                            projects.size == 1 -> stringResource(R.string.agy_cloud_ui_one_project)
+                            else -> stringResource(R.string.agy_cloud_ui_n_projects, projects.size)
                         },
                         onClick = { dialogTab = 0 }
                     )
                     HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07f))
                     CloudSettingsRow(
                         icon = Icons.Outlined.Link,
-                        title = "Connections (GitHub, Drive…)",
+                        title = stringResource(R.string.agy_cloud_ui_connections_row),
                         value = when {
                             !githubChecked -> "…"
                             github == null -> ""
-                            github!!.connected -> "GitHub connected"
-                            github!!.expired -> "GitHub expired"
-                            else -> "GitHub not connected"
+                            github!!.connected -> stringResource(R.string.agy_cloud_ui_github_connected)
+                            github!!.expired -> stringResource(R.string.agy_cloud_ui_github_expired)
+                            else -> stringResource(R.string.agy_cloud_ui_github_not_connected)
                         },
                         onClick = { dialogTab = 1 }
                     )
@@ -230,8 +230,9 @@ private fun CloudSettingsRow(icon: androidx.compose.ui.graphics.vector.ImageVect
     }
 }
 
+@Composable
 private fun repoSummary(p: AgyCloud.CloudProject): String = when (p.repos.size) {
-    0 -> "No repos"
+    0 -> stringResource(R.string.agy_cloud_ui_no_repos)
     1 -> p.repos[0].display_name.ifBlank { p.repos[0].resource_id }
     else -> "${p.repos[0].display_name.ifBlank { p.repos[0].resource_id }} +${p.repos.size - 1}"
 }
@@ -255,10 +256,10 @@ fun LazyListScope.cloudProjectsSection(
             Icon(Icons.Outlined.Cloud, null, tint = GeminiBlue, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Column(Modifier.weight(1f)) {
-                Text("Cloud", fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
-                Text("Runs in Google's cloud with your GitHub repos, also while the phone is off", fontSize = 11.sp, color = subtle(), lineHeight = 14.sp)
+                Text(stringResource(R.string.agy_cloud_ui_cloud), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+                Text(stringResource(R.string.agy_cloud_ui_runs_in_google_cloud), fontSize = 11.sp, color = subtle(), lineHeight = 14.sp)
             }
-            TextButton(onClick = onManage) { Text("Manage", fontSize = 12.5.sp) }
+            TextButton(onClick = onManage) { Text(stringResource(R.string.agy_cloud_ui_manage), fontSize = 12.5.sp) }
         }
     }
     if (error != null && projects.isEmpty()) {
@@ -295,7 +296,7 @@ fun LazyListScope.cloudProjectsSection(
             Row(Modifier.padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Add, null, tint = GeminiBlue, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("New cloud project", color = GeminiBlue, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp)
+                Text(stringResource(R.string.agy_cloud_ui_new_cloud_project), color = GeminiBlue, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp)
             }
         }
     }
@@ -391,7 +392,7 @@ fun CloudProjectsDialog(
 
     when (val e = editor) {
         EditorTarget.New -> CloudProjectEditor(
-            title = "New cloud project",
+            title = stringResource(R.string.agy_cloud_ui_new_cloud_project),
             initialName = "",
             initialRepos = emptyList(),
             askName = true,
@@ -402,7 +403,7 @@ fun CloudProjectsDialog(
             onDismiss = { editor = null }
         )
         is EditorTarget.Repos -> CloudProjectEditor(
-            title = "Repos of ${e.project.name}",
+            title = stringResource(R.string.agy_cloud_ui_repos_of, e.project.name),
             initialName = e.project.name,
             initialRepos = e.project.repos,
             askName = false,

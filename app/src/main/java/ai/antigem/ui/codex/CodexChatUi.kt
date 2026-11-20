@@ -83,7 +83,7 @@ import kotlinx.serialization.json.contentOrNull
  * the command prefix Codex suggests), or deny with an optional note that Codex gets right away. [messages]: the chat,
  * where a file change's diff is (its request does not carry it).
  */
-fun codexApprovalItems(pending: List<CodexPending>, backend: CodexChatBackend, messages: List<ChatMessage>): List<ApprovalItem> =
+fun codexApprovalItems(context: android.content.Context, pending: List<CodexPending>, backend: CodexChatBackend, messages: List<ChatMessage>): List<ApprovalItem> =
     pending.map { p ->
         val prm = p.params
         val tool = p.itemId?.let { id -> CodexTranscript.safeId(id) }?.let { id -> messages.asReversed().firstNotNullOfOrNull { m -> m.toolCalls.firstOrNull { it.id == id } } }
@@ -100,16 +100,16 @@ fun codexApprovalItems(pending: List<CodexPending>, backend: CodexChatBackend, m
                     key = p.key,
                     agent = AgentKind.CODEX,
                     icon = if (network != null) Icons.Outlined.Language else Icons.Outlined.Terminal,
-                    title = if (network != null) "Allow network access?" else "Run a command?",
+                    title = if (network != null) context.getString(R.string.codex_chat_ui_allow_network_access) else context.getString(R.string.codex_chat_ui_run_command),
                     subtitle = network?.let { "${it.str("protocol").orEmpty()} ${it.str("host").orEmpty()}".trim() } ?: prm.str("cwd"),
                     preview = command.takeIf { it.isNotBlank() }?.let { "$ $it" },
                     reason = reason,
-                    primary = ApprovalChoice("Allow") { backend.approve(p.key) },
+                    primary = ApprovalChoice(context.getString(R.string.codex_chat_ui_allow)) { backend.approve(p.key) },
                     always = buildList {
-                        add(ApprovalChoice("Allow for this session", "Codex asks again after a restart") { backend.approve(p.key, always = true) })
-                        if (rule.isNotEmpty()) add(ApprovalChoice("Always allow `${rule.joinToString(" ")}`", "Codex saves this rule") { backend.approveRule(p.key) })
+                        add(ApprovalChoice(context.getString(R.string.codex_chat_ui_allow_for_session), context.getString(R.string.codex_chat_ui_asks_again_after_restart)) { backend.approve(p.key, always = true) })
+                        if (rule.isNotEmpty()) add(ApprovalChoice(context.getString(R.string.codex_chat_ui_always_allow_rule, rule.joinToString(" ")), context.getString(R.string.codex_chat_ui_saves_this_rule)) { backend.approveRule(p.key) })
                     },
-                    denyPlaceholder = "Tell Codex what to do instead (optional)",
+                    denyPlaceholder = context.getString(R.string.codex_chat_ui_deny_placeholder),
                     onDeny = deny
                 )
             }
@@ -117,9 +117,9 @@ fun codexApprovalItems(pending: List<CodexPending>, backend: CodexChatBackend, m
                 key = p.key,
                 agent = AgentKind.CODEX,
                 icon = Icons.Outlined.EditNote,
-                title = "Change files?",
+                title = context.getString(R.string.codex_chat_ui_change_files),
                 subtitle = tool?.command,
-                target = prm.str("grantRoot")?.let { "Write access to $it" },
+                target = prm.str("grantRoot")?.let { context.getString(R.string.codex_chat_ui_write_access_to, it) },
                 preview = tool?.output?.takeIf { it.isNotBlank() }?.lines()?.take(80)?.joinToString("\n") { line ->
                     // the panel colors "+ " / "- " lines
                     when {
@@ -129,42 +129,42 @@ fun codexApprovalItems(pending: List<CodexPending>, backend: CodexChatBackend, m
                     }
                 },
                 reason = reason,
-                primary = ApprovalChoice("Allow") { backend.approve(p.key) },
-                always = listOf(ApprovalChoice("Allow edits for this session", "Codex asks again after a restart") { backend.approve(p.key, always = true) }),
-                denyPlaceholder = "Tell Codex what to do instead (optional)",
+                primary = ApprovalChoice(context.getString(R.string.codex_chat_ui_allow)) { backend.approve(p.key) },
+                always = listOf(ApprovalChoice(context.getString(R.string.codex_chat_ui_allow_edits_for_session), context.getString(R.string.codex_chat_ui_asks_again_after_restart)) { backend.approve(p.key, always = true) }),
+                denyPlaceholder = context.getString(R.string.codex_chat_ui_deny_placeholder),
                 onDeny = deny
             )
             "item/permissions/requestApproval" -> ApprovalItem(
                 key = p.key,
                 agent = AgentKind.CODEX,
                 icon = Icons.Outlined.Lock,
-                title = "Grant more access?",
+                title = context.getString(R.string.codex_chat_ui_grant_more_access),
                 subtitle = prm.str("cwd"),
                 preview = prm.o("permissions")?.toString(),
                 reason = reason,
-                primary = ApprovalChoice("Allow for this turn") { backend.approve(p.key) },
-                always = listOf(ApprovalChoice("Allow for this session") { backend.approve(p.key, always = true) }),
+                primary = ApprovalChoice(context.getString(R.string.codex_chat_ui_allow_for_turn)) { backend.approve(p.key) },
+                always = listOf(ApprovalChoice(context.getString(R.string.codex_chat_ui_allow_for_session)) { backend.approve(p.key, always = true) }),
                 onDeny = deny
             )
             "mcpServer/elicitation/request" -> ApprovalItem(
                 key = p.key,
                 agent = AgentKind.CODEX,
                 icon = Icons.Outlined.Extension,
-                title = prm.str("title") ?: "${prm.str("serverName") ?: "An MCP server"} asks",
+                title = prm.str("title") ?: context.getString(R.string.codex_chat_ui_mcp_server_asks, prm.str("serverName") ?: context.getString(R.string.codex_chat_ui_mcp_server_default)),
                 subtitle = prm.str("serverName"),
                 target = prm.str("url"),
                 reason = prm.str("message") ?: prm.str("description"),
-                primary = ApprovalChoice("Continue") { backend.approve(p.key) },
+                primary = ApprovalChoice(context.getString(R.string.codex_chat_ui_continue)) { backend.approve(p.key) },
                 onDeny = deny
             )
             else -> ApprovalItem(
                 key = p.key,
                 agent = AgentKind.CODEX,
                 icon = Icons.Outlined.Shield,
-                title = "Allow this?",
+                title = context.getString(R.string.codex_chat_ui_allow_this),
                 subtitle = p.method,
                 reason = reason,
-                primary = ApprovalChoice("Allow") { backend.approve(p.key) },
+                primary = ApprovalChoice(context.getString(R.string.codex_chat_ui_allow)) { backend.approve(p.key) },
                 onDeny = deny
             )
         }
@@ -350,7 +350,7 @@ fun CodexModelSheet(backend: CodexChatBackend, onOpenSettings: () -> Unit, onDis
         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 16.dp).navigationBarsPadding()) {
             AgentSheetHeader(
                 AgentKind.CODEX,
-                title = "Select model",
+                title = stringResource(R.string.codex_chat_ui_select_model),
                 detail = if (models.isNotEmpty()) "${models.size} models" else null,
                 refreshing = refreshing,
                 onRefresh = {
@@ -360,7 +360,7 @@ fun CodexModelSheet(backend: CodexChatBackend, onOpenSettings: () -> Unit, onDis
                 }
             )
             if (windows.isNotEmpty() && models.isNotEmpty()) {
-                ai.antigem.ui.models.QuotaGroupHeader(title = "All models", accent = CodexAccent, count = models.size, windows = windows)
+                ai.antigem.ui.models.QuotaGroupHeader(title = stringResource(R.string.codex_chat_ui_all_models), accent = CodexAccent, count = models.size, windows = windows)
             } else Spacer(Modifier.height(10.dp))
             error?.let { Text(it, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 6.dp)) }
             LazyColumn(Modifier.fillMaxWidth().heightIn(max = 520.dp)) {
@@ -377,7 +377,7 @@ fun CodexModelSheet(backend: CodexChatBackend, onOpenSettings: () -> Unit, onDis
                     ) {
                         Row(Modifier.padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(m.displayName + if (m.isDefault) " · default" else "", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(m.displayName + if (m.isDefault) stringResource(R.string.codex_chat_ui_default_suffix) else "", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 if (m.description.isNotBlank()) Text(
                                     m.description, fontSize = 11.5.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f), maxLines = 2, overflow = TextOverflow.Ellipsis
                                 )

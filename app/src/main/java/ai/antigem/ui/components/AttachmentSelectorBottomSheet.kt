@@ -58,8 +58,8 @@ fun AttachmentSelectorBottomSheet(
             AttachmentOptionRow(
                 icon = Icons.Outlined.PhotoCamera,
                 iconColor = ClaudeTerracotta,
-                title = "Camera Photo",
-                subtitle = "Take a photo with your camera to attach directly to the chat.",
+                title = stringResource(R.string.attachment_selector_camera_title),
+                subtitle = stringResource(R.string.attachment_selector_camera_subtitle),
                 onClick = {
                     onDismiss()
                     onTakePhoto()
@@ -71,8 +71,8 @@ fun AttachmentSelectorBottomSheet(
             AttachmentOptionRow(
                 icon = Icons.Outlined.Image,
                 iconColor = ClaudeTerracotta,
-                title = "Photo / Image",
-                subtitle = "The model sees the image directly. Big photos are shrunk first.",
+                title = stringResource(R.string.attachment_selector_image_title),
+                subtitle = stringResource(R.string.attachment_selector_image_subtitle),
                 onClick = {
                     onDismiss()
                     onPickImage()
@@ -84,8 +84,8 @@ fun AttachmentSelectorBottomSheet(
             AttachmentOptionRow(
                 icon = Icons.Outlined.Description,
                 iconColor = GeminiBlue,
-                title = "Document / File",
-                subtitle = "Copied from your phone to the agent's machine. Avoid large files here: copying takes time and storage. Use \"From Files\" for big files.",
+                title = stringResource(R.string.attachment_selector_document_title),
+                subtitle = stringResource(R.string.attachment_selector_document_subtitle),
                 onClick = {
                     onDismiss()
                     onPickFile()
@@ -97,8 +97,8 @@ fun AttachmentSelectorBottomSheet(
             AttachmentOptionRow(
                 icon = Icons.Outlined.Folder,
                 iconColor = ClaudeTerracotta,
-                title = "From Files",
-                subtitle = "Attach any file, any size: nothing is copied. The agent opens the original file, so it could change it (it is told not to, and usually won't).",
+                title = stringResource(R.string.attachment_selector_from_files_title),
+                subtitle = stringResource(R.string.attachment_selector_from_files_subtitle),
                 onClick = {
                     onDismiss()
                     onPickFromFiles()

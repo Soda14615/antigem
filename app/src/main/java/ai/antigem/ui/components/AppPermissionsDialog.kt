@@ -281,8 +281,8 @@ fun AppPermissionsDialog(
                         PermissionRow(
                             icon = Icons.Outlined.NotificationsActive,
                             accent = ClaudeTerracotta,
-                            title = "Notifications",
-                            subtitle = "Keeps the background service running and shows progress",
+                            title = stringResource(R.string.app_permissions_notifications_title),
+                            subtitle = stringResource(R.string.app_permissions_notifications_subtitle),
                             required = true,
                             isGranted = hasNotification,
                             onAllow = {
@@ -300,8 +300,8 @@ fun AppPermissionsDialog(
                         PermissionRow(
                             icon = Icons.Outlined.Folder,
                             accent = GeminiBlue,
-                            title = "Files",
-                            subtitle = "Open projects and files on your storage",
+                            title = stringResource(R.string.app_permissions_files_title),
+                            subtitle = stringResource(R.string.app_permissions_files_subtitle),
                             required = false,
                             isGranted = hasStorage,
                             onAllow = { requestStorage() }
@@ -313,8 +313,8 @@ fun AppPermissionsDialog(
                         PermissionRow(
                             icon = Icons.Outlined.Mic,
                             accent = GeminiPurple,
-                            title = "Microphone",
-                            subtitle = "Dictate messages and voice notes",
+                            title = stringResource(R.string.app_permissions_microphone_title),
+                            subtitle = stringResource(R.string.app_permissions_microphone_subtitle),
                             required = false,
                             isGranted = hasAudio,
                             onAllow = { audioLauncher.launch(Manifest.permission.RECORD_AUDIO) }

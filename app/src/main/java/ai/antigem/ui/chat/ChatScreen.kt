@@ -2733,11 +2733,11 @@ fun ChatScreen(
                 // Agent prompts docked above the input (both agents): permission requests, then questions
                 val approvalItems = remember(pendingApprovals, claudePending, openCodePending, codexPending, isClaudeChat, isOpenCodeChat, isCodexChat, context) {
                     if (isCodexChat) {
-                        ai.antigem.ui.codex.codexApprovalItems(codexPending, codexBackend, messages)
+                        ai.antigem.ui.codex.codexApprovalItems(context, codexPending, codexBackend, messages)
                     } else if (isOpenCodeChat) {
                         ai.antigem.ui.opencode.openCodeApprovalItems(openCodePending, openCodeBackend)
                     } else if (isClaudeChat) {
-                        ai.antigem.ui.claude.claudeApprovalItems(claudePending, claudeBackend)
+                        ai.antigem.ui.claude.claudeApprovalItems(context, claudePending, claudeBackend)
                     } else {
                         ai.antigem.ui.agents.agyApprovalItems(
                             context,

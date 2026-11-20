@@ -129,4 +129,13 @@
     <string name="jarvis_settings_screen_add_a_word_or_a_whole_sentence">"添加一个单词或整个句子"</string>
     <string name="jarvis_settings_screen_add_suggestions">"添加建议 ( %1$s )"</string>
     <string name="jarvis_settings_screen_remove_all">"全部删除"</string>
+    <string name="jarvis_settings_default_model">"默认模型"</string>
+    <string name="jarvis_settings_added_to_codex">"已添加到 Codex"</string>
+    <string name="jarvis_settings_added_to_opencode">"已添加到 OpenCode"</string>
+    <string name="jarvis_settings_could_not_add">"添加失败"</string>
+    <string name="jarvis_settings_installed_item">"已安装 %1$s"</string>
+    <string name="jarvis_settings_install_failed">"安装失败"</string>
+    <string name="jarvis_settings_voice_prefix">"语音：%1$s"</string>
+    <string name="jarvis_settings_system_default">"系统默认"</string>
+    <string name="jarvis_settings_next_message_new_chat">"下一条消息将开启新的 Jarvis 对话"</string>
 </resources>

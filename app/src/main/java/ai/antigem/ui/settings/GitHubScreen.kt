@@ -324,7 +324,7 @@ private fun GitSetupCard(state: GitHubManager.State, cardBg: Color, cardBorder: 
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Git", fontSize = 14.5.sp, fontWeight = FontWeight.Bold)
             if (!state.gitInstalled) {
-                Text("git isn't installed" + (if (GitHubManager.remote) " on the server." else ". Run \"pkg install git\" in the terminal."),
+                Text(if (GitHubManager.remote) stringResource(R.string.github_screen_git_not_installed_remote) else stringResource(R.string.github_screen_git_not_installed_local),
                     fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
                 return@Column
             }
@@ -367,7 +367,7 @@ private fun ReposCard(state: GitHubManager.State, cardBg: Color, cardBorder: Bor
     Card(shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = cardBg), border = cardBorder) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Repositories" + if (state.reposLoaded) " (${state.repos.size})" else "", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(if (state.reposLoaded) stringResource(R.string.github_screen_repositories_count, state.repos.size) else stringResource(R.string.github_screen_repositories), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 if (state.reposLoading) CircularProgressIndicator(Modifier.padding(8.dp).size(18.dp), strokeWidth = 2.dp)
                 else IconButton(onClick = GitHubManager::loadRepos) { Icon(Icons.Outlined.Refresh, stringResource(R.string.git_hub_screen_reload_repositories), Modifier.size(20.dp)) }
             }

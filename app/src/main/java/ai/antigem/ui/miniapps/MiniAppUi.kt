@@ -96,7 +96,7 @@ object MiniAppShortcuts {
     }
     fun addToHome(context: Context, app: MiniApp) {
         if (!ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            Toast.makeText(context, "This launcher can't add shortcuts", Toast.LENGTH_SHORT).show(); return
+            Toast.makeText(context, context.getString(R.string.mini_app_ui_launcher_no_shortcuts), Toast.LENGTH_SHORT).show(); return
         }
         val info = ShortcutInfoCompat.Builder(context, "miniapp:${app.id}")
             .setShortLabel(app.name)
@@ -467,13 +467,13 @@ fun AppInfoSheet(app: MiniApp, onDismiss: () -> Unit, onClearData: () -> Unit) {
                 if (app.signed) OutlinedButton(onClick = { confirmUninstall = true }) { Text(stringResource(R.string.claude_settings_screen_uninstall), color = MaterialTheme.colorScheme.error) }
                 else OutlinedButton(enabled = !exporting, onClick = {
                     if (!ai.antigem.data.miniapps.MiniAppSigning.hasKey(context)) {
-                        Toast.makeText(context, "Create a developer key first (Mini Apps → key icon)", Toast.LENGTH_LONG).show(); return@OutlinedButton
+                        Toast.makeText(context, context.getString(R.string.mini_app_ui_create_dev_key_first), Toast.LENGTH_LONG).show(); return@OutlinedButton
                     }
                     exporting = true
                     scope.launch {
                         runCatching { exportSignedPackage(context, app) }
-                            .onSuccess { f -> Toast.makeText(context, "Signed: ~/mini-apps-dist/${f.name}", Toast.LENGTH_LONG).show(); MiniAppPackages.sharePackage(context, f) }
-                            .onFailure { Toast.makeText(context, it.message ?: "Export failed", Toast.LENGTH_LONG).show() }
+                            .onSuccess { f -> Toast.makeText(context, context.getString(R.string.mini_app_ui_signed_dist, f.name), Toast.LENGTH_LONG).show(); MiniAppPackages.sharePackage(context, f) }
+                            .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.mini_app_ui_export_failed), Toast.LENGTH_LONG).show() }
                         exporting = false
                     }
                 }) { Text(if (exporting) stringResource(R.string.mini_app_ui_signing) else stringResource(R.string.mini_app_ui_export_signed_package)) }
@@ -482,7 +482,7 @@ fun AppInfoSheet(app: MiniApp, onDismiss: () -> Unit, onClearData: () -> Unit) {
             if (app.signed) Row(Modifier.padding(top = 4.dp)) {
                 OutlinedButton(onClick = {
                     val f = runCatching { ai.antigem.data.miniapps.MiniAppInstaller.shareablePackage(context, app) }.getOrNull()
-                    if (f == null) Toast.makeText(context, "The package isn't kept for apps installed before sharing existed: install it again to share it", Toast.LENGTH_LONG).show()
+                    if (f == null) Toast.makeText(context, context.getString(R.string.mini_app_ui_package_not_kept), Toast.LENGTH_LONG).show()
                     else MiniAppPackages.sharePackage(context, f)
                 }) { Text(stringResource(R.string.mini_app_ui_share_app)) }
             }
@@ -507,8 +507,8 @@ fun AppInfoSheet(app: MiniApp, onDismiss: () -> Unit, onClearData: () -> Unit) {
             TextButton(onClick = {
                 confirmUninstall = false
                 runCatching { ai.antigem.data.miniapps.MiniAppInstaller.uninstall(context, app) }
-                    .onSuccess { Toast.makeText(context, "${app.name} uninstalled", Toast.LENGTH_SHORT).show(); onDismiss() }
-                    .onFailure { Toast.makeText(context, it.message ?: "Couldn't uninstall", Toast.LENGTH_LONG).show() }
+                    .onSuccess { Toast.makeText(context, context.getString(R.string.mini_app_ui_uninstalled, app.name), Toast.LENGTH_SHORT).show(); onDismiss() }
+                    .onFailure { Toast.makeText(context, it.message ?: context.getString(R.string.mini_app_ui_could_not_uninstall), Toast.LENGTH_LONG).show() }
             }) { Text(stringResource(R.string.claude_settings_screen_uninstall), color = MaterialTheme.colorScheme.error) }
         },
         dismissButton = { TextButton(onClick = { confirmUninstall = false }) { Text(stringResource(R.string.accounts_ui_cancel)) } },
@@ -522,7 +522,7 @@ fun AppInfoSheet(app: MiniApp, onDismiss: () -> Unit, onClearData: () -> Unit) {
                 confirmClear = false
                 MiniAppNet.forgetApp(app.id)
                 MiniAppRuntime.clearData(context, app)
-                Toast.makeText(context, "Data cleared", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.mini_app_ui_data_cleared), Toast.LENGTH_SHORT).show()
                 onClearData()
             }) { Text(stringResource(R.string.custom_system_prompt_dialog_clear), color = MaterialTheme.colorScheme.error) }
         },
@@ -561,7 +561,7 @@ private fun BackgroundSection(app: MiniApp, tick: Int, refresh: () -> Unit) {
             }
             TextButton(onClick = {
                 MiniAppScheduler.runNow(context, app.id, t.optString("name"), "manual")
-                Toast.makeText(context, "Running ${t.optString("name")}…", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.mini_app_ui_running_task, t.optString("name")), Toast.LENGTH_SHORT).show()
             }) { Text(stringResource(R.string.mini_app_ui_run_now)) }
         }
     }
