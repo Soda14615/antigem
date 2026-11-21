@@ -83,6 +83,9 @@ object JarvisEvents {
 
     fun pending(owner: String): Int = queues[owner]?.size ?: 0
 
+    /** A delegated manager must not finish before its children\'s result delivery is complete. */
+    fun hasPendingWork(owner: String): Boolean = pending(owner) > 0 || inFlight.containsKey(owner)
+
     fun drain(owner: String): List<Event> {
         val q = queues[owner] ?: return emptyList()
         return synchronized(q) { val out = q.toList(); q.clear(); out }
@@ -150,6 +153,7 @@ object JarvisEvents {
         append("These are automatic messages from the AntiGem app about work YOU delegated; they are not the user's words. ")
         append("Each <event> is separate: read every <task_reply> as that sub-agent's own report.\n")
         if (voice) append("- Tell the user with ONE jarvis_speak covering all events together (one or two short spoken sentences), not one call per event.\n")
+        else if (JarvisManagers.isDelegated(owner)) append("- Process the child results and continue the assigned mission. Report the verified final result to your parent only after the mission is complete.\n")
         else append("- Write the user a short update in this chat (a line per event, plain and concrete).\n")
         if ("task_done" in kinds) append("- Done: check the result against the task goal and the mission. Do not trust \"done\" blindly: verify what matters (read the files, run the tests, or send a reviewer team). Good → mark the mission step done (jarvis_mission_update) and delegate the next step. Not good enough → jarvis_task_reply with precise feedback.\n")
         if (events.any { it.kind == "task_done" && it.replyChars > it.body.length }) append("- A <task_reply cut=…> is only the END of a long reply (usually its conclusion), which is often enough. " +
