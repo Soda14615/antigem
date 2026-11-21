@@ -1,3 +1,5 @@
+> **独立 Paseo 后端（可选／实验性）**：日常使用团队编排请直接点汉化版侧栏「团队编排」，使用 Jarvis 已有 Claude、Codex、OpenCode、agy 后端，**无需安装 Paseo npm 服务**。以下说明只针对想另外启动上游 Paseo Web UI 的高级用户；不再是默认团队入口。
+
 # 原版 Paseo 团队接入（试验分支）
 
 ## 设计

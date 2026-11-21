@@ -1,6 +1,6 @@
 # Hierarchical Agent orchestration (development preview)
 
-This change extends the existing Jarvis runtime instead of adding a second agent runner or embedding a Paseo daemon. It reuses the native AGY, Claude Code, OpenCode, and Codex backends.
+This change extends the existing Jarvis runtime instead of adding a second agent runner or embedding a Paseo daemon. In AntiGem, the sidebar **Team orchestration** entry now opens a normal Jarvis command-center chat, without npm installation. The optional standalone Paseo CLI remains available only for users who explicitly choose it in the local terminal. It reuses the native AGY, Claude Code, OpenCode, and Codex backends.
 
 ## Profiles and management
 
