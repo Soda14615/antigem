@@ -169,7 +169,7 @@ jobs:
 
   paseo-android-package:
     name: Android ARM64 npm package audit (not device execution)
-    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team') || (github.event_name == 'push' && github.ref == 'refs/heads/chatgpt/paseo-native-team')
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && (github.ref == 'refs/heads/zh-cn-v2.0.1' || github.ref == 'refs/heads/zh-cn'))
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

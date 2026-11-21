@@ -152,9 +152,20 @@ fun ChatScreen(
     // Native team orchestration delegates through Jarvis and reuses the app's existing providers.
     // The optional upstream Paseo daemon remains available separately from the local terminal.
     val openNativeTeam: () -> Unit = {
-        val problem = ai.antigem.data.jarvis.JarvisController.startTextChat()
-        if (problem != null) android.widget.Toast.makeText(context, problem, android.widget.Toast.LENGTH_LONG).show()
-        else scope.launch { drawerState.close() }
+        // Keep the named team catalog instead of starting an empty manager on every tap.
+        val existing = ai.antigem.data.jarvis.JarvisManagers.textKeys().lastOrNull { id ->
+            !ai.antigem.data.jarvis.JarvisManagers.isDelegated(id) &&
+                ai.antigem.data.jarvis.JarvisManagers.of(id).teams.isNotEmpty()
+        }
+        if (existing != null) {
+            viewModel.selectConversation(existing)
+            viewModel.requestViewMode("CHAT")
+            scope.launch { drawerState.close() }
+        } else {
+            val problem = ai.antigem.data.jarvis.JarvisController.startTextChat()
+            if (problem != null) android.widget.Toast.makeText(context, problem, android.widget.Toast.LENGTH_LONG).show()
+            else scope.launch { drawerState.close() }
+        }
     }
     // The sidebar is 82% of the screen width, so turning the phone (e.g. a landscape full-screen video)
     // changes its width; the drawer then moves to whichever position is nearest and can open by itself.

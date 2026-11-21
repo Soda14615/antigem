@@ -312,6 +312,10 @@ do_install() {
   [[ "$target" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9][a-zA-Z0-9.-]*)?$ ]] || fail "非法 Paseo 版本：$target"
   require_node
   dest="$root/runtimes/$target"
+  # A manual install must not silently replace the runtime of a live daemon.
+  if [[ "$runtime" != "$dest" && -f "$paseo" ]] && daemon_running; then
+    fail "Paseo 正在运行；请先 paseo-team stop，再切换运行时"
+  fi
   mkdir -p -m 700 "$root/runtimes"
   if [[ -f "$dest/.verified-install" ]]; then
     runtime="$dest"
