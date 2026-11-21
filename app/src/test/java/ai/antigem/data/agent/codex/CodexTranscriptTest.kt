@@ -19,7 +19,9 @@ import org.junit.Test
 class CodexTranscriptTest {
 
     private fun resource(name: String): String =
-        javaClass.classLoader!!.getResource("codex/$name")!!.readText()
+        requireNotNull(javaClass.classLoader!!.getResource("codex/$name")) {
+            "Missing recorded Codex fixture: app/src/test/resources/codex/$name; recover the original sanitized recording before accepting this regression test."
+        }.readText()
 
     private fun replay(t: CodexTranscript, file: String, skipLast: Int = 0) {
         val lines = resource(file).lines().filter { it.isNotBlank() }

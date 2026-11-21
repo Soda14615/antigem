@@ -62,9 +62,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("release.jks")
-            storePassword = "123456"
+            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
             keyAlias = "antigem"
-            keyPassword = "123456"
+            keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
         }
     }
 
@@ -308,6 +308,9 @@ val copyScriptsToAssets = tasks.register<Copy>("copyScriptsToAssets") {
   }
   from(layout.projectDirectory.file("../scripts/git_clone.sh")) {
     rename { "git_clone" }
+  }
+  from(layout.projectDirectory.file("../scripts/paseo-team.sh")) {
+    rename { "paseo-team" }
   }
   into(layout.projectDirectory.dir("src/main/assets/bin"))
 }

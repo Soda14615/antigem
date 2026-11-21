@@ -5,19 +5,35 @@ on:
     branches:
       - zh-cn
       - zh-cn-v2.0.1
+  pull_request:
+    branches:
+      - zh-cn-v2.0.1
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   build-zh-cn:
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team')
+    name: Build and test (${{ matrix.target }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ github.event_name == 'pull_request' && fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""},{"target":"localized-base","repository":"Soda14615/antigem","ref":"5861fb38744fd199480729023e4e4138ad384ea1"},{"target":"official-upstream","repository":"santoshkurmi/antigem","ref":"c9981af375f0044386677980916c80bf39b95bec"}]') || fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""}]') }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref || github.sha }}
           fetch-depth: 0
 
       - name: Fetch termux-am submodule
@@ -42,40 +58,139 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Check Paseo team launcher
+        if: matrix.target == 'candidate' && (github.head_ref == 'chatgpt/paseo-native-team' || github.ref == 'refs/heads/chatgpt/paseo-native-team')
+        run: bash -n scripts/paseo-team.sh
+
       - name: Build ARM64 APK
+        id: apk
+        if: matrix.target == 'candidate'
         env:
-          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && secrets.RELEASE_KEYSTORE_BASE64 || '' }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.RELEASE_KEYSTORE_PASSWORD || '' }}
+          EXPECTED_CERT: ${{ vars.ANTIGEM_RELEASE_CERT_SHA256 }}
+          PREVIEW_BUILD: ${{ github.event_name == 'pull_request' }}
         run: |
+          set -euo pipefail
           chmod +x gradlew
           mkdir -p dist
-          VERSION_NAME=$(python3 -c "import json; print(json.load(open('version.json')).get('version_name', '2.0.0'))")
-          if [ -n "$RELEASE_KEYSTORE_BASE64" ]; then
-            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.jks
-            ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
-            APK_SRC=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
-            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
-            cp "$APK_SRC" "$APK_OUT"
-          else
-            echo "RELEASE_KEYSTORE_BASE64 not set; building ARM64 debug APK for testing."
+          trap 'rm -f app/release.jks' EXIT
+          VERSION_NAME=$(python3 -c "import json; print(json.load(open('version.json'))['version_name'])")
+          if [[ "$PREVIEW_BUILD" == true || -z "$RELEASE_KEYSTORE_BASE64" ]]; then
+            if [[ "$PREVIEW_BUILD" != true ]]; then
+              echo "::warning::Permanent keystore not yet configured. Producing compile-test APK only; not a release update."
+            fi
             ./gradlew :app:assembleDebug -Pantigem.arm64Only=true
-            APK_SRC=$(ls app/build/outputs/apk/debug/*.apk | head -n 1)
-            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64-debug.apk"
-            cp "$APK_SRC" "$APK_OUT"
+            APK_SRC=$(find app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)
+            APK_OUT="dist/AntiGem-v${VERSION_NAME}-CI-ONLY-debug.apk"
+            EXPECTED_PACKAGE=ai.antidev
+            echo "kind=debug" >> "$GITHUB_OUTPUT"
+          else
+            [[ -n "$RELEASE_KEYSTORE_PASSWORD" ]] || { echo "::error::Missing RELEASE_KEYSTORE_PASSWORD"; exit 1; }
+            [[ "$EXPECTED_CERT" =~ ^[0-9a-fA-F]{64}$ ]] || { echo "::error::Missing or invalid ANTIGEM_RELEASE_CERT_SHA256 repository variable"; exit 1; }
+            umask 077
+            printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.jks
+            ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
+            APK_SRC=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
+            APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
+            EXPECTED_PACKAGE=ai.antigem
           fi
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT"
-          "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK_OUT" | grep -E "package:|native-code:|locales:"
+          test -f "$APK_SRC"
+          cp "$APK_SRC" "$APK_OUT"
+          CERT_INFO=$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_OUT")
+          printf '%s\n' "$CERT_INFO"
+          ACTUAL_CERT=$(printf '%s\n' "$CERT_INFO" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          test -n "$ACTUAL_CERT"
+          if [[ "$EXPECTED_PACKAGE" == ai.antigem ]]; then
+            if [[ "${ACTUAL_CERT,,}" != "${EXPECTED_CERT,,}" ]]; then
+              echo "::error::Signing certificate mismatch; do not distribute this APK."
+              exit 1
+            fi
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+          fi
+          BADGING=$("$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK_OUT")
+          printf '%s\n' "$BADGING" | grep -E "package:|native-code:|locales:"
+          grep -Fq "package: name='$EXPECTED_PACKAGE'" <<< "$BADGING"
           sha256sum "$APK_OUT"
 
-      - name: Upload APK Artifact
+      - name: Upload fixed-signature installable APK
+        if: matrix.target == 'candidate' && steps.apk.outputs.kind == 'release'
         uses: actions/upload-artifact@v4
         with:
           name: antigem-zh-cn-arm64-apk
-          path: dist/*.apk
+          path: dist/*-zh-CN-arm64.apk
           retention-days: 30
           if-no-files-found: error
 
-      # Runs after the APK is uploaded on purpose: the recorded Codex fixtures are not in the
-      # repo and two legacy assertions fail on dash, so a red test task must not swallow the build.
+      - name: Upload CI-only debug APK (not an upgrade)
+        if: matrix.target == 'candidate' && steps.apk.outputs.kind == 'debug'
+        uses: actions/upload-artifact@v4
+        with:
+          name: antigem-ci-only-debug-do-not-install
+          path: dist/*-CI-ONLY-debug.apk
+          retention-days: 3
+          if-no-files-found: error
+
+      # Do not mask failures: the APK is a build artifact, not proof of regression-test success.
       - name: Run Debug Unit Tests
-        continue-on-error: true
         run: ./gradlew :app:testDebugUnitTest -Pantigem.arm64Only=true
+
+      - name: Upload Test Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-${{ matrix.target }}
+          path: |
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/tests/testDebugUnitTest/
+          if-no-files-found: warn
+          retention-days: 7
+
+  paseo-runtime:
+    name: Paseo upstream runtime (Linux)
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team') || (github.event_name == 'push' && github.ref == 'refs/heads/chatgpt/paseo-native-team')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check scripts
+        run: |
+          bash -n scripts/paseo-team.sh
+          bash -n scripts/paseo-runtime-smoke.sh
+      - name: Install and run real Paseo daemon and terminal worker
+        run: bash scripts/paseo-runtime-smoke.sh
+
+  paseo-android-package:
+    name: Android ARM64 npm package audit (not device execution)
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team') || (github.event_name == 'push' && github.ref == 'refs/heads/chatgpt/paseo-native-team')
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Inspect actual Android PTY package and resolve Android npm dependency graph
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          paseo_version="$(sed -nE 's/^version="\$\{PASEO_TEAM_VERSION:-([^}]+)\}"/\1/p' scripts/paseo-team.sh)"
+          pty_version="$(sed -nE 's/^pty_version="\$\{PASEO_TEAM_PTY_VERSION:-([^}]+)\}"/\1/p' scripts/paseo-team.sh)"
+          cd "$work"
+          test -n "$paseo_version" && test -n "$pty_version"
+          npm view "@getpaseo/cli@$paseo_version" version
+          pkg="$(npm pack "@mmmbuto/node-pty-android-arm64@$pty_version" --silent)"
+          tar -xzf "$pkg"
+          node -e 'const p=require("./package/package.json"); console.log(JSON.stringify({name:p.name,version:p.version,os:p.os,cpu:p.cpu,main:p.main,dependencies:p.dependencies,scripts:p.scripts},null,2))'
+          test -d package/lib
+          test -d package/build/Release || test -d package/prebuilds/android-arm64
+          find package -name '*.node' -exec file {} \; | tee native.txt
+          grep -E 'ARM aarch64|ARM64|AArch64' native.txt
+          node -e 'const fs=require("fs"); fs.writeFileSync("package.json",JSON.stringify({name:"paseo-android-audit",private:true,dependencies:{"@getpaseo/cli":process.argv[1]},overrides:{"node-pty":"npm:@mmmbuto/node-pty-android-arm64@"+process.argv[2]}}))' "$paseo_version" "$pty_version"
+          # Metadata resolution only: this Linux runner cannot execute Android Bionic addons.
+          npm install --package-lock-only --ignore-scripts --force --os=android --cpu=arm64 --no-audit --no-fund
+          node -e 'const p=require("./package-lock.json").packages; const nodes=Object.entries(p).filter(([k])=>k.endsWith("/node-pty")); if(!nodes.length||nodes.some(([k,v])=>v.name!=="@mmmbuto/node-pty-android-arm64")) throw Error("Android override not resolved: "+JSON.stringify(nodes)); console.log(nodes.map(([k,v])=>[k,v.name,v.version]))'
