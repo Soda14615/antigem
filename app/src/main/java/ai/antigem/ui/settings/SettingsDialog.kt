@@ -99,13 +99,16 @@ enum class SettingsSection(
     THEMES("Themes", "Light and dark mode, and the theme gallery", R.string.settings_section_themes_title, R.string.settings_section_themes_subtitle),
     APPEARANCE("Appearance", "Chat text size, chat list, header icons, the app switcher and Gemmy", R.string.settings_section_appearance_title, R.string.settings_section_appearance_subtitle),
     STEM_RENDERING("STEM & diagrams", "Chemistry, graphs, geometry, simulations, circuits and offline Mermaid in chats", R.string.settings_section_stem_rendering_title, R.string.settings_section_stem_rendering_subtitle),
-    SERVERS("Servers & Connectivity", "Configure AGY Hub and IDE Bridge endpoints", R.string.settings_section_servers_title, R.string.settings_section_servers_subtitle),
+    SERVERS("Where agents run", "This phone (AntiGem or Ubuntu chroot) or your server, and how the app reaches it", R.string.settings_section_servers_title, R.string.settings_section_servers_subtitle),
     CONNECT_PC("Connect to PC", "Use the agents on your PC (AntiGem in VS Code) from this phone", R.string.settings_section_connect_pc_title, R.string.settings_section_connect_pc_subtitle),
     WEBVIEW_EXTENSIONS("Custom AntiGem Plugins", "Install and manage plugins: MCP tools and skills", R.string.settings_section_webview_extensions_title, R.string.settings_section_webview_extensions_subtitle),
     SLASH_COMMANDS("Slash Commands", "Your own / commands and what they expand to", R.string.settings_section_slash_commands_title, R.string.settings_section_slash_commands_subtitle),
     MCP("MCP Servers", "Model Context Protocol tools & integrations", R.string.settings_section_mcp_title, R.string.settings_section_mcp_subtitle),
     SKILLS_PLUGINS("Skills & Plugins", "Agent capabilities, Google plugins, and extensions", R.string.settings_section_skills_plugins_title, R.string.settings_section_skills_plugins_subtitle),
-    TERMINAL("Terminal & Shell", "SSH configuration, local tools, and styling", R.string.settings_section_terminal_title, R.string.settings_section_terminal_subtitle),
+    TERMINAL("Terminal", "Font, cursor and colors, and SSH for terminal tabs", R.string.settings_section_terminal_title, R.string.settings_section_terminal_subtitle),
+    UBUNTU_CHROOT("Ubuntu chroot", "Status, mounts, shared folders, storage, packages and settings of the rooted Ubuntu", R.string.settings_section_ubuntu_chroot_title, R.string.settings_section_ubuntu_chroot_subtitle),
+    /** Not a page: shown in place of a Termux-only page while the Ubuntu chroot is the phone's runtime. */
+    TERMUX_ONLY("Termux only", "Works with the Termux environment", R.string.settings_section_termux_only_title, R.string.settings_section_termux_only_subtitle),
     BACKUPS("Backups & Restore", "Backup rootfs environment and AGY chat histories", R.string.settings_section_backups_title, R.string.settings_section_backups_subtitle),
     DATA_PROTECTION("Data Loss Protection", "Uninstall shield & App Info clear data protection", R.string.settings_section_data_protection_title, R.string.settings_section_data_protection_subtitle),
     PROJECT_CHECKPOINTS("Project checkpoints", "Go back to before any chat message: files restored with a preview", R.string.settings_section_project_checkpoints_title, R.string.settings_section_project_checkpoints_subtitle),
@@ -173,14 +176,29 @@ enum class SettingsSection(
         CLAUDE_PAGE -> CLAUDE
         OPENCODE_PAGE -> OPENCODE
         CODEX_PAGE -> CODEX
-        TERMUX_API, X11_DESKTOP -> TERMUX_SUPPORT
+        TERMUX_API -> TERMUX_SUPPORT
+        // with the Ubuntu chroot the X11 row is on the main page (Termux Support is Termux-only there)
+        X11_DESKTOP -> if (chrootRunsPhone()) MAIN else TERMUX_SUPPORT
         REA_GROUPS -> REA
+        UBUNTU_CHROOT -> SERVERS
         GLOBAL_CONTEXT, AGENT_MEMORY, EGM -> AGENTS
         AGENT_HISTORY -> AGENT_MEMORY
         CHANGELOG -> ABOUT
         else -> if (jarvisPage != null) JARVIS else MAIN
     }
 }
+
+/**
+ * Pages that run the Termux environment's own tools (Termux:API, backups, the GitHub CLI). REA, Android development
+ * and the X11 desktop work in the Ubuntu chroot too (they install into it), so they are not here.
+ */
+private val TERMUX_ONLY_SECTIONS = setOf(
+    SettingsSection.TERMUX_SUPPORT, SettingsSection.TERMUX_API, SettingsSection.BACKUPS, SettingsSection.GITHUB
+)
+
+/** The Ubuntu chroot is this phone's runtime (not server mode): Termux-only pages show a notice instead. */
+private fun chrootRunsPhone(): Boolean =
+    !ai.antigem.data.preferences.AuthPreferences.currentRemoteMode && ai.antigem.data.local.chroot.ChrootManager.isActiveNow()
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -330,6 +348,8 @@ fun SettingsDialog(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var currentSection by remember { mutableStateOf(initialSection ?: if (initialClaudePage != null && claude != null) SettingsSection.CLAUDE_PAGE else SettingsSection.MAIN) }
+    // the Ubuntu chroot shown on its page (null: the one in use)
+    var chrootManagePath by remember { mutableStateOf<String?>(null) }
     var claudePage by remember { mutableStateOf(initialClaudePage ?: ai.antigem.ui.claude.ClaudeSettingsPage.ACCOUNT) }
     var openCodePage by remember { mutableStateOf(initialOpenCodePage ?: ai.antigem.ui.opencode.OpenCodeSettingsPage.SERVER) }
     LaunchedEffect(initialOpenCodePage) {
@@ -456,7 +476,27 @@ fun SettingsDialog(
                     .weight(1f),
                 label = "SettingsSectionTransition"
             ) { section ->
-                when (section) {
+                // pages that use the Termux environment's tools: a notice while the Ubuntu chroot runs this phone
+                val termuxOnly = section in TERMUX_ONLY_SECTIONS && !ai.antigem.data.preferences.AuthPreferences.currentRemoteMode &&
+                    ai.antigem.data.local.chroot.ChrootManager.isActiveNow()
+                when (if (termuxOnly) SettingsSection.TERMUX_ONLY else section) {
+                    SettingsSection.TERMUX_ONLY -> ai.antigem.ui.settings.chroot.TermuxOnlyNotice(section.title, cardBg, cardBorder,
+                        note = if (section == SettingsSection.BACKUPS) "The Ubuntu chroot has its own backups: Where agents run → Ubuntu chroot → Manage → Backup & restore." else null) {
+                        currentSection = SettingsSection.SERVERS
+                    }
+                    SettingsSection.UBUNTU_CHROOT -> ai.antigem.ui.settings.chroot.ChrootManageScreen(
+                        path = chrootManagePath,
+                        cardBg = cardBg,
+                        cardBorder = cardBorder,
+                        onOpenTerminal = {
+                            onOpenLocalTerminal()
+                            onDismiss()
+                        },
+                        onDeleted = {
+                            chrootManagePath = null
+                            currentSection = SettingsSection.SERVERS
+                        }
+                    )
                     SettingsSection.MAIN -> MainSettingsMenu(
                         themeMode = themeMode,
                         isServerOnline = isServerOnline,
@@ -509,7 +549,12 @@ fun SettingsDialog(
                         isBridgeOnline = isBridgeOnline,
                         cardBg = cardBg,
                         cardBorder = cardBorder,
-                        onSaveServerUrls = onSaveServerUrls
+                        onSaveServerUrls = onSaveServerUrls,
+                        onInstallTermux = onInstallLocalTools,
+                        onManageChroot = { path ->
+                            chrootManagePath = path
+                            currentSection = SettingsSection.UBUNTU_CHROOT
+                        }
                     )
 
                     SettingsSection.CONNECT_PC -> ai.antigem.ui.pc.ConnectPcScreen(cardBg = cardBg, cardBorder = cardBorder)
@@ -588,7 +633,8 @@ fun SettingsDialog(
                         onInstallLocalTools = onInstallLocalTools,
                         onResetLocalTools = onResetLocalTools,
                         onSaveTerminalPreferences = onSaveTerminalPreferences,
-                        onOpenLocalTerminal = onOpenLocalTerminal
+                        onOpenLocalTerminal = onOpenLocalTerminal,
+                        onOpenRuntime = { currentSection = SettingsSection.SERVERS }
                     )
 
                     SettingsSection.BACKUPS -> BackupsSubScreen(
@@ -897,7 +943,13 @@ private fun MainSettingsMenu(
                 row(SettingsSection.THEMES, Icons.Outlined.Palette, c.accentPink, ai.antigem.theme.ThemeManager.current.name),
                 row(SettingsSection.APPEARANCE, Icons.Outlined.Tune, c.accentAlt),
                 stemRow,
-                row(SettingsSection.SERVERS, Icons.Outlined.Dns, c.info, serverValue, serverColor),
+                // where agents run (Termux, Ubuntu chroot or a server), and whether the app reaches it
+                row(SettingsSection.SERVERS, Icons.Outlined.Dns, c.info,
+                    when {
+                        ai.antigem.data.preferences.AuthPreferences.currentRemoteMode -> "Server"
+                        ai.antigem.data.local.chroot.ChrootManager.isActiveNow() -> "Ubuntu chroot"
+                        else -> "AntiGem"
+                    } + if (serverColor == QuotaGreen) "" else " · $serverValue", serverColor),
                 pcRow
             ),
             listOfNotNull(
@@ -941,8 +993,10 @@ private fun MainSettingsMenu(
                 deviceTools.automation,
                 reaRow,
                 androidDevRow,
-                // Termux:API and X11, used by the Termux packages in the terminal
-                row(SettingsSection.TERMUX_SUPPORT, Icons.Outlined.Cable, c.accentIndigo),
+                // Termux:API and X11, used by the Termux packages in the terminal; with the Ubuntu chroot only X11
+                // works (Termux Support is Termux-only there), so its row takes the place of the menu
+                if (chrootRunsPhone()) rememberX11Row(onNavigate)
+                else row(SettingsSection.TERMUX_SUPPORT, Icons.Outlined.Cable, c.accentIndigo),
                 // Utilities only shows once it has something in it (its old items are rows of their own now)
                 if (utilityRows(onNavigate).isNotEmpty()) row(SettingsSection.UTILITIES, Icons.Outlined.Handyman, c.accentTeal) else null,
                 row(SettingsSection.DIAGNOSTICS, Icons.Outlined.Speed, c.success,
@@ -1040,6 +1094,22 @@ private fun TermuxSupportMenu(
             )
         )
     )
+}
+
+/** The X11 Desktop row of the main settings page (Ubuntu chroot mode), with whether the X server runs. */
+@Composable
+private fun rememberX11Row(onNavigate: (SettingsSection) -> Unit): SettingsRowItem {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        ai.antigem.data.x11.X11DesktopManager.init(context)
+        ai.antigem.data.x11.X11DesktopManager.refresh()
+    }
+    val x11 by ai.antigem.data.x11.X11DesktopManager.state.collectAsState()
+    val c = ai.antigem.theme.AppColors
+    return SettingsRowItem(Icons.Outlined.DesktopWindows, c.accentIndigo, SettingsSection.X11_DESKTOP.title,
+        if (x11.running) "Running" else null, if (x11.running) QuotaGreen else null) {
+        onNavigate(SettingsSection.X11_DESKTOP)
+    }
 }
 
 /** What Settings → Utilities lists. Empty for now: when it is, the Utilities row is hidden. Add future handy tools here. */
@@ -3850,17 +3920,13 @@ private fun TerminalSubScreen(
     onInstallLocalTools: () -> Unit,
     onResetLocalTools: () -> Unit,
     onSaveTerminalPreferences: (Int, String, Int, String) -> Unit,
-    onOpenLocalTerminal: () -> Unit
+    onOpenLocalTerminal: () -> Unit,
+    /** Where agents run (the phone's runtime: install, switch, delete). */
+    onOpenRuntime: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val remoteMode = ai.antigem.data.preferences.AuthPreferences.currentRemoteMode
     val coroutineScope = rememberCoroutineScope()
-    var showResetWarningDialog by remember { mutableStateOf(false) }
-    var showResetPasswordDialog by remember { mutableStateOf(false) }
-    var resetPasswordInput by remember { mutableStateOf("") }
-    var showShutdownCountdownDialog by remember { mutableStateOf(false) }
-    var countdownSeconds by remember { mutableIntStateOf(5) }
-
     var hostState by remember { mutableStateOf(sshHost) }
     var portState by remember { mutableStateOf(sshPort.toString()) }
     var userState by remember { mutableStateOf(sshUser) }
@@ -4076,57 +4142,14 @@ private fun TerminalSubScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.settings_dialog_save_ssh_settings), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
-                } else {
-                    // Local tools mode details
-                    Spacer(modifier = Modifier.height(14.dp))
-                    HorizontalDivider(thickness = 0.6.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column {
-                            Text(stringResource(R.string.settings_dialog_embedded_linux_rootfs), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = if (isLocalToolsInstalled) stringResource(R.string.settings_dialog_installed_and_ready) else stringResource(R.string.settings_dialog_not_installed_30mb_download), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                        }
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = if (isLocalToolsInstalled) QuotaGreen.copy(alpha = 0.15f) else ClaudeTerracotta.copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = if (isLocalToolsInstalled) stringResource(R.string.settings_dialog_installed) else stringResource(R.string.settings_dialog_not_installed),
-                                fontSize = 10.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isLocalToolsInstalled) QuotaGreen else ClaudeTerracotta,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-
+                } else if (!remoteMode) {
                     Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        if (isLocalToolsInstalled) {
-                            OutlinedButton(
-                                onClick = { showResetWarningDialog = true },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                                border = BorderStroke(1.dp, Color.Red.copy(alpha = 0.4f))
-                            ) {
-                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.Red)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(stringResource(R.string.settings_dialog_delete_all_factory_reset), fontSize = 12.5.sp, color = Color.Red, fontWeight = FontWeight.SemiBold)
-                            }
-                        } else {
-                            Button(
-                                onClick = onInstallLocalTools,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
-                            ) {
-                                Text(stringResource(R.string.settings_dialog_download_install_local_tools), fontSize = 12.5.sp)
-                            }
-                        }
-                    }
+                    Text(
+                        text = "终端标签页会在智能体运行的这台手机上打开 shell：AntiGem 的内置环境或 Ubuntu chroot，在「智能体运行在哪里」中选择（以及安装或删除）。",
+                        fontSize = 11.5.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                    TextButton(onClick = onOpenRuntime) { Text(stringResource(R.string.settings_section_servers_title), color = ClaudeTerracotta) }
                 }
             }
         }
@@ -4239,6 +4262,26 @@ private fun TerminalSubScreen(
             Icon(imageVector = Icons.Default.Terminal, contentDescription = null, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.settings_dialog_launch_terminal_now), fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+/**
+ * "Delete all app data": a warning, the typed confirmation, a countdown, then Android wipes AntiGem's data (the app
+ * closes). [show] opens it; [onShown] resets the caller's flag.
+ */
+@Composable
+internal fun FactoryResetDialogs(show: Boolean, onShown: () -> Unit) {
+    val context = LocalContext.current
+    var showResetWarningDialog by remember { mutableStateOf(false) }
+    var showResetPasswordDialog by remember { mutableStateOf(false) }
+    var resetPasswordInput by remember { mutableStateOf("") }
+    var showShutdownCountdownDialog by remember { mutableStateOf(false) }
+    var countdownSeconds by remember { mutableIntStateOf(5) }
+    LaunchedEffect(show) {
+        if (show) {
+            showResetWarningDialog = true
+            onShown()
         }
     }
 

@@ -136,6 +136,7 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
         StepCard(
             2, stringResource(R.string.x11_desktop_screen_termux_x11_command),
             when {
+                state.chroot -> "不需要"
                 state.companionOk -> stringResource(R.string.claude_settings_screen_installed)
                 state.companion != null -> stringResource(R.string.x11_desktop_screen_wrong_package)
                 else -> null
@@ -143,7 +144,12 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
             cardBg, cardBorder,
             badgeColor = if (state.companionOk) QuotaGreen else Amber
         ) {
-            Hint(stringResource(R.string.x11_desktop_screen_the_terminal_part_the_termux_x11_command, state.neededCompanion.toString(), (if (app == null) "the Termux:X11 above" else "the installed Termux:X11").toString()))
+            if (state.chroot) {
+                // the app starts the X server itself and shares its display with the chroot
+                Hint("在 Ubuntu chroot 中不需要：AntiGem 会自己启动 X 服务器（来自 Termux:X11 应用），并与 chroot 共享显示。")
+                return@StepCard
+            }
+            Hint("终端部分：启动 X 服务器的 termux-x11 命令。${state.neededCompanion} 对应${if (app == null) "上面的 Termux:X11" else "已安装的 Termux:X11"}。")
             if (state.companion != null && !state.companionOk) {
                 Text(
                     stringResource(R.string.x11_desktop_screen_is_installed_but_this_termux_x11_needs, state.companion.toString(), state.neededCompanion.toString()),
@@ -176,7 +182,7 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
                 when (state.desktop) {
                     Desktop.XFCE -> "XFCE is a full, light desktop and a good place to start."
                     Desktop.LXQT -> "LXQt is a light Qt desktop."
-                } + " It comes from x11-repo and is a large download."
+                } + if (state.chroot) " It comes from Ubuntu (apt) and runs in the Ubuntu chroot as your user. A large download." else " It comes from x11-repo and is a large download."
             )
             if (!state.desktopOk) {
                 Button(enabled = !busy, onClick = X11DesktopManager::installDesktop) {
@@ -189,7 +195,8 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
         // Step 4: start / open / stop
         StepCard(4, stringResource(R.string.x11_desktop_screen_start_the_desktop), if (state.running) stringResource(R.string.agent_tool_call_card_running) else null, cardBg, cardBorder) {
             if (state.running) {
-                Hint(stringResource(R.string.x11_desktop_screen_the_x_server_is_running_on_display))
+                Hint(if (state.chroot) "X 服务器正运行在显示 :0 上，与 Ubuntu chroot 共享。在 chroot 的终端里用 DISPLAY=:0 启动的程序会显示在桌面上。"
+                    else "X 服务器正运行在显示 :0 上。在终端里用 DISPLAY=:0 启动的程序会显示在桌面上。")
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = !busy, onClick = { X11DesktopManager.open(context) }) {
                         Icon(Icons.Outlined.DesktopWindows, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.x11_desktop_screen_open_desktop))
@@ -227,7 +234,8 @@ fun X11DesktopScreen(cardBg: Color, cardBorder: BorderStroke, onOpenAdbConnect: 
                         )
                     }
                 }
-                Hint(stringResource(R.string.x11_desktop_screen_install_a_browser_from_tur_repo_to))
+                Hint(if (state.chroot) "从 xtradeb/apps PPA 在 Ubuntu chroot 中安装 Chromium 或 Firefox（Ubuntu 自带的这两个包是 snap，无法在 chroot 中运行）。"
+                    else "从 tur-repo 安装浏览器，在桌面上上网。")
                 if (!state.desktopOk) {
                     Hint(stringResource(R.string.x11_desktop_screen_install_a_desktop_above_first))
                 }

@@ -8,8 +8,8 @@
     <string name="settings_section_appearance_subtitle">"Chat text size, chat list, header icons, the app switcher and Gemmy"</string>
     <string name="settings_section_stem_rendering_title">"STEM &amp; diagrams"</string>
     <string name="settings_section_stem_rendering_subtitle">"Chemistry, graphs, geometry, simulations, circuits and offline Mermaid in chats"</string>
-    <string name="settings_section_servers_title">"Servers &amp; Connectivity"</string>
-    <string name="settings_section_servers_subtitle">"Configure AGY Hub and IDE Bridge endpoints"</string>
+    <string name="settings_section_servers_title">"Where agents run"</string>
+    <string name="settings_section_servers_subtitle">"This phone (AntiGem or Ubuntu chroot) or your server, and how the app reaches it"</string>
     <string name="settings_section_connect_pc_title">"Connect to PC"</string>
     <string name="settings_section_connect_pc_subtitle">"Use the agents on your PC (AntiGem in VS Code) from this phone"</string>
     <string name="settings_section_webview_extensions_title">"Custom AntiGem Plugins"</string>
@@ -20,8 +20,12 @@
     <string name="settings_section_mcp_subtitle">"Model Context Protocol tools &amp; integrations"</string>
     <string name="settings_section_skills_plugins_title">"Skills &amp; Plugins"</string>
     <string name="settings_section_skills_plugins_subtitle">"Agent capabilities, Google plugins, and extensions"</string>
-    <string name="settings_section_terminal_title">"Terminal &amp; Shell"</string>
-    <string name="settings_section_terminal_subtitle">"SSH configuration, local tools, and styling"</string>
+    <string name="settings_section_terminal_title">"Terminal"</string>
+    <string name="settings_section_terminal_subtitle">"Font, cursor and colors, and SSH for terminal tabs"</string>
+    <string name="settings_section_ubuntu_chroot_title">"Ubuntu chroot"</string>
+    <string name="settings_section_ubuntu_chroot_subtitle">"Status, mounts, shared folders, storage, packages and settings of the rooted Ubuntu"</string>
+    <string name="settings_section_termux_only_title">"Termux only"</string>
+    <string name="settings_section_termux_only_subtitle">"Works with the Termux environment"</string>
     <string name="settings_section_backups_title">"Backups &amp; Restore"</string>
     <string name="settings_section_backups_subtitle">"Backup rootfs environment and AGY chat histories"</string>
     <string name="settings_section_data_protection_title">"Data Loss Protection"</string>

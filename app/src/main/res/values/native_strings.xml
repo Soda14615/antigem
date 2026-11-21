@@ -130,6 +130,7 @@
     <string name="notification_adb_pairing_bad_code">The pairing code has 6 digits.</string>
     <string name="notification_adb_pairing_missing_port">Pairing port not found yet. Tap \"Pair device with pairing code\" in Wireless debugging, or type the port and code.</string>
     <string name="notification_adb_no_response">No response from adb</string>
+    <string name="notification_adb_too_old_pairing">This adb is too old to pair over Wi-Fi (it needs adb 30 or newer; the Ubuntu chroot needs Ubuntu 24.04 or newer).</string>
     <string name="notification_adb_pairing_try_again">%1$s. Check the code and try again.</string>
 
     <string name="notification_rootfs_channel">Rootfs Installation</string>

@@ -156,7 +156,7 @@ fun AndroidDevScreen(
 
         // Check
         DevInfoCard("Check the tools", cardBg, cardBorder) {
-            Hint(stringResource(R.string.android_dev_screen_prints_the_version_of_every_tool_in))
+            Hint("列出 Ubuntu 中每个工具的版本：Java、SDK 平台、aapt2、adb、Node.js、Flutter、CMake。")
             OutlinedButton(enabled = !busy && Component.CONTAINER in state.installed && state.filesReady, onClick = AndroidDevManager::runDoctor) {
                 Icon(Icons.Outlined.HealthAndSafety, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.android_dev_screen_check))
             }
@@ -174,7 +174,8 @@ fun AndroidDevScreen(
             "clean-cache" -> Triple("Delete Gradle's caches?", "Frees the space Gradle's downloads use. The next build of every project downloads them again (slow).", { AndroidDevManager.cleanCache() })
             else -> Triple(
                 "Remove the Android tools?",
-                "Deletes the Android SDK, Flutter, Gradle's files and the adev commands. The Ubuntu container, Java, Node.js (REA uses them) and your projects stay.",
+                if (state.chroot) "Deletes the Android SDK, Flutter, Gradle's files and the adev commands. Java, Node.js, adb and fastboot (REA uses them) and your projects stay in the Ubuntu chroot."
+                else "Deletes the Android SDK, Flutter, Gradle's files and the adev commands. The Ubuntu container, Java, Node.js (REA uses them) and your projects stay.",
                 { AndroidDevManager.uninstall() }
             )
         }
@@ -204,8 +205,9 @@ private fun IntroCard(state: AndroidDevManager.State, cardBg: Color, cardBorder:
                     else -> Pill(stringResource(R.string.android_dev_screen_not_set_up), MaterialTheme.colorScheme.primary)
                 }
             }
-            Hint(stringResource(R.string.android_dev_screen_let_agents_and_you_create_build_and))
-            Hint(stringResource(R.string.android_dev_screen_install_only_what_you_need_kotlin_java))
+            Hint("让智能体（和你）直接在这里创建、构建和安装 Android 应用：Kotlin 或 Java + Jetpack Compose、Flutter、React Native。Gradle、Android SDK 和 Flutter 运行在 " +
+                if (state.chroot) "这台手机的 Ubuntu chroot 中，和 REA 一样。" else "终端内的 Ubuntu 容器（proot-distro）中，与 REA 使用同一个容器。")
+            Hint("只安装你需要的：先装 Kotlin / Java（其他的都基于它），再装 Flutter 或 React Native。")
         }
     }
 }
@@ -258,7 +260,7 @@ private fun InstallStep(state: AndroidDevManager.State, cardBg: Color, cardBorde
     ) {
         Hint(stringResource(R.string.android_dev_screen_pick_what_you_want_to_build_everything))
         val facts = listOfNotNull(
-            state.containerName?.let { "Container: $it" },
+            state.containerName?.let { if (state.chroot) "Ubuntu chroot: $it" else "Container: $it" },
             state.platforms.takeIf { it.isNotEmpty() }?.let { "SDK platforms: ${it.joinToString()}" },
             state.flutterVersion?.let { "Flutter $it" },
             state.nodeVersion?.let { "Node.js $it" }
@@ -340,7 +342,7 @@ private fun PartRow(c: Component, state: AndroidDevManager.State, checked: Boole
                 Column(Modifier.weight(1f)) {
                     Text(c.label, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
                     Text(
-                        c.size + when {
+                        if (state.chroot && c == Component.CONTAINER) "this phone's runtime" else c.size + when {
                             running -> " · installing…"
                             installed -> " · installed"
                             else -> ""
@@ -351,7 +353,8 @@ private fun PartRow(c: Component, state: AndroidDevManager.State, checked: Boole
                 }
                 if (running) {
                     CircularProgressIndicator(Modifier.padding(end = 12.dp).size(18.dp), strokeWidth = 2.dp)
-                } else {
+                } else if (!(state.chroot && c == Component.CONTAINER)) {
+                    // the Ubuntu chroot is the phone's runtime: nothing to install or reinstall here
                     TextButton(enabled = !busy, onClick = { AndroidDevManager.install(c) }) {
                         Text(if (installed) (if (c == Component.FLUTTER) stringResource(R.string.claude_settings_screen_update) else stringResource(R.string.android_dev_screen_reinstall)) else stringResource(R.string.claude_settings_screen_install), fontSize = 12.5.sp)
                     }
@@ -433,7 +436,7 @@ private fun UseGuide(state: AndroidDevManager.State) {
     if (Component.LAUNCHER !in state.installed) Hint(stringResource(R.string.android_dev_screen_install_kotlin_java_above_first))
     DevCopyLine("adev-new compose ~/${AndroidDevManager.PROJECTS_DIR}/my-app", mono = true)
     DevCopyLine("cd ~/${AndroidDevManager.PROJECTS_DIR}/my-app && adev ./gradlew assembleDebug", mono = true)
-    Hint(stringResource(R.string.android_dev_screen_adev_runs_a_command_in_the_container))
+    Hint("adev 会在当前文件夹中用 PATH 上的 Java、SDK、Gradle、Flutter 和 Node.js 执行命令（在 Ubuntu 容器或 chroot 中）。adev-new 还能创建 Flutter（flutter）和 React Native（rn）项目。项目请放在 Termux 主目录，不要放在共享存储。")
     Text(stringResource(R.string.android_dev_screen_try_in_chat), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     listOf(
         "Create a Jetpack Compose app called Notes in ~/AndroidProjects/notes with a list and an add button, build it and give me the APK.",
@@ -469,7 +472,14 @@ private fun TerminalCard(state: AndroidDevManager.State, cardBg: Color, cardBord
     val repo = runCatching { ai.antigem.ui.browser.PluginRepositories.parse(state.source) }.getOrNull()
     val raw = "https://raw.githubusercontent.com/${repo?.slug ?: "Santoshkurmi/antigem_plugins"}/${repo?.ref?.ifBlank { "main" } ?: "main"}/android-dev/skills/android-dev/scripts"
     val s = "\$PREFIX/share/antigem-android/android-setup.sh"
-    val steps = listOf(
+    // In the Ubuntu chroot the script runs inside it, as root (AntiGem copies the files to /opt/antigem/share/antigem-android)
+    val c = "sudo env ANTIGEM_RUNTIME=chroot bash /opt/antigem/share/antigem-android/android-setup.sh"
+    val steps = if (state.chroot) listOf(
+        "1. The setup files are in /opt/antigem/share/antigem-android (Get setup files above copies them there). See every step" to "$c help",
+        "2. Kotlin / Java / Compose (base java sdk launcher)" to "$c kotlin",
+        "3. Flutter (with release builds) and / or React Native (Node.js and the NDK)" to "$c flutter flutter-release node ndk",
+        "4. Check it, and build a test app (in ~/AndroidProjects)" to "$c doctor && $c test compose"
+    ) else listOf(
         "1. Download the setup files" to
             "mkdir -p \$PREFIX/share/antigem-android && cd \$PREFIX/share/antigem-android && for f in files.json android-setup.sh adev adev-new; do curl -fsSLO $raw/\$f; done",
         "2. See every step" to "bash $s help",
@@ -508,7 +518,8 @@ private fun RemoveCard(state: AndroidDevManager.State, busy: Boolean, cardBg: Co
                 TextButton(onClick = { open = !open }) { Text(if (open) stringResource(R.string.claude_settings_screen_hide) else stringResource(R.string.claude_settings_screen_show), fontSize = 12.5.sp) }
             }
             if (!open) return@Column
-            Hint(stringResource(R.string.android_dev_screen_your_projects_are_never_deleted_the_ubuntu))
+            Hint(if (state.chroot) "你的项目永远不会被删除。Ubuntu chroot 本身在它自己的页面删除（智能体运行在哪里 → Ubuntu chroot）。"
+                else "你的项目永远不会被删除。Ubuntu 容器本身在 REA 页面移除（删除容器），因为两者共用它。")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("clean-cache") }) { Text(stringResource(R.string.android_dev_screen_clean_gradle_cache)) }
                 if (Component.FLUTTER in state.installed) OutlinedButton(enabled = !busy && state.filesReady, onClick = { onConfirm("uninstall-flutter") }) { Text(stringResource(R.string.android_dev_screen_remove_flutter)) }

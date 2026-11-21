@@ -18,6 +18,9 @@
     <string name="chat_history_drawer_check_status">"Check Status"</string>
     <string name="chat_history_drawer_sign_in_again">"Sign In Again"</string>
     <string name="chat_history_drawer_exit_antigem">"Exit AntiGem?"</string>
+    <string name="chat_history_drawer_exit_keeps_chroot_running">"Do you want to exit the app? Its background services and terminals stop."</string>
+    <string name="chat_history_drawer_also_stop_chroot">Also stop the Ubuntu chroot (its bridge and agents)</string>
+    <string name="chat_history_drawer_keep_chroot_running">Also stop the Ubuntu chroot (off: agents keep working while AntiGem is closed)</string>
     <string name="chat_history_drawer_do_you_want_to_exit_the_app">"Do you want to exit the app? This will stop all active background services, servers, and terminals."</string>
     <string name="chat_history_drawer_exit_app">"Exit App"</string>
     <string name="chat_history_drawer_delete_conversation">"Delete Conversation?"</string>

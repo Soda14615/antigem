@@ -97,6 +97,13 @@ fun AdbConnectScreen(cardBg: Color, cardBorder: BorderStroke) {
                         Icon(Icons.Outlined.Build, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.adb_connect_screen_repair_adb))
                     }
                 }
+                !state.installing && AdbConnectManager.inChroot -> {
+                    // the Ubuntu chroot is the phone's runtime: its agents use Ubuntu's adb
+                    Hint("adb isn't installed in the Ubuntu chroot yet. This installs Ubuntu's adb and fastboot packages: they run as your user, no sudo needed (also for USB / OTG devices).")
+                    Button(onClick = AdbConnectManager::installAdb) {
+                        Icon(Icons.Outlined.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Install adb and fastboot")
+                    }
+                }
                 !state.installing -> {
                     Hint(stringResource(R.string.adb_connect_screen_adb_isn_t_installed_in_the_terminal))
                     Button(onClick = AdbConnectManager::installAdb) {

@@ -8,8 +8,8 @@
     <string name="settings_section_appearance_subtitle">"聊天字号、聊天列表、顶部图标、应用切换器和 Gemmy"</string>
     <string name="settings_section_stem_rendering_title">"STEM 与图表"</string>
     <string name="settings_section_stem_rendering_subtitle">"在聊天中显示化学式、图表、几何图形、仿真、电路和离线 Mermaid 图"</string>
-    <string name="settings_section_servers_title">"服务器与连接"</string>
-    <string name="settings_section_servers_subtitle">"配置 AGY Hub 和 IDE Bridge 端点"</string>
+    <string name="settings_section_servers_title">"智能体运行在哪里"</string>
+    <string name="settings_section_servers_subtitle">"这台手机（AntiGem 或 Ubuntu chroot）或你的服务器，以及应用如何连接到它"</string>
     <string name="settings_section_connect_pc_title">"连接电脑"</string>
     <string name="settings_section_connect_pc_subtitle">"在手机上使用电脑上 AntiGem（VS Code 扩展）的智能体"</string>
     <string name="settings_section_webview_extensions_title">"自定义 AntiGem 插件"</string>
@@ -20,8 +20,12 @@
     <string name="settings_section_mcp_subtitle">"模型上下文协议工具和集成"</string>
     <string name="settings_section_skills_plugins_title">"技能与插件"</string>
     <string name="settings_section_skills_plugins_subtitle">"智能体能力、Google 插件和扩展程序"</string>
-    <string name="settings_section_terminal_title">"终端与 Shell"</string>
-    <string name="settings_section_terminal_subtitle">"SSH 配置、本地工具和外观"</string>
+    <string name="settings_section_terminal_title">"终端"</string>
+    <string name="settings_section_terminal_subtitle">"字体、光标和配色，以及终端标签页的 SSH"</string>
+    <string name="settings_section_ubuntu_chroot_title">"Ubuntu chroot"</string>
+    <string name="settings_section_ubuntu_chroot_subtitle">"已 root 的 Ubuntu 的状态、挂载、共享文件夹、存储、软件包和设置"</string>
+    <string name="settings_section_termux_only_title">"仅 Termux"</string>
+    <string name="settings_section_termux_only_subtitle">"仅在 Termux 环境下可用"</string>
     <string name="settings_section_backups_title">"备份与恢复"</string>
     <string name="settings_section_backups_subtitle">"备份 rootfs 环境及 AGY 聊天记录"</string>
     <string name="settings_section_data_protection_title">"防止数据丢失"</string>

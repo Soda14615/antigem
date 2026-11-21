@@ -97,14 +97,17 @@ fun GlobalContextScreen() {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "告知智能体 " + (if (GlobalContext.runsOnPhone) "它运行在 Android 上的 AntiGem Linux 系统中（用 \$TMPDIR 而非 /tmp；用 pkg 而非 sudo），以及 " else "") +
-                        "如何在此聊天中显示图片、视频和文件。Jarvis 及其发起的聊天也会收到。",
+                    "告知智能体它运行在哪里（" + when (GlobalContext.runPlace) {
+                        GlobalContext.RunPlace.ANTIGEM -> "这台手机上 AntiGem 的内置环境：用 \$TMPDIR 而非 /tmp；用 pkg 而非 sudo"
+                        GlobalContext.RunPlace.CHROOT -> "这台手机上的 Ubuntu chroot：用 apt，sudo 就是整台手机的 root"
+                        GlobalContext.RunPlace.SERVER -> "你的服务器"
+                        GlobalContext.RunPlace.PC -> "你的电脑，通过「连接到 PC」"
+                    } + "），不要自行使用 sudo、su 或 root（只在你要求时），以及如何在此聊天中显示图片、视频和文件。" +
+                        "Jarvis 及其发起的聊天也会收到。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
-                if (!GlobalContext.runsOnPhone) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(stringResource(R.string.global_context_screen_the_android_part_is_added_only_while), fontSize = 11.5.sp, color = muted)
-                }
+                Spacer(Modifier.height(4.dp))
+                Text("「你运行在哪里」这部分跟随 设置 → 智能体运行在哪里。", fontSize = 11.5.sp, color = muted)
                 TextButton(onClick = { showBuiltIn = !showBuiltIn }, contentPadding = PaddingValues(horizontal = 0.dp)) {
                     Text(if (showBuiltIn) stringResource(R.string.global_context_screen_hide_the_text) else stringResource(R.string.global_context_screen_show_exactly_what_is_sent))
                 }

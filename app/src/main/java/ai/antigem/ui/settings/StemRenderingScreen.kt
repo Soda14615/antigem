@@ -196,7 +196,7 @@ fun StemRenderingScreen() {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "简要列出本机可用的块及其确切版本，供智能体在回答中使用" +
-                        (if (GlobalContext.runsOnPhone) "，并说明完整指南在本机的位置（仅在需要时读取）" else "") +
+                        (if (GlobalContext.canReadAppFiles) "，并说明完整指南在本机的位置（仅在需要时读取）" else "") +
                         "。内容变化后聊天会重新获取。Jarvis 不会获取。",
                     fontSize = 13.sp, lineHeight = 18.sp
                 )
@@ -206,7 +206,7 @@ fun StemRenderingScreen() {
                 if (showPrompt) {
                     val text = remember(active, tellAgents, installed) {
                         if (!tellAgents) "(off: nothing is sent)"
-                        else RenderBundle.promptSection(canReadFiles = GlobalContext.runsOnPhone) ?: "(nothing switched on)"
+                        else RenderBundle.promptSection(canReadFiles = GlobalContext.canReadAppFiles) ?: "(nothing switched on)"
                     }
                     SelectionContainer {
                         Text(

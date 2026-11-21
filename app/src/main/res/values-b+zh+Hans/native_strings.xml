@@ -130,6 +130,7 @@
     <string name="notification_adb_pairing_bad_code">配对码由 6 位数字组成。</string>
     <string name="notification_adb_pairing_missing_port">尚未找到配对端口。请在“无线调试”中点按“使用配对码配对设备”，或输入端口和配对码。</string>
     <string name="notification_adb_no_response">adb 无响应</string>
+    <string name="notification_adb_too_old_pairing">这个 adb 版本太旧，不能用 Wi-Fi 配对（需要 adb 30 或更新；Ubuntu chroot 需要 Ubuntu 24.04 或更新）。</string>
     <string name="notification_adb_pairing_try_again">%1$s。请检查配对码后重试。</string>
 
     <string name="notification_rootfs_channel">根文件系统安装</string>

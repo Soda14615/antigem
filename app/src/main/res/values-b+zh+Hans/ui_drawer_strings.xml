@@ -18,6 +18,9 @@
     <string name="chat_history_drawer_check_status">"检查状态"</string>
     <string name="chat_history_drawer_sign_in_again">"再次登录"</string>
     <string name="chat_history_drawer_exit_antigem">"退出 AntiGem？"</string>
+    <string name="chat_history_drawer_exit_keeps_chroot_running">"你想退出应用程序吗？它的后台服务和终端会停止。"</string>
+    <string name="chat_history_drawer_also_stop_chroot">同时停止 Ubuntu chroot（它的桥接和智能体）</string>
+    <string name="chat_history_drawer_keep_chroot_running">同时停止 Ubuntu chroot（关闭：AntiGem 关闭后智能体继续工作）</string>
     <string name="chat_history_drawer_do_you_want_to_exit_the_app">"你想退出应用程序吗？这将停止所有活动的后台服务、服务器和终端。"</string>
     <string name="chat_history_drawer_exit_app">"退出应用程序"</string>
     <string name="chat_history_drawer_delete_conversation">"删除对话？"</string>
