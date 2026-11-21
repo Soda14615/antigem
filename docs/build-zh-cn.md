@@ -24,11 +24,13 @@ git fetch upstream --tags
 ```
 
 将本项目的发布签名密钥保存在仓库外的私有位置，并设置环境变量 `ANTIGEM_KEYSTORE` 指向其绝对路径。
-构建沿用项目的发布签名配置，密钥别名为 `antigem`，口令须与 `app/build.gradle.kts` 中的签名配置一致。
+构建沿用项目的发布签名配置（别名 `antigem`，口令取自 `RELEASE_KEYSTORE_PASSWORD` / `RELEASE_KEY_PASSWORD`）。
 请保留同一签名密钥以供后续构建，并妥善备份。严禁将密钥文件或其 Base64 内容提交到 Git 或上传为发布附件。
+完整规则见 [`SIGNING.md`](SIGNING.md)——包名与证书必须同时一致才能覆盖安装，换一次密钥就意味着所有用户卸载重装。
 
 ```sh
-ln -s "${ANTIGEM_KEYSTORE:?请指定发布密钥路径}" app/release.jks
+export ANTIGEM_KEYSTORE=/绝对路径/antigem.jks
+export RELEASE_KEYSTORE_PASSWORD='口令'
 ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
 ./gradlew :app:testDebugUnitTest
 ```

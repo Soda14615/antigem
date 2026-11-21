@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import java.io.File
 
 val versionFile = rootProject.file("version.json")
 val parsedVersion = if (versionFile.exists()) {
@@ -33,6 +34,13 @@ val targetAbi = (findProperty("abi") as String?)?.trim()?.ifEmpty { null } ?: "a
 require(targetAbi == "arm64" || targetAbi == "x86_64") { "-Pabi must be arm64 or x86_64, not $targetAbi" }
 val isX86 = targetAbi == "x86_64"
 
+// One shared release keystore for CI and every local/agent checkout: an APK can only upgrade over the one
+// already installed when both the applicationId and the signing certificate match. Resolution order:
+// $ANTIGEM_KEYSTORE (absolute path, see docs/SIGNING.md), then app/release.jks.
+// Defined outside android {} and kept as a plain path so the configuration cache can serialise it.
+val releaseKeystorePath = System.getenv("ANTIGEM_KEYSTORE")?.trim()?.takeIf { it.isNotEmpty() }
+    ?: file("release.jks").absolutePath
+
 android {
     namespace = "ai.antigem"
     compileSdk = 37
@@ -61,10 +69,13 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("release.jks")
+            // Always point at the shared keystore: when it is missing, AGP fails at validateSigningRelease with
+            // "Keystore file ... not found" instead of quietly signing with something else.
+            storeFile = file(releaseKeystorePath)
             storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
-            keyAlias = "antigem"
-            keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: "antigem"
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+                ?: System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
         }
     }
 
