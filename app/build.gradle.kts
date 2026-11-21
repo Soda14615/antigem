@@ -58,7 +58,6 @@ val apkSuffix = when {
     chrootProp == "true" -> "-chroot"
     else -> ""
 }
-
 android {
     namespace = "ai.antigem"
     compileSdk = 37
