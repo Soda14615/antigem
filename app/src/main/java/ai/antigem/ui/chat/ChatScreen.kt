@@ -158,8 +158,10 @@ fun ChatScreen(
             scope.launch {
                 try {
                     val ready = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                        val marker = File(LocalEnvironmentManager.getHomeDir(context), ".local/share/antigem-paseo-team/runtime-arm64-v2/.verified-install")
-                        if (!marker.isFile) false else runCatching {
+                        val root = File(LocalEnvironmentManager.getHomeDir(context), ".local/share/antigem-paseo-team")
+                        val installed = File(root, "current/.verified-install").isFile ||
+                            File(root, "runtime-arm64-v2/.verified-install").isFile
+                        if (!installed) false else runCatching {
                             val connection = java.net.URL("http://127.0.0.1:6799/api/health").openConnection() as java.net.HttpURLConnection
                             try {
                                 connection.connectTimeout = 1500
@@ -192,7 +194,7 @@ fun ChatScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(stringResource(R.string.paseo_team_setup))
                     SelectionContainer {
-                        Text("paseo-team install\npaseo-team password\npaseo-team start", fontFamily = FontFamily.Monospace)
+                        Text("paseo-team doctor\npaseo-team install\npaseo-team providers --write\npaseo-team password\npaseo-team start\npaseo-team verify", fontFamily = FontFamily.Monospace)
                     }
                     Text(stringResource(R.string.paseo_team_stop_hint))
                 }
