@@ -1,11 +1,6 @@
 name: Build & Publish Release
 
 on:
-  push:
-    branches:
-      - standalone
-    paths:
-      - 'version.json'
   workflow_dispatch:
 
 permissions:
