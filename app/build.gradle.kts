@@ -33,6 +33,11 @@ val targetAbi = (findProperty("abi") as String?)?.trim()?.ifEmpty { null } ?: "a
 require(targetAbi == "arm64" || targetAbi == "x86_64") { "-Pabi must be arm64 or x86_64, not $targetAbi" }
 val isX86 = targetAbi == "x86_64"
 
+// Use the same release signing key across local workspaces. Never generate a per-build replacement.
+// The fallback is the existing ignored app/release.jks for older local environments.
+val releaseKeystorePath = System.getenv("ANTIGEM_KEYSTORE")?.trim()?.takeIf { it.isNotEmpty() }
+    ?: file("release.jks").absolutePath
+
 android {
     namespace = "ai.antigem"
     compileSdk = 37
@@ -61,10 +66,11 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("release.jks")
+            storeFile = file(releaseKeystorePath)
             storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
-            keyAlias = "antigem"
-            keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: "antigem"
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+                ?: System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
         }
     }
 
