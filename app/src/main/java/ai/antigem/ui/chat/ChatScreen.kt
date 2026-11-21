@@ -2134,7 +2134,7 @@ fun ChatScreen(
                         }
                     } else if (isExistingChat) {
                         ai.antigem.ui.components.ConversationLoadingSkeleton()
-                    } else if (messages.isEmpty()) {
+                    } else if (messages.isEmpty() && voiceCallItems.isEmpty()) {
                         BoxWithConstraints(
                             modifier = Modifier.fillMaxSize()
                         ) {
