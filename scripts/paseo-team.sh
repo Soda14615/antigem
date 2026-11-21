@@ -293,12 +293,12 @@ daemon_running() {
 activate_runtime() {
   local target="$1" old link
   old="$(resolve_runtime)"
-  if [[ "$old" != "$target" ]]; then
-    link="$root/.current-$$"
+  if [[ ! -L "$root/current" || "$old" != "$target" ]]; then
+    link="$root/.current-$"
     ln -s "$target" "$link"
     mv -Tf "$link" "$root/current" || fail "切换运行时失败"
-    if [[ -f "$old/.verified-install" ]]; then
-      link="$root/.previous-$$"
+    if [[ "$old" != "$target" && -f "$old/.verified-install" ]]; then
+      link="$root/.previous-$"
       ln -s "$old" "$link"
       mv -Tf "$link" "$root/previous" || fail "保存回滚目标失败"
     fi
