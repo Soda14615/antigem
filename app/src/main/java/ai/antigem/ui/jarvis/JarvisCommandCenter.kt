@@ -10,6 +10,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,16 +34,22 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,13 +59,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ai.antigem.data.daemon.IdeDaemonManager
+import ai.antigem.data.jarvis.JarvisController
 import ai.antigem.data.jarvis.JarvisEvents
 import ai.antigem.data.jarvis.JarvisManagers
+import ai.antigem.data.jarvis.JarvisOrchestrationRules
 import ai.antigem.data.jarvis.JarvisTasks
+import ai.antigem.data.jarvis.JarvisWorktreeManager
+import ai.antigem.domain.model.AgentKind
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 private fun agentLabel(name: String) = when (name.uppercase()) {
@@ -96,7 +115,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
     val title = when {
         !mission.isEmpty -> mission.goal
         voice -> "Jarvis · voice chat"
-        else -> "Jarvis 指挥中心"
+        else -> teamText("Team orchestration", "团队编排")
     }
     val subtitle = when {
         status != null -> status
@@ -177,7 +196,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
                 )
             }
         }
-        if (expanded) Board(key, m, mine, onOpenChat)
+        if (expanded) androidx.compose.runtime.key(chatId) { Board(m, tasks, onOpenChat) }
     }
 }
 
@@ -222,13 +241,97 @@ private fun TaskPill(t: JarvisTasks.Task, onClick: () -> Unit) {
 
 /** Everything of one manager: mission steps, teams, tasks. */
 @Composable
-private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks.Task>, onOpenChat: (String) -> Unit) {
+private fun Board(m: JarvisManagers.Manager, tasks: List<JarvisTasks.Task>, onOpenChat: (String) -> Unit) {
     val onSurface = MaterialTheme.colorScheme.onSurface
-    val scope = rememberCoroutineScope()
-    Column(
-        Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState()).padding(start = 12.dp, end = 12.dp, bottom = 10.dp)
+    val owner = m.key
+    var showArchived by remember(owner) { mutableStateOf(false) }
+    val tree = teamTaskTree(owner, tasks)
+    val activeTree = tree.filterNot { it.task.archived }
+    val archivedTree = tree.filter { it.task.archived }
+    var editRole by remember { mutableStateOf(false) }
+    var role by remember { mutableStateOf<JarvisManagers.Team?>(null) }
+    var selectedTask by remember { mutableStateOf<String?>(null) }
+    var showApprovals by remember { mutableStateOf(false) }
+    var feedback by remember { mutableStateOf<String?>(null) }
+    LazyColumn(
+        Modifier.fillMaxWidth().heightIn(max = 360.dp).padding(start = 12.dp, end = 12.dp, bottom = 10.dp)
     ) {
-        val mi = m.mission
+        item { MissionSection(owner, m.mission) }
+        item {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) { BoardTitle(teamText("Roles", "岗位")) }
+                if (m.parentKey.isBlank()) SmallAction(teamText("Add role", "新增岗位"), Cyan) {
+                    role = null
+                    editRole = true
+                }
+            }
+        }
+        items(JarvisManagers.profiles(owner), key = { "role:${it.name}" }) { profile ->
+            Row(
+                Modifier.fillMaxWidth().padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        listOf(profile.name, agentLabel(profile.agent.name), profile.model).filter { it.isNotBlank() }.joinToString(" · "),
+                        fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = onSurface
+                    )
+                    if (profile.childRoles.isNotEmpty()) {
+                        Text(teamText("Can delegate to ", "可委派给 ") + profile.childRoles.joinToString(), fontSize = 11.sp)
+                    }
+                    if (profile.role.isNotBlank()) {
+                        Text(profile.role, fontSize = 11.sp, color = onSurface.copy(alpha = 0.55f), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+                if (m.parentKey.isBlank()) SmallAction(teamText("Edit", "编辑"), Cyan) {
+                    role = profile
+                    editRole = true
+                }
+            }
+        }
+        item {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) { BoardTitle(teamText("Task tree", "任务树")) }
+                if (archivedTree.isNotEmpty()) SmallAction(
+                    if (showArchived) teamText("Hide archived", "隐藏归档") else teamText("Archived (${archivedTree.size})", "归档 (${archivedTree.size})"), onSurface
+                ) {
+                    showArchived = !showArchived
+                    selectedTask = null
+                }
+                SmallAction(teamText("Approvals", "审批"), Amber) { showApprovals = true }
+            }
+            if (activeTree.isEmpty()) Text(stringResource(R.string.jarvis_command_center_none_yet), fontSize = 12.sp, color = onSurface.copy(alpha = 0.5f))
+        }
+        items(activeTree, key = { "task:${it.task.id}" }) { (task, depth) ->
+            TeamTaskRow(task, depth, { selectedTask = task.id }, { onOpenChat(task.id) })
+        }
+        if (showArchived) items(archivedTree, key = { "archived:${it.task.id}" }) { (task, depth) ->
+            TeamTaskRow(task, depth, { selectedTask = task.id }, { onOpenChat(task.id) })
+        }
+        feedback?.let { message ->
+            item { Text(message, fontSize = 12.sp, color = onSurface, modifier = Modifier.padding(top = 6.dp)) }
+        }
+    }
+
+    if (editRole) TeamRoleEditor(owner, role) { editRole = false }
+    tree.firstOrNull { it.task.id == selectedTask }?.task?.let { task ->
+        key(task.id) {
+            TeamTaskDetail(
+                task = task,
+                canArchive = tree.none { it.task.owner == task.id && it.task.active },
+                onClose = { selectedTask = null },
+                onOpen = { selectedTask = null; onOpenChat(task.id) },
+                onArchived = { selectedTask = null; feedback = it }
+            )
+        }
+    }
+    if (showApprovals) TeamApprovals(tree, onOpenChat) { showApprovals = false }
+}
+
+@Composable
+private fun MissionSection(owner: String, mi: JarvisManagers.Mission) {
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    Column {
         BoardTitle("Mission")
         if (mi.isEmpty) {
             Text(
@@ -254,51 +357,475 @@ private fun Board(key: String, m: JarvisManagers.Manager, mine: List<JarvisTasks
             }
             if (mi.notes.isNotBlank()) Text(stringResource(R.string.jarvis_command_center_notes, mi.notes.toString()), fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SmallAction("清除任务书", Danger) { JarvisManagers.clearMission(key) }
-                if (mi.status != "active") SmallAction("Resume", Cyan) { JarvisManagers.updateMission(key, null, null, null, emptyList(), "active", null, null) }
-                else SmallAction("Pause", Amber) { JarvisManagers.updateMission(key, null, null, null, emptyList(), "paused", null, null) }
-            }
-        }
-        if (m.teams.isNotEmpty()) {
-            BoardTitle("Teams")
-            m.teams.forEach { t ->
-                val running = mine.count { it.active && it.team.equals(t.name, true) }
-                Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "${t.name} · ${agentLabel(t.agent.name)}${if (t.model.isNotBlank()) " · ${t.model}" else ""}",
-                            fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = onSurface
-                        )
-                        if (t.role.isNotBlank()) Text(t.role, fontSize = 11.sp, color = onSurface.copy(alpha = 0.55f), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    }
-                    if (running > 0) Text(stringResource(R.string.jarvis_command_center_working, running.toString()), fontSize = 11.sp, color = Violet)
-                    IconMini(Icons.Filled.Close, "移除团队", onSurface.copy(alpha = 0.45f)) { JarvisManagers.removeTeam(key, t.name) }
-                }
-            }
-        }
-        BoardTitle("Tasks")
-        if (mine.isEmpty()) Text(stringResource(R.string.jarvis_command_center_none_yet), fontSize = 12.sp, color = onSurface.copy(alpha = 0.5f))
-        mine.take(20).forEach { t ->
-            val c = taskColor(t.state)
-            Row(
-                Modifier.fillMaxWidth().padding(top = 4.dp).clip(RoundedCornerShape(10.dp)).clickable { onOpenChat(t.id) }.padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(c))
-                Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(t.title, fontSize = 12.5.sp, color = onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(
-                        listOfNotNull(t.team.takeIf { it.isNotBlank() }, agentLabel(t.agent.name), t.state.label, age(t.createdAt), t.note.takeIf { it.isNotBlank() && it != "Working" }).joinToString(" · "),
-                        fontSize = 10.5.sp, color = c.copy(alpha = 0.9f), maxLines = 1, overflow = TextOverflow.Ellipsis
-                    )
-                }
-                IconMini(Icons.AutoMirrored.Filled.OpenInNew, "Open", onSurface.copy(alpha = 0.6f)) { onOpenChat(t.id) }
-                if (t.active) IconMini(Icons.Filled.Stop, "Stop", Danger) { scope.launch { JarvisTasks.stop(t.id) } }
-                else IconMini(Icons.Filled.Close, "Dismiss", onSurface.copy(alpha = 0.45f)) { JarvisTasks.close(t.id) }
+                SmallAction("清除任务书", Danger) { JarvisManagers.clearMission(owner) }
+                if (mi.status != "active") SmallAction("Resume", Cyan) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "active", null, null) }
+                else SmallAction("Pause", Amber) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "paused", null, null) }
             }
         }
     }
+}
+
+@Composable
+private fun teamText(english: String, chinese: String): String =
+    if (LocalConfiguration.current.locales[0].language == "zh") chinese else english
+
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun TeamRoleEditor(owner: String, existing: JarvisManagers.Team?, onClose: () -> Unit) {
+    val vm = JarvisController.vm
+    val enabled by vm.enabledAgents.collectAsState()
+    val managers by JarvisManagers.managers.collectAsState()
+    val projects by IdeDaemonManager.projects.collectAsState()
+    val activeProject by IdeDaemonManager.activeProject.collectAsState()
+    val catalog = managers[owner]?.teams.orEmpty()
+    var name by remember { mutableStateOf(existing?.name.orEmpty()) }
+    var agent by remember { mutableStateOf(existing?.agent ?: enabled.firstOrNull() ?: AgentKind.AGY) }
+    var model by remember { mutableStateOf(existing?.model.orEmpty()) }
+    var effort by remember { mutableStateOf(existing?.effort.orEmpty()) }
+    var project by remember { mutableStateOf(existing?.project.orEmpty()) }
+    var instructions by remember { mutableStateOf(existing?.role.orEmpty()) }
+    var children by remember { mutableStateOf(existing?.childRoles.orEmpty()) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val models by when (agent) {
+        AgentKind.AGY -> vm.agyBackend.enabledModels
+        AgentKind.CLAUDE -> vm.claudeBackend.availableModels
+        AgentKind.CODEX -> vm.codexBackend.availableModels
+        AgentKind.OPENCODE -> vm.openCodeBackend.availableModels
+    }.collectAsState()
+    val efforts = JarvisController.effortLevelsFor(agent, model.ifBlank { null }).getOrDefault(emptyList())
+    val defaultValue = teamText("Default", "默认")
+    val duplicateName = teamText("A role with this name already exists.", "已存在同名岗位。")
+    val invalidGraph = teamText("Delegation must reference existing roles and cannot form a cycle.", "委派只能引用已有岗位，且不能形成循环。")
+    val inUse = teamText("Remove this role from the roles that delegate to it first.", "请先移除其他岗位对该岗位的委派授权。")
+    val missingRole = teamText("This role was removed. Reopen the editor to add it again.", "该岗位已被移除，请重新打开编辑器添加。")
+    val saveFailure = teamText("Could not save this role.", "无法保存岗位。")
+
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(if (existing == null) teamText("Add role", "新增岗位") else teamText("Edit role", "编辑岗位"))
+                error?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
+            }
+        },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = name, onValueChange = { name = it; error = null },
+                    label = { Text(teamText("Role name", "岗位名称")) }, singleLine = true,
+                    readOnly = existing != null, modifier = Modifier.fillMaxWidth()
+                )
+                val agents = AgentKind.entries.filter { it in enabled || it == existing?.agent }
+                TeamChoice(
+                    teamText("Provider", "服务商"), agent, agents.map { it to agentLabel(it.name) }, agentLabel(agent.name)
+                ) {
+                    if (it != agent) {
+                        agent = it
+                        model = ""
+                        effort = ""
+                    }
+                }
+                TeamChoice(
+                    teamText("Model", "模型"), model,
+                    listOf("" to defaultValue) + models.map { it.id to it.displayName.ifBlank { it.id } },
+                    model.ifBlank { defaultValue }
+                ) {
+                    if (it != model) {
+                        model = it
+                        effort = ""
+                    }
+                }
+                if (efforts.isNotEmpty() || effort.isNotBlank()) {
+                    TeamChoice(
+                        teamText("Reasoning effort", "推理强度"), effort,
+                        listOf("" to defaultValue) + efforts.map { it to it }, effort.ifBlank { defaultValue }
+                    ) { effort = it }
+                }
+                TeamChoice(
+                    teamText("Project", "项目"), project,
+                    listOf("" to teamText("Use active project", "使用当前项目")) +
+                        (listOfNotNull(activeProject) + projects).distinctBy { it.path }.map { it.path to it.name.ifBlank { it.path } },
+                    project.ifBlank { teamText("Use active project", "使用当前项目") }
+                ) { project = it }
+                OutlinedTextField(
+                    value = instructions, onValueChange = { instructions = it },
+                    label = { Text(teamText("Instructions", "职责说明")) }, minLines = 2, maxLines = 5,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                val eligible = (catalog.map { it.name }.filterNot { it.equals(name.trim(), true) } + children)
+                    .distinctBy { it.lowercase() }
+                if (eligible.isNotEmpty()) {
+                    Text(teamText("May delegate to", "允许委派给"), style = MaterialTheme.typography.labelLarge)
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        eligible.forEach { child ->
+                            val selected = children.any { it.equals(child, true) }
+                            FilterChip(selected = selected, label = { Text(child) }, onClick = {
+                                children = if (selected) children.filterNot { it.equals(child, true) } else children + child
+                                error = null
+                            })
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = name.isNotBlank() && (agent in enabled || agent == existing?.agent),
+                onClick = {
+                    val next = JarvisManagers.Team(name.trim(), agent, model, instructions.trim(), project, effort, children)
+                    val problem = synchronized(JarvisManagers) {
+                        val latest = JarvisManagers.of(owner).teams
+                        val matching = latest.firstOrNull { it.name.equals(next.name, true) }
+                        val graph = (latest.filterNot { it == matching } + next).associate { it.name to it.childRoles }
+                        when {
+                            existing == null && matching != null -> duplicateName
+                            existing != null && matching == null -> missingRole
+                            !JarvisOrchestrationRules.validRoleGraph(graph) -> invalidGraph
+                            else -> runCatching { JarvisManagers.upsertTeam(owner, next) }.exceptionOrNull()?.let { it.message ?: saveFailure }
+                        }
+                    }
+                    if (problem == null) onClose() else error = problem.ifBlank { saveFailure }
+                }
+            ) { Text(teamText("Save", "保存")) }
+        },
+        dismissButton = {
+            Row {
+                if (existing != null) {
+                    TextButton(onClick = {
+                        val problem = synchronized(JarvisManagers) {
+                            val latest = JarvisManagers.of(owner).teams
+                            val referenced = latest.any { profile -> profile.childRoles.any { it.equals(existing.name, true) } }
+                            when {
+                                referenced -> inUse
+                                JarvisManagers.removeTeam(owner, existing.name) -> null
+                                else -> missingRole
+                            }
+                        }
+                        if (problem == null) onClose() else error = problem
+                    }) { Text(teamText("Remove role", "移除岗位"), color = MaterialTheme.colorScheme.error) }
+                }
+                TextButton(onClick = onClose) { Text(teamText("Cancel", "取消")) }
+            }
+        }
+    )
+}
+
+@Composable
+private fun <T> TeamChoice(label: String, selected: T, choices: List<Pair<T, String>>, fallback: String, onSelect: (T) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Column {
+        Text(label, style = MaterialTheme.typography.labelMedium)
+        Box {
+            TextButton(enabled = choices.isNotEmpty(), onClick = { open = true }) {
+                Text(choices.firstOrNull { it.first == selected }?.second ?: fallback)
+            }
+            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                choices.forEach { (value, name) ->
+                    DropdownMenuItem(text = { Text(name) }, onClick = { open = false; onSelect(value) })
+                }
+            }
+        }
+    }
+}
+
+private data class TeamTaskNode(val task: JarvisTasks.Task, val depth: Int)
+
+private fun teamTaskTree(owner: String, tasks: List<JarvisTasks.Task>): List<TeamTaskNode> {
+    val children = tasks.groupBy { JarvisManagers.ownerOrVoice(it.owner) }
+    val seen = hashSetOf(owner)
+    val queue = ArrayDeque<TeamTaskNode>()
+    fun push(parent: String, depth: Int) {
+        children[parent].orEmpty().asReversed().forEach { queue.addLast(TeamTaskNode(it, depth)) }
+    }
+    push(owner, 0)
+    return buildList {
+        while (queue.isNotEmpty()) {
+            val node = queue.removeLast()
+            if (seen.add(node.task.id)) {
+                add(node)
+                push(node.task.id, node.depth + 1)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TeamTaskRow(task: JarvisTasks.Task, depth: Int, onDetails: () -> Unit, onOpen: () -> Unit) {
+    val color = taskColor(task.state)
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    Row(
+        Modifier.fillMaxWidth().padding(start = (depth.coerceAtMost(7) * 12).dp, top = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).clickable(onClick = onDetails).padding(vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.size(8.dp).clip(CircleShape).background(color))
+            Spacer(Modifier.width(8.dp))
+            Column {
+                Text(task.title, fontSize = 12.5.sp, color = onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    listOf(task.team, agentLabel(task.agent.name), task.state.label, if (task.archived) teamText("Archived", "已归档") else "", age(task.createdAt))
+                        .filter { it.isNotBlank() }.joinToString(" · "),
+                    fontSize = 10.5.sp, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+        IconMini(Icons.AutoMirrored.Filled.OpenInNew, teamText("Open chat", "打开会话"), onSurface.copy(alpha = 0.6f), onOpen)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun TeamTaskDetail(task: JarvisTasks.Task, canArchive: Boolean, onClose: () -> Unit, onOpen: () -> Unit, onArchived: (String) -> Unit) {
+    val scope = rememberCoroutineScope()
+    var message by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var feedback by remember { mutableStateOf<String?>(null) }
+    var showDiff by remember { mutableStateOf(false) }
+    val workspace = task.workspace
+    val failure = teamText("Could not complete the action.", "无法完成操作。")
+    val archived = teamText("Task and its child task history were archived.", "任务及其子任务历史已归档。")
+    val restored = teamText("Task history restored to the task tree.", "任务历史已恢复到任务树。")
+    val reviewGoal = teamText("Review the saved goal before you send it.", "发送前请检查已保存的任务目标。")
+    fun runAction(action: suspend () -> String) {
+        if (busy) return
+        busy = true
+        scope.launch {
+            try {
+                feedback = action()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                feedback = error.message ?: failure
+            } finally {
+                busy = false
+            }
+        }
+    }
+    fun send(interrupt: Boolean) {
+        val text = message.trim()
+        runAction {
+            JarvisTasks.reply(task.id, text, interrupt).also {
+                if (it.startsWith("Sent") || it.startsWith("Queued")) message = ""
+            }
+        }
+    }
+
+    if (showDiff && workspace != null) {
+        TeamWorktreeDiff(workspace) { showDiff = false }
+        return
+    }
+
+    AlertDialog(
+        onDismissRequest = { if (!busy) onClose() },
+        title = { Text(task.title) },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(task.state.label, color = taskColor(task.state))
+                if (task.archived) Text(teamText("Archived", "已归档"), style = MaterialTheme.typography.labelSmall)
+                if (task.note.isNotBlank()) SelectionContainer { Text(task.note) }
+                if (workspace != null) {
+                    TextButton(enabled = !busy, onClick = { showDiff = true }) {
+                        Text(teamText("Review Git changes", "审查 Git 变更"))
+                    }
+                }
+                if (task.goal.isNotBlank()) {
+                    Text(teamText("Goal", "目标"), style = MaterialTheme.typography.labelLarge)
+                    SelectionContainer { Text(task.goal) }
+                }
+                if (task.result.isNotBlank()) {
+                    Text(
+                        if (task.resultChars > task.result.length) teamText("Result preview", "结果摘要") else teamText("Result", "结果"),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    SelectionContainer { Text(task.result) }
+                }
+                OutlinedTextField(
+                    value = message, onValueChange = { message = it },
+                    label = { Text(teamText("Follow up", "追问")) }, minLines = 2, maxLines = 5,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                FlowRow {
+                    TextButton(enabled = !busy && message.isNotBlank(), onClick = { send(interrupt = false) }) {
+                        Text(teamText("Send", "发送"))
+                    }
+                    if (task.active) {
+                        TextButton(enabled = !busy && message.isNotBlank(), onClick = { send(interrupt = true) }) {
+                            Text(teamText("Interrupt and send", "打断并发送"))
+                        }
+                        TextButton(enabled = !busy, onClick = { runAction { JarvisTasks.stop(task.id) } }) {
+                            Text(teamText("Stop", "停止"), color = MaterialTheme.colorScheme.error)
+                        }
+                    } else {
+                        if (task.goal.isNotBlank()) {
+                            TextButton(enabled = !busy, onClick = {
+                                if (task.goal.length >= 600) {
+                                    message = task.goal
+                                    feedback = reviewGoal
+                                } else {
+                                    runAction { JarvisTasks.reply(task.id, task.goal, interrupt = false) }
+                                }
+                            }) {
+                                Text(teamText("Restart with goal", "按原目标重启"))
+                            }
+                        }
+                        if (!task.archived && canArchive) {
+                            TextButton(enabled = !busy, onClick = {
+                                if (JarvisTasks.archive(task.id)) onArchived(archived) else feedback = failure
+                            }) { Text(teamText("Archive task", "归档任务")) }
+                        } else if (task.archived) {
+                            TextButton(enabled = !busy, onClick = {
+                                if (JarvisTasks.unarchive(task.id)) onArchived(restored) else feedback = failure
+                            }) { Text(teamText("Restore task", "恢复任务")) }
+                        }
+                    }
+                }
+                feedback?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            }
+        },
+        confirmButton = { TextButton(enabled = !busy, onClick = onOpen) { Text(teamText("Open chat", "打开会话")) } },
+        dismissButton = { TextButton(enabled = !busy, onClick = onClose) { Text(teamText("Close", "关闭")) } }
+    )
+}
+
+@Composable
+private fun TeamWorktreeDiff(workspace: JarvisWorktreeManager.Workspace, onClose: () -> Unit) {
+    val context = LocalContext.current.applicationContext
+    var revision by remember { mutableStateOf(0) }
+    var diff by remember(workspace, revision) { mutableStateOf<JarvisWorktreeManager.Diff?>(null) }
+    var failure by remember(workspace, revision) { mutableStateOf<String?>(null) }
+    val loadError = teamText("Could not read the Git worktree.", "无法读取 Git worktree。")
+    LaunchedEffect(workspace, revision) {
+        try {
+            diff = JarvisWorktreeManager.diff(context, workspace)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            failure = error.message ?: loadError
+        }
+    }
+
+    val changes = diff
+    val blocks = remember(changes?.patch) { patchPreviewBlocks(changes?.patch.orEmpty()) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(teamText("Git worktree changes", "Git worktree 变更")) },
+        text = {
+            LazyColumn(
+                Modifier.fillMaxWidth().heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                item {
+                    SelectionContainer {
+                        Column {
+                            Text(workspace.branch, style = MaterialTheme.typography.labelLarge)
+                            Text(workspace.checkoutRoot, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+                val problem = failure
+                when {
+                    problem != null -> item { Text(problem, color = MaterialTheme.colorScheme.error) }
+                    changes == null -> item { Text(teamText("Reading Git changes…", "正在读取 Git 变更…")) }
+                    else -> {
+                        if (blocks.isEmpty() && changes.untrackedFiles.isEmpty()) {
+                            item { Text(teamText("No changes from the base commit.", "相对于基准提交没有变更。")) }
+                        }
+                        if (changes.untrackedFiles.isNotEmpty()) {
+                            item { BoardTitle(teamText("Untracked files", "未跟踪文件")) }
+                            items(changes.untrackedFiles) { path ->
+                                SelectionContainer { Text(path, style = MaterialTheme.typography.bodySmall) }
+                            }
+                        }
+                        if (blocks.isNotEmpty()) {
+                            item { BoardTitle(teamText("Patch", "补丁")) }
+                            if (changes.truncated) item {
+                                Text(teamText("Preview limit reached. The full changes remain in the worktree.", "预览已达上限，完整变更仍保留在工作树中。"))
+                            }
+                            items(blocks) { block ->
+                                SelectionContainer {
+                                    Text(block, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(teamText("Back to task", "返回任务")) } },
+        dismissButton = {
+            TextButton(enabled = changes != null || failure != null, onClick = { revision++ }) {
+                Text(teamText("Refresh", "刷新"))
+            }
+        }
+    )
+}
+
+/** Preserve line boundaries between lazy rows except when a single line exceeds the layout limit. */
+private fun patchPreviewBlocks(patch: String): List<String> = buildList {
+    var start = 0
+    while (start < patch.length) {
+        var end = (start + 4096).coerceAtMost(patch.length)
+        if (end < patch.length) {
+            val newline = patch.lastIndexOf('\n', startIndex = end - 1)
+            if (newline >= start) end = newline + 1
+            else if (patch[end - 1].isHighSurrogate()) end--
+        }
+        add(patch.substring(start, end).removeSuffix("\n"))
+        start = end
+    }
+}
+
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun TeamApprovals(tree: List<TeamTaskNode>, onOpenChat: (String) -> Unit, onClose: () -> Unit) {
+    val taskById = tree.associate { it.task.id to it.task }
+    fun pending() = tree.map { JarvisManagers.ownerOrVoice(it.task.owner) }.distinct().flatMap { owner ->
+        JarvisController.pendingFor(owner).filter { it.chatId in taskById }.map { owner to it }
+    }
+    // Task state changes cause the board to recompose. Selections refresh immediately and can also be refreshed manually.
+    var revision by remember { mutableStateOf(0) }
+    var feedback by remember { mutableStateOf<String?>(null) }
+    val approvals = remember(tree, revision) { pending() }
+    val expired = teamText("This request is no longer pending.", "该请求已不再等待审批。")
+    val refusal = teamText("The user denied this request.", "用户拒绝了该请求。")
+    fun decide(owner: String, perm: JarvisController.Perm, allow: Boolean) {
+        feedback = if (JarvisController.pendingFor(owner).any { it.key == perm.key && it.chatId == perm.chatId }) {
+            JarvisController.resolve(perm.key, approve = allow, all = false, reason = if (allow) null else refusal, caller = owner)
+        } else expired
+        revision++
+    }
+
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(teamText("Pending task approvals", "待审批任务")) },
+        text = {
+            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (approvals.isEmpty()) Text(teamText("No approvals are pending.", "没有待审批请求。"))
+                approvals.forEach { (owner, perm) ->
+                    key(perm.key) {
+                        Column {
+                            Text(taskById.getValue(perm.chatId).title, style = MaterialTheme.typography.titleSmall)
+                            if (perm.risk == JarvisController.Risk.RISKY) {
+                                Text(teamText("Risky operation", "风险操作"), color = MaterialTheme.colorScheme.error)
+                            }
+                            SelectionContainer { Text(perm.summary) }
+                            FlowRow {
+                                TextButton(onClick = { decide(owner, perm, true) }) { Text(teamText("Allow once", "允许一次")) }
+                                TextButton(onClick = { decide(owner, perm, false) }) { Text(teamText("Deny", "拒绝")) }
+                                TextButton(onClick = { onClose(); onOpenChat(perm.chatId) }) { Text(teamText("Open chat", "打开会话")) }
+                            }
+                        }
+                    }
+                }
+                feedback?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(teamText("Close", "关闭")) } },
+        dismissButton = { TextButton(onClick = { revision++ }) { Text(teamText("Refresh", "刷新")) } }
+    )
 }
 
 @Composable
