@@ -8,7 +8,6 @@ export HOME="$temp/home"
 mkdir -p "$HOME" "$temp/project"
 export PASEO_PASSWORD="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
 export PASEO_HOME="$HOME/.local/share/antigem-paseo-team/state"
-runtime="$HOME/.local/share/antigem-paseo-team/runtime-arm64-v2"
 cleanup() {
   "${team[@]}" cli terminal kill ci-worker >/dev/null 2>&1 || true
   "${team[@]}" stop >/dev/null 2>&1 || true
@@ -19,22 +18,14 @@ cleanup() {
 }
 trap 'cleanup "$?"' EXIT
 git -C "$temp/project" init -q
+"${team[@]}" doctor
 "${team[@]}" install
-# Use the original Paseo auth implementation for noninteractive isolated test setup.
-mkdir -p "$PASEO_HOME"
-node - "$runtime" "$PASEO_HOME" <<'JS'
-const fs = require("node:fs");
-const path = require("node:path");
-const {createRequire} = require("node:module");
-const {pathToFileURL} = require("node:url");
-const [root, home] = process.argv.slice(2);
-const req = createRequire(path.join(root,"node_modules","@getpaseo","cli","package.json"));
-(async () => {
-  const {hashDaemonPassword} = await import(pathToFileURL(req.resolve("@getpaseo/server/auth")).href);
-  const config = {version:1,daemon:{listen:"127.0.0.1:6799",relay:{enabled:false},auth:{password:hashDaemonPassword(process.env.PASEO_PASSWORD)},mcp:{enabled:true,injectIntoAgents:true}},features:{webUi:{enabled:true},dictation:{enabled:false},voiceMode:{enabled:false}}};
-  fs.writeFileSync(path.join(home,"config.json"),JSON.stringify(config,null,2),{mode:0o600,flag:"wx"});
-})().catch(e => {console.error(e);process.exitCode=1;});
-JS
+"${team[@]}" install  # Reuse installed version
+"${team[@]}" check
+"${team[@]}" providers --write
+printf '[{"id":"ci-reader","name":"CI reader","provider":"claude","notes":"Read-only test"}]\n' > "$temp/profiles.json"
+"${team[@]}" profiles --write "$temp/profiles.json"
+"${team[@]}" password
 "${team[@]}" start
 "${team[@]}" verify
 "${team[@]}" cli terminal create --cwd "$temp/project" --name ci-worker
