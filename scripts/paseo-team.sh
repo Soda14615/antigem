@@ -290,30 +290,6 @@ daemon_running() {
   run_paseo daemon status --home "$team_home" 2>/dev/null | grep -Fxq 'localDaemon: running'
 }
 
-stop_quietly() {
-  if daemon_running; then
-    run_paseo daemon stop --home "$team_home" >/dev/null 2>&1 || true
-    info "已停止运行中的守护进程，以便安全修改配置"
-  fi
-}
-
-activate_runtime() {
-  local target="$1" old link
-  old="$(resolve_runtime)"
-  if [[ "$old" != "$target" ]]; then
-    link="$root/.current-$$"
-    ln -s "$target" "$link"
-    mv -Tf "$link" "$root/current" || fail "切换运行时失败"
-    if [[ -f "$old/.verified-install" ]]; then
-      link="$root/.previous-$$"
-      ln -s "$old" "$link"
-      mv -Tf "$link" "$root/previous" || fail "保存回滚目标失败"
-    fi
-  fi
-  runtime="$target"
-  paseo="$runtime/node_modules/@getpaseo/cli/bin/paseo"
-  info "当前运行时：$runtime"
-}
 do_install() {
   local target="${1:-$version}" dest stage
   [[ "$target" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9][a-zA-Z0-9.-]*)?$ ]] || fail "非法 Paseo 版本：$target"
@@ -669,7 +645,7 @@ case "${1:-help}" in
     ;;
   logs)
     if [[ "${2:-}" == "-f" ]]; then
-      exec tail -f "$team_home/daemon.log"
+      tail -f "$team_home/daemon.log"
     fi
     tail -n 80 "$team_home/daemon.log"
     ;;
@@ -706,7 +682,7 @@ case "${1:-help}" in
     shift
     require_paseo
     [[ $# -gt 0 ]] || fail "用法：paseo-team cli <args>"
-    exec node --disable-warning=DEP0040 "$paseo" --home "$team_home" "$@"
+    run_paseo --home "$team_home" "$@"
     ;;
   help|-h|--help)
     usage
