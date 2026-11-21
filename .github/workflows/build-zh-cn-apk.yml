@@ -20,13 +20,13 @@ permissions:
 
 jobs:
   build-zh-cn:
-    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team')
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     name: Build and test (${{ matrix.target }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ github.event_name == 'pull_request' && fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""},{"target":"localized-base","repository":"Soda14615/antigem","ref":"5861fb38744fd199480729023e4e4138ad384ea1"},{"target":"official-upstream","repository":"santoshkurmi/antigem","ref":"c9981af375f0044386677980916c80bf39b95bec"}]') || fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""}]') }}
+        include: ${{ github.event_name == 'pull_request' && github.head_ref == 'chatgpt/paseo-native-team' && fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""},{"target":"localized-base","repository":"Soda14615/antigem","ref":"5861fb38744fd199480729023e4e4138ad384ea1"},{"target":"official-upstream","repository":"santoshkurmi/antigem","ref":"c9981af375f0044386677980916c80bf39b95bec"}]') || fromJSON('[{"target":"candidate","repository":"Soda14615/antigem","ref":""}]') }}
 
     steps:
       - name: Checkout Code
@@ -59,7 +59,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Check Paseo team launcher
-        if: matrix.target == 'candidate' && (github.head_ref == 'chatgpt/paseo-native-team' || github.ref == 'refs/heads/chatgpt/paseo-native-team')
+        if: matrix.target == 'candidate'
         run: bash -n scripts/paseo-team.sh
 
       - name: Build ARM64 APK
@@ -131,6 +131,10 @@ jobs:
           retention-days: 3
           if-no-files-found: error
 
+      - name: Test native orchestration rules
+        if: matrix.target == 'candidate'
+        run: ./gradlew :app:testDebugUnitTest -Pantigem.arm64Only=true --tests ai.antigem.data.jarvis.JarvisOrchestrationRulesTest
+
       # Do not mask failures: the APK is a build artifact, not proof of regression-test success.
       - name: Run Debug Unit Tests
         run: ./gradlew :app:testDebugUnitTest -Pantigem.arm64Only=true
@@ -148,7 +152,7 @@ jobs:
 
   paseo-runtime:
     name: Paseo upstream runtime (Linux)
-    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team') || (github.event_name == 'push' && github.ref == 'refs/heads/chatgpt/paseo-native-team')
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && (github.ref == 'refs/heads/zh-cn-v2.0.1' || github.ref == 'refs/heads/zh-cn'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -165,7 +169,7 @@ jobs:
 
   paseo-android-package:
     name: Android ARM64 npm package audit (not device execution)
-    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chatgpt/paseo-native-team') || (github.event_name == 'push' && github.ref == 'refs/heads/chatgpt/paseo-native-team')
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && (github.ref == 'refs/heads/zh-cn-v2.0.1' || github.ref == 'refs/heads/zh-cn'))
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

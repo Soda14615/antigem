@@ -1,66 +1,34 @@
-# 原版 Paseo 团队接入（试验分支）
+# 团队编排：默认原生模式与可选 Paseo 模式
 
-## 设计
+## 默认：直接使用 AntiGem 已安装的环境
 
-保留 AntiGem / Jarvis 的既有多 Agent 功能，不修改其运行器。通过本地 Bash 新增一个独立的团队入口，安装并运行官方 npm 包 @getpaseo/cli，而不是重写 Paseo 的编排机制。
+汉化版侧栏和聊天顶部的「团队编排」打开 **Jarvis 原生团队管理会话**，优先返回已有岗位的管理会话。首次使用会创建 Jarvis 文本会话（需要在设置中启用 Jarvis 和至少一个 Agent）。
 
-- npm 独立安装前缀：~/.local/share/antigem-paseo-team/runtimes/<版本>（current 软链指向当前版本，兼容旧 runtime-arm64-v2）
-- Paseo 独立数据目录：~/.local/share/antigem-paseo-team/state
-- 本地监听：127.0.0.1:6799；Relay 默认关闭；正常启动入口要求先通过原版 bcrypt 哈希函数设置访问密码
-- 初次启动启用原版编排工具注入与原版 Web UI，关闭口述和语音模式（不替换语音依赖、不跳过 npm 安装脚本）；已有配置不覆盖
-- 只有用户执行 install 才联网安装依赖；APK 只打包轻量 Bash 启动器
-- 试验目标版本：0.17.0-beta.1（与审核时上游源码一致）；npm 发布可用性由独立 CI 实际检查
+原生模式使用 AntiGem 已有的 Claude Code、Codex、OpenCode、agy 后端、账户和项目环境。**不要求执行 `paseo-team install`、安装第二套 Node.js、重新登录模型、打开额外 Web UI 或运行额外 Paseo Daemon。** 这是将原先需要的分层岗位、子 Agent 委派、消息回传等能力接入 Jarvis 的实现；不是完整重写或逐行移植所有上游 Paseo 功能。
 
-## 使用
+岗位在 Jarvis 对话内通过 `jarvis_team_create` 配置：可设置 Agent、模型、推理等级、项目和职责。使用 `child_roles` 将已有岗位授权给管理岗，再用 `jarvis_task_start(team=...,goal=...)` 创建独立任务。所有委派都由 AntiGem 原生会话管理和原有 MCP 工具运行。支持多级角色配置；真实设备上的多级委派、权限请求与结果回传仍需验证。
 
-汉化版聊天顶部与侧栏均新增「Paseo 团队」入口。验证过安装且 /api/health 返回 status=ok 时直接进入原版团队工作区，并保留原浏览器标签；否则显示首次安装引导。首次打开显示安装及启动命令，点击「本地终端」进入既有终端；服务实际就绪后点击「打开团队」，复用 AntiGem 内置浏览器。没有后台自动安装、没有替换 Jarvis，也没有重新开发 Paseo 的 Web UI。
+详见 [原生分层编排设计](hierarchical-agent-orchestration.md)。
 
-在新版 AntiGem 本地 Bash 中执行（不是 SSH 终端）：
+## 可选：独立的原版 Paseo 服务端（非默认入口）
+
+原先集成的 `scripts/paseo-team.sh` 作为兼容/实验工具保留。只有明确希望使用 **Paseo 原版 Web UI、原版 Daemon、Paseo 特有功能** 的用户，才需在 AntiGem 本地终端执行：
 
 ```bash
 paseo-team doctor
 paseo-team install
-paseo-team providers
 paseo-team providers --write
 paseo-team password
 paseo-team start
-paseo-team status
 paseo-team verify
-paseo-team check
-paseo-team url
-paseo-team cli --help
-paseo-team stop
-paseo-team logs
-paseo-team versions
-paseo-team update <新版本>
-paseo-team rollback
-paseo-team profiles --write /path/to/profiles.json
-# Android 终端 socket 长度不足时，停服后才可选择：
-# paseo-team patch-terminal
 ```
 
-更新和回滚需要先停服。`profiles --write` 必须提供真实岗位的 JSON 数组，不能自动写入未经确认的模型名称。`doctor` 是只读诊断；`providers --write` 只改 Paseo 独立配置中的 CLI 绝对路径，并不代表登录态已经验证通过。
+这条实验路线会通过已有 Node/npm 单独安装官方 `@getpaseo/cli@0.17.0-beta.1` 及其 npm 依赖（包括 server 和 Web UI），但不会重新安装 Claude、Codex、OpenCode 或 agy。安装位置 `~/.local/share/antigem-paseo-team/runtimes/<版本>`，`current` 链接指向已选版本，数据独立存放在 `state`。独立 Web 界面监听 `127.0.0.1:6799`，Relay 关闭、需密码。
 
-从 AntiGem 原有浏览器打开 http://127.0.0.1:6799（服务实际就绪且 Web UI 可用后）。也可直接在已签出的源码里运行 bash scripts/paseo-team.sh，避免先重新打 APK。没有自动登录、没有原 Jarvis 会话导入、没有将小说资料写入仓库。
+管理命令：`paseo-team status`、`stop`、`logs`、`versions`、`update <版本>`、`rollback`、`check`。切换版本前先停服。PTY 和原版 Unix socket 对 Android 的兼容性仍未实机验收；PTY 失败不应拦住核心编排，但终端页签可能不可用。仅在确实需要时、停服后执行可回滚的 `patch-terminal`。
 
-## 并存边界
+## 共存原则与验证边界
 
-两者拥有不同的编排状态、会话管理权、命令入口和服务端口。Paseo 应创建自己的会话，Jarvis 创建自己的会话；不要把同一个现有会话同时交给两者管理。不需要禁用 Jarvis。
+原生 Jarvis 团队与可选原版 Paseo 服务分别管理会话与任务，不应让两个调度器并发修改同一工作目录。它们可共享本机 CLI 与账户，却**不共享任务数据库或 Agent 会话所有权**。无需把 Jarvis 和 Paseo 两套编排器同时启动。
 
-这不等于进程、安全或资源隔离。它们运行在同一 Android 应用环境，可能使用相同 CLI、认证文件、全局 MCP 配置、项目文件及模型额度。不要同时让两个编排器修改同一工作树。若 CLI 争用或全局 MCP 互相影响，优先复用独立工作区、使用提供方支持的独立配置，或串行运行。仅绑定 loopback 也不是认证：启动器通过原版 hashDaemonPassword 保存 bcrypt 哈希，交互式连接会提示输入密码，非交互环境可使用 PASEO_PASSWORD 环境变量。仍需在真机验证 HTTP/WebSocket 认证及其他 Android 本地应用的可访问性，不要将端口转发或公开。原版 CLI 透传不是安全沙箱。
-
-## Android 兼容
-
-使用独立 npm 根 package.json 的 overrides，在 process.platform=android、process.arch=arm64 时将 node-pty 替换为已发布的 @mmmbuto/node-pty-android-arm64@1.1.2；Linux 保留原依赖。Paseo 上游的 node-pty 为 1.2.0-beta.15，兼容性不能从 API 名称推定。核心模块与 CLI 通过检查后允许写入 .verified-install；PTY 失败单独记录，不再阻断团队编排。Android 终端 worker 的 socket 路径可能超过 AF_UNIX 限制，可使用需要明确执行、可回滚的 `patch-terminal` 缩短文件名，仍须真机验证 dlopen/bind。原版 Paseo 版本当前固定为 0.17.0-beta.1，其 npm 发布可用性仍需核验。原版语音模块仍是依赖，禁用语音只是避免调用 native loader，不等于已证明可安装。
-
-## 验收
-
-1. 真机验证 Node/npm、npm 包发布版本及 native 依赖（特别是 node-pty、sherpa-onnx-node）；安装失败保留原始错误，不使用 --ignore-scripts 假装成功。必要时评估 Termux 原生构建、glibc 或 Ubuntu proot。
-2. 原版 Daemon 必须实际启动，状态确认 RPC 可达，Web UI 可访问。
-3. 确认 provider discovery 和认证是否能够复用已有 CLI；从 Paseo 新建总控及下级组长，组长自行创建两名真实专家；核对实际会话 ID、模型及完成通知。
-4. 验证 Jarvis 独立启动任务，双方不能互相接管会话；检查并发 CLI、MCP、工作目录、手机休眠与额度。
-5. 用用户原有岗位配置做导入兼容测试。未通过以上步骤前，不宣称具备完整手机团队运行能力。
-
-本分支提供独立原版运行入口、APK 打包接线及侧栏入口。ARM64 调试 APK 已成功构建；对照测试证明原有 11 项失败中的两项已修正，九项缺失 Codex 记录仍需恢复。新增独立 CI：真实 Linux 安装、认证、Web UI、实际 terminal worker 回显；Android ARM64 npm 包和依赖图审计只检查发布文件与解析，不等同于 Android 执行。最新运行脚本增加 core/PTY 分级检查，Linux CI 通过安装、认证、Web UI、真实终端 worker 测试后才能认为该版本 Linux 链路通过；Android 必须真机运行 doctor/install/start/verify 才能确定手机运行层。验证状态以真实 CI 和设备日志为准。参考：[Paseo CLI](https://paseo.sh/docs/cli)、[配置](https://paseo.sh/docs/configuration)、[编排](https://paseo.sh/docs/orchestration)。
-
-聊天入口只复用原版完整 Web UI，并非把 Paseo 会话混入 Jarvis/AntiGem 原生对话列表。需验证在 WebView 内创建和编辑 profile、创建总控、选择模型、发送和追问、查看真实子 Agent 结果、修改运行配置及停止任务。上游 Agent 配置文档与实现支持这些操作，但 Android 端尚未验收。不要以页面成功加载当作功能通过。
+Linux CI 的原版 Paseo 安装、认证和终端测试，不能代替 Android 真机测试。原生团队编排的单元测试也不能代替真实模型端到端测试。正式验收须确认同一手机上由总控创建组长、组长创建执行者、完整收集结果、处理中断与重启。

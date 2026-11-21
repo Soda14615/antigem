@@ -149,67 +149,23 @@ fun ChatScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    var showPaseoTeam by remember { mutableStateOf(false) }
-    var paseoOpening by remember { mutableStateOf(false) }
-    var paseoTabId by remember { mutableStateOf<String?>(null) }
-    val openPaseoTeam: () -> Unit = {
-        if (!paseoOpening) {
-            paseoOpening = true
-            scope.launch {
-                try {
-                    val ready = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                        val root = File(LocalEnvironmentManager.getHomeDir(context), ".local/share/antigem-paseo-team")
-                        val installed = File(root, "current/.verified-install").isFile ||
-                            File(root, "runtime-arm64-v2/.verified-install").isFile
-                        if (!installed) false else runCatching {
-                            val connection = java.net.URL("http://127.0.0.1:6799/api/health").openConnection() as java.net.HttpURLConnection
-                            try {
-                                connection.connectTimeout = 1500
-                                connection.readTimeout = 1500
-                                connection.instanceFollowRedirects = false
-                                connection.responseCode == 200 &&
-                                    org.json.JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).optString("status") == "ok"
-                            } finally { connection.disconnect() }
-                        }.getOrDefault(false)
-                    }
-                    if (ready) {
-                        showPaseoTeam = false
-                        drawerState.close()
-                        val browser = ai.antigem.ui.browser.BrowserSessionManager.instance
-                        val existingTab = paseoTabId
-                        if (existingTab == null || !browser.switchTab(existingTab)) {
-                            paseoTabId = browser.openUrl("http://127.0.0.1:6799", newTab = true).id
-                        }
-                        onNavigateToBrowser()
-                    } else showPaseoTeam = true
-                } finally { paseoOpening = false }
-            }
+    // Native team orchestration delegates through Jarvis and reuses the app's existing providers.
+    // The optional upstream Paseo daemon remains available separately from the local terminal.
+    val openNativeTeam: () -> Unit = {
+        // Keep the named team catalog instead of starting an empty manager on every tap.
+        val existing = ai.antigem.data.jarvis.JarvisManagers.textKeys().lastOrNull { id ->
+            !ai.antigem.data.jarvis.JarvisManagers.isDelegated(id) &&
+                ai.antigem.data.jarvis.JarvisManagers.of(id).teams.isNotEmpty()
         }
-    }
-    if (showPaseoTeam) {
-        AlertDialog(
-            onDismissRequest = { showPaseoTeam = false },
-            title = { Text(stringResource(R.string.paseo_team_title)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(stringResource(R.string.paseo_team_setup))
-                    SelectionContainer {
-                        Text("paseo-team doctor\npaseo-team install\npaseo-team providers --write\npaseo-team password\npaseo-team start\npaseo-team verify", fontFamily = FontFamily.Monospace)
-                    }
-                    Text(stringResource(R.string.paseo_team_stop_hint))
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = openPaseoTeam, enabled = !paseoOpening) { Text(stringResource(R.string.paseo_team_open)) }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showPaseoTeam = false
-                    scope.launch { drawerState.close() }
-                    onNavigateToTerminal()
-                }) { Text(stringResource(R.string.paseo_team_terminal)) }
-            }
-        )
+        if (existing != null) {
+            viewModel.selectConversation(existing)
+            viewModel.requestViewMode("CHAT")
+            scope.launch { drawerState.close() }
+        } else {
+            val problem = ai.antigem.data.jarvis.JarvisController.startTextChat()
+            if (problem != null) android.widget.Toast.makeText(context, problem, android.widget.Toast.LENGTH_LONG).show()
+            else scope.launch { drawerState.close() }
+        }
     }
     // The sidebar is 82% of the screen width, so turning the phone (e.g. a landscape full-screen video)
     // changes its width; the drawer then moves to whichever position is nearest and can open by itself.
@@ -1498,7 +1454,7 @@ fun ChatScreen(
                 onCancelLogin = {
                     viewModel.cancelAgyLogin()
                 },
-                onOpenPaseoTeam = if (!isInFloatingWindow) openPaseoTeam else null,
+                onOpenNativeTeam = if (!isInFloatingWindow) openNativeTeam else null,
                 onOpenSettings = {
                     showSettingsDialog = true
                     scope.launch { drawerState.close() }
@@ -2003,8 +1959,8 @@ fun ChatScreen(
                     },
                     actions = {
                         if (!isInFloatingWindow) {
-                            IconButton(onClick = openPaseoTeam, enabled = !paseoOpening) {
-                                Icon(Icons.Outlined.Apps, contentDescription = stringResource(R.string.paseo_team_title))
+                            IconButton(onClick = openNativeTeam) {
+                                Icon(Icons.Outlined.Apps, contentDescription = stringResource(R.string.native_team_title))
                             }
                         }
                         // Browser, Terminal and the IDE are in the floating switcher (always on)

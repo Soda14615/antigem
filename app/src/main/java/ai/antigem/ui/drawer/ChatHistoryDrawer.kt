@@ -139,7 +139,7 @@ fun ChatHistoryDrawer(
     onNewJarvisChat: ((ai.antigem.domain.model.AgentKind?) -> Unit)? = null,
     enabledAgents: Set<ai.antigem.domain.model.AgentKind> = emptySet(),
     modifier: Modifier = Modifier,
-    onOpenPaseoTeam: (() -> Unit)? = null
+    onOpenNativeTeam: (() -> Unit)? = null
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -1241,9 +1241,9 @@ fun ChatHistoryDrawer(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
             )
 
-            if (onOpenPaseoTeam != null) {
+            if (onOpenNativeTeam != null) {
                 Surface(
-                    onClick = onOpenPaseoTeam,
+                    onClick = onOpenNativeTeam,
                     color = Color.Transparent,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp),
                     shape = RoundedCornerShape(8.dp)
@@ -1251,7 +1251,7 @@ fun ChatHistoryDrawer(
                     Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Apps, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(10.dp))
-                        Text(stringResource(R.string.paseo_team_title), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.native_team_title), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
