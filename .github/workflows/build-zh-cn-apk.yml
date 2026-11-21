@@ -88,7 +88,7 @@ jobs:
             ./gradlew :app:assembleRelease -Pantigem.arm64Only=true
             APK_SRC=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
             APK_OUT="dist/AntiGem-v${VERSION_NAME}-zh-CN-arm64.apk"
-            EXPECTED_PACKAGE=ai.antigem
+            EXPECTED_PACKAGE=ai.antigcn
           fi
           test -f "$APK_SRC"
           cp "$APK_SRC" "$APK_OUT"

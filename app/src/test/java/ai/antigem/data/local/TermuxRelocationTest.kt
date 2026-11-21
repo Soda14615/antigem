@@ -67,6 +67,22 @@ class TermuxRelocationTest {
         assertEquals(reference(bytes, true), scan(bytes, true))
     }
 
+    /** Native Termux binary paths and explicit service components must target the fork identity. */
+    @Test
+    fun chineseForkUsesIndependentPackage() {
+        val fork = "ai.antigcn"
+        assertEquals("com.termux".length, fork.length)
+        val script = "/data/data/com.termux/files/usr/bin/bash\n-n com.termux/com.termux.app.TermuxService"
+        assertEquals(
+            "/data/data/ai.antigcn/files/usr/bin/bash\n-n ai.antigcn/ai.antigcn.app.TermuxService",
+            String(TermuxRelocation.rewrite(script.toByteArray(), fork))
+        )
+        assertEquals(
+            "/data/data/ai.antigcn/files/usr",
+            String(TermuxRelocation.rewrite("/data/data/ai.antigem/files/usr".toByteArray(), fork, releasePaths = true))
+        )
+    }
+
     @Test
     fun matchesAcrossChunkBoundariesAgreeWithReference() {
         val rnd = Random(42)

@@ -17,7 +17,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "AppUpdateManager"
-private const val DEFAULT_VERSION_URL = "https://raw.githubusercontent.com/santoshkurmi/antigem/standalone/version.json"
+private const val DEFAULT_VERSION_URL = "https://raw.githubusercontent.com/Soda14615/antigem/zh-cn/version.json"
 
 data class AppUpdateInfo(
     val versionCode: Int,
@@ -115,8 +115,28 @@ class AppUpdateManager(private val context: Context) {
         }
     }
 
-    private fun apkUrl(versionName: String, suffix: String) =
-        "https://github.com/santoshkurmi/antigem/releases/download/v$versionName/AntiGem-v$versionName$suffix.apk"
+    /** Resolve only assets published by our own fork, never the original ai.antigem package. */
+    private fun apkUrl(versionName: String, suffix: String): String = runCatching {
+        val request = Request.Builder()
+            .url("https://api.github.com/repos/Soda14615/antigem/releases/latest")
+            .header("User-Agent", "AntiGem-CN-Updater/${BuildConfig.VERSION_NAME}")
+            .build()
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return@use ""
+            val release = JSONObject(response.body?.string().orEmpty())
+            if (!release.optString("tag_name").startsWith("v$versionName-zh-cn.")) return@use ""
+            val expectedName = when (suffix) {
+                "-chroot" -> "AntiGem-v$versionName-zh-CN-arm64-chroot.apk"
+                "-x86_64" -> "AntiGem-v$versionName-zh-CN-x86_64.apk"
+                else -> "AntiGem-v$versionName-zh-CN-arm64.apk"
+            }
+            val assets = release.optJSONArray("assets") ?: return@use ""
+            (0 until assets.length()).asSequence()
+                .mapNotNull { assets.optJSONObject(it) }
+                .firstOrNull { it.optString("name") == expectedName }
+                ?.optString("browser_download_url").orEmpty()
+        }
+    }.getOrDefault("")
 
     /** Whether the release file is on GitHub (a release is published before CI has uploaded its APKs). */
     private fun isPublished(url: String): Boolean = try {

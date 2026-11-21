@@ -4,7 +4,9 @@
 
 Android 只允许在 **applicationId 相同且签名证书相同** 时原地升级。所以：
 
-- 包名必须是 `ai.antigem`（debug 变体是 `ai.antidev`，与正式包互不覆盖）
+- 中文整合版使用独立包名 `ai.antigcn`（桌面名称 AntiGem CN），与官方 `ai.antigem` 并存；这是新应用安装，不会自动继承旧版数据，须备份迁移。
+
+- 包名必须是 `ai.antigcn`（debug 变体是 `ai.antidev`，与正式包互不覆盖）
 - 所有 APK 必须用**同一把 keystore** 签名
 
 任何一次"本地随手 `keytool` 生成一把"，都会导致已安装用户必须卸载重装。
@@ -62,6 +64,6 @@ export RELEASE_KEYSTORE_PASSWORD='口令'
 
 | 变体 | applicationId | 可否升级正式包 |
 | --- | --- | --- |
-| release | `ai.antigem` | 是（证书一致时） |
+| release | `ai.antigcn` | 是（证书一致时） |
 | debug | `ai.antidev` | 否，需卸载 |
-| x86_64 debug（临时） | `ai.antigem` | 否，证书不同会冲突 |
+| x86_64 debug（临时） | `ai.antigcn` | 否，证书不同会冲突 |

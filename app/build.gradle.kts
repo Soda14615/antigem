@@ -63,7 +63,7 @@ android {
     compileSdk = 37
     compileSdkMinor = 1
     defaultConfig {
-        applicationId = "ai.antigem"
+        applicationId = "ai.antigcn"
         minSdk = 24
         targetSdk = 28
         versionCode = appVersionCode
@@ -100,7 +100,7 @@ android {
     }
 
     // Local ports differ per app so they can all run side by side: the old com.termux build uses 1234/1235/8765,
-    // release (ai.antigem) 1236/1237/8767, debug (ai.antidev, see androidComponents below) 1238/1239/8768
+    // official (ai.antigem) 1236/1237/8767, zh-CN release (ai.antigcn) 1240/1241/8769, debug (ai.antidev, see androidComponents below) 1238/1239/8768
     buildTypes {
         debug {
             buildConfigField("int", "BRIDGE_PORT", "1238")
@@ -110,9 +110,9 @@ android {
             buildConfigField("boolean", "HAS_CHROOT", "${hasChroot("debug")}")
         }
         release {
-            buildConfigField("int", "BRIDGE_PORT", "1236")
-            buildConfigField("int", "HUB_PORT", "1237")
-            buildConfigField("int", "BROWSER_MCP_PORT", "8767")
+            buildConfigField("int", "BRIDGE_PORT", "1240")
+            buildConfigField("int", "HUB_PORT", "1241")
+            buildConfigField("int", "BROWSER_MCP_PORT", "8769")
             buildConfigField("boolean", "HAS_CHROOT", "${hasChroot("release")}")
             isMinifyEnabled = true
             isShrinkResources = true
@@ -568,8 +568,8 @@ androidComponents {
 
         // Debug builds are their own app, ai.antidev ("AntiGem Dev"), so they install next to the release one. It must
         // have the length of com.termux (10): the Termux packages are rewritten for it byte for byte.
-        // TEMPORARY: x86_64 debug builds stay ai.antigem while the x86_64 rootfs is made on the emulator (its backup
-        // must have ai.antigem paths). Remove `&& !isX86` once that rootfs is hosted.
+        // TEMPORARY: x86_64 debug builds stay ai.antigcn while the x86_64 rootfs is made on the emulator (its backup
+        // must have ai.antigcn paths). Remove `&& !isX86` once that rootfs is hosted.
         if (variant.buildType == "debug" && !isX86) variant.applicationId.set("ai.antidev")
 
         val amBuildType = if (variant.buildType == "release") "release" else "debug"

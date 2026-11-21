@@ -65,7 +65,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
         const val ACTION_STOP_SERVICE = "ai.antigem.service_stop"
 
         fun start(context: Context) {
-            val intent = Intent(context, ai.antigem.app.TermuxService::class.java)
+            val intent = Intent().setClassName(context.packageName, "${context.packageName}.app.TermuxService")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
@@ -74,7 +74,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, ai.antigem.app.TermuxService::class.java).setAction(ACTION_STOP_SERVICE)
+            val intent = Intent().setClassName(context.packageName, "${context.packageName}.app.TermuxService").setAction(ACTION_STOP_SERVICE)
             context.startService(intent)
         }
 
@@ -217,7 +217,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
         )
 
         // Exit action
-        val exitIntent = Intent(this, ai.antigem.app.TermuxService::class.java).setAction(ACTION_STOP_SERVICE)
+        val exitIntent = Intent().setClassName(packageName, "${packageName}.app.TermuxService").setAction(ACTION_STOP_SERVICE)
         val exitPendingIntent = PendingIntent.getService(
             this, 1, exitIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -225,7 +225,7 @@ open class AntiGemService : Service(), LifecycleOwner, ViewModelStoreOwner, Save
 
         // WakeLock toggle action
         val wakeAction = if (wakeLockHeld) ACTION_WAKE_UNLOCK else ACTION_WAKE_LOCK
-        val toggleWakeLockIntent = Intent(this, ai.antigem.app.TermuxService::class.java).setAction(wakeAction)
+        val toggleWakeLockIntent = Intent().setClassName(packageName, "${packageName}.app.TermuxService").setAction(wakeAction)
         val wakePendingIntent = PendingIntent.getService(
             this, 2, toggleWakeLockIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

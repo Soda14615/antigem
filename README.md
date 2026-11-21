@@ -2,7 +2,7 @@
 
 <img src="docs/readme/icon.svg" alt="AntiGem app icon" width="112">
 
-# AntiGem
+# AntiGem CN
 
 *A gem that defies gravity. A full coding environment, light enough to carry in your pocket.*
 
@@ -11,9 +11,9 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://developer.android.com/jetpack/compose)
 [![Go](https://img.shields.io/badge/Bridge-Go-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev)
 [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)](LICENSE)
-[![Releases](https://img.shields.io/github/v/release/santoshkurmi/antigem?style=flat-square&label=Download)](https://github.com/santoshkurmi/antigem/releases)
+[![Releases](https://img.shields.io/github/v/release/santoshkurmi/antigem?style=flat-square&label=Download)](https://github.com/Soda14615/antigem/releases)
 
-[Download](https://github.com/santoshkurmi/antigem/releases) · [Website](https://santoshkurmi.github.io/antigem/) · [VS Code extension](https://github.com/Santoshkurmi/antigem_vscode_extension) · [Plugin SDK](extension_docs/README.md) · [User Guide](user_docs/README.md) · [WhatsApp community](https://chat.whatsapp.com/IGQX8q9zSVV0RarG70sclV?s=cl&p=a&mlu=4&ilr=4)
+[Download](https://github.com/Soda14615/antigem/releases) · [Website](https://santoshkurmi.github.io/antigem/) · [VS Code extension](https://github.com/Santoshkurmi/antigem_vscode_extension) · [Plugin SDK](extension_docs/README.md) · [User Guide](user_docs/README.md) · [WhatsApp community](https://chat.whatsapp.com/IGQX8q9zSVV0RarG70sclV?s=cl&p=a&mlu=4&ilr=4)
 
 <br>
 
@@ -22,6 +22,8 @@
 </div>
 
 > [!IMPORTANT]
+> **中文版独立安装：**本分支的应用名称为 AntiGem CN，包名 `ai.antigcn`，与官方 `ai.antigem` 并存。安装后的数据目录独立，旧版数据需要先备份再迁移。[本仓库 Releases](https://github.com/Soda14615/antigem/releases)。
+>
 > ### AntiGem has a new home: `ai.antigem`
 > From **v2.0.0**, AntiGem is released under its own package name, **`ai.antigem`**. The old app was installed as `com.termux`, the Termux project's package name, which we used only so Termux packages could run at full speed. Shipping AntiGem under another project's name wasn't right, and it also stopped AntiGem from being installed next to the real Termux app. AntiGem now rewrites `com.termux` to `ai.antigem` inside each package as it installs (both names are 10 characters, so it is swapped byte for byte), with no proot and no slowdown.
 >
@@ -29,7 +31,7 @@
 > - **You can use both.** The new app installs next to the old one; nothing in the old one is touched. Move over whenever you're ready.
 > - **To move your setup:**
 >   1. In the old app: **Settings → Backups & Restore → Back up environment** (tick *Include SSH keys and sign-ins* to keep your logins; never share that file). It is saved to `Download/Antigem/backups`.
->   2. Install **`AntiGem-v2.x.x.apk`** from [Releases](https://github.com/santoshkurmi/antigem/releases) (version 2.0.0 or newer; versions below 2.0.0 are the old app).
+>   2. Install **`AntiGem-v2.x.x.apk`** from [Releases](https://github.com/Soda14615/antigem/releases) (version 2.0.0 or newer; versions below 2.0.0 are the old app).
 >   3. On the new app's setup screen, choose **From a ZIP file** and pick your backup. Every `com.termux` path is rewritten for `ai.antigem` while it restores.
 >   4. When everything works, uninstall the old app, and delete the backup if it contains your sign-ins.
 >
@@ -250,7 +252,7 @@ Use the agents running on your PC from your phone. [AntiGem for VS Code](https:/
 
 ## Download
 
-Get the latest APK from [Releases](https://github.com/santoshkurmi/antigem/releases). There is one app, with the package name `ai.antigem`. It sets up its own Linux environment from the Termux packages, so it doesn't need the Termux app, and it can be installed next to it.
+Get the latest APK from [Releases](https://github.com/Soda14615/antigem/releases). There is one app, with the package name `ai.antigem`. It sets up its own Linux environment from the Termux packages, so it doesn't need the Termux app, and it can be installed next to it.
 
 **Server mode** (a mode, not another build): the bridge, the agents (`agy`, Claude Code, OpenCode, Codex), your projects and the terminal run on **your own server (a VPS)**, and the phone is only the screen. Switch it on in **Settings → Where agents run**. See [Server mode](#server-mode-run-it-on-a-vps) below.
 

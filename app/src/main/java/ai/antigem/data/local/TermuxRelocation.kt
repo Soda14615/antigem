@@ -9,9 +9,9 @@ import java.io.RandomAccessFile
 
 /**
  * Runs Termux packages in the Native system without proot and without rebuilding them. Termux packages are built
- * for /data/data/com.termux; this app's package name (ai.antigem) has the same length (10 bytes), so every
+ * for /data/data/com.termux; this app's package name (ai.antigcn for the Chinese release) has the same length (10 bytes), so every
  * "com.termux" in their files can be rewritten byte for byte: nothing inside a binary moves. Termux scripts then
- * call this app's components by the rewritten names (ai.antigem/ai.antigem.app.TermuxService, ...), which the
+ * call this app's components by the rewritten names (ai.antigcn/ai.antigcn.app.TermuxService, ...), which the
  * manifest declares.
  *
  * - The bootstrap, a rootfs or a restored backup: [relocateTree] after it is extracted. In the home folder only paths
@@ -26,7 +26,7 @@ object TermuxRelocation {
     const val TERMUX_PACKAGE = "com.termux"
 
     /**
-     * The release app's package name. A rootfs or backup made by it holds /data/data/ai.antigem paths instead of
+     * The legacy official app's package name. A rootfs or backup made by it holds /data/data/ai.antigem paths instead of
      * com.termux ones; a debug install (ai.antidev) rewrites those paths too ([relocateTree] with releasePaths).
      */
     private const val RELEASE_PACKAGE = "ai.antigem"

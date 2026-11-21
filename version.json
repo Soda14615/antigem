@@ -1,10 +1,11 @@
 {
-  "version_code": 133,
+  "version_code": 134,
   "version_name": "2.0.2",
   "min_supported_version_code": 2,
   "changelog": [
-   "Added chroot support for Linux environments.(rooted android)",
-   "Fixed notification causing app crash in android 7"
+    "中文整合版使用独立应用包名 ai.antigcn，现可与官方 AntiGem 并存；调整本地服务端口与更新来源。",
+    "Added chroot support for Linux environments.(rooted android)",
+    "Fixed notification causing app crash in android 7"
   ],
   "is_critical": false
 }
