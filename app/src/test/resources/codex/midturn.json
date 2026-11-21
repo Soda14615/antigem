@@ -1,0 +1,53 @@
+{
+  "thread": "thr_midturn",
+  "snapshot_after": 9,
+  "events": [
+    {"method": "turn/started", "params": {"threadId": "thr_midturn", "turn": {"id": "turn_1", "status": "inProgress"}}},
+    {"method": "item/started", "params": {"threadId": "thr_midturn", "turnId": "turn_1", "item": {"id": "u_1", "type": "userMessage", "content": [{"type": "text", "text": "Hi"}]}}},
+    {"method": "item/completed", "params": {"threadId": "thr_midturn", "turnId": "turn_1", "item": {"id": "u_1", "type": "userMessage", "content": [{"type": "text", "text": "Hi"}]}}},
+    {"method": "item/started", "params": {"threadId": "thr_midturn", "turnId": "turn_1", "item": {"id": "a_1", "type": "agentMessage", "text": "Hello!"}}},
+    {"method": "item/completed", "params": {"threadId": "thr_midturn", "turnId": "turn_1", "item": {"id": "a_1", "type": "agentMessage", "text": "Hello!"}}},
+    {"method": "turn/completed", "params": {"threadId": "thr_midturn", "turn": {"id": "turn_1", "status": "completed"}}},
+    {"method": "turn/started", "params": {"threadId": "thr_midturn", "turn": {"id": "turn_2", "status": "inProgress"}}},
+    {"method": "item/completed", "params": {"threadId": "thr_midturn", "turnId": "turn_2", "item": {"id": "u_2", "type": "userMessage", "content": [{"type": "text", "text": "Explain"}]}}},
+    {"method": "item/agentMessage/delta", "params": {"threadId": "thr_midturn", "turnId": "turn_2", "itemId": "a_2", "delta": "First part "}},
+    {"method": "item/agentMessage/delta", "params": {"threadId": "thr_midturn", "turnId": "turn_2", "itemId": "a_2", "delta": "second part."}},
+    {"method": "item/completed", "params": {"threadId": "thr_midturn", "turnId": "turn_2", "item": {"id": "a_2", "type": "agentMessage", "text": "First part second part."}}},
+    {"method": "turn/completed", "params": {"threadId": "thr_midturn", "turn": {"id": "turn_2", "status": "completed"}}}
+  ],
+  "snapshot": [
+    {
+      "id": "turn_2",
+      "status": "inProgress",
+      "items": [
+        {"id": "u_2", "type": "userMessage", "content": [{"type": "text", "text": "Explain"}]}
+      ]
+    },
+    {
+      "id": "turn_1",
+      "status": "completed",
+      "items": [
+        {"id": "u_1", "type": "userMessage", "content": [{"type": "text", "text": "Hi"}]},
+        {"id": "a_1", "type": "agentMessage", "text": "Hello!"}
+      ]
+    }
+  ],
+  "final": [
+    {
+      "id": "turn_2",
+      "status": "completed",
+      "items": [
+        {"id": "u_2", "type": "userMessage", "content": [{"type": "text", "text": "Explain"}]},
+        {"id": "a_2", "type": "agentMessage", "text": "First part second part."}
+      ]
+    },
+    {
+      "id": "turn_1",
+      "status": "completed",
+      "items": [
+        {"id": "u_1", "type": "userMessage", "content": [{"type": "text", "text": "Hi"}]},
+        {"id": "a_1", "type": "agentMessage", "text": "Hello!"}
+      ]
+    }
+  ]
+}

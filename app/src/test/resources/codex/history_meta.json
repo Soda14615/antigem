@@ -1,0 +1,48 @@
+{
+  "turns": {
+    "turn_1": {
+      "model": "gpt-6-luna",
+      "duration_ms": 1100,
+      "usage": {
+        "input_tokens": 100,
+        "cached_input_tokens": 20,
+        "output_tokens": 30,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 130
+      }
+    },
+    "turn_2": {
+      "model": "gpt-5.6-luna",
+      "duration_ms": 1200,
+      "usage": {
+        "input_tokens": 120,
+        "cached_input_tokens": 20,
+        "output_tokens": 40,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 160
+      }
+    },
+    "turn_3": {
+      "model": "gpt-6-luna",
+      "duration_ms": 1300,
+      "usage": {
+        "input_tokens": 140,
+        "cached_input_tokens": 40,
+        "output_tokens": 50,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 190
+      }
+    },
+    "turn_4": {
+      "model": "gpt-5.6-terra",
+      "duration_ms": 1400,
+      "usage": {
+        "input_tokens": 160,
+        "cached_input_tokens": 40,
+        "output_tokens": 60,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 220
+      }
+    }
+  }
+}

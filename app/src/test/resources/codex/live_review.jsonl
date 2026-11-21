@@ -1,0 +1,9 @@
+{"method":"turn/started","params":{"threadId":"thr_review","turn":{"id":"turn_outer","status":"inProgress"}}}
+{"method":"item/started","params":{"threadId":"thr_review","turnId":"turn_outer","item":{"id":"u_rev","type":"userMessage","content":[{"type":"text","text":"Review 2 + 2"}]}}}
+{"method":"item/completed","params":{"threadId":"thr_review","turnId":"turn_outer","item":{"id":"u_rev","type":"userMessage","content":[{"type":"text","text":"Review 2 + 2"}]}}}
+{"method":"item/completed","params":{"threadId":"thr_review","turnId":"turn_outer","item":{"id":"enter_rev","type":"enteredReviewMode","review":"2 + 2"}}}
+{"method":"turn/started","params":{"threadId":"thr_review","turn":{"id":"turn_inner","rootTurnId":"turn_outer","status":"inProgress"}}}
+{"method":"item/started","params":{"threadId":"thr_review","turnId":"turn_inner","item":{"id":"a_rev","type":"agentMessage","text":""}}}
+{"method":"item/agentMessage/delta","params":{"threadId":"thr_review","turnId":"turn_inner","itemId":"a_rev","delta":"Yes, 2 + 2 = 4."}}
+{"method":"item/completed","params":{"threadId":"thr_review","turnId":"turn_inner","item":{"id":"a_rev","type":"agentMessage","text":"Yes, 2 + 2 = 4."}}}
+{"method":"turn/completed","params":{"threadId":"thr_review","turn":{"id":"turn_outer","status":"completed","durationMs":900}}}

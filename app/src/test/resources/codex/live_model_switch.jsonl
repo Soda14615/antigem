@@ -1,0 +1,24 @@
+{"method":"thread/settings/updated","params":{"threadId":"thr_model_switch","threadSettings":{"model":"gpt-6-luna"}}}
+{"method":"turn/started","params":{"threadId":"thr_model_switch","turn":{"id":"turn_1","status":"inProgress"}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"u_1","type":"userMessage","content":[{"type":"text","text":"How many birds in the flock?"}]}}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"u_1","type":"userMessage","content":[{"type":"text","text":"How many birds in the flock?"}]}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"r_1","type":"reasoning","summary":[]}}}
+{"method":"item/reasoning/summaryTextDelta","params":{"threadId":"thr_model_switch","turnId":"turn_1","itemId":"r_1","summaryIndex":0,"delta":"Calculating flock size"}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"r_1","type":"reasoning","summary":["Calculating flock size"]}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"a_1","type":"agentMessage","text":""}}}
+{"method":"item/agentMessage/delta","params":{"threadId":"thr_model_switch","turnId":"turn_1","itemId":"a_1","delta":"18"}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_1","item":{"id":"a_1","type":"agentMessage","text":"18"}}}
+{"method":"thread/tokenUsage/updated","params":{"threadId":"thr_model_switch","turnId":"turn_1","tokenUsage":{"total":{"inputTokens":125,"cachedInputTokens":25,"outputTokens":25,"cacheWriteInputTokens":0,"totalTokens":150},"last":{"inputTokens":125,"cachedInputTokens":25,"outputTokens":25,"cacheWriteInputTokens":0,"totalTokens":150}}}}
+{"method":"turn/completed","params":{"threadId":"thr_model_switch","turn":{"id":"turn_1","status":"completed","durationMs":1200}}}
+{"method":"thread/settings/updated","params":{"threadId":"thr_model_switch","threadSettings":{"model":"gpt-5.6-terra"}}}
+{"method":"turn/started","params":{"threadId":"thr_model_switch","turn":{"id":"turn_2","status":"inProgress"}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"u_2","type":"userMessage","content":[{"type":"text","text":"Now double it."}]}}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"u_2","type":"userMessage","content":[{"type":"text","text":"Now double it."}]}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"r_2","type":"reasoning","summary":[]}}}
+{"method":"item/reasoning/summaryTextDelta","params":{"threadId":"thr_model_switch","turnId":"turn_2","itemId":"r_2","summaryIndex":0,"delta":"Calculating final quantities"}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"r_2","type":"reasoning","summary":["Calculating final quantities"]}}}
+{"method":"item/started","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"a_2","type":"agentMessage","text":""}}}
+{"method":"item/agentMessage/delta","params":{"threadId":"thr_model_switch","turnId":"turn_2","itemId":"a_2","delta":"36"}}
+{"method":"item/completed","params":{"threadId":"thr_model_switch","turnId":"turn_2","item":{"id":"a_2","type":"agentMessage","text":"36"}}}
+{"method":"thread/tokenUsage/updated","params":{"threadId":"thr_model_switch","turnId":"turn_2","tokenUsage":{"total":{"inputTokens":275,"cachedInputTokens":50,"outputTokens":45,"cacheWriteInputTokens":0,"totalTokens":320},"last":{"inputTokens":150,"cachedInputTokens":25,"outputTokens":20,"cacheWriteInputTokens":0,"totalTokens":170}}}}
+{"method":"turn/completed","params":{"threadId":"thr_model_switch","turn":{"id":"turn_2","status":"completed","durationMs":1400}}}
