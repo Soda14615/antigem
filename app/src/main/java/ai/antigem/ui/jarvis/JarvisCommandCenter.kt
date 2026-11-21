@@ -87,7 +87,7 @@ private fun agentLabel(name: String) = when (name.uppercase()) {
 
 private fun age(ms: Long): String {
     val m = (System.currentTimeMillis() - ms) / 60_000
-    return if (m < 1) "now" else if (m < 60) "${m}m" else "${m / 60}h ${m % 60}m"
+    return if (m < 1) "刚刚" else if (m < 60) "${m}分钟" else "${m / 60}小时 ${m % 60}分钟"
 }
 
 /**
@@ -114,17 +114,17 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
 
     val title = when {
         !mission.isEmpty -> mission.goal
-        voice -> "Jarvis · voice chat"
+        voice -> "Jarvis · 语音会话"
         else -> teamText("Team orchestration", "团队编排")
     }
     val subtitle = when {
         status != null -> status
         active.any { it.state.needsUser } -> "有任务需要决定"
-        active.isNotEmpty() -> "${active.size} task${if (active.size == 1) "" else "s"} working · news comes in by itself"
+        active.isNotEmpty() -> "${active.size} 个任务进行中 · 进展会自动送达"
         mission.status == "done" -> "任务完成"
         mission.status == "paused" -> "任务已暂停"
         mission.isEmpty -> "交给我一个大任务：我来规划、带团队执行并持续推进。"
-        mission.autopilot -> "Autopilot on · keeps going until done"
+        mission.autopilot -> "自动驾驶开启 · 持续推进直到完成"
         else -> "等待你"
     }
 
@@ -172,7 +172,7 @@ fun JarvisCommandStrip(chatId: String, onOpenChat: (String) -> Unit, toolsMissin
                 }
             }
             if (!mission.isEmpty) {
-                ToggleChip(if (mission.autopilot) "自动驾驶开启" else "Autopilot", Icons.Filled.Autorenew, mission.autopilot) {
+                ToggleChip(if (mission.autopilot) "自动驾驶开启" else "自动驾驶关闭", Icons.Filled.Autorenew, mission.autopilot) {
                     JarvisManagers.setAutopilot(key, !mission.autopilot)
                 }
             }
@@ -332,7 +332,7 @@ private fun Board(m: JarvisManagers.Manager, tasks: List<JarvisTasks.Task>, onOp
 private fun MissionSection(owner: String, mi: JarvisManagers.Mission) {
     val onSurface = MaterialTheme.colorScheme.onSurface
     Column {
-        BoardTitle("Mission")
+        BoardTitle("任务书")
         if (mi.isEmpty) {
             Text(
                 stringResource(R.string.jarvis_command_center_no_mission_yet_ask_for_something_big),
@@ -358,8 +358,8 @@ private fun MissionSection(owner: String, mi: JarvisManagers.Mission) {
             if (mi.notes.isNotBlank()) Text(stringResource(R.string.jarvis_command_center_notes, mi.notes.toString()), fontSize = 11.5.sp, color = onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SmallAction("清除任务书", Danger) { JarvisManagers.clearMission(owner) }
-                if (mi.status != "active") SmallAction("Resume", Cyan) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "active", null, null) }
-                else SmallAction("Pause", Amber) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "paused", null, null) }
+                if (mi.status != "active") SmallAction("继续执行", Cyan) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "active", null, null) }
+                else SmallAction("暂停", Amber) { JarvisManagers.updateMission(owner, null, null, null, emptyList(), "paused", null, null) }
             }
         }
     }
@@ -863,11 +863,11 @@ private fun eventColor(kind: String): Color = when (kind) {
 }
 
 private fun eventWord(kind: String): String = when (kind) {
-    "task_done" -> "Finished"
-    "task_failed" -> "Failed"
+    "task_done" -> "已完成"
+    "task_failed" -> "失败"
     "task_stalled" -> "无进展"
     "task_approval" -> "需要审批"
-    "task_question" -> "Asks a question"
+    "task_question" -> "提出问题"
     "nudge" -> "自动驾驶：继续"
     "autopilot_paused" -> "自动驾驶已暂停"
     else -> kind
@@ -911,7 +911,7 @@ fun JarvisEventCard(raw: String, onOpenChat: (String) -> Unit) {
                 Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        e.title.ifBlank { "Mission" } + listOfNotNull(e.team.takeIf { it.isNotBlank() }, e.agent.takeIf { it.isNotBlank() }?.let { agentLabel(it) })
+                        e.title.ifBlank { "任务书" } + listOfNotNull(e.team.takeIf { it.isNotBlank() }, e.agent.takeIf { it.isNotBlank() }?.let { agentLabel(it) })
                             .joinToString(" · ").let { if (it.isBlank()) "" else "  ·  $it" },
                         fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis
                     )

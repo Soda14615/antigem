@@ -223,7 +223,7 @@ object JarvisEvents {
         root.put("delivered_ids", JSONArray().apply { synchronized(deliveredEventIds) { deliveredEventIds.forEach { put(it) } } })
         val store = prefs ?: return
         check(store.edit().putString("outbox", root.toString()).commit()) {
-            "Could not durably save Jarvis task events."
+            "无法持久保存 Jarvis 任务事件。"
         }
     }
 
@@ -285,9 +285,9 @@ object JarvisEvents {
 
     /** The one line the chat shows for the whole batch. */
     fun label(events: List<Event>): String {
-        val parts = events.map { e -> if (e.title.isBlank()) "任务：${kindWord(e.kind)}" else "${e.title.take(30)}: ${kindWord(e.kind)}" }
-        val head = if (events.size == 1) "⚡ Jarvis · " else "⚡ Jarvis · ${events.size} updates — "
-        return head + parts.take(4).joinToString(" · ") + if (parts.size > 4) " · +${parts.size - 4} more" else ""
+        val parts = events.map { e -> if (e.title.isBlank()) "任务：${kindWord(e.kind)}" else "${e.title.take(30)}：${kindWord(e.kind)}" }
+        val head = if (events.size == 1) "⚡ Jarvis · " else "⚡ Jarvis · ${events.size} 条更新 — "
+        return head + parts.take(4).joinToString(" · ") + if (parts.size > 4) " · 另有 ${parts.size - 4} 条" else ""
     }
 
     private fun attr(s: String) = s.replace("&", "&amp;").replace("\"", "'").replace("<", "‹").replace(">", "›").replace("\n", " ").trim()
@@ -310,8 +310,8 @@ object JarvisEvents {
                 replyChars > body.length -> "<task_reply cut=\"only the last ${body.length - 1} of $replyChars characters\">\n${inner(body)}\n</task_reply>\n"
                 else -> "<task_reply>\n${inner(body)}\n</task_reply>\n"
             })
-            "task_failed" -> append("<error>\n${inner(body.ifBlank { "unknown error" })}\n</error>\n")
-            "task_stalled" -> append("<error>No visible progress for ${JarvisPreferences.stallMinutes.value} minutes while still running.</error>\n")
+            "task_failed" -> append("<error>\n${inner(body.ifBlank { "未知错误" })}\n</error>\n")
+            "task_stalled" -> append("<error>仍在运行，但已 ${JarvisPreferences.stallMinutes.value} 分钟没有可见进展。</error>\n")
             "task_approval" -> append("<approval key=\"${attr(key)}\" risk=\"${attr(risk)}\">\nwants to ${inner(body)}\n</approval>\n")
             "task_question" -> append("<question>\n${inner(body)}\n</question>\n")
             "nudge" -> append("<nudge>\n${inner(body)}\n</nudge>\n")
@@ -445,9 +445,9 @@ object JarvisEvents {
             val n = pending(owner)
             if (!droppedVoiceNotice) {
                 droppedVoiceNotice = true
-                val why = if (chatOnly) "Jarvis is set to chat only (Settings → Jarvis → Floating button & voice)"
-                    else "no voice agent is set (Settings → Jarvis → Voice agent)"
-                JarvisController.showProblem("$n update${if (n == 1) "" else "s"} for the voice Jarvis could not be delivered: $why.")
+                val why = if (chatOnly) "Jarvis 已设为仅聊天（设置 → Jarvis → 悬浮按钮与语音）"
+                    else "未设置语音智能体（设置 → Jarvis → 语音智能体）"
+                JarvisController.showProblem("有 $n 条发给语音 Jarvis 的更新无法送达：$why。")
             }
             return
         }
@@ -526,12 +526,12 @@ object JarvisEvents {
                 val max = JarvisPreferences.autopilotMaxNudges.value.coerceIn(1, 20)
                 if (m.mission.nudges >= max) {
                     JarvisManagers.update(owner) { it.copy(mission = it.mission.copy(autopilot = false, nudges = 0)) }
-                    post(owner, Event("autopilot_paused", body = "Autopilot nudged you $max times in a row without any progress, so it paused."))
+                    post(owner, Event("autopilot_paused", body = "自动驾驶连续提醒了你 $max 次却没有任何进展，因此已暂停。"))
                 } else {
                     JarvisManagers.update(owner) { it.copy(mission = it.mission.copy(nudges = it.mission.nudges + 1)) }
                     val left = m.mission.steps.filter { it.status != "done" }.joinToString("; ") { "${it.n}. ${it.text}" }.take(400)
-                    post(owner, Event("nudge", body = "The mission \"${m.mission.goal.take(120)}\" is not done and no team is working." +
-                        (if (left.isNotBlank()) " Open steps: $left" else "") + " (nudge ${m.mission.nudges + 1} of $max)"))
+                    post(owner, Event("nudge", body = "使命「${m.mission.goal.take(120)}」尚未完成，也没有团队在工作。" +
+                        (if (left.isNotBlank()) " 待办步骤：$left" else "") + "（第 ${m.mission.nudges + 1} 次提醒，共 $max 次）"))
                 }
             }
         }

@@ -370,7 +370,7 @@ You direct only your own tasks: other Jarvis chats' tasks (and those chats thems
             .filter { owner == JarvisManagers.VOICE || it.owner != owner }.take(6)
         if (tasks.isNotEmpty()) {
             lines += (if (owner == JarvisManagers.VOICE) "tasks: " else "other managers' tasks: ") + tasks.joinToString("; ") { t ->
-                "\"${t.title.take(40)}\" ${t.state.label} ${ago(t.createdAt)} (${t.agent.name.lowercase()}, id ${t.id})"
+                "\"${t.title.take(40)}\" ${t.state.name.lowercase()} ${ago(t.createdAt)} (${t.agent.name.lowercase()}, id ${t.id})"
             }
         }
         val taskIds = JarvisTasks.tasks.value.map { it.id }.toSet()

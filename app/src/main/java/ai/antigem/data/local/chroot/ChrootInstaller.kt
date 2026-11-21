@@ -40,13 +40,13 @@ sealed class ChrootSource {
 }
 
 enum class ChrootPackageBundle(val title: String, val description: String, val packages: List<String>, val nodeJs: Boolean = false) {
-    ESSENTIALS("Essentials", "sudo, certificates, curl, wget, git, ripgrep, procps, tzdata, nano, less, unzip: needed by the bridge and the agents",
+    ESSENTIALS("基础组件", "sudo、证书、curl、wget、git、ripgrep、procps、tzdata、nano、less、unzip：桥接与智能体需要",
         listOf("sudo", "ca-certificates", "curl", "wget", "git", "ripgrep", "procps", "tzdata", "less", "nano", "unzip", "xz-utils", "gnupg", "openssh-client")),
-    BUILD("Build tools", "build-essential, pkg-config, cmake, make", listOf("build-essential", "pkg-config", "cmake", "make")),
+    BUILD("构建工具", "build-essential, pkg-config, cmake, make", listOf("build-essential", "pkg-config", "cmake", "make")),
     PYTHON("Python", "python3, pip, venv", listOf("python3", "python3-pip", "python3-venv")),
-    NODE("Node.js 22 LTS", "From NodeSource (Ubuntu's own Node.js is older)", emptyList(), nodeJs = true),
-    TOOLS("Command-line extras", "htop, tmux, jq, zip, file, vim, ping, dig", listOf("htop", "tmux", "jq", "zip", "file", "vim", "iputils-ping", "dnsutils")),
-    ANDROID("Android tools", "adb, fastboot, lsusb: flash or debug another phone over USB OTG", listOf("adb", "fastboot", "usbutils"))
+    NODE("Node.js 22 LTS", "来自 NodeSource（Ubuntu 自带的 Node.js 版本较旧）", emptyList(), nodeJs = true),
+    TOOLS("命令行扩展", "htop, tmux, jq, zip, file, vim, ping, dig", listOf("htop", "tmux", "jq", "zip", "file", "vim", "iputils-ping", "dnsutils")),
+    ANDROID("Android 工具", "adb、fastboot、lsusb：通过 USB OTG 刷写或调试另一台手机", listOf("adb", "fastboot", "usbutils"))
 }
 
 data class ChrootInstallRequest(
@@ -63,13 +63,13 @@ data class ChrootInstallRequest(
 )
 
 enum class ChrootInstallStep(val label: String) {
-    CHECK("Check root and space"),
-    DOWNLOAD("Download"),
-    VERIFY("Verify the checksum"),
-    EXTRACT("Extract the rootfs"),
-    CONFIGURE("Set up Ubuntu and the user"),
-    PACKAGES("Install packages"),
-    FINISH("Finish")
+    CHECK("检查 root 权限与空间"),
+    DOWNLOAD("下载"),
+    VERIFY("验证校验和"),
+    EXTRACT("解压 rootfs"),
+    CONFIGURE("配置 Ubuntu 与用户"),
+    PACKAGES("安装软件包"),
+    FINISH("完成")
 }
 
 data class ChrootInstallState(
@@ -165,7 +165,7 @@ object ChrootInstaller {
     /** Stops between steps and during the download (a running extraction or apt finishes on its own). */
     fun cancel() {
         job?.cancel()
-        _state.value = _state.value.copy(running = false, error = "Cancelled", failedStep = _state.value.step)
+        _state.value = _state.value.copy(running = false, error = "已取消", failedStep = _state.value.step)
     }
 
     fun reset() {
@@ -199,12 +199,12 @@ object ChrootInstaller {
             done(step)
             // the archive is only kept for a retry
             downloaded?.second?.delete(); downloaded = null
-            _state.value = _state.value.copy(running = false, step = null, progress = 1f, detail = "Ready", result = install)
+            _state.value = _state.value.copy(running = false, step = null, progress = 1f, detail = "就绪", result = install)
             log("✅ Ubuntu chroot ready at ${install.path} (user ${install.user}, uid ${install.uid})")
             if (sha != null) Log.d(TAG, "installed from an archive with sha256 $sha")
         } catch (e: kotlinx.coroutines.CancellationException) {
             log("Cancelled.")
-            _state.value = _state.value.copy(running = false, error = "Cancelled", failedStep = step)
+            _state.value = _state.value.copy(running = false, error = "已取消", failedStep = step)
         } catch (e: Exception) {
             val msg = e.message ?: e.toString()
             log("❌ $msg")
@@ -215,32 +215,32 @@ object ChrootInstaller {
     // ------------------------------------------------------------------ steps
 
     private suspend fun check(context: Context, req: ChrootInstallRequest) {
-        set(ChrootInstallStep.CHECK, "Asking for root access…")
+        set(ChrootInstallStep.CHECK, "正在请求 root 权限…")
         log("Checking root access (accept the root manager's prompt)…")
         val probe = ChrootManager.probe(context)
-        if (!probe.rootOk) throw InstallError(probe.error ?: "No root access.")
+        if (!probe.rootOk) throw InstallError(probe.error ?: "没有 root 权限。")
         log("Root: ${probe.rootManager ?: "granted"} · busybox: ${probe.busybox ?: "none (toybox)"} · SELinux: ${probe.selinux} · kernel ${probe.kernel}")
         if (req.config.nsMode == ChrootNsMode.PRIVATE && !probe.canPrivateNs) {
-            throw InstallError("This phone has no unshare/nsenter for a private mount namespace. Choose the global namespace under Options.")
+            throw InstallError("此手机不支持 unshare/nsenter，无法建立私有挂载命名空间。请在“选项”中选择全局命名空间。")
         }
         ChrootManager.validateRootPath(req.path)?.let { throw InstallError(it) }
-        if (!ChrootManager.isUserName(req.user)) throw InstallError("The user name may only have lowercase letters, digits, _ and -.")
+        if (!ChrootManager.isUserName(req.user)) throw InstallError("用户名只能包含小写字母、数字、_ 和 -。")
         if (req.config.nsMode == ChrootNsMode.GLOBAL && ChrootManager.isInAppStorage(context, req.path)) {
-            throw InstallError("A chroot in the app's storage must use the private namespace: Android deletes that folder with the app, and with global mounts it would go through /sdcard.")
+            throw InstallError("位于应用存储中的 chroot 必须使用私有命名空间：Android 会随应用一起删除该文件夹，而使用全局挂载时会经过 /sdcard。")
         }
         val free = try { StatFs("/data").availableBytes } catch (_: Exception) { -1L }
-        if (free in 0 until MIN_FREE_BYTES) throw InstallError("Only ${free / (1 shl 20)} MB free on /data: at least 1 GB is needed.")
+        if (free in 0 until MIN_FREE_BYTES) throw InstallError("/data 仅剩 ${free / (1 shl 20)} MB 可用：至少需要 1 GB。")
         log("Free on /data: ${if (free >= 0) "${free / (1 shl 20)} MB" else "unknown"}")
     }
 
     /** Downloads the source (unless the same verified archive is still there): the file and its expected sha256. */
     private suspend fun download(context: Context, source: ChrootSource): Pair<File, String?> {
-        set(ChrootInstallStep.DOWNLOAD, "Finding the release…")
+        set(ChrootInstallStep.DOWNLOAD, "正在查找版本…")
         val (url, sha) = when (source) {
             is ChrootSource.Official -> resolveOfficial(source.release)
             is ChrootSource.Prebuilt -> {
                 val shaText = httpText("${prebuiltUrl()}.sha256")
-                    ?: throw InstallError("AntiGem's prebuilt Ubuntu is not published yet ($PREBUILT_PAGE). Pick Official Ubuntu instead.")
+                    ?: throw InstallError("AntiGem 预构建的 Ubuntu 尚未发布（$PREBUILT_PAGE）。请改选官方 Ubuntu。")
                 prebuiltUrl() to shaText.trim().split(Regex("\\s+")).firstOrNull()
             }
             is ChrootSource.Url -> source.url to source.sha256?.trim()?.lowercase()?.takeIf { it.matches(Regex("^[0-9a-f]{64}$")) }
@@ -261,11 +261,11 @@ object ChrootInstaller {
         val response = try {
             http.newCall(Request.Builder().url(url).header("User-Agent", "AntiGem-Chroot").build()).execute()
         } catch (e: IOException) {
-            throw InstallError("Download failed: ${e.message}")
+            throw InstallError("下载失败：${e.message}")
         }
         response.use { resp ->
-            if (!resp.isSuccessful) throw InstallError("Download failed: HTTP ${resp.code} for $url")
-            val body = resp.body ?: throw InstallError("Download failed: empty answer")
+            if (!resp.isSuccessful) throw InstallError("下载失败：HTTP ${resp.code}（$url）")
+            val body = resp.body ?: throw InstallError("下载失败：响应为空")
             val total = body.contentLength()
             var read = 0L
             val started = System.currentTimeMillis()
@@ -284,15 +284,15 @@ object ChrootInstaller {
                             last = now
                             val speed = read / ((now - started).coerceAtLeast(1) / 1000.0) / (1 shl 20)
                             set(ChrootInstallStep.DOWNLOAD,
-                                "${read / (1 shl 20)} MB${if (total > 0) " of ${total / (1 shl 20)} MB" else ""} · ${"%.1f".format(speed)} MB/s",
+                                "${read / (1 shl 20)} MB${if (total > 0) " / ${total / (1 shl 20)} MB" else ""} · ${"%.1f".format(speed)} MB/s",
                                 if (total > 0) read.toFloat() / total else null)
                         }
                     }
                 }
             }
-            if (total > 0 && read != total) throw InstallError("Download incomplete: $read of $total bytes")
+            if (total > 0 && read != total) throw InstallError("下载不完整：$read / $total 字节")
         }
-        if (!part.renameTo(file)) throw InstallError("Could not save the download")
+        if (!part.renameTo(file)) throw InstallError("无法保存下载的文件")
         log("Downloaded ${file.length() / (1 shl 20)} MB")
         downloaded = url to file
         return file to sha
@@ -301,11 +301,11 @@ object ChrootInstaller {
     private fun resolveOfficial(release: UbuntuRelease): Pair<String, String> {
         val arch = if (ChrootManager.defaultArch() == "x86_64") "amd64" else "arm64"
         val dir = "https://cdimage.ubuntu.com/ubuntu-base/releases/${release.version}/release/"
-        val sums = httpText(dir + "SHA256SUMS") ?: throw InstallError("Could not reach cdimage.ubuntu.com (SHA256SUMS)")
+        val sums = httpText(dir + "SHA256SUMS") ?: throw InstallError("无法连接 cdimage.ubuntu.com（SHA256SUMS）")
         val pattern = Regex("^([0-9a-f]{64}) \\*?(ubuntu-base-(${Regex.escape(release.version)}(?:\\.\\d+)?)-base-$arch\\.tar\\.gz)$")
         val best = sums.lines().mapNotNull { pattern.find(it.trim()) }
             .maxByOrNull { m -> m.groupValues[3].split('.').map { it.toIntOrNull() ?: 0 }.let { it.getOrElse(2) { 0 } } }
-            ?: throw InstallError("No Ubuntu ${release.version} base image for $arch was found.")
+            ?: throw InstallError("未找到适用于 $arch 的 Ubuntu ${release.version} 基础镜像。")
         log("Newest point release: ${best.groupValues[2]}")
         return (dir + best.groupValues[2]) to best.groupValues[1]
     }
@@ -320,7 +320,7 @@ object ChrootInstaller {
 
     private suspend fun verify(file: File, expected: String?) {
         if (expected == null) {
-            set(ChrootInstallStep.VERIFY, "No checksum given: skipped")
+            set(ChrootInstallStep.VERIFY, "未提供校验和：已跳过")
             log("No checksum to verify against.")
             return
         }
@@ -337,25 +337,25 @@ object ChrootInstaller {
                 digest.update(buf, 0, n)
                 read += n
                 val now = System.currentTimeMillis()
-                if (now - last > 200) { last = now; set(ChrootInstallStep.VERIFY, "Checking…", read.toFloat() / total) }
+                if (now - last > 200) { last = now; set(ChrootInstallStep.VERIFY, "校验中…", read.toFloat() / total) }
             }
         }
         val actual = digest.digest().joinToString("") { "%02x".format(it) }
         if (!actual.equals(expected, ignoreCase = true)) {
             file.delete(); downloaded = null
-            throw InstallError("Checksum mismatch: the download is damaged (got $actual). Try again.")
+            throw InstallError("校验和不匹配：下载文件已损坏（实际为 $actual）。请重试。")
         }
         log("✅ sha256 matches")
     }
 
     private suspend fun extract(context: Context, req: ChrootInstallRequest, archive: File?) {
-        set(ChrootInstallStep.EXTRACT, "Preparing ${req.path}…")
+        set(ChrootInstallStep.EXTRACT, "正在准备 ${req.path}…")
         var prep = ChrootManager.runCtl(context, listOf("prepare", "--root", req.path))
         if (!prep.ok && createdPath == req.path) {
             // our own partial extraction from the failed attempt
             log("Removing the partial extraction from the last attempt…")
             val del = ChrootManager.runCtl(context, listOf("delete", "--root", req.path), timeoutMs = 30 * 60_000L)
-            if (!del.ok) throw InstallError("Could not clear ${req.path}: ${del.message()}")
+            if (!del.ok) throw InstallError("无法清理 ${req.path}：${del.message()}")
             prep = ChrootManager.runCtl(context, listOf("prepare", "--root", req.path))
         }
         if (!prep.ok) throw InstallError(prep.message())
@@ -364,7 +364,7 @@ object ChrootInstaller {
         val partial = ChrootInstall(req.path, req.name, "installing", ChrootManager.defaultArch(), req.user,
             android.os.Process.myUid(), sourceLabel(req.source), System.currentTimeMillis(), false)
         ChrootManager.writeMeta(context, req.path, "manifest", partial.toManifest() + "INSTALLING=1\n")
-            .let { if (!it.ok) throw InstallError("Could not write the manifest: ${it.message()}") }
+            .let { if (!it.ok) throw InstallError("无法写入清单文件：${it.message()}") }
 
         val (raw, total) = openSource(context, req.source, archive)
         val counting = CountingInputStream(raw)
@@ -382,13 +382,13 @@ object ChrootInstaller {
                     if (now - last > 250) {
                         last = now
                         val mb = counting.count / (1 shl 20)
-                        set(ChrootInstallStep.EXTRACT, "$mb MB${if (total > 0) " of ${total / (1 shl 20)} MB" else ""} read",
+                        set(ChrootInstallStep.EXTRACT, "$mb MB${if (total > 0) " / ${total / (1 shl 20)} MB" else ""} 已读取",
                             if (total > 0) counting.count.toFloat() / total else null)
                     }
                 }
             }
         }, onLine = { log(it) }, timeoutMs = 60 * 60_000L)
-        if (!r.ok) throw InstallError("Extraction failed: ${r.message()}")
+        if (!r.ok) throw InstallError("解压失败：${r.message()}")
         log("✅ Extracted")
         // a backup made by AntiGem brings its manifest (the one written before extracting says INSTALLING)
         val f = ChrootManager.scan(context, req.path).firstOrNull { it.path == req.path }
@@ -406,10 +406,10 @@ object ChrootInstaller {
                     if (c.moveToFirst() && !c.isNull(0)) c.getLong(0) else -1L
                 } ?: -1L
             } catch (_: Exception) { -1L }
-            (context.contentResolver.openInputStream(source.uri) ?: throw InstallError("Cannot open ${source.displayName}")) to size
+            (context.contentResolver.openInputStream(source.uri) ?: throw InstallError("无法打开 ${source.displayName}")) to size
         }
         else -> {
-            val f = archive ?: throw InstallError("Nothing was downloaded")
+            val f = archive ?: throw InstallError("尚未下载任何文件")
             f.inputStream() to f.length()
         }
     }
@@ -428,8 +428,8 @@ object ChrootInstaller {
             n >= 3 && b(0) == 0x42 && b(1) == 0x5a && b(2) == 0x68 ->
                 org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream(input, true)
             n >= 4 && b(0) == 0x28 && b(1) == 0xb5 && b(2) == 0x2f && b(3) == 0xfd ->
-                throw InstallError("zstd archives are not supported: use .tar.gz or .tar.xz")
-            n >= 2 && b(0) == 0x50 && b(1) == 0x4b -> throw InstallError("That is a ZIP file: the chroot needs a rootfs .tar.gz / .tar.xz")
+                throw InstallError("不支持 zstd 压缩包：请使用 .tar.gz 或 .tar.xz")
+            n >= 2 && b(0) == 0x50 && b(1) == 0x4b -> throw InstallError("这是一个 ZIP 文件：chroot 需要 rootfs 的 .tar.gz / .tar.xz")
             else -> input
         }
     }
@@ -449,31 +449,31 @@ object ChrootInstaller {
         if (backup?.hasConf == true) {
             log("Keeping the backup's settings (mounts, DNS, shared folders): change them on its page.")
         } else {
-            set(ChrootInstallStep.CONFIGURE, "Writing the chroot's settings…")
+            set(ChrootInstallStep.CONFIGURE, "正在写入 chroot 设置…")
             ChrootManager.writeMeta(context, req.path, "chroot.conf", req.config.toConf())
-                .let { if (!it.ok) throw InstallError("Could not save the settings: ${it.message()}") }
+                .let { if (!it.ok) throw InstallError("无法保存设置：${it.message()}") }
         }
-        set(ChrootInstallStep.CONFIGURE, "Mounting and setting up DNS…")
+        set(ChrootInstallStep.CONFIGURE, "正在挂载并设置 DNS…")
         val draft = ChrootInstall(req.path, req.name, "installing", ChrootManager.defaultArch(), userOf(req),
             android.os.Process.myUid(), sourceLabel(req.source), System.currentTimeMillis(), false)
         val s = ChrootManager.start(context, draft, withBridge = false, onLine = { log(it) })
-        if (!s.ok) throw InstallError("Could not start the chroot: ${s.message}")
-        set(ChrootInstallStep.CONFIGURE, "Network groups and user ${userOf(req)}…")
+        if (!s.ok) throw InstallError("无法启动 chroot：${s.message}")
+        set(ChrootInstallStep.CONFIGURE, "网络组与用户 ${userOf(req)}…")
         val r = ChrootManager.execAsRoot(context, req.path,
             ChrootScripts.userScript(userOf(req), android.os.Process.myUid(), req.password, req.sudoNoPassword, keepSudoers = backup != null),
             onLine = { log(it) })
-        if (!r.ok) throw InstallError("Setting up Ubuntu failed: ${r.message()}")
+        if (!r.ok) throw InstallError("配置 Ubuntu 失败：${r.message()}")
     }
 
     private suspend fun packages(context: Context, req: ChrootInstallRequest) {
         if (restoredBackup != null) {
-            set(ChrootInstallStep.PACKAGES, "Kept from the backup")
+            set(ChrootInstallStep.PACKAGES, "已从备份保留")
             log("Packages: the backup's are kept (none installed now).")
             return
         }
         val bundles = req.bundles + ChrootPackageBundle.ESSENTIALS
         val names = bundles.flatMap { it.packages } + req.extraPackages.filter { ChrootScripts.isPackageName(it) }
-        set(ChrootInstallStep.PACKAGES, "apt: ${names.size} packages${if (bundles.any { it.nodeJs }) " + Node.js" else ""}…")
+        set(ChrootInstallStep.PACKAGES, "apt：${names.size} 个软件包${if (bundles.any { it.nodeJs }) " + Node.js" else ""}…")
         var lastLine = ""
         val r = ChrootManager.execAsRoot(context, req.path, ChrootScripts.packagesScript(names, bundles.any { it.nodeJs }, upgrade = false),
             onLine = { line ->
@@ -483,23 +483,23 @@ object ChrootInstaller {
                     set(ChrootInstallStep.PACKAGES, line.take(120))
                 }
             })
-        if (!r.ok) throw InstallError("Installing packages failed: ${r.message()} (check the log; Retry continues from here)")
+        if (!r.ok) throw InstallError("安装软件包失败：${r.message()}（请查看日志；重试将从此处继续）")
     }
 
     private suspend fun finish(context: Context, req: ChrootInstallRequest): ChrootInstall {
-        set(ChrootInstallStep.FINISH, "Registering the install…")
+        set(ChrootInstallStep.FINISH, "正在注册安装…")
         val found = ChrootManager.scan(context, req.path).firstOrNull { it.path == req.path }
         val install = ChrootInstall(
             path = req.path, name = req.name, os = found?.os?.takeIf { it.isNotBlank() } ?: "Ubuntu",
             arch = found?.arch ?: ChrootManager.defaultArch(), user = userOf(req), uid = android.os.Process.myUid(),
-            source = restoredBackup?.let { "backup of ${it.manifest["NAME"] ?: "a chroot"} (${sourceLabel(req.source)})" } ?: sourceLabel(req.source),
+            source = restoredBackup?.let { "备份自 ${it.manifest["NAME"] ?: "一个 chroot"}（${sourceLabel(req.source)}）" } ?: sourceLabel(req.source),
             createdAt = System.currentTimeMillis(), legacy = false
         )
         ChrootManager.writeMeta(context, install.path, "manifest", install.toManifest())
-            .let { if (!it.ok) throw InstallError("Could not write the manifest: ${it.message()}") }
+            .let { if (!it.ok) throw InstallError("无法写入清单文件：${it.message()}") }
         ChrootManager.runCtl(context, listOf("register", "--root", install.path))
         ChrootManager.addOrUpdate(context, install)
-        set(ChrootInstallStep.FINISH, "Putting the bridge into the chroot…")
+        set(ChrootInstallStep.FINISH, "正在将桥接写入 chroot…")
         val s = ChrootManager.start(context, install, withBridge = true, onLine = { log(it) })
         if (!s.ok) log("⚠️ ${s.message}")
         if (req.activate) ChrootManager.activate(context, install)
@@ -508,9 +508,9 @@ object ChrootInstaller {
     }
 
     fun sourceLabel(source: ChrootSource): String = when (source) {
-        is ChrootSource.Official -> "official ${source.release.label}"
-        is ChrootSource.Prebuilt -> "AntiGem prebuilt ($PREBUILT_TAG)"
-        is ChrootSource.Url -> "url ${source.url.take(200)}"
-        is ChrootSource.LocalFile -> "file ${source.displayName.take(120)}"
+        is ChrootSource.Official -> "官方 ${source.release.label}"
+        is ChrootSource.Prebuilt -> "AntiGem 预构建（$PREBUILT_TAG）"
+        is ChrootSource.Url -> "链接 ${source.url.take(200)}"
+        is ChrootSource.LocalFile -> "文件 ${source.displayName.take(120)}"
     }
 }

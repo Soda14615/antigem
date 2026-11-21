@@ -969,7 +969,7 @@ object JarvisMcp {
     }
 
     private fun taskJson(t: JarvisTasks.Task) = JSONObject().apply {
-        put("id", t.id); put("title", t.title); put("agent", t.agent.name.lowercase()); put("state", t.state.label)
+        put("id", t.id); put("title", t.title); put("agent", t.agent.name.lowercase()); put("state", t.state.name.lowercase())
         if (t.team.isNotBlank()) put("team", t.team)
         put("parent_manager_id", t.owner); put("is_manager", JarvisManagers.isDelegated(t.id))
         if (t.archived) put("archived", true)

@@ -81,14 +81,14 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
         scope.launch {
             step = ChrootBuildStep.Looking
             val url = manager.findChrootBuild().getOrElse {
-                step = ChrootBuildStep.Failed(it.message ?: "Could not reach GitHub.")
+                step = ChrootBuildStep.Failed(it.message ?: "无法连接 GitHub。")
                 return@launch
             }
             step = ChrootBuildStep.Downloading(0f, 0L, 0L)
             val file = manager.downloadApk(url) { progress, done, total ->
                 step = ChrootBuildStep.Downloading(progress, done, total)
             }.getOrElse {
-                step = ChrootBuildStep.Failed("The download failed: ${it.message ?: "network error"}")
+                step = ChrootBuildStep.Failed("下载失败：${it.message ?: "网络错误"}")
                 return@launch
             }
             install(file)
@@ -101,10 +101,10 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         // header, like the chroot setup page
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { if (!busy) onClose() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = AppColors.onBackground) }
+            IconButton(onClick = { if (!busy) onClose() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回", tint = AppColors.onBackground) }
             Column(Modifier.weight(1f)) {
-                Text("Ubuntu chroot (root)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.onBackground)
-                Text("Needs the chroot build of AntiGem", fontSize = 11.5.sp, color = AppColors.textSecondary)
+                Text("Ubuntu chroot（root）", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.onBackground)
+                Text("需要 AntiGem 的 chroot 版本", fontSize = 11.5.sp, color = AppColors.textSecondary)
             }
         }
         HorizontalDivider(color = AppColors.border.copy(alpha = 0.5f))
@@ -113,17 +113,16 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = chrootColumnSpacing
         ) {
-            ChrootSection("The chroot build", "This is the normal build of AntiGem", Icons.Outlined.Storage, AppColors.success) {
+            ChrootSection("chroot 版本", "当前是 AntiGem 的普通版本", Icons.Outlined.Storage, AppColors.success) {
                 Text(
-                    "On a rooted phone, agents can run in a real Ubuntu (apt, glibc, sudo) through a chroot. It uses a Linux " +
-                        "build of AntiGem's bridge, which only the chroot build carries (about 4 MB more), so other phones " +
-                        "don't download it.",
+                    "在已 root 的手机上，智能体可以通过 chroot 在真正的 Ubuntu（apt、glibc、sudo）中运行。它使用 AntiGem " +
+                        "桥接的 Linux 版本，该版本只有 chroot 版才包含（大约多 4 MB），因此其他手机不会下载它。",
                     fontSize = 12.5.sp, lineHeight = 17.sp, color = AppColors.onBackground
                 )
                 Spacer(Modifier.height(8.dp))
-                ChrootNote("• The same app with the same signature: it installs over this one and keeps your chats, settings and environment.")
-                ChrootNote("• Its updates are chroot builds too.")
-                ChrootNote("• Setting up the chroot afterwards needs root (Magisk, KernelSU or APatch).")
+                ChrootNote("• 同一个应用、同一个签名：会覆盖安装当前版本，并保留你的对话、设置和环境。")
+                ChrootNote("• 它的更新也是 chroot 版本。")
+                ChrootNote("• 之后搭建 chroot 需要 root（Magisk、KernelSU 或 APatch）。")
             }
 
             when (val s = step) {
@@ -131,11 +130,11 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
                 ChrootBuildStep.Looking -> Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = ClaudeTerracotta)
                     Spacer(Modifier.width(10.dp))
-                    Text("Looking for the chroot build on GitHub…", fontSize = 12.5.sp, color = AppColors.onBackground)
+                    Text("正在 GitHub 上查找 chroot 版本…", fontSize = 12.5.sp, color = AppColors.onBackground)
                 }
                 is ChrootBuildStep.Downloading -> Column {
                     Text(
-                        if (s.total > 0) "Downloading the chroot build: ${mb(s.done)} of ${mb(s.total)}" else "Downloading the chroot build: ${mb(s.done)}",
+                        if (s.total > 0) "正在下载 chroot 版本：${mb(s.done)} / ${mb(s.total)}" else "正在下载 chroot 版本：${mb(s.done)}",
                         fontSize = 12.5.sp, color = AppColors.onBackground
                     )
                     Spacer(Modifier.height(8.dp))
@@ -146,8 +145,8 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
                     )
                 }
                 is ChrootBuildStep.Downloaded -> ChrootNote(
-                    if (s.opened) "Downloaded. Confirm the update in Android's installer: AntiGem restarts as the chroot build."
-                    else "Downloaded. Allow AntiGem to install apps (Android opened that setting), then come back and tap Install.",
+                    if (s.opened) "已下载。请在 Android 安装器中确认更新：AntiGem 将以 chroot 版本重启。"
+                    else "已下载。请允许 AntiGem 安装应用（Android 已打开该设置），然后返回并点击安装。",
                     if (s.opened) AppColors.success else AppColors.warning
                 )
                 is ChrootBuildStep.Failed -> ChrootNote(s.message, AppColors.danger)
@@ -166,9 +165,9 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
             ) {
                 Text(
                     when (s) {
-                        is ChrootBuildStep.Downloaded -> "Install"
-                        is ChrootBuildStep.Failed -> "Try again"
-                        else -> "Download and install the chroot build"
+                        is ChrootBuildStep.Downloaded -> "安装"
+                        is ChrootBuildStep.Failed -> "重试"
+                        else -> "下载并安装 chroot 版本"
                     },
                     fontWeight = FontWeight.SemiBold
                 )
@@ -176,7 +175,7 @@ fun ChrootBuildScreen(onClose: () -> Unit) {
             OutlinedButton(
                 onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RELEASES_PAGE)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } },
                 modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(14.dp)
-            ) { Text("Open the releases page (AntiGem-v…-chroot.apk)") }
+            ) { Text("打开发布页面（AntiGem-v…-chroot.apk）") }
         }
     }
 }

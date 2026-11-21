@@ -42,8 +42,8 @@ object JarvisTasks {
     private const val START_GRACE_MS = 25_000L
 
     enum class State(val label: String) {
-        STARTING("starting"), RUNNING("running"), NEEDS_APPROVAL("waiting for approval"), NEEDS_ANSWER("asking a question"),
-        STALLED("no progress"), DONE("done"), FAILED("failed"), STOPPED("stopped");
+        STARTING("启动中"), RUNNING("运行中"), NEEDS_APPROVAL("等待审批"), NEEDS_ANSWER("等待回答"),
+        STALLED("无进展"), DONE("已完成"), FAILED("失败"), STOPPED("已停止");
 
         val active: Boolean get() = this == STARTING || this == RUNNING || this == NEEDS_APPROVAL || this == NEEDS_ANSWER || this == STALLED
         val needsUser: Boolean get() = this == NEEDS_APPROVAL || this == NEEDS_ANSWER
@@ -141,7 +141,7 @@ object JarvisTasks {
             }
             val detail = when (task.state) {
                 State.DONE -> task.result
-                State.FAILED -> task.note.removePrefix("Failed:").trim()
+                State.FAILED -> task.note.removePrefix("失败：").trim()
                 else -> task.note
             }
             JarvisController.onTaskEvent(task, kind, detail)
@@ -212,14 +212,14 @@ object JarvisTasks {
         workspaceIsolation: String = "auto"
     ): Task {
         val text = goal.trim()
-        require(text.isNotEmpty()) { "The task needs a goal." }
+        require(text.isNotEmpty()) { "任务需要提供目标。" }
         val isolation = workspaceIsolation.trim().lowercase().ifBlank { "auto" }
-        require(isolation in setOf("auto", "shared", "worktree")) { "Workspace isolation must be auto, shared or worktree." }
+        require(isolation in setOf("auto", "shared", "worktree")) { "工作区隔离方式必须是 auto、shared 或 worktree。" }
         val launchId = UUID.randomUUID().toString()
         val workspace = when {
             isolation == "shared" -> null
             projectPath.isNullOrBlank() -> {
-                require(isolation != "worktree") { "Select a local Git project before requesting a task worktree." }
+                require(isolation != "worktree") { "请求任务 worktree 之前，请先选择一个本地 Git 项目。" }
                 null
             }
             isolation == "auto" && ai.antigem.data.preferences.AuthPreferences.isRemoteEndpoint() -> null
@@ -231,7 +231,7 @@ object JarvisTasks {
         fun prepare(id: String): String {
             val task = Task(id = id, agent = agent,
                 title = title?.trim()?.takeIf { it.isNotEmpty() }?.take(60) ?: shortTitle(text),
-                goal = text.take(600), project = projectPath.orEmpty(), note = "Started",
+                goal = text.take(600), project = projectPath.orEmpty(), note = "已开始",
                 owner = JarvisManagers.ownerOrVoice(owner), team = team.trim(), workspace = workspace)
             if (childProfiles.isNotEmpty()) JarvisManagers.registerDelegated(id, agent, task.owner, childProfiles, text)
             created = task
@@ -246,7 +246,7 @@ object JarvisTasks {
             AgentKind.CODEX -> {
                 val b = newCodexBackend()
                 if (b.state.value.isBlocking) b.refreshStatus()
-                if (b.state.value.isBlocking) { b.stop(); error("Codex is not available: ${b.state.value.label}.") }
+                if (b.state.value.isBlocking) { b.stop(); error("Codex 不可用：${b.state.value.label}。") }
                 // Codex gives the chat its id when it is created: create it now so the task knows it
                 val id = runCatching { b.createChatNow(effectiveProjectPath, modelId) }.getOrElse { b.stop(); throw it }
                 effort?.let { b.selectEffort(it) }
@@ -266,10 +266,10 @@ object JarvisTasks {
             AgentKind.OPENCODE -> {
                 val b = newOpenCodeBackend()
                 if (b.state.value.isBlocking) b.refreshStatus()
-                if (b.state.value.isBlocking) { b.stop(); error("OpenCode is not available: ${b.state.value.label}.") }
+                if (b.state.value.isBlocking) { b.stop(); error("OpenCode 不可用：${b.state.value.label}。") }
                 b.startNewChat()
                 delay(150)
-                val id = b.currentConversation.value?.id ?: run { b.stop(); error("Could not create the chat") }
+                val id = b.currentConversation.value?.id ?: run { b.stop(); error("无法创建会话") }
                 effectiveProjectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
                 openCodeBackends[id] = b
@@ -289,7 +289,7 @@ object JarvisTasks {
                 val b = newClaudeBackend()
                 b.startNewChat()
                 delay(150)
-                val id = b.currentConversation.value?.id ?: error("Could not create the chat")
+                val id = b.currentConversation.value?.id ?: error("无法创建会话")
                 effectiveProjectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
                 effort?.let { b.setEffort(it) }
@@ -324,7 +324,7 @@ object JarvisTasks {
             created?.let { task ->
                 if (task.agent == AgentKind.AGY) runCatching { hub.cancelCascadeInvocation(task.id) }
                 release(task.id)
-                put(task.copy(state = State.FAILED, note = "Launch failed: ${e.message.orEmpty().take(160)}", reported = true))
+                put(task.copy(state = State.FAILED, note = "启动失败：${e.message.orEmpty().take(160)}", reported = true))
                 if (JarvisManagers.isDelegated(task.id)) {
                     JarvisManagers.remove(task.id)
                     JarvisPreferences.removeChatId(task.id)
@@ -340,7 +340,7 @@ object JarvisTasks {
         val existing = find(id)
         if (existing != null && existing.id == id) {
             put(existing.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
-                followUps = existing.followUps + 1, note = "Follow-up sent", reported = true))
+                followUps = existing.followUps + 1, note = "已发送追问", reported = true))
             return
         }
         val conv = vm.allConversations.value.find { it.id == id }
@@ -353,35 +353,35 @@ object JarvisTasks {
 
     /** Sends a follow-up, a correction or a new direction to the task. With [interrupt] a running task is stopped first. */
     suspend fun reply(id: String, message: String, interrupt: Boolean): String {
-        var t = find(id) ?: return "No task with that id. Use jarvis_task_list."
+        var t = find(id) ?: return "没有该 id 对应的任务。请使用 jarvis_task_list。"
         val text = message.trim()
-        if (text.isEmpty()) return "The message is empty."
+        if (text.isEmpty()) return "消息为空。"
         val lock = taskSendLocks.getOrPut(t.id) { Mutex() }
         return lock.withLock {
-            t = find(t.id) ?: return@withLock "No task with that id. Use jarvis_task_list."
+            t = find(t.id) ?: return@withLock "没有该 id 对应的任务。请使用 jarvis_task_list。"
             val running = isRunningNow(t) || t.state.active
             if (running && !interrupt) {
-                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
-                put(t.copy(queuedFollowUps = t.queuedFollowUps + QueuedFollowUp(message = text), note = "Follow-up queued (${t.queuedFollowUps.size + 1})"), durable = true)
-                return@withLock "Queued behind the current turn. The task will receive it automatically when it finishes."
+                if (t.queuedFollowUps.size >= 20) return@withLock "该任务已排了 20 条追问。请等它完成后再添加。"
+                put(t.copy(queuedFollowUps = t.queuedFollowUps + QueuedFollowUp(message = text), note = "追问已排队（${t.queuedFollowUps.size + 1}）"), durable = true)
+                return@withLock "已排到当前回合之后。任务完成时会自动收到。"
             }
             if (running && interrupt) {
-                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
+                if (t.queuedFollowUps.size >= 20) return@withLock "该任务已排了 20 条追问。请等它完成后再添加。"
                 val urgent = QueuedFollowUp(message = text, interrupt = true)
                 put(t.copy(queuedFollowUps = listOf(urgent) + t.queuedFollowUps,
-                    note = "Stopping current turn; follow-up queued"), durable = true)
+                    note = "正在停止当前回合；追问已排队"), durable = true)
                 val stopped = stop(t.id, quiet = true)
-                if (stopped != "Stopped.") {
+                if (stopped != "已停止。") {
                     find(t.id)?.let { current -> put(current.copy(queuedFollowUps = current.queuedFollowUps.filterNot { it.id == urgent.id }), durable = true) }
                     return@withLock stopped
                 }
-                return@withLock "Stop requested. The follow-up is queued and will be sent after the provider confirms the turn has stopped."
+                return@withLock "已请求停止。追问已排队，将在 provider 确认本轮停止后发送。"
             }
             if (t.queuedFollowUps.isNotEmpty()) {
-                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
+                if (t.queuedFollowUps.size >= 20) return@withLock "该任务已排了 20 条追问。请等它完成后再添加。"
                 put(t.copy(state = State.STARTING, queuedFollowUps = t.queuedFollowUps + QueuedFollowUp(message = text),
-                    queuedRetryAt = 0L, queuedAttempts = 0, note = "Retrying queued follow-ups"), durable = true)
-                return@withLock "Queued follow-ups resumed in order. The task will receive them automatically."
+                    queuedRetryAt = 0L, queuedAttempts = 0, note = "正在重试排队的追问"), durable = true)
+                return@withLock "已按顺序恢复排队的追问，任务会自动收到。"
             }
             sendFollowUpNow(t, text)
         }
@@ -399,7 +399,7 @@ object JarvisTasks {
         }
         val now = System.currentTimeMillis()
         put(t.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
-            followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0,
+            followUps = t.followUps + 1, note = "追问：${text.take(60)}", result = "", resultChars = 0,
             reported = true, archived = false), durable = true)
         try {
         when (t.agent) {
@@ -442,7 +442,7 @@ object JarvisTasks {
                 if (JarvisManagers.isDelegated(t.id)) JarvisManagers.update(t.id) { it.copy(mission = previousMission) }
             }
             if (e is kotlinx.coroutines.CancellationException) throw e
-            return "Could not send: ${e.message.orEmpty()}"
+            return "发送失败：${e.message.orEmpty()}"
         }
         return "Sent to the task."
     }
@@ -460,24 +460,24 @@ object JarvisTasks {
             if (hasFollowUpMarker(latest, head.id)) {
                 put(latest.copy(queuedFollowUps = latest.queuedFollowUps.drop(1), followUpInFlightId = "",
                     followUpInFlightAt = 0L, queuedAttempts = 0, queuedRetryAt = 0L,
-                    note = "Queued follow-up delivered"), durable = true)
+                    note = "排队的追问已送达"), durable = true)
                 return@withLock true
             }
             if (latest.followUpInFlightId == head.id && now - latest.followUpInFlightAt < 30_000L) return@withLock false
             latest = latest.copy(followUpInFlightId = head.id, followUpInFlightAt = now)
             put(latest, durable = true)
             val result = sendFollowUpNow(latest, head.message, head.id)
-            if (result.startsWith("Could not send:")) {
+            if (result.startsWith("发送失败：")) {
                 val current = find(taskId) ?: return@withLock false
                 val attempts = latest.queuedAttempts + 1
-                val detail = result.removePrefix("Could not send:").trim().take(120)
+                val detail = result.removePrefix("发送失败：").trim().take(120)
                 if (attempts >= 5) {
                     put(current.copy(queuedFollowUps = listOf(head) + current.queuedFollowUps.filterNot { it.id == head.id }, queuedAttempts = attempts,
-                        queuedRetryAt = 0L, state = State.FAILED, note = "Queued follow-up failed after $attempts attempts: $detail", reported = false), durable = true)
+                        queuedRetryAt = 0L, state = State.FAILED, note = "排队的追问在 $attempts 次尝试后仍然失败：$detail", reported = false), durable = true)
                 } else {
                     val wait = (5_000L shl (attempts - 1)).coerceAtMost(300_000L)
                     put(current.copy(queuedAttempts = attempts, queuedRetryAt = System.currentTimeMillis() + wait, state = State.STARTING,
-                        note = "Queued follow-up send failed; retrying in ${wait / 1000}s: $detail", reported = true), durable = true)
+                        note = "排队的追问发送失败，${wait / 1000} 秒后重试：$detail", reported = true), durable = true)
                 }
                 false
             } else {
@@ -501,11 +501,11 @@ object JarvisTasks {
 
     /** Stops what the task is doing. */
     suspend fun stop(id: String, quiet: Boolean = false): String {
-        val t = find(id) ?: return "No task with that id."
+        val t = find(id) ?: return "没有该 id 对应的任务。"
         if (!quiet && JarvisManagers.isDelegated(t.id)) {
             for (child in ownedBy(t.id).filter { it.active }) {
                 val stopped = stop(child.id)
-                if (stopped != "Stopped.") return "Could not stop child ${child.title}: $stopped"
+                if (stopped != "已停止。") return "无法停止子任务 ${child.title}：$stopped"
             }
         }
         when (t.agent) {
@@ -517,9 +517,9 @@ object JarvisTasks {
             AgentKind.OPENCODE -> (openCodeBackends[t.id] ?: vm.openCodeBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
             AgentKind.CODEX -> (codexBackends[t.id] ?: vm.codexBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
         }
-        if (!quiet) put(t.copy(state = State.STOPPED, updatedAt = System.currentTimeMillis(), note = "Stopped", reported = true,
+        if (!quiet) put(t.copy(state = State.STOPPED, updatedAt = System.currentTimeMillis(), note = "已停止", reported = true,
             queuedFollowUps = emptyList(), queuedRetryAt = 0L, queuedAttempts = 0, followUpInFlightId = "", followUpInFlightAt = 0L), durable = true)
-        return "Stopped."
+        return "已停止。"
     }
 
     /** Forgets the task (the chat itself stays). */
@@ -754,7 +754,7 @@ object JarvisTasks {
                 val last = msgs.lastOrNull()
                 // OpenCode reports failures as an error card in the reply (provider error, gave up after retries, no answer)
                 error = b.conversationError.value ?: last?.takeIf { !running && it.role == MessageRole.ASSISTANT && it.content.contains("<!-- error -->") }
-                    ?.let { m -> Regex("\"userMessage\":\"((?:[^\"\\\\]|\\\\.)*)\"").find(m.content)?.groupValues?.get(1) ?: "the provider failed" }
+                    ?.let { m -> Regex("\"userMessage\":\"((?:[^\"\\\\]|\\\\.)*)\"").find(m.content)?.groupValues?.get(1) ?: "provider 调用失败" }
                 sig = "${msgs.size}:${last?.content?.length}:${last?.toolCalls?.size}:${last?.toolCalls?.lastOrNull()?.status}"
             }
             AgentKind.CODEX -> {
@@ -765,7 +765,7 @@ object JarvisTasks {
                 val last = msgs.lastOrNull()
                 // Codex reports a failed turn as an error card in the reply (usage limit, connection, model)
                 error = b.conversationError.value ?: last?.takeIf { !running && it.role == MessageRole.ASSISTANT && it.content.contains("<!-- error -->") }
-                    ?.let { m -> Regex("\"userMessage\":\"((?:[^\"\\\\]|\\\\.)*)\"").find(m.content)?.groupValues?.get(1) ?: "Codex failed" }
+                    ?.let { m -> Regex("\"userMessage\":\"((?:[^\"\\\\]|\\\\.)*)\"").find(m.content)?.groupValues?.get(1) ?: "Codex 失败" }
                 sig = "${msgs.size}:${last?.content?.length}:${last?.toolCalls?.size}:${last?.toolCalls?.lastOrNull()?.status}"
             }
         }
@@ -774,7 +774,7 @@ object JarvisTasks {
         if (!running && t.queuedFollowUps.isNotEmpty() &&
             (t.queuedFollowUps.first().interrupt || !needsApproval && !asking)) {
             if ((t.seenRunning || now - t.turnAt >= START_GRACE_MS) && now >= t.queuedRetryAt) dispatchQueuedFollowUp(t.id)
-            else if (t.state != State.STARTING) put(t.copy(state = State.STARTING, note = "Waiting to deliver queued follow-ups"))
+            else if (t.state != State.STARTING) put(t.copy(state = State.STARTING, note = "等待投递排队的追问"))
             return
         }
         if (progressSig.put(t.id, sig) != sig) t = t.copy(progressAt = now)
@@ -806,16 +806,16 @@ object JarvisTasks {
         }
         if (next != t.state) {
             t = t.copy(state = next, updatedAt = now, reported = false, note = when (next) {
-                State.NEEDS_APPROVAL -> "Waiting for an approval"
-                State.NEEDS_ANSWER -> "Asking a question"
+                State.NEEDS_APPROVAL -> "等待审批"
+                State.NEEDS_ANSWER -> "正在提问"
                 State.STALLED -> when {
-                    delegated && !running && !missionDone -> "Manager is idle with an unfinished mission"
-                    !running && !t.seenRunning -> "No confirmed execution or current-turn result"
-                    else -> "No progress for ${(now - t.progressAt) / 60_000} min"
+                    delegated && !running && !missionDone -> "管理者空闲，但使命尚未完成"
+                    !running && !t.seenRunning -> "未确认到执行动作或本轮结果"
+                    else -> "已 ${(now - t.progressAt) / 60_000} 分钟无进展"
                 }
                 State.RUNNING -> "Working"
-                State.DONE -> "Finished"
-                State.FAILED -> "Failed: ${error.orEmpty().take(80)}"
+                State.DONE -> "已完成"
+                State.FAILED -> "失败：${error.orEmpty().take(80)}"
                 else -> t.note
             })
             // the manager gets the sub-agent's whole report (cut only when very long)
@@ -833,7 +833,7 @@ object JarvisTasks {
         if (!putIfCurrent(t0, if (kind == null && !t.reported) t.copy(reported = true) else t)) return
         if (kind != null) {
             JarvisController.onTaskEvent(t, kind, when (kind) {
-                "failed" -> error.orEmpty().ifBlank { t.note.removePrefix("Failed:").trim() }
+                "failed" -> error.orEmpty().ifBlank { t.note.removePrefix("失败：").trim() }
                 "stalled" -> t.note
                 else -> t.result
             })
@@ -876,7 +876,7 @@ object JarvisTasks {
 
     private fun shortTitle(text: String): String {
         val first = PromptExpansion.collapse(text).lines().firstOrNull { it.isNotBlank() }.orEmpty().trim()
-        return if (first.length > 48) first.take(48).trimEnd() + "…" else first.ifBlank { "Task" }
+        return if (first.length > 48) first.take(48).trimEnd() + "…" else first.ifBlank { "任务" }
     }
 
     private fun save(durable: Boolean = false) {
@@ -899,7 +899,7 @@ object JarvisTasks {
             })
         }
         val editor = prefs?.edit()?.putString("list", arr.toString()) ?: return
-        if (durable) check(editor.commit()) { "Could not durably save Jarvis task state." } else editor.apply()
+        if (durable) check(editor.commit()) { "无法持久保存 Jarvis 任务状态。" } else editor.apply()
     }
 
     private fun load() {

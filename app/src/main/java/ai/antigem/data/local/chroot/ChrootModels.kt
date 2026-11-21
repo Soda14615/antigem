@@ -5,8 +5,8 @@ import org.json.JSONObject
 
 /** Where the chroot's mounts live (see chrootctl.sh). */
 enum class ChrootNsMode(val conf: String, val label: String) {
-    PRIVATE("private", "Private (recommended)"),
-    GLOBAL("global", "Global (whole phone)");
+    PRIVATE("private", "私有（推荐）"),
+    GLOBAL("global", "全局（整部手机）");
 
     companion object {
         fun of(value: String?) = entries.firstOrNull { it.conf == value } ?: PRIVATE
@@ -23,9 +23,9 @@ enum class ChrootDnsMode(val conf: String) {
 
 /** What happens to the chroot when AntiGem is exited (notification or drawer Exit). */
 enum class ChrootExitBehavior(val label: String, val description: String) {
-    KEEP_RUNNING("Keep running", "The bridge and the agents keep working while AntiGem is closed; AntiGem reconnects when opened."),
-    STOP_BRIDGE("Stop the bridge and agents", "The chroot's mounts stay, so the next start is quick."),
-    STOP_ALL("Stop everything", "Every process of the chroot is stopped and its folders are unmounted.")
+    KEEP_RUNNING("保持运行", "AntiGem 关闭期间，桥接与智能体继续工作；再次打开 AntiGem 时会自动重连。"),
+    STOP_BRIDGE("停止桥接与智能体", "chroot 的挂载会保留，因此下次启动很快。"),
+    STOP_ALL("全部停止", "chroot 的所有进程都会停止，其目录也会被卸载。")
 }
 
 /** A host folder shown inside the chroot. */

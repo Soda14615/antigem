@@ -90,7 +90,7 @@ object ChrootManager {
                     ChrootInstall(
                         path = LEGACY_DIR, name = "ubuntu", os = "Ubuntu", arch = defaultArch(),
                         user = AuthPreferences(appContext).getChrootUsernameSync(), uid = -1,
-                        source = "first chroot version", createdAt = 0L, legacy = true
+                        source = "最初的 chroot 版本", createdAt = 0L, legacy = true
                     )
                 )
                 active = LEGACY_DIR
@@ -192,11 +192,11 @@ object ChrootManager {
     /** Why [target] cannot hold a shared folder inside the chroot (null: it can). */
     fun bindTargetProblem(target: String, user: String?): String? {
         val t = target.trimEnd('/')
-        if (!t.startsWith("/") || !isPlainPath(t)) return "Use a full path inside Ubuntu with letters, digits, . _ - and /, e.g. /mnt/photos."
-        if (t.split('/').any { it == "." || it == ".." }) return "No . or .. in the path."
-        if (t in CHROOT_SYSTEM_DIRS || (user != null && t == "/home/$user")) return "$t is a folder Ubuntu needs: pick one inside it, e.g. ${if (user != null) "/home/$user/photos" else "/mnt/photos"}."
+        if (!t.startsWith("/") || !isPlainPath(t)) return "请使用 Ubuntu 内的完整路径，只能包含字母、数字、. _ - 和 /，例如 /mnt/photos。"
+        if (t.split('/').any { it == "." || it == ".." }) return "路径中不能包含 . 或 ..。"
+        if (t in CHROOT_SYSTEM_DIRS || (user != null && t == "/home/$user")) return "$t 是 Ubuntu 需要的文件夹：请选择它内部的一个文件夹，例如 ${if (user != null) "/home/$user/photos" else "/mnt/photos"}。"
         val top = "/" + t.split('/').getOrElse(1) { "" }
-        if (top in CHROOT_NO_BIND_TOPS) return "Nothing can be shared inside $top: pick e.g. /mnt/<name> or a folder in your home."
+        if (top in CHROOT_NO_BIND_TOPS) return "不能在 $top 内共享任何内容：请选择例如 /mnt/<name>，或主目录中的文件夹。"
         return null
     }
 
@@ -209,11 +209,11 @@ object ChrootManager {
     fun validateRootPath(path: String): String? {
         val p = path.trimEnd('/')
         return when {
-            !isPlainPath(p) -> "Use only letters, digits, . _ - and / in the path."
-            !p.startsWith("/data/") -> "The rootfs must be on /data: /sdcard has no Linux permissions and cannot run programs."
-            p.split('/').size < 4 -> "Pick a folder of its own, e.g. $BASE_DIR/ubuntu."
+            !isPlainPath(p) -> "路径中只能使用字母、数字、. _ - 和 /。"
+            !p.startsWith("/data/") -> "rootfs 必须位于 /data 下：/sdcard 没有 Linux 权限，无法运行程序。"
+            p.split('/').size < 4 -> "请选择单独的文件夹，例如 $BASE_DIR/ubuntu。"
             p == BASE_DIR || p.startsWith("/data/media") || p.startsWith("/data/local/tmp") || p.startsWith("/data/adb") ->
-                "That folder is used by Android or the root manager."
+                "该文件夹已被 Android 或 root 管理器使用。"
             else -> null
         }
     }
@@ -238,7 +238,7 @@ object ChrootManager {
             if (i > 0 && !line.startsWith("MOUNT|") && !line.startsWith("PROC|")) line.substring(0, i) to line.substring(i + 1) else null
         }.toMap()
         fun message(): String = err.lineSequence().map { it.removePrefix("ERROR: ").trim() }.filter { it.isNotEmpty() }
-            .lastOrNull() ?: out.lastOrNull() ?: "exit code $exitCode"
+            .lastOrNull() ?: out.lastOrNull() ?: "退出码 $exitCode"
     }
 
     fun b64(text: String): String = Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
@@ -278,12 +278,12 @@ object ChrootManager {
         val line = try {
             ctlLine(context, args)
         } catch (e: Exception) {
-            return@withContext SuResult(-1, emptyList(), e.message ?: "bad argument")
+            return@withContext SuResult(-1, emptyList(), e.message ?: "参数无效")
         }
         val process = try {
             ProcessBuilder("su", "-c", line).start()
         } catch (e: IOException) {
-            return@withContext SuResult(-1, emptyList(), "su is not available: this phone is not rooted, or AntiGem has no root access")
+            return@withContext SuResult(-1, emptyList(), "su 不可用：此手机未 root，或 AntiGem 没有 root 权限")
         }
         val out = Collections.synchronizedList(mutableListOf<String>())
         val err = StringBuffer()
@@ -309,11 +309,11 @@ object ChrootManager {
         if (!finished) {
             process.destroy()
             tOut.join(1000); tErr.join(1000)
-            return@withContext SuResult(-2, out.toList(), (err.toString() + "\ntimed out").trim())
+            return@withContext SuResult(-2, out.toList(), (err.toString() + "\n已超时").trim())
         }
         tOut.join(3000); tErr.join(3000)
         val code = process.exitValue()
-        val errText = err.toString().trim().ifEmpty { if (code != 0 && stdinError != null) "input closed: $stdinError" else "" }
+        val errText = err.toString().trim().ifEmpty { if (code != 0 && stdinError != null) "输入已关闭：$stdinError" else "" }
         SuResult(code, out.toList(), errText)
     }
 
@@ -332,7 +332,7 @@ object ChrootManager {
     suspend fun probe(context: Context): ChrootProbe {
         if (!checkRoot()) {
             return ChrootProbe(false, null, null, false, null, null, null,
-                "No root access. A rooted phone (Magisk, KernelSU or APatch) that grants AntiGem root is needed.").also { _probe.value = it }
+                "没有 root 权限。需要一台已 root 的手机（Magisk、KernelSU 或 APatch），并授予 AntiGem root 权限。").also { _probe.value = it }
         }
         val r = runCtl(context, listOf("probe"), timeoutMs = 30_000L)
         val v = r.values()
@@ -404,11 +404,11 @@ object ChrootManager {
      */
     suspend fun adopt(context: Context, found: ChrootFound, user: String, onLine: ((String) -> Unit)? = null): Result<ChrootInstall> {
         init(context)
-        if (!isUserName(user)) return Result.failure(IllegalArgumentException("Invalid user name: $user"))
+        if (!isUserName(user)) return Result.failure(IllegalArgumentException("用户名无效：$user"))
         val base = found.toInstall()
         val install = base.copy(user = user, uid = android.os.Process.myUid(), legacy = false,
             name = base.name.takeIf { isInstallName(it) } ?: "ubuntu",
-            source = if (found.hasManifest) base.source else "adopted",
+            source = if (found.hasManifest) base.source else "已接管",
             createdAt = if (base.createdAt > 0) base.createdAt else System.currentTimeMillis())
         // its processes run as the old uid: stop them before the user moves
         stop(context, install)
@@ -420,7 +420,7 @@ object ChrootManager {
         runCtl(context, listOf("register", "--root", install.path))
         val script = ChrootScripts.userScript(install.user, install.uid, password = "", sudoNoPassword = true, keepSudoers = true)
         val r = execAsRoot(context, install.path, script, onLine)
-        if (!r.ok) return Result.failure(IOException("Could not set up user ${install.user}: ${r.message()}"))
+        if (!r.ok) return Result.failure(IOException("无法设置用户 ${install.user}：${r.message()}"))
         saveInstalls(context, _installs.value.filterNot { it.path == install.path } + install)
         return Result.success(install)
     }
@@ -455,7 +455,7 @@ object ChrootManager {
      */
     suspend fun start(context: Context, install: ChrootInstall? = activeInstall(context), withBridge: Boolean = false,
                       onLine: ((String) -> Unit)? = null): StartResult {
-        install ?: return StartResult(false, "No Ubuntu chroot is installed.", false, null)
+        install ?: return StartResult(false, "未安装 Ubuntu chroot。", false, null)
         val myUid = android.os.Process.myUid()
         if (!install.legacy && install.uid != myUid && install.uid >= 0) {
             // AntiGem was reinstalled with a new uid: the chroot's user follows it (its processes must be stopped)
@@ -474,9 +474,9 @@ object ChrootManager {
         tzArg()?.let { args += listOf("--tz", it) }
         if (withBridge) {
             val bridge = linuxBridgeFile(context) ?: return StartResult(false,
-                if (ai.antigem.BuildConfig.HAS_CHROOT) "This app has no Linux bridge inside."
-                else "This is the normal build of AntiGem, without the Ubuntu chroot. Install the chroot build: " +
-                    "Settings → Where agents run → Ubuntu chroot → Get the chroot build (it keeps your data).", false, null)
+                if (ai.antigem.BuildConfig.HAS_CHROOT) "此应用中没有内置的 Linux 桥接。"
+                else "这是 AntiGem 的普通版本，不包含 Ubuntu chroot。请安装 chroot 版本：" +
+                    "设置 → 智能体运行在哪里 → Ubuntu chroot → 获取 chroot 版本（会保留你的数据）。", false, null)
             args += listOf("--bridge", bridge.absolutePath)
         }
         val r = runCtl(context, args, onLine = onLine, timeoutMs = 60_000L)
@@ -486,7 +486,7 @@ object ChrootManager {
 
     /** Stops every process of the chroot and unmounts it. */
     suspend fun stop(context: Context, install: ChrootInstall? = activeInstall(context)): SuResult {
-        install ?: return SuResult(-1, emptyList(), "No Ubuntu chroot is installed.")
+        install ?: return SuResult(-1, emptyList(), "未安装 Ubuntu chroot。")
         return runCtl(context, listOf("stop", "--root", install.path), timeoutMs = 60_000L).also { refreshStatus(context, install) }
     }
 
@@ -539,7 +539,7 @@ object ChrootManager {
     }
 
     suspend fun unmount(context: Context, mountPoint: String, install: ChrootInstall? = activeInstall(context)): SuResult {
-        install ?: return SuResult(-1, emptyList(), "No chroot")
+        install ?: return SuResult(-1, emptyList(), "没有 chroot")
         return runCtl(context, listOf("umount", "--root", install.path, "--path", mountPoint)).also { refreshStatus(context, install) }
     }
 
@@ -554,7 +554,7 @@ object ChrootManager {
     }
 
     suspend fun killProcess(context: Context, pid: Int, install: ChrootInstall? = activeInstall(context)): SuResult {
-        install ?: return SuResult(-1, emptyList(), "No chroot")
+        install ?: return SuResult(-1, emptyList(), "没有 chroot")
         return runCtl(context, listOf("kill", "--root", install.path, "--pid", pid.toString())).also { refreshStatus(context, install) }
     }
 
@@ -669,12 +669,12 @@ object ChrootManager {
 
     /** Starts the bridge in the chroot as its user, detached (it outlives the app when the exit setting keeps it). */
     suspend fun startBridge(context: Context, command: String, install: ChrootInstall? = activeInstall(context)): SuResult {
-        install ?: return SuResult(-1, emptyList(), "No Ubuntu chroot is installed.")
+        install ?: return SuResult(-1, emptyList(), "未安装 Ubuntu chroot。")
         return runCtl(context, listOf("bridge-start", "--root", install.path, "--user", install.user, "--cmd", b64(command)), timeoutMs = 60_000L)
     }
 
     suspend fun stopBridge(context: Context, install: ChrootInstall? = activeInstall(context)): SuResult {
-        install ?: return SuResult(-1, emptyList(), "No chroot")
+        install ?: return SuResult(-1, emptyList(), "没有 chroot")
         return runCtl(context, listOf("bridge-stop", "--root", install.path), timeoutMs = 30_000L)
     }
 
@@ -704,8 +704,8 @@ object ChrootManager {
     // ------------------------------------------------------------------ backups
 
     enum class BackupFormat(val ext: String, val mime: String, val label: String) {
-        GZIP("tar.gz", "application/gzip", ".tar.gz (fast)"),
-        XZ("tar.xz", "application/x-xz", ".tar.xz (smaller, slow)")
+        GZIP("tar.gz", "application/gzip", ".tar.gz（快速）"),
+        XZ("tar.xz", "application/x-xz", ".tar.xz（更小，较慢）")
     }
 
     /** Counts and hashes what is written (the file's size and sha256). */
@@ -718,9 +718,9 @@ object ChrootManager {
     /** chrootctl as root with its stdout (binary) handed to [consume]; its stderr lines go to [onLine]. */
     private suspend fun runCtlStreaming(context: Context, args: List<String>, onLine: ((String) -> Unit)?, consume: (java.io.InputStream) -> Unit): SuResult =
         withContext(Dispatchers.IO) {
-            val line = try { ctlLine(context, args) } catch (e: Exception) { return@withContext SuResult(-1, emptyList(), e.message ?: "bad argument") }
+            val line = try { ctlLine(context, args) } catch (e: Exception) { return@withContext SuResult(-1, emptyList(), e.message ?: "参数无效") }
             val process = try { ProcessBuilder("su", "-c", line).start() } catch (e: IOException) {
-                return@withContext SuResult(-1, emptyList(), "su is not available")
+                return@withContext SuResult(-1, emptyList(), "su 不可用")
             }
             process.outputStream.close()
             val err = StringBuffer()
@@ -743,12 +743,12 @@ object ChrootManager {
                        totalKbHint: Long?, shaDest: Uri? = null, shaName: String? = null, onLine: (String) -> Unit): SuResult = withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
         val raw = try { resolver.openOutputStream(dest, "w") } catch (e: Exception) { null }
-            ?: return@withContext SuResult(-1, emptyList(), "Cannot write the chosen file")
+            ?: return@withContext SuResult(-1, emptyList(), "无法写入所选文件")
         val digest = java.security.MessageDigest.getInstance("SHA-256")
         val counting = CountingOutputStream(java.io.BufferedOutputStream(raw, 1 shl 20), digest)
         var read = 0L
         val started = System.currentTimeMillis()
-        onLine("Reading ${install.path}${if (clean) " (clean image: no homes, logins, history or apt lists)" else ""}…")
+        onLine("正在读取 ${install.path}${if (clean) "（纯净镜像：不含主目录、登录信息、历史记录和 apt 列表）" else ""}…")
         val args = listOf("backup", "--root", install.path) + if (clean) listOf("--clean") else emptyList()
         val r = runCtlStreaming(context, args, onLine) { input ->
             val compressor: OutputStream = when (format) {
@@ -766,23 +766,23 @@ object ChrootManager {
                     val now = System.currentTimeMillis()
                     if (now - last > 3000) {
                         last = now
-                        val pct = totalKbHint?.takeIf { it > 0 }?.let { " (~${(read * 100 / (it * 1024)).coerceAtMost(99)}%)" }.orEmpty()
-                        onLine("… ${read / (1 shl 20)} MB read$pct, ${counting.count / (1 shl 20)} MB written")
+                        val pct = totalKbHint?.takeIf { it > 0 }?.let { "（约 ${(read * 100 / (it * 1024)).coerceAtMost(99)}%）" }.orEmpty()
+                        onLine("… 已读取 ${read / (1 shl 20)} MB$pct，已写入 ${counting.count / (1 shl 20)} MB")
                     }
                 }
             }
         }
         if (!r.ok || read == 0L) {
             runCatching { android.provider.DocumentsContract.deleteDocument(resolver, dest) }
-            return@withContext if (r.ok) SuResult(1, emptyList(), "Nothing was read from the rootfs") else r
+            return@withContext if (r.ok) SuResult(1, emptyList(), "未能从 rootfs 读取任何内容") else r
         }
         val sha = digest.digest().joinToString("") { "%02x".format(it) }
         if (shaDest != null) {
             runCatching { resolver.openOutputStream(shaDest, "w")?.use { it.write("$sha  ${shaName ?: "rootfs"}\n".toByteArray()) } }
-                .onFailure { onLine("⚠️ Could not write the .sha256 file: ${it.message}") }
+                .onFailure { onLine("⚠️ 无法写入 .sha256 文件：${it.message}") }
         }
         val secs = (System.currentTimeMillis() - started) / 1000
-        onLine("✅ Done in ${secs / 60} min ${secs % 60} s: ${counting.count / (1 shl 20)} MB file (${read / (1 shl 20)} MB of files) · sha256 $sha")
+        onLine("✅ 完成，用时 ${secs / 60} 分 ${secs % 60} 秒：文件 ${counting.count / (1 shl 20)} MB（共读取 ${read / (1 shl 20)} MB 文件）· sha256 $sha")
         r
     }
 
@@ -795,10 +795,10 @@ object ChrootManager {
         val name = ChrootInstaller.prebuiltAsset()
         val dir = android.provider.DocumentsContract.buildDocumentUriUsingTree(treeUri, android.provider.DocumentsContract.getTreeDocumentId(treeUri))
         val archive = runCatching { android.provider.DocumentsContract.createDocument(resolver, dir, "application/octet-stream", name) }.getOrNull()
-            ?: return SuResult(-1, emptyList(), "Cannot create $name in that folder")
+            ?: return SuResult(-1, emptyList(), "无法在该文件夹中创建 $name")
         val sha = runCatching { android.provider.DocumentsContract.createDocument(resolver, dir, "application/octet-stream", "$name.sha256") }.getOrNull()
-        onLine("Writing $name and $name.sha256 (upload both to the GitHub release ${ChrootInstaller.PREBUILT_TAG})")
-        if (!install.os.contains("24.04")) onLine("⚠️ The prebuilt source is named for Ubuntu 24.04; this install is ${install.os}.")
+        onLine("正在写入 $name 和 $name.sha256（请将两者都上传到 GitHub 发布 ${ChrootInstaller.PREBUILT_TAG}）")
+        if (!install.os.contains("24.04")) onLine("⚠️ 预构建源是按 Ubuntu 24.04 命名的；此安装是 ${install.os}。")
         val r = backup(context, install, archive, BackupFormat.XZ, clean = true, totalKbHint = totalKbHint, shaDest = sha, shaName = name, onLine = onLine)
         if (!r.ok) sha?.let { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, it) } }
         return r

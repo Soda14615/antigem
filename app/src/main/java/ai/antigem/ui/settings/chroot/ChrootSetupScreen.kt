@@ -230,10 +230,10 @@ fun ChrootSetupScreen(
     Column(Modifier.fillMaxSize()) {
         // header
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = AppColors.onBackground) }
+            IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回", tint = AppColors.onBackground) }
             Column(Modifier.weight(1f)) {
-                Text(if (restore) "Restore an Ubuntu backup" else "Ubuntu chroot (root)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.onBackground)
-                Text("A real Ubuntu on this phone for the bridge, the agents and the terminal", fontSize = 11.5.sp, color = AppColors.textSecondary)
+                Text(if (restore) "还原 Ubuntu 备份" else "Ubuntu chroot（root）", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.onBackground)
+                Text("在这台手机上运行真正的 Ubuntu，供桥接、智能体和终端使用", fontSize = 11.5.sp, color = AppColors.textSecondary)
             }
         }
         HorizontalDivider(color = AppColors.border.copy(alpha = 0.5f))
@@ -246,45 +246,45 @@ fun ChrootSetupScreen(
                 InstallProgress(state.step, state.progress, state.detail, state.done, state.error, state.result != null, logs)
             } else {
                 // ---------------- the phone
-                ChrootSection("This phone", "Root, the mount tools and free space", Icons.Outlined.Search) {
+                ChrootSection("这台手机", "root、挂载工具与可用空间", Icons.Outlined.Search) {
                     when {
                         checking -> Row(verticalAlignment = Alignment.CenterVertically) {
                             CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = ClaudeTerracotta)
                             Spacer(Modifier.width(10.dp))
-                            Text("Checking (accept the root manager's prompt)…", fontSize = 12.5.sp, color = AppColors.onBackground)
+                            Text("正在检查（请接受 root 管理器的授权请求）…", fontSize = 12.5.sp, color = AppColors.onBackground)
                         }
-                        probe == null -> Text("Not checked yet", fontSize = 12.5.sp, color = AppColors.textSecondary)
+                        probe == null -> Text("尚未检查", fontSize = 12.5.sp, color = AppColors.textSecondary)
                         probe?.rootOk != true -> {
-                            Text(probe?.error ?: "No root access", fontSize = 12.5.sp, color = AppColors.danger)
+                            Text(probe?.error ?: "没有 root 权限", fontSize = 12.5.sp, color = AppColors.danger)
                         }
                         else -> {
                             val p = probe!!
-                            ChrootKeyValue("Root", p.rootManager ?: "granted", AppColors.success)
-                            ChrootKeyValue("CPU", "${p.machine ?: "?"} · kernel ${p.kernel ?: "?"}")
+                            ChrootKeyValue("root 权限", p.rootManager ?: "已授予", AppColors.success)
+                            ChrootKeyValue("CPU", "${p.machine ?: "?"} · 内核 ${p.kernel ?: "?"}")
                             ChrootKeyValue("SELinux", p.selinux ?: "?")
-                            ChrootKeyValue("Mount tools", if (p.canPrivateNs) "unshare + nsenter (${p.busybox ?: "toybox"})" else "no unshare/nsenter: global namespace only",
+                            ChrootKeyValue("挂载工具", if (p.canPrivateNs) "unshare + nsenter (${p.busybox ?: "toybox"})" else "没有 unshare/nsenter：仅支持全局命名空间",
                                 if (p.canPrivateNs) AppColors.success else AppColors.warning)
                             val free = runCatching { android.os.StatFs("/data").availableBytes }.getOrDefault(-1L)
-                            if (free >= 0) ChrootKeyValue("Free on /data", formatBytes(free), if (free < (2L shl 30)) AppColors.warning else AppColors.onBackground)
+                            if (free >= 0) ChrootKeyValue("/data 可用空间", formatBytes(free), if (free < (2L shl 30)) AppColors.warning else AppColors.onBackground)
                         }
                     }
                     if (!checking) {
-                        TextButton(onClick = { runCheck() }) { Text(if (probe == null) "Check" else "Check again", color = ClaudeTerracotta) }
+                        TextButton(onClick = { runCheck() }) { Text(if (probe == null) "检查" else "重新检查", color = ClaudeTerracotta) }
                     }
                 }
 
                 // ---------------- installs already on the phone
                 val foundList = found.orEmpty()
                 if (foundList.isNotEmpty()) {
-                    ChrootSection("Found on this phone", "Use an install that is already here instead of downloading a new one", Icons.Outlined.Storage) {
+                    ChrootSection("在本机发现", "直接使用已有的安装，无需重新下载", Icons.Outlined.Storage) {
                         foundList.forEach { f ->
                             val known = installs.firstOrNull { it.path == f.path }
                             Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(f.os.ifBlank { "Linux" }, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground, modifier = Modifier.weight(1f))
-                                    if (f.running) ChrootTag("running", AppColors.success)
-                                    else if (f.mounted) ChrootTag("mounted, nothing running", AppColors.warning)
-                                    if (!f.hasManifest) { Spacer(Modifier.width(4.dp)); ChrootTag("not AntiGem's yet", AppColors.warning) }
+                                    if (f.running) ChrootTag("运行中", AppColors.success)
+                                    else if (f.mounted) ChrootTag("已挂载，无运行进程", AppColors.warning)
+                                    if (!f.hasManifest) { Spacer(Modifier.width(4.dp)); ChrootTag("尚未纳入 AntiGem", AppColors.warning) }
                                 }
                                 Text("${f.path} · ${f.arch}", fontSize = 11.5.sp, fontFamily = FontFamily.Monospace, color = AppColors.textSecondary)
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 6.dp)) {
@@ -299,12 +299,12 @@ fun ChrootSetupScreen(
                                                 }
                                             },
                                             colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta), shape = RoundedCornerShape(10.dp)
-                                        ) { Text("Use this", fontSize = 12.5.sp) }
+                                        ) { Text("使用此项", fontSize = 12.5.sp) }
                                     } else {
                                         Button(
                                             onClick = { adoptTarget = f; adoptError = null },
                                             colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta), shape = RoundedCornerShape(10.dp)
-                                        ) { Text("Adopt…", fontSize = 12.5.sp) }
+                                        ) { Text("接管…", fontSize = 12.5.sp) }
                                     }
                                 }
                                 if (adoptTarget?.path == f.path) {
@@ -329,68 +329,68 @@ fun ChrootSetupScreen(
                 }
 
                 // ---------------- source
-                ChrootSection("Source", "Where the Ubuntu rootfs comes from", Icons.Outlined.Cloud) {
+                ChrootSection("来源", "Ubuntu rootfs 从哪里来", Icons.Outlined.Cloud) {
                     ChrootRadioRow(
-                        "AntiGem Ubuntu (prebuilt)",
-                        "Ubuntu 24.04 with sudo, git, curl, Node.js, Python and the Android fixes already set up: the quickest start.",
+                        "AntiGem Ubuntu（预构建）",
+                        "已预装 sudo、git、curl、Node.js、Python 和 Android 相关修复的 Ubuntu 24.04：起步最快。",
                         selected = source == SourceChoice.PREBUILT,
                         enabled = prebuiltAvailable == true,
-                        tag = when (prebuiltAvailable) { true -> "recommended"; false -> "not published yet"; null -> "checking…" },
+                        tag = when (prebuiltAvailable) { true -> "推荐"; false -> "尚未发布"; null -> "检查中…" },
                         tagColor = if (prebuiltAvailable == true) AppColors.success else AppColors.textSecondary
                     ) { source = SourceChoice.PREBUILT }
-                    ChrootRadioRow(UbuntuRelease.NOBLE.label, "Official Ubuntu Base from cdimage.ubuntu.com (newest point release, checksum checked) · ~30 MB",
+                    ChrootRadioRow(UbuntuRelease.NOBLE.label, "来自 cdimage.ubuntu.com 的官方 Ubuntu Base（最新点版本，已核对校验和）· 约 30 MB",
                         source == SourceChoice.OFFICIAL_2404, tag = "LTS") { source = SourceChoice.OFFICIAL_2404 }
-                    ChrootRadioRow(UbuntuRelease.RESOLUTE.label, "Official Ubuntu Base, the newest LTS", source == SourceChoice.OFFICIAL_2604) { source = SourceChoice.OFFICIAL_2604 }
-                    ChrootRadioRow(UbuntuRelease.JAMMY.label, "Official Ubuntu Base, the older LTS", source == SourceChoice.OFFICIAL_2204) { source = SourceChoice.OFFICIAL_2204 }
-                    ChrootRadioRow("Another URL", "Any rootfs .tar.gz / .tar.xz (Debian, Kali, Arch ARM …)", source == SourceChoice.URL) { source = SourceChoice.URL }
+                    ChrootRadioRow(UbuntuRelease.RESOLUTE.label, "官方 Ubuntu Base，最新的 LTS", source == SourceChoice.OFFICIAL_2604) { source = SourceChoice.OFFICIAL_2604 }
+                    ChrootRadioRow(UbuntuRelease.JAMMY.label, "官方 Ubuntu Base，较旧的 LTS", source == SourceChoice.OFFICIAL_2204) { source = SourceChoice.OFFICIAL_2204 }
+                    ChrootRadioRow("其他 URL", "任意 rootfs 的 .tar.gz / .tar.xz（Debian、Kali、Arch ARM 等）", source == SourceChoice.URL) { source = SourceChoice.URL }
                     if (source == SourceChoice.URL) {
-                        OutlinedTextField(url, { url = it }, label = { Text("Rootfs URL") }, singleLine = true,
+                        OutlinedTextField(url, { url = it }, label = { Text("rootfs URL") }, singleLine = true,
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                         Spacer(Modifier.height(6.dp))
-                        OutlinedTextField(sha, { sha = it }, label = { Text("sha256 (optional)") }, singleLine = true,
+                        OutlinedTextField(sha, { sha = it }, label = { Text("sha256（可选）") }, singleLine = true,
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     }
-                    ChrootRadioRow("A file on this phone", "An AntiGem backup (keeps its user, home, settings and packages), or any rootfs .tar.gz / .tar.xz", source == SourceChoice.FILE) {
+                    ChrootRadioRow("本机上的文件", "AntiGem 备份（保留其用户、家目录、设置和软件包），或任意 rootfs 的 .tar.gz / .tar.xz", source == SourceChoice.FILE) {
                         if (fileUri == null) filePicker.launch(arrayOf("*/*")) else source = SourceChoice.FILE
                     }
                     if (source == SourceChoice.FILE) {
                         OutlinedButton(onClick = { filePicker.launch(arrayOf("*/*")) }, shape = RoundedCornerShape(10.dp)) {
                             Icon(Icons.Outlined.FolderOpen, null, Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text(if (fileUri == null) "Choose a file" else fileName.ifBlank { "Chosen" }, fontSize = 12.5.sp)
+                            Text(if (fileUri == null) "选择文件" else fileName.ifBlank { "已选择" }, fontSize = 12.5.sp)
                         }
                     }
                 }
 
                 // ---------------- location
-                ChrootSection("Location", "The rootfs needs Linux permissions, so it lives on /data (never on /sdcard)", Icons.Outlined.Storage) {
-                    ChrootRadioRow("${ChrootManager.BASE_DIR}/<name>", "Stays when AntiGem is uninstalled or its data is cleared, and is found again after a reinstall.",
-                        location == LocationChoice.DEFAULT, tag = "recommended") { location = LocationChoice.DEFAULT }
-                    ChrootRadioRow("AntiGem's app storage", "Removed together with the app (uninstall or Clear data). Private mount namespace only.",
+                ChrootSection("位置", "rootfs 需要 Linux 权限，因此存放在 /data（绝不会放在 /sdcard）", Icons.Outlined.Storage) {
+                    ChrootRadioRow("${ChrootManager.BASE_DIR}/<name>", "卸载 AntiGem 或清除其数据后仍会保留，重装后也能重新找到。",
+                        location == LocationChoice.DEFAULT, tag = "推荐") { location = LocationChoice.DEFAULT }
+                    ChrootRadioRow("AntiGem 的应用存储", "随应用一起删除（卸载或清除数据）。仅使用私有挂载命名空间。",
                         location == LocationChoice.APP) { location = LocationChoice.APP; nsMode = ChrootNsMode.PRIVATE }
-                    ChrootRadioRow("Another folder on /data", null, location == LocationChoice.CUSTOM) { location = LocationChoice.CUSTOM }
+                    ChrootRadioRow("/data 上的其他文件夹", null, location == LocationChoice.CUSTOM) { location = LocationChoice.CUSTOM }
                     if (location == LocationChoice.CUSTOM) {
-                        OutlinedTextField(customPath, { customPath = it }, label = { Text("Folder") }, singleLine = true,
+                        OutlinedTextField(customPath, { customPath = it }, label = { Text("文件夹") }, singleLine = true,
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     } else {
-                        OutlinedTextField(name, { name = it.trim(); nameEdited = true }, label = { Text("Name") }, singleLine = true,
+                        OutlinedTextField(name, { name = it.trim(); nameEdited = true }, label = { Text("名称") }, singleLine = true,
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     }
-                    ChrootNote("Installs into: $path")
+                    ChrootNote("安装到：$path")
                     val pathError = ChrootManager.validateRootPath(path)
-                        ?: if (location != LocationChoice.CUSTOM && !ChrootManager.isInstallName(name)) "The name may use letters, digits, . _ and -." else null
+                        ?: if (location != LocationChoice.CUSTOM && !ChrootManager.isInstallName(name)) "名称只能使用字母、数字、. _ 和 -。" else null
                     if (pathError != null) ChrootNote(pathError, AppColors.danger)
-                    if (installs.any { it.path == path }) ChrootNote("AntiGem already has an install there: pick another name.", AppColors.danger)
+                    if (installs.any { it.path == path }) ChrootNote("该位置已有 AntiGem 安装，请换一个名称。", AppColors.danger)
                 }
 
                 // ---------------- user
-                ChrootSection("User", "The normal user the bridge, the agents and the terminal run as (it gets AntiGem's own uid)", Icons.Outlined.Person) {
-                    if (source == SourceChoice.FILE) ChrootNote("Restoring an AntiGem backup keeps the backup's own user (and its settings): these fields are used for other rootfs files.", AppColors.info)
-                    OutlinedTextField(user, { user = it.trim().lowercase() }, label = { Text("User name") }, singleLine = true,
+                ChrootSection("用户", "桥接、智能体和终端所使用的普通用户（它会获得 AntiGem 自己的 uid）", Icons.Outlined.Person) {
+                    if (source == SourceChoice.FILE) ChrootNote("还原 AntiGem 备份时会保留备份中的用户（及其设置）：这些字段仅用于其他 rootfs 文件。", AppColors.info)
+                    OutlinedTextField(user, { user = it.trim().lowercase() }, label = { Text("用户名") }, singleLine = true,
                         isError = !ChrootManager.isUserName(user), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     Spacer(Modifier.height(6.dp))
                     OutlinedTextField(
-                        password, { password = it.replace("\n", "") }, label = { Text("Password (optional)") }, singleLine = true,
+                        password, { password = it.replace("\n", "") }, label = { Text("密码（可选）") }, singleLine = true,
                         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
@@ -400,43 +400,43 @@ fun ChrootSetupScreen(
                         },
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)
                     )
-                    ChrootSwitchRow("sudo without a password", "Agents can install packages without asking (recommended for agents)",
+                    ChrootSwitchRow("sudo 免密码", "智能体无需询问即可安装软件包（推荐在智能体场景使用）",
                         sudoNoPassword) { sudoNoPassword = it }
-                    if (!sudoNoPassword && password.isBlank()) ChrootNote("Without a password sudo could never be used: set one, or keep this on.", AppColors.danger)
+                    if (!sudoNoPassword && password.isBlank()) ChrootNote("没有密码时 sudo 将始终无法使用：请设置密码，或保持此项开启。", AppColors.danger)
                 }
 
                 // ---------------- options
-                ChrootSection("Options", "All of these can be changed later on the chroot's own page", Icons.Outlined.Settings) {
-                    ChrootSwitchRow("Phone storage at /sdcard", "Your files (Download, DCIM …) inside the chroot", mountSdcard) { mountSdcard = it }
-                    if (mountSdcard) ChrootSwitchRow("Read-only", "Programs in the chroot can read the phone's files but never change or delete them", sdcardRo) { sdcardRo = it }
-                    if (mountSdcard) ChrootSwitchRow("USB drives and SD cards (/storage)",
-                        if (sdcardRo) "Off with a read-only /sdcard (the phone's storage would be writable through /storage)"
-                        else "Every volume at /storage/…, also drives plugged in after the chroot started",
+                ChrootSection("选项", "这些都可以稍后在 chroot 自己的页面中修改", Icons.Outlined.Settings) {
+                    ChrootSwitchRow("手机存储挂载到 /sdcard", "chroot 内可访问你的文件（Download、DCIM 等）", mountSdcard) { mountSdcard = it }
+                    if (mountSdcard) ChrootSwitchRow("只读", "chroot 中的程序可以读取手机文件，但无法修改或删除", sdcardRo) { sdcardRo = it }
+                    if (mountSdcard) ChrootSwitchRow("USB 存储设备与 SD 卡（/storage）",
+                        if (sdcardRo) "在 /sdcard 为只读时关闭（否则手机存储会通过 /storage 变为可写）"
+                        else "所有卷都挂载到 /storage/…，也包括 chroot 启动后插入的驱动器",
                         mountStorage && !sdcardRo, enabled = !sdcardRo) { mountStorage = it }
-                    ChrootNote("USB devices (fastboot, adb, serial adapters over OTG) are always reachable at /dev/bus/usb; the user is in Android's usb group.")
-                    ChrootSwitchRow("Automatic DNS", "Uses the phone's DNS servers at every start (custom servers otherwise)", dnsAuto) { dnsAuto = it }
+                    ChrootNote("USB 设备（fastboot、adb、通过 OTG 连接的串口适配器）始终可以在 /dev/bus/usb 访问；该用户已加入 Android 的 usb 用户组。")
+                    ChrootSwitchRow("自动 DNS", "每次启动都使用手机的 DNS 服务器（否则使用自定义服务器）", dnsAuto) { dnsAuto = it }
                     if (!dnsAuto) {
-                        OutlinedTextField(dnsCustom, { dnsCustom = it }, label = { Text("DNS servers (comma separated)") }, singleLine = true,
+                        OutlinedTextField(dnsCustom, { dnsCustom = it }, label = { Text("DNS 服务器（以逗号分隔）") }, singleLine = true,
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text("Mount namespace", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+                    Text("挂载命名空间", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
                     ChrootRadioRow(ChrootNsMode.PRIVATE.label,
-                        "The chroot's mounts (/dev, /proc, /sdcard …) exist only for its own processes. Nothing outside can reach your files through the rootfs, even a root file manager deleting it. USB drives plugged in later still show up.",
+                        "chroot 的挂载点（/dev、/proc、/sdcard 等）只对它自己的进程存在。外部任何程序都无法通过 rootfs 访问你的文件，即使用 root 文件管理器去删除也不行。稍后插入的 USB 存储设备仍会出现。",
                         nsMode == ChrootNsMode.PRIVATE, enabled = probe?.canPrivateNs != false) { nsMode = ChrootNsMode.PRIVATE }
                     ChrootRadioRow(ChrootNsMode.GLOBAL.label,
-                        "Mounts visible to the whole phone until stopped (like Linux Deploy). For advanced users: deleting the rootfs folder with another tool while it runs would go into /sdcard.",
+                        "挂载结果对整台手机可见，直到停止（类似 Linux Deploy）。仅供高级用户：运行期间用其他工具删除 rootfs 文件夹，删除操作会落到 /sdcard 中。",
                         nsMode == ChrootNsMode.GLOBAL, enabled = !inAppStorage) { nsMode = ChrootNsMode.GLOBAL }
                     Spacer(Modifier.height(10.dp))
                     ChrootFoldersEditor(user = user, binds = sharedFolders) { sharedFolders = it }
                 }
 
                 // ---------------- packages
-                ChrootSection("Packages", "Installed with apt right after the rootfs (more can be added later)", Icons.Outlined.Inventory2) {
+                ChrootSection("软件包", "rootfs 就绪后立即通过 apt 安装（之后还可以再添加）", Icons.Outlined.Inventory2) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
                         Checkbox(true, null, enabled = false)
                         Column(Modifier.weight(1f)) {
-                            Text(ChrootPackageBundle.ESSENTIALS.title + " (always)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+                            Text(ChrootPackageBundle.ESSENTIALS.title + "（始终安装）", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
                             Text(ChrootPackageBundle.ESSENTIALS.description, fontSize = 11.sp, color = AppColors.textSecondary)
                         }
                     }
@@ -450,10 +450,10 @@ fun ChrootSetupScreen(
                             }
                         }
                     }
-                    OutlinedTextField(extraPackages, { extraPackages = it }, label = { Text("More packages (space separated)") },
+                    OutlinedTextField(extraPackages, { extraPackages = it }, label = { Text("更多软件包（以空格分隔）") },
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
                     val bad = extraPackages.split(Regex("[\\s,]+")).filter { it.isNotBlank() && !ChrootScripts.isPackageName(it) }
-                    if (bad.isNotEmpty()) ChrootNote("Not package names: ${bad.joinToString(" ")}", AppColors.danger)
+                    if (bad.isNotEmpty()) ChrootNote("以下不是软件包名：${bad.joinToString(" ")}", AppColors.danger)
                 }
             }
         }
@@ -466,23 +466,23 @@ fun ChrootSetupScreen(
                     onClick = { val r = state.result!!; ChrootInstaller.reset(); onDone(r) },
                     modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
-                ) { Text("Done", fontWeight = FontWeight.SemiBold) }
+                ) { Text("完成", fontWeight = FontWeight.SemiBold) }
                 state.running -> {
                     val canCancel = state.step == null || state.step!!.ordinal <= ChrootInstallStep.VERIFY.ordinal
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = onClose, modifier = Modifier.weight(1f).height(48.dp), shape = RoundedCornerShape(14.dp)) {
-                            Text("Continue in background")
+                            Text("后台继续")
                         }
                         if (canCancel) OutlinedButton(onClick = { ChrootInstaller.cancel() }, modifier = Modifier.height(48.dp), shape = RoundedCornerShape(14.dp)) {
-                            Text("Cancel", color = AppColors.danger)
+                            Text("取消", color = AppColors.danger)
                         }
                     }
                 }
                 state.error != null -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { ChrootInstaller.retry(context) }, modifier = Modifier.weight(1f).height(48.dp), shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)) { Text("Retry") }
+                        colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)) { Text("重试") }
                     OutlinedButton(onClick = { ChrootInstaller.reset() }, modifier = Modifier.weight(1f).height(48.dp), shape = RoundedCornerShape(14.dp)) {
-                        Text("Change options")
+                        Text("更改选项")
                     }
                 }
                 else -> {
@@ -497,15 +497,15 @@ fun ChrootSetupScreen(
                     }
                     val dnsList = dnsCustom.split(',', ' ').map { it.trim() }.filter { it.isNotEmpty() }
                     val problem = when {
-                        probe?.rootOk != true -> "Root access is needed (Check above)."
-                        src == null -> if (source == SourceChoice.FILE) "Choose a file." else "Enter an http(s) URL."
+                        probe?.rootOk != true -> "需要 root 权限（请在上方检查）。"
+                        src == null -> if (source == SourceChoice.FILE) "请选择文件。" else "请输入 http(s) URL。"
                         ChrootManager.validateRootPath(path) != null -> ChrootManager.validateRootPath(path)
-                        location != LocationChoice.CUSTOM && !ChrootManager.isInstallName(name) -> "Check the name."
-                        installs.any { it.path == path } -> "That folder is already an install."
-                        !ChrootManager.isUserName(user) -> "Check the user name."
-                        !sudoNoPassword && password.isBlank() -> "Set a password, or keep sudo without a password."
-                        !dnsAuto && (dnsList.isEmpty() || dnsList.any { !ChrootManager.isDnsServer(it) }) -> "Check the DNS servers."
-                        extra.any { !ChrootScripts.isPackageName(it) } -> "Check the package names."
+                        location != LocationChoice.CUSTOM && !ChrootManager.isInstallName(name) -> "请检查名称。"
+                        installs.any { it.path == path } -> "该文件夹已是一份安装。"
+                        !ChrootManager.isUserName(user) -> "请检查用户名。"
+                        !sudoNoPassword && password.isBlank() -> "请设置密码，或保持 sudo 免密码。"
+                        !dnsAuto && (dnsList.isEmpty() || dnsList.any { !ChrootManager.isDnsServer(it) }) -> "请检查 DNS 服务器。"
+                        extra.any { !ChrootScripts.isPackageName(it) } -> "请检查软件包名称。"
                         else -> null
                     }
                     if (problem != null) Text(problem, fontSize = 12.sp, color = AppColors.warning)
@@ -536,7 +536,7 @@ fun ChrootSetupScreen(
                         enabled = problem == null,
                         modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta)
-                    ) { Text("Install Ubuntu chroot", fontWeight = FontWeight.SemiBold, fontSize = 15.sp) }
+                    ) { Text("安装 Ubuntu chroot", fontWeight = FontWeight.SemiBold, fontSize = 15.sp) }
                 }
             }
         }
@@ -549,11 +549,11 @@ private fun AdoptPanel(found: ChrootFound, busy: Boolean, error: String?, onAdop
     Surface(shape = RoundedCornerShape(12.dp), color = AppColors.surface, border = BorderStroke(1.dp, AppColors.border.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
         Column(Modifier.padding(12.dp)) {
-            Text("AntiGem writes its manifest and settings into this rootfs and gives its user AntiGem's uid " +
-                "(files in that user's home move with it). Its running processes are stopped first.",
+            Text("AntiGem 会把自身的清单和设置写入这个 rootfs，并让该用户获得 AntiGem 的 uid " +
+                "（该用户家目录中的文件会随之迁移）。它正在运行的进程会先被停止。",
                 fontSize = 11.5.sp, lineHeight = 15.sp, color = AppColors.textSecondary)
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(user, { user = it.trim().lowercase() }, label = { Text("User") }, singleLine = true,
+            OutlinedTextField(user, { user = it.trim().lowercase() }, label = { Text("用户") }, singleLine = true,
                 isError = !ChrootManager.isUserName(user), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp))
             if (error != null) ChrootNote(error, AppColors.danger)
             Spacer(Modifier.height(8.dp))
@@ -563,7 +563,7 @@ private fun AdoptPanel(found: ChrootFound, busy: Boolean, error: String?, onAdop
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = AppColors.onBackground)
                     Spacer(Modifier.width(8.dp))
                 }
-                Text(if (busy) "Adopting…" else "Adopt and use", fontSize = 12.5.sp)
+                Text(if (busy) "正在接管…" else "接管并使用", fontSize = 12.5.sp)
             }
         }
     }
@@ -580,8 +580,8 @@ private fun InstallProgress(
     logs: List<String>
 ) {
     ChrootSection(
-        when { finished -> "Ubuntu chroot is ready"; error != null -> "Installation stopped"; else -> "Installing…" },
-        if (finished) "The bridge and the terminal use it from now on (switch in Settings → Where agents run)" else null,
+        when { finished -> "Ubuntu chroot 已就绪"; error != null -> "安装已停止"; else -> "正在安装…" },
+        if (finished) "从现在起桥接和终端都会使用它（可在 设置 → 智能体运行位置 中切换）" else null,
         if (finished) Icons.Filled.CheckCircle else if (error != null) Icons.Filled.Error else Icons.Outlined.Inventory2,
         tint = if (finished) AppColors.success else if (error != null) AppColors.danger else ClaudeTerracotta
     ) {
@@ -614,5 +614,5 @@ private fun InstallProgress(
             Text(error, fontSize = 12.5.sp, lineHeight = 17.sp, color = AppColors.danger)
         }
     }
-    ChrootSection("Log", null) { ChrootLog(logs, maxHeight = 320) }
+    ChrootSection("日志", null) { ChrootLog(logs, maxHeight = 320) }
 }

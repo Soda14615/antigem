@@ -78,25 +78,25 @@ internal fun ChrootFoldersEditor(user: String, binds: List<ChrootBind>, onChange
         if (uri == null) return@rememberLauncherForActivityResult
         val path = treeUriToPath(uri)
         if (path != null) choose(path)
-        else pickError = "That folder is not on the phone's storage: type its path instead (root can share any folder)."
+        else pickError = "该文件夹不在手机存储中：请直接输入它的路径（root 可以共享任何文件夹）。"
     }
 
-    Text("Shared folders", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
-    ChrootNote("Folders of the phone (yours, or Android's own like /system) shown inside Ubuntu, with any drives mounted inside " +
-        "them. Inside Ubuntu they are the real folders: what is deleted there is deleted on the phone (choose read-only to prevent " +
-        "it). Deleting the Ubuntu install never touches them.")
+    Text("共享文件夹", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+    ChrootNote("手机的文件夹（你的文件夹，或 Android 自带的如 /system）会显示在 Ubuntu 中，其中的磁盘也会一并挂载。" +
+        "在 Ubuntu 里它们是真实的文件夹：在那里删除的内容也会从手机上删除（可选择只读来避免）。删除 Ubuntu " +
+        "安装不会影响它们。")
     Spacer(Modifier.height(4.dp))
-    if (binds.isEmpty()) Text("None yet", fontSize = 12.sp, color = AppColors.textSecondary)
+    if (binds.isEmpty()) Text("暂无", fontSize = 12.sp, color = AppColors.textSecondary)
     binds.forEach { b ->
         Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(b.target, fontSize = 12.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
-                    if (b.readOnly) { Spacer(Modifier.width(6.dp)); ChrootTag("read-only", AppColors.info) }
+                    if (b.readOnly) { Spacer(Modifier.width(6.dp)); ChrootTag("只读", AppColors.info) }
                 }
                 Text("← ${b.source}", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = AppColors.textSecondary)
             }
-            TextButton(onClick = { onChange(binds - b) }) { Text("Remove", color = AppColors.danger, fontSize = 12.sp) }
+            TextButton(onClick = { onChange(binds - b) }) { Text("移除", color = AppColors.danger, fontSize = 12.sp) }
         }
     }
 
@@ -107,7 +107,7 @@ internal fun ChrootFoldersEditor(user: String, binds: List<ChrootBind>, onChange
         ) {
             Icon(Icons.Outlined.Add, null, Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
-            Text("Add a folder")
+            Text("添加文件夹")
         }
         return
     }
@@ -116,44 +116,44 @@ internal fun ChrootFoldersEditor(user: String, binds: List<ChrootBind>, onChange
     Surface(shape = RoundedCornerShape(12.dp), color = AppColors.surface, border = BorderStroke(1.dp, AppColors.border.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
         Column(Modifier.padding(12.dp)) {
-            Text("1. The folder on the phone", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+            Text("1. 手机上的文件夹", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                AssistChip(onClick = { choose(home, "/home/$user/antigem_home") }, label = { Text("AntiGem home") })
-                AssistChip(onClick = { choose("/storage/emulated/0/Download") }, label = { Text("Download") })
-                AssistChip(onClick = { choose("/storage/emulated/0/Documents") }, label = { Text("Documents") })
+                AssistChip(onClick = { choose(home, "/home/$user/antigem_home") }, label = { Text("AntiGem 主目录") })
+                AssistChip(onClick = { choose("/storage/emulated/0/Download") }, label = { Text("下载") })
+                AssistChip(onClick = { choose("/storage/emulated/0/Documents") }, label = { Text("文档") })
                 AssistChip(onClick = { choose("/storage/emulated/0/DCIM") }, label = { Text("DCIM") })
-                AssistChip(onClick = { choose("/storage/emulated/0/Pictures") }, label = { Text("Pictures") })
-                AssistChip(onClick = { picker.launch(null) }, label = { Text("Browse…") },
+                AssistChip(onClick = { choose("/storage/emulated/0/Pictures") }, label = { Text("图片") })
+                AssistChip(onClick = { picker.launch(null) }, label = { Text("浏览…") },
                     leadingIcon = { Icon(Icons.Outlined.FolderOpen, null, Modifier.size(16.dp)) })
             }
             // Android's own folders, at the same place inside Ubuntu (the system ones read-only)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Android:", fontSize = 11.5.sp, color = AppColors.textSecondary, modifier = Modifier.padding(end = 6.dp))
+                Text("Android：", fontSize = 11.5.sp, color = AppColors.textSecondary, modifier = Modifier.padding(end = 6.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("/system" to true, "/vendor" to true, "/apex" to true, "/product" to true, "/data/local/tmp" to false).forEach { (p, ro) ->
                         AssistChip(onClick = { choose(p, readOnlyDefault = ro) }, label = { Text(p, fontFamily = FontFamily.Monospace, fontSize = 12.sp) })
                     }
                 }
             }
-            OutlinedTextField(source, { choose(it) }, label = { Text("Phone folder (any path)") }, singleLine = true,
+            OutlinedTextField(source, { choose(it) }, label = { Text("手机文件夹（任意路径）") }, singleLine = true,
                 modifier = Modifier.fillMaxWidth())
             pickError?.let { ChrootNote(it, AppColors.warning) }
             Spacer(Modifier.height(8.dp))
-            Text("2. Where it shows up inside Ubuntu", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
-            OutlinedTextField(target, { target = it.trim(); targetEdited = true }, label = { Text("Path inside Ubuntu") }, singleLine = true,
-                placeholder = { Text("/home/$user/photos or /mnt/photos") }, modifier = Modifier.fillMaxWidth())
+            Text("2. 它在 Ubuntu 中的位置", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = AppColors.onBackground)
+            OutlinedTextField(target, { target = it.trim(); targetEdited = true }, label = { Text("Ubuntu 中的路径") }, singleLine = true,
+                placeholder = { Text("/home/$user/photos 或 /mnt/photos") }, modifier = Modifier.fillMaxWidth())
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(readOnly, { readOnly = it }, colors = CheckboxDefaults.colors(checkedColor = ClaudeTerracotta))
-                Text("Read-only (Ubuntu can read but never change or delete; drives mounted inside it keep their own setting)", fontSize = 12.sp, color = AppColors.onBackground)
+                Text("只读（Ubuntu 可读取，但永远无法修改或删除；其中挂载的磁盘保留各自的设置）", fontSize = 12.sp, color = AppColors.onBackground)
             }
             val src = source.trim().trimEnd('/')
             val dst = target.trim().trimEnd('/')
             val problem = when {
-                src.isEmpty() -> "Pick or type the phone folder."
-                !ChrootManager.isBindSource(src) -> "Use the folder's full path (starting with /), without | or ;."
-                dst.isEmpty() -> "Type where it shows up inside Ubuntu."
+                src.isEmpty() -> "请选择或输入手机文件夹。"
+                !ChrootManager.isBindSource(src) -> "请使用文件夹的完整路径（以 / 开头），且不含 | 或 ;。"
+                dst.isEmpty() -> "请输入它在 Ubuntu 中的位置。"
                 else -> ChrootManager.bindTargetProblem(dst, user)
-                    ?: if (binds.any { it.target.trimEnd('/') == dst }) "Something is already shared at $dst." else null
+                    ?: if (binds.any { it.target.trimEnd('/') == dst }) "$dst 已被共享。" else null
             }
             if (problem != null) ChrootNote(problem, AppColors.warning)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 6.dp)) {
@@ -161,8 +161,8 @@ internal fun ChrootFoldersEditor(user: String, binds: List<ChrootBind>, onChange
                     onClick = { onChange(binds + ChrootBind(src, dst, readOnly)); adding = false },
                     enabled = problem == null,
                     colors = ButtonDefaults.buttonColors(containerColor = ClaudeTerracotta), shape = RoundedCornerShape(10.dp)
-                ) { Text("Add") }
-                TextButton(onClick = { adding = false }) { Text("Cancel") }
+                ) { Text("添加") }
+                TextButton(onClick = { adding = false }) { Text("取消") }
             }
         }
     }
