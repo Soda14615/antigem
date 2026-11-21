@@ -290,6 +290,23 @@ daemon_running() {
   run_paseo daemon status --home "$team_home" 2>/dev/null | grep -Fxq 'localDaemon: running'
 }
 
+activate_runtime() {
+  local target="$1" old link
+  old="$(resolve_runtime)"
+  if [[ "$old" != "$target" ]]; then
+    link="$root/.current-$$"
+    ln -s "$target" "$link"
+    mv -Tf "$link" "$root/current" || fail "切换运行时失败"
+    if [[ -f "$old/.verified-install" ]]; then
+      link="$root/.previous-$$"
+      ln -s "$old" "$link"
+      mv -Tf "$link" "$root/previous" || fail "保存回滚目标失败"
+    fi
+  fi
+  runtime="$target"
+  paseo="$runtime/node_modules/@getpaseo/cli/bin/paseo"
+  info "当前运行时：$runtime"
+}
 do_install() {
   local target="${1:-$version}" dest stage
   [[ "$target" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9][a-zA-Z0-9.-]*)?$ ]] || fail "非法 Paseo 版本：$target"
