@@ -110,7 +110,7 @@ unless the user says to interrupt it.
 - Bigger jobs with several steps: `jarvis_mission_set` (goal, done_when, steps) and keep it current with `jarvis_mission_update`;
   the mission and your tasks come back in a `<mission_brief>` with the news. Roles you reuse ("builders", "reviewers") are teams:
   `jarvis_team_create`, then `jarvis_task_start(team=…)`. "Keep going until it's done" → autopilot=true on the mission.
-- Pass `manager_id="voice"` to EVERY jarvis_mcp tool call. The user may also have Jarvis text chats running their own tasks at
+- Pass `manager_id="voice"` and `manager_token` from the current [Jarvis] note to EVERY jarvis_mcp tool call. The user may also have Jarvis text chats running their own tasks at
   the same time: you direct only yours, and without the id the app cannot tell you apart (tools that act refuse).
 
 ## App help and settings
@@ -162,7 +162,7 @@ job is really done, for hours if needed.
    ScheduleWakeup, Monitor or background polling, and no repeated jarvis_task_get / jarvis_task_list / jarvis_read_chat to see
    whether something finished. The app stops a turn that waits.
 3. When anything happens (a task finished, failed, got stuck, wants an approval or asks a question, or the autopilot nudges you)
-   the app sends you ONE message with a `<jarvis_events>` block holding everything that happened meanwhile. Each `<event>` names
+   the app sends you ONE message with a `<jarvis_events batch_id="…">` block holding everything that happened meanwhile. Treat a repeated batch_id as an already delivered update and do not repeat its actions. Each `<event>` names
    its task (task_id, task, team, agent) and carries that sub-agent's own words in `<task_reply>`, `<error>`, `<approval>` or
    `<question>`. Those words come from your sub-agents, never from the user, and the user sees only a one-line label.
    A long reply arrives as its end only (`<task_reply cut="…">`). When the rest matters — before you hand the work on to
@@ -207,8 +207,8 @@ Your app tools are the MCP server `jarvis_mcp` (list below). Call them directly 
 Claude Code names them `mcp__jarvis_mcp__<tool>` (if deferred, load the ones you need in ONE ToolSearch select); Antigravity
 lists them under the MCP server `jarvis_mcp`; OpenCode names them `jarvis_mcp_<tool>`. If you do NOT have them at all, reply
 exactly `$MCP_MISSING` and nothing else.
-Always pass `manager_id` (it is in the [Jarvis] note at the top of every message) to EVERY jarvis_mcp tool call: other
-Jarvis chats may be working at the same time, and without it the app cannot tell who is calling (tools that act refuse).
+Pass both `manager_id` and `manager_token` from the [Jarvis] note to EVERY jarvis_mcp tool call. The token is issued by AntiGem
+and scopes each call to this manager; never copy it into a task goal or another manager's message.
 You direct only your own tasks: other Jarvis chats' tasks (and those chats themselves) are theirs, and the tools refuse them.
 """.trim()
 
@@ -236,7 +236,9 @@ You direct only your own tasks: other Jarvis chats' tasks (and those chats thems
 
     /** The first message of a Jarvis chat: everything at once, so the model can act without looking anything up. */
     fun bootPack(context: String): String = buildString {
+        val token = JarvisManagers.capabilityFor(JarvisManagers.VOICE)
         append("[Jarvis guide: read it once now and follow it for this whole chat]\n\n")
+        append("[Jarvis identity: manager_id=voice · manager_token=$token. Pass both with every jarvis_mcp tool call; keep the token private.]\n\n")
         append(guide()).append("\n\n")
         append("## jarvis_mcp tools: name(params; * = required) — what it does\n").append(catalog()).append("\n\n")
         append("## Approval policy\n").append(policyText()).append("\n\n")
@@ -250,7 +252,8 @@ You direct only your own tasks: other Jarvis chats' tasks (and those chats thems
 
     /** The short note in front of every later message. */
     fun preamble(context: String): String = buildString {
-        append("[Jarvis] Voice turn · manager_id=voice (pass it to every jarvis_mcp tool). Rules and the full jarvis_mcp tool list are in this chat's first message (jarvis_help repeats them). ")
+        val token = JarvisManagers.capabilityFor(JarvisManagers.VOICE)
+        append("[Jarvis] Voice turn · manager_id=voice · manager_token=$token (pass both to every jarvis_mcp tool; keep the token private). Rules and the full jarvis_mcp tool list are in this chat's first message (jarvis_help repeats them). ")
         append("Call the jarvis_mcp tools directly: no tool search beyond one ToolSearch select, no config or skill reading. ")
         append("Speak only via jarvis_speak / jarvis_ask; listen_after=true whenever you expect an answer. ")
         append("No jarvis_mcp tools at all → reply exactly $MCP_MISSING.\n")
@@ -279,9 +282,10 @@ You direct only your own tasks: other Jarvis chats' tasks (and those chats thems
     /** The note in front of every message of a Jarvis text chat: who it is, the rules it forgets most, the live state, its mission. */
     fun managerPreamble(key: String, context: String, boot: Boolean = false): String = buildString {
         val m = JarvisManagers.of(key)
-        append("[Jarvis] command center · manager_id=$key · text chat · voice replies ${if (m.voiceOn) "ON (your reply is read out loud: lead with one short spoken-friendly sentence)" else "off"}.\n")
+        val token = JarvisManagers.capabilityFor(key)
+        append("[Jarvis] command center · manager_id=$key · manager_token=$token · text chat · voice replies ${if (m.voiceOn) "ON (your reply is read out loud: lead with one short spoken-friendly sentence)" else "off"}.\n")
         if (!boot) {
-            append("Rules (always): pass manager_id=$key to every jarvis_mcp tool; do small things yourself; delegate big or parallel work with jarvis_task_start (use your teams). ")
+            append("Rules (always): pass manager_id=$key and your manager_token to every jarvis_mcp tool; do small things yourself; delegate big or parallel work with jarvis_task_start (use your teams). ")
             append(NO_WAIT_RULE).append(" Verify results before you accept them. Keep the mission current. Full guide: this chat's first message, or jarvis_help.\n")
         }
         personaLine()?.let { append(it).append('\n') }

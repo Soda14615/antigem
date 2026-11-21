@@ -315,9 +315,8 @@ class AndroidLocalBridgeServer private constructor() {
      * batch gets an array, and GET (the optional server-sent event stream) is not offered (405).
      */
     /**
-     * Jarvis' endpoint gives every MCP connection its own session id (each agent process of a chat connects on its own),
-     * and passes it with each tool call as `_mcp_session`: Jarvis then knows which of its chats is calling, even when
-     * several work at once (see JarvisManagers.resolveCaller).
+     * Jarvis' endpoint gives every MCP connection its own session id and passes it with each tool call as `_mcp_session`.
+     * Jarvis binds the authenticated manager capability to this bridge session before dispatching the tool.
      */
     private fun withJarvisSession(req: JSONObject, endpoint: McpEndpoint, session: String?): JSONObject {
         if (endpoint != McpEndpoint.JARVIS || session.isNullOrBlank() || req.optString("method") != "tools/call") return req
