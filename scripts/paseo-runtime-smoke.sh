@@ -20,6 +20,8 @@ trap 'cleanup "$?"' EXIT
 git -C "$temp/project" init -q
 "${team[@]}" doctor
 "${team[@]}" install
+runtime="$HOME/.local/share/antigem-paseo-team/current"
+[[ -L "$runtime" && -f "$runtime/.verified-install" ]] || { echo "Missing current runtime symlink" >&2; exit 1; }
 "${team[@]}" install  # Reuse installed version
 "${team[@]}" check
 "${team[@]}" providers --write
