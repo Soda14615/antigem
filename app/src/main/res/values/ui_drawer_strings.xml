@@ -67,6 +67,7 @@
     <string name="chat_history_drawer_turns">"%1$s turns"</string>
     <string name="chat_history_drawer_new_jarvis_chat">"New Jarvis chat"</string>
     <string name="chat_history_drawer_any_agent_and_model_give_it_a">"Any agent and model. Give it a big job: it plans, runs teams of agents and keeps going"</string>
+    <string name="native_team_title">Team orchestration</string>
     <string name="profile_detail_dialog_prompt_credits">"Prompt Credits"</string>
     <string name="profile_detail_dialog_available">"%1$s Available"</string>
     <string name="profile_detail_dialog_flow_credits">"Flow Credits"</string>

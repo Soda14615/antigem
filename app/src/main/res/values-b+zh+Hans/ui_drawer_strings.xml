@@ -67,6 +67,7 @@
     <string name="chat_history_drawer_turns">"%1$s 转"</string>
     <string name="chat_history_drawer_new_jarvis_chat">"新的 Jarvis 聊天"</string>
     <string name="chat_history_drawer_any_agent_and_model_give_it_a">"任意智能体与模型。给它一项艰巨的任务：它会规划、运行智能体团队并持续推进"</string>
+    <string name="native_team_title">团队编排</string>
     <string name="profile_detail_dialog_prompt_credits">"提示积分"</string>
     <string name="profile_detail_dialog_available">"%1$s 可用"</string>
     <string name="profile_detail_dialog_flow_credits">"流量积分"</string>

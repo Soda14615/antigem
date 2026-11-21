@@ -149,6 +149,24 @@ fun ChatScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    // Native team orchestration delegates through Jarvis and reuses the app's existing providers.
+    // The optional upstream Paseo daemon remains available separately from the local terminal.
+    val openNativeTeam: () -> Unit = {
+        // Keep the named team catalog instead of starting an empty manager on every tap.
+        val existing = ai.antigem.data.jarvis.JarvisManagers.textKeys().lastOrNull { id ->
+            !ai.antigem.data.jarvis.JarvisManagers.isDelegated(id) &&
+                ai.antigem.data.jarvis.JarvisManagers.of(id).teams.isNotEmpty()
+        }
+        if (existing != null) {
+            viewModel.selectConversation(existing)
+            viewModel.requestViewMode("CHAT")
+            scope.launch { drawerState.close() }
+        } else {
+            val problem = ai.antigem.data.jarvis.JarvisController.startTextChat()
+            if (problem != null) android.widget.Toast.makeText(context, problem, android.widget.Toast.LENGTH_LONG).show()
+            else scope.launch { drawerState.close() }
+        }
+    }
     // The sidebar is 82% of the screen width, so turning the phone (e.g. a landscape full-screen video)
     // changes its width; the drawer then moves to whichever position is nearest and can open by itself.
     // Remember where it was before the width changed and put it back once the new layout is in.
@@ -1436,6 +1454,7 @@ fun ChatScreen(
                 onCancelLogin = {
                     viewModel.cancelAgyLogin()
                 },
+                onOpenNativeTeam = if (!isInFloatingWindow) openNativeTeam else null,
                 onOpenSettings = {
                     showSettingsDialog = true
                     scope.launch { drawerState.close() }
@@ -1939,6 +1958,11 @@ fun ChatScreen(
                         }
                     },
                     actions = {
+                        if (!isInFloatingWindow) {
+                            IconButton(onClick = openNativeTeam) {
+                                Icon(Icons.Outlined.Apps, contentDescription = stringResource(R.string.native_team_title))
+                            }
+                        }
                         // Browser, Terminal and the IDE are in the floating switcher (always on)
                         if (isInFloatingWindow) {
                             IconButton(onClick = onMinimizeWindow) {

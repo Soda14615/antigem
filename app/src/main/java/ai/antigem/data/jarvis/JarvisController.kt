@@ -1296,6 +1296,10 @@ object JarvisController {
 
     /** The user's message to a Jarvis text chat with its hidden note in front. */
     fun wrapManagerMessage(chatId: String, text: String): String {
+        if (JarvisManagers.isDelegated(chatId)) {
+            JarvisManagers.markSent(chatId)
+            return PromptExpansion.hidden(JarvisManagers.brief(chatId)) + text
+        }
         val m = JarvisManagers.of(chatId)
         val boot = m.bootFor != JarvisSkill.managerVersion
         val ctx = if (JarvisPreferences.contextInPrompt.value || boot) JarvisSkill.liveContext("typed in the chat", chatId) else ""

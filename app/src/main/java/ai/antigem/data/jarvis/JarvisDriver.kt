@@ -33,6 +33,7 @@ object JarvisDriver {
     /** The chat is working on a turn right now. */
     fun isBusy(id: String): Boolean {
         if (!JarvisController.isAttached || id.isBlank()) return false
+        if (JarvisManagers.isDelegated(id)) return JarvisTasks.delegatedBusy(id)
         val agent = agentOf(id)
         if (onScreen(id) && vm.currentConversation.value?.agent == agent && vm.isCurrentChatActivelyRunning.value) return true
         return when (agent) {
@@ -51,7 +52,7 @@ object JarvisDriver {
 
     /** Keeps a live backend on a chat that is not on screen (its state and messages stay current). */
     fun ensure(id: String) {
-        if (!JarvisController.isAttached || onScreen(id)) return
+        if (!JarvisController.isAttached || onScreen(id) || JarvisManagers.isDelegated(id)) return
         when (agentOf(id)) {
             AgentKind.CLAUDE -> claude.getOrPut(id) { newClaude().also { it.selectConversation(id) } }
             AgentKind.OPENCODE -> openCode.getOrPut(id) { newOpenCode().also { it.selectConversation(id) } }
@@ -95,6 +96,11 @@ object JarvisDriver {
      * the user sees it at once; otherwise through the chat's own backend.
      */
     suspend fun send(id: String, text: String): Result<Unit> = runCatching {
+        if (JarvisManagers.isDelegated(id)) {
+            val result = JarvisTasks.reply(id, text, interrupt = false)
+            check(result.startsWith("Sent")) { result }
+            return@runCatching
+        }
         val agent = agentOf(id)
         val screenFree = onScreen(id) && vm.currentConversation.value?.agent == agent && vm.attachments.value.isEmpty()
         when (agent) {
@@ -126,6 +132,10 @@ object JarvisDriver {
 
     /** Stops the chat's current turn. */
     suspend fun stop(id: String) {
+        if (JarvisManagers.isDelegated(id)) {
+            JarvisTasks.stop(id, quiet = true)
+            return
+        }
         when (agentOf(id)) {
             AgentKind.CLAUDE -> {
                 if (onScreen(id) && vm.currentConversation.value?.agent == AgentKind.CLAUDE) vm.claudeBackend.stopStreaming()
@@ -143,11 +153,14 @@ object JarvisDriver {
     }
 
     /** The chat's messages as they are live (Claude, OpenCode); null when only the server has them (Antigravity). */
-    fun liveMessages(id: String): List<ChatMessage>? = when (agentOf(id)) {
+    fun liveMessages(id: String): List<ChatMessage>? {
+        if (JarvisManagers.isDelegated(id) && !onScreen(id)) return JarvisTasks.delegatedMessages(id)
+        return when (agentOf(id)) {
         AgentKind.CLAUDE -> if (onScreen(id) && vm.currentConversation.value?.agent == AgentKind.CLAUDE) vm.claudeBackend.messages.value else claude[id]?.messages?.value
         AgentKind.OPENCODE -> if (onScreen(id) && vm.currentConversation.value?.agent == AgentKind.OPENCODE) vm.openCodeBackend.messages.value else openCode[id]?.messages?.value
         AgentKind.CODEX -> if (onScreen(id) && vm.currentConversation.value?.agent == AgentKind.CODEX) vm.codexBackend.messages.value else codex[id]?.messages?.value
         AgentKind.AGY -> if (onScreen(id) && vm.currentConversation.value?.agent == AgentKind.AGY) vm.messages.value else null
+        }
     }
 
     /** The tool the chat's current reply is running, if any. */
