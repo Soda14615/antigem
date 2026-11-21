@@ -23,6 +23,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Jarvis as a manager: work the user hands over ("build the release and tell me when it's done") runs as a task in its
@@ -46,6 +48,8 @@ object JarvisTasks {
         val active: Boolean get() = this == STARTING || this == RUNNING || this == NEEDS_APPROVAL || this == NEEDS_ANSWER || this == STALLED
         val needsUser: Boolean get() = this == NEEDS_APPROVAL || this == NEEDS_ANSWER
     }
+
+    data class QueuedFollowUp(val id: String = UUID.randomUUID().toString(), val message: String, val interrupt: Boolean = false)
 
     data class Task(
         val id: String,
@@ -75,7 +79,16 @@ object JarvisTasks {
         /** The Jarvis manager that started it and gets its news: [JarvisManagers.VOICE] or a Jarvis text chat's id. */
         val owner: String = JarvisManagers.VOICE,
         /** The manager's team that works on it (empty: none). */
-        val team: String = ""
+        val team: String = "",
+        /** Isolated checkout metadata. A null workspace means the task uses the shared project directory. */
+        val workspace: JarvisWorktreeManager.Workspace? = null,
+        /** User or manager follow-ups queued behind the current provider turn. */
+        val queuedFollowUps: List<QueuedFollowUp> = emptyList(),
+        val queuedRetryAt: Long = 0L,
+        val queuedAttempts: Int = 0,
+        val followUpInFlightId: String = "",
+        val followUpInFlightAt: Long = 0L,
+        val archived: Boolean = false
     ) {
         val active: Boolean get() = state.active
     }
@@ -97,6 +110,7 @@ object JarvisTasks {
     private val openCodeBackends = ConcurrentHashMap<String, ai.antigem.data.agent.opencode.OpenCodeChatBackend>()
     private val codexBackends = ConcurrentHashMap<String, ai.antigem.data.agent.codex.CodexChatBackend>()
     private val attachedAt = ConcurrentHashMap<String, Long>()
+    private val taskSendLocks = ConcurrentHashMap<String, Mutex>()
     private val progressSig = ConcurrentHashMap<String, String>()
     /** Approvals waiting in Antigravity chats that are not on screen (tasks and the Jarvis chat), from the hub. */
     private val agyPending = ConcurrentHashMap<String, List<Pair<ToolCall, String>>>()
@@ -114,6 +128,28 @@ object JarvisTasks {
         prefs = application.getSharedPreferences("jarvis_tasks", Context.MODE_PRIVATE)
         load()
         scope.launch { loop() }
+    }
+
+    /** Replays terminal task notifications that were not durably enqueued before the previous process stopped. */
+    fun replayUnreportedEvents() {
+        if (!JarvisPreferences.enabled.value) return
+        _tasks.value.filter { !it.reported && it.state in setOf(State.DONE, State.FAILED, State.STALLED) }.forEach { task ->
+            val kind = when (task.state) {
+                State.DONE -> "done"
+                State.FAILED -> "failed"
+                else -> "stalled"
+            }
+            val detail = when (task.state) {
+                State.DONE -> task.result
+                State.FAILED -> task.note.removePrefix("Failed:").trim()
+                else -> task.note
+            }
+            JarvisController.onTaskEvent(task, kind, detail)
+            val current = find(task.id)
+            if (current != null && current.turnAt == task.turnAt && current.state == task.state && !current.reported) {
+                put(current.copy(reported = true))
+            }
+        }
     }
 
     /** The task with [id], or the one whose id starts with it (models often shorten ids; at least 4 characters). */
@@ -172,19 +208,34 @@ object JarvisTasks {
         owner: String = JarvisManagers.VOICE, team: String = "", brief: String? = null,
         /** Reasoning effort for Claude Code / Codex (already checked against the model); null = the model's default. */
         effort: String? = null,
-        childProfiles: List<JarvisManagers.Team> = emptyList()
+        childProfiles: List<JarvisManagers.Team> = emptyList(),
+        workspaceIsolation: String = "auto"
     ): Task {
         val text = goal.trim()
         require(text.isNotEmpty()) { "The task needs a goal." }
+        val isolation = workspaceIsolation.trim().lowercase().ifBlank { "auto" }
+        require(isolation in setOf("auto", "shared", "worktree")) { "Workspace isolation must be auto, shared or worktree." }
+        val launchId = UUID.randomUUID().toString()
+        val workspace = when {
+            isolation == "shared" -> null
+            projectPath.isNullOrBlank() -> {
+                require(isolation != "worktree") { "Select a local Git project before requesting a task worktree." }
+                null
+            }
+            isolation == "auto" && ai.antigem.data.preferences.AuthPreferences.isRemoteEndpoint() -> null
+            isolation == "auto" && !JarvisWorktreeManager.isGitRepository(app, projectPath) -> null
+            else -> JarvisWorktreeManager.create(app, projectPath, launchId)
+        }
+        val effectiveProjectPath = workspace?.workingDirectory ?: projectPath
         var created: Task? = null
         fun prepare(id: String): String {
             val task = Task(id = id, agent = agent,
                 title = title?.trim()?.takeIf { it.isNotEmpty() }?.take(60) ?: shortTitle(text),
                 goal = text.take(600), project = projectPath.orEmpty(), note = "Started",
-                owner = JarvisManagers.ownerOrVoice(owner), team = team.trim())
+                owner = JarvisManagers.ownerOrVoice(owner), team = team.trim(), workspace = workspace)
             if (childProfiles.isNotEmpty()) JarvisManagers.registerDelegated(id, agent, task.owner, childProfiles, text)
             created = task
-            put(task)
+            put(task, durable = true)
             val hiddenNote = listOfNotNull(brief?.takeIf { it.isNotBlank() },
                 JarvisManagers.delegatedNote(id).takeIf { it.isNotBlank() },
                 ai.antigem.data.context.GlobalContext.taskBody()).joinToString("\n\n")
@@ -197,7 +248,7 @@ object JarvisTasks {
                 if (b.state.value.isBlocking) b.refreshStatus()
                 if (b.state.value.isBlocking) { b.stop(); error("Codex is not available: ${b.state.value.label}.") }
                 // Codex gives the chat its id when it is created: create it now so the task knows it
-                val id = runCatching { b.createChatNow(projectPath, modelId) }.getOrElse { b.stop(); throw it }
+                val id = runCatching { b.createChatNow(effectiveProjectPath, modelId) }.getOrElse { b.stop(); throw it }
                 effort?.let { b.selectEffort(it) }
                 codexBackends[id] = b
                 attachedAt[id] = System.currentTimeMillis()
@@ -219,7 +270,7 @@ object JarvisTasks {
                 b.startNewChat()
                 delay(150)
                 val id = b.currentConversation.value?.id ?: run { b.stop(); error("Could not create the chat") }
-                projectPath?.let { b.setWorkspaceOfNewChat(it) }
+                effectiveProjectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
                 openCodeBackends[id] = b
                 attachedAt[id] = System.currentTimeMillis()
@@ -239,7 +290,7 @@ object JarvisTasks {
                 b.startNewChat()
                 delay(150)
                 val id = b.currentConversation.value?.id ?: error("Could not create the chat")
-                projectPath?.let { b.setWorkspaceOfNewChat(it) }
+                effectiveProjectPath?.let { b.setWorkspaceOfNewChat(it) }
                 modelId?.takeIf { it.isNotBlank() }?.let { b.selectModel(it) }
                 effort?.let { b.setEffort(it) }
                 claudeBackends[id] = b
@@ -259,7 +310,7 @@ object JarvisTasks {
                 val id = UUID.randomUUID().toString()
                 val chosen = modelId?.takeIf { it.isNotBlank() } ?: vm.agyBackend.selectedModelId.value
                 val enum = AgyHubClient.resolveModelEnum(chosen)
-                val ws = projectPath ?: (ai.antigem.data.daemon.IdeDaemonManager.activeProject.value?.path
+                val ws = effectiveProjectPath ?: (ai.antigem.data.daemon.IdeDaemonManager.activeProject.value?.path
                     ?: ai.antigem.data.local.LocalEnvironmentManager.getHomeDir(app).absolutePath)
                 hub.startCascade(id, enum, if (ws.startsWith("file://")) ws else "file://$ws").getOrThrow()
                 vm.agyBackend.rememberChatModel(id, chosen)
@@ -302,28 +353,54 @@ object JarvisTasks {
 
     /** Sends a follow-up, a correction or a new direction to the task. With [interrupt] a running task is stopped first. */
     suspend fun reply(id: String, message: String, interrupt: Boolean): String {
-        val t = find(id) ?: return "No task with that id. Use jarvis_task_list."
+        var t = find(id) ?: return "No task with that id. Use jarvis_task_list."
         val text = message.trim()
         if (text.isEmpty()) return "The message is empty."
-        if (isRunningNow(t)) {
-            if (!interrupt) return "The task is still working. Pass interrupt=true to stop it and send this instead, or wait for it to finish."
-            val stopped = stop(t.id, quiet = true)
-            if (stopped != "Stopped.") return stopped
-            var w = 0
-            while (isRunningNow(t) && w < 24) { delay(500); w++ }
-            if (isRunningNow(t)) return "The previous turn has not stopped yet."
+        val lock = taskSendLocks.getOrPut(t.id) { Mutex() }
+        return lock.withLock {
+            t = find(t.id) ?: return@withLock "No task with that id. Use jarvis_task_list."
+            val running = isRunningNow(t) || t.state.active
+            if (running && !interrupt) {
+                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
+                put(t.copy(queuedFollowUps = t.queuedFollowUps + QueuedFollowUp(message = text), note = "Follow-up queued (${t.queuedFollowUps.size + 1})"), durable = true)
+                return@withLock "Queued behind the current turn. The task will receive it automatically when it finishes."
+            }
+            if (running && interrupt) {
+                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
+                val urgent = QueuedFollowUp(message = text, interrupt = true)
+                put(t.copy(queuedFollowUps = listOf(urgent) + t.queuedFollowUps,
+                    note = "Stopping current turn; follow-up queued"), durable = true)
+                val stopped = stop(t.id, quiet = true)
+                if (stopped != "Stopped.") {
+                    find(t.id)?.let { current -> put(current.copy(queuedFollowUps = current.queuedFollowUps.filterNot { it.id == urgent.id }), durable = true) }
+                    return@withLock stopped
+                }
+                return@withLock "Stop requested. The follow-up is queued and will be sent after the provider confirms the turn has stopped."
+            }
+            if (t.queuedFollowUps.isNotEmpty()) {
+                if (t.queuedFollowUps.size >= 20) return@withLock "The task already has 20 queued follow-ups. Wait for it to finish before adding more."
+                put(t.copy(state = State.STARTING, queuedFollowUps = t.queuedFollowUps + QueuedFollowUp(message = text),
+                    queuedRetryAt = 0L, queuedAttempts = 0, note = "Retrying queued follow-ups"), durable = true)
+                return@withLock "Queued follow-ups resumed in order. The task will receive them automatically."
+            }
+            sendFollowUpNow(t, text)
         }
+    }
+
+    private suspend fun sendFollowUpNow(t: Task, text: String, deliveryId: String? = null): String {
         // the user's every-message entries allowed for Jarvis go along with each follow-up
         val scopedNote = JarvisManagers.delegatedNote(t.id)
+        val deliveryNote = deliveryId?.let { PromptExpansion.hidden("<antigem-task-follow-up id=\"$it\"/>") }.orEmpty()
         val outgoing = ai.antigem.data.context.GlobalContext.taskFollowUp(
-            (if (scopedNote.isNotBlank()) PromptExpansion.hidden(scopedNote) else "") + PromptExpansion.expand(text))
+            (if (scopedNote.isNotBlank()) PromptExpansion.hidden(scopedNote) else "") + deliveryNote + PromptExpansion.expand(text))
         val previousMission = JarvisManagers.of(t.id).mission
         if (JarvisManagers.isDelegated(t.id) && !t.active) {
             JarvisManagers.update(t.id) { it.copy(mission = it.mission.copy(status = "active", nudges = 0)) }
         }
         val now = System.currentTimeMillis()
         put(t.copy(state = State.STARTING, turnAt = now, updatedAt = now, progressAt = now, seenRunning = false,
-            followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0, reported = true))
+            followUps = t.followUps + 1, note = "Follow-up: ${text.take(60)}", result = "", resultChars = 0,
+            reported = true, archived = false), durable = true)
         try {
         when (t.agent) {
             AgentKind.CLAUDE -> {
@@ -361,13 +438,65 @@ object JarvisTasks {
         }
         } catch (e: Exception) {
             if (find(t.id)?.turnAt == now) {
-                put(t)
+                put(t, durable = true)
                 if (JarvisManagers.isDelegated(t.id)) JarvisManagers.update(t.id) { it.copy(mission = previousMission) }
             }
             if (e is kotlinx.coroutines.CancellationException) throw e
             return "Could not send: ${e.message.orEmpty()}"
         }
         return "Sent to the task."
+    }
+
+    /** Sends one durable queued follow-up only after the provider chat is idle. */
+    private suspend fun dispatchQueuedFollowUp(taskId: String): Boolean {
+        val lock = taskSendLocks.getOrPut(taskId) { Mutex() }
+        return lock.withLock {
+            var latest = find(taskId) ?: return@withLock false
+            if (latest.queuedFollowUps.isEmpty() || isRunningNow(latest) || System.currentTimeMillis() < latest.queuedRetryAt) return@withLock false
+            val head = latest.queuedFollowUps.first()
+            val now = System.currentTimeMillis()
+            // A send may have reached the provider just before process death. The stable marker lives in
+            // the provider's user message; acknowledge it after recovery instead of sending it twice.
+            if (hasFollowUpMarker(latest, head.id)) {
+                put(latest.copy(queuedFollowUps = latest.queuedFollowUps.drop(1), followUpInFlightId = "",
+                    followUpInFlightAt = 0L, queuedAttempts = 0, queuedRetryAt = 0L,
+                    note = "Queued follow-up delivered"), durable = true)
+                return@withLock true
+            }
+            if (latest.followUpInFlightId == head.id && now - latest.followUpInFlightAt < 30_000L) return@withLock false
+            latest = latest.copy(followUpInFlightId = head.id, followUpInFlightAt = now)
+            put(latest, durable = true)
+            val result = sendFollowUpNow(latest, head.message, head.id)
+            if (result.startsWith("Could not send:")) {
+                val current = find(taskId) ?: return@withLock false
+                val attempts = latest.queuedAttempts + 1
+                val detail = result.removePrefix("Could not send:").trim().take(120)
+                if (attempts >= 5) {
+                    put(current.copy(queuedFollowUps = listOf(head) + current.queuedFollowUps.filterNot { it.id == head.id }, queuedAttempts = attempts,
+                        queuedRetryAt = 0L, state = State.FAILED, note = "Queued follow-up failed after $attempts attempts: $detail", reported = false), durable = true)
+                } else {
+                    val wait = (5_000L shl (attempts - 1)).coerceAtMost(300_000L)
+                    put(current.copy(queuedAttempts = attempts, queuedRetryAt = System.currentTimeMillis() + wait, state = State.STARTING,
+                        note = "Queued follow-up send failed; retrying in ${wait / 1000}s: $detail", reported = true), durable = true)
+                }
+                false
+            } else {
+                val current = find(taskId) ?: return@withLock false
+                if (current.followUpInFlightId == head.id) put(current.copy(
+                    queuedFollowUps = current.queuedFollowUps.filterNot { it.id == head.id },
+                    followUpInFlightId = "", followUpInFlightAt = 0L, queuedAttempts = 0, queuedRetryAt = 0L
+                ), durable = true)
+                true
+            }
+        }
+    }
+
+    private suspend fun hasFollowUpMarker(task: Task, id: String): Boolean {
+        val marker = "antigem-task-follow-up id=\"$id\""
+        val messages = delegatedMessages(task.id)?.takeIf { it.isNotEmpty() }
+            ?: runCatching { JarvisController.readChat(task.id) }.getOrDefault(emptyList())
+        return messages.any { message -> message.role == MessageRole.USER &&
+            listOfNotNull(message.content, message.rawContent, message.rawPayload).any { it.contains(marker) } }
     }
 
     /** Stops what the task is doing. */
@@ -388,7 +517,8 @@ object JarvisTasks {
             AgentKind.OPENCODE -> (openCodeBackends[t.id] ?: vm.openCodeBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
             AgentKind.CODEX -> (codexBackends[t.id] ?: vm.codexBackend).interrupt(t.id).onFailure { return "无法停止：${it.message}" }
         }
-        if (!quiet) put(t.copy(state = State.STOPPED, updatedAt = System.currentTimeMillis(), note = "Stopped", reported = true))
+        if (!quiet) put(t.copy(state = State.STOPPED, updatedAt = System.currentTimeMillis(), note = "Stopped", reported = true,
+            queuedFollowUps = emptyList(), queuedRetryAt = 0L, queuedAttempts = 0, followUpInFlightId = "", followUpInFlightAt = 0L), durable = true)
         return "Stopped."
     }
 
@@ -400,6 +530,45 @@ object JarvisTasks {
         _tasks.value = _tasks.value.filter { it.id != t.id }
         save()
         return true
+    }
+
+    /** Archives a terminal task while retaining its task, session and worktree metadata. */
+    @Synchronized
+    fun archive(id: String): Boolean {
+        val task = find(id) ?: return false
+        val subtree = taskSubtree(task)
+        if (subtree.any { it.active || it.queuedFollowUps.isNotEmpty() }) return false
+        val now = System.currentTimeMillis()
+        val ids = subtree.mapTo(HashSet()) { it.id }
+        val previous = _tasks.value
+        _tasks.value = previous.map { if (it.id in ids) it.copy(archived = true, updatedAt = now) else it }
+        try { save(durable = true) } catch (_: Exception) { _tasks.value = previous; return false }
+        return true
+    }
+
+    @Synchronized
+    fun unarchive(id: String): Boolean {
+        val task = find(id) ?: return false
+        val subtree = taskSubtree(task)
+        if (subtree.any { it.active || it.queuedFollowUps.isNotEmpty() }) return false
+        val now = System.currentTimeMillis()
+        val ids = subtree.mapTo(HashSet()) { it.id }
+        val previous = _tasks.value
+        _tasks.value = previous.map { if (it.id in ids) it.copy(archived = false, updatedAt = now) else it }
+        try { save(durable = true) } catch (_: Exception) { _tasks.value = previous; return false }
+        return true
+    }
+
+    private fun taskSubtree(root: Task): List<Task> {
+        val seen = hashSetOf(root.id)
+        val result = ArrayList<Task>()
+        fun visit(parent: String) {
+            _tasks.value.filter { JarvisManagers.ownerOrVoice(it.owner) == parent }.forEach { child ->
+                if (seen.add(child.id)) { visit(child.id); result += child }
+            }
+        }
+        visit(root.id)
+        return result + root
     }
 
     /** Removes the finished tasks from the list. */
@@ -538,6 +707,9 @@ object JarvisTasks {
             try {
                 if (!JarvisController.isAttached || !JarvisPreferences.enabled.value) continue
                 for (t in _tasks.value.filter { it.active }) runCatching { check(t, tick) }.onFailure { Log.w(TAG, "check ${t.id}: ${it.message}") }
+                // A completion stays pending until its event reached the durable outbox. Retry in-process
+                // if the device briefly cannot commit SharedPreferences.
+                replayUnreportedEvents()
                 _anyActive.value = _tasks.value.any { it.active }
             } catch (e: Exception) {
                 Log.w(TAG, "loop: ${e.message}")
@@ -597,6 +769,14 @@ object JarvisTasks {
                 sig = "${msgs.size}:${last?.content?.length}:${last?.toolCalls?.size}:${last?.toolCalls?.lastOrNull()?.status}"
             }
         }
+        // A queued follow-up owns the next turn. Do not publish a transient DONE state or let the parent
+        // conclude while the recipient still has work waiting in its per-session queue.
+        if (!running && t.queuedFollowUps.isNotEmpty() &&
+            (t.queuedFollowUps.first().interrupt || !needsApproval && !asking)) {
+            if ((t.seenRunning || now - t.turnAt >= START_GRACE_MS) && now >= t.queuedRetryAt) dispatchQueuedFollowUp(t.id)
+            else if (t.state != State.STARTING) put(t.copy(state = State.STARTING, note = "Waiting to deliver queued follow-ups"))
+            return
+        }
         if (progressSig.put(t.id, sig) != sig) t = t.copy(progressAt = now)
         if (running && !t.seenRunning) t = t.copy(seenRunning = true)
         val graceFrom = maxOf(t.turnAt, attachedAt[t.id] ?: 0L)
@@ -644,16 +824,21 @@ object JarvisTasks {
                 t = t.copy(result = cutEnd(full, RESULT_MAX), resultChars = full.length)
             }
         }
-        if (!putIfCurrent(t0, if (t.reported) t else t.copy(reported = true))) return
-        if (!t.reported) {
-            // approvals and questions are reported by the controller's own loops (they can be answered there)
-            val kind = when (t.state) {
-                State.DONE -> "done"
-                State.FAILED -> "failed"
-                State.STALLED -> "stalled"
-                else -> null
-            }
-            if (kind != null) JarvisController.onTaskEvent(t, kind, if (kind == "failed") error.orEmpty() else t.result)
+        val kind = if (!t.reported) when (t.state) {
+            State.DONE -> "done"
+            State.FAILED -> "failed"
+            State.STALLED -> "stalled"
+            else -> null
+        } else null
+        if (!putIfCurrent(t0, if (kind == null && !t.reported) t.copy(reported = true) else t)) return
+        if (kind != null) {
+            JarvisController.onTaskEvent(t, kind, when (kind) {
+                "failed" -> error.orEmpty().ifBlank { t.note.removePrefix("Failed:").trim() }
+                "stalled" -> t.note
+                else -> t.result
+            })
+            val latest = find(t.id)
+            if (latest?.turnAt == t.turnAt && latest.state == t.state && !latest.reported) put(latest.copy(reported = true))
             if (!t.state.active) {
                 // keep the chat readable, but stop listening to it
                 scope.launch {
@@ -679,14 +864,14 @@ object JarvisTasks {
     }
 
     @Synchronized
-    private fun put(task: Task) {
+    private fun put(task: Task, durable: Boolean = false) {
         val list = _tasks.value
         val changed = list.firstOrNull { it.id == task.id } != task
         val ordered = (listOf(task) + list.filter { it.id != task.id }).sortedByDescending { it.createdAt }
         _tasks.value = JarvisOrchestrationRules.retain(ordered, KEEP_FINISHED, { it.active },
-            { JarvisManagers.isDelegated(it.id) || JarvisManagers.isDelegated(it.owner) })
+            { it.archived || JarvisManagers.isDelegated(it.id) || JarvisManagers.isDelegated(it.owner) })
         _anyActive.value = _tasks.value.any { it.active }
-        if (changed) save()
+        if (changed) save(durable = durable || !task.reported && task.state in setOf(State.DONE, State.FAILED, State.STALLED))
     }
 
     private fun shortTitle(text: String): String {
@@ -694,17 +879,27 @@ object JarvisTasks {
         return if (first.length > 48) first.take(48).trimEnd() + "…" else first.ifBlank { "Task" }
     }
 
-    private fun save() {
+    private fun save(durable: Boolean = false) {
         val arr = JSONArray()
         _tasks.value.forEach { t ->
             arr.put(JSONObject().apply {
                 put("id", t.id); put("agent", t.agent.name); put("title", t.title); put("goal", t.goal); put("project", t.project)
                 put("state", t.state.name); put("created", t.createdAt); put("turn", t.turnAt); put("updated", t.updatedAt)
-                put("seen", t.seenRunning); put("follow", t.followUps); put("note", t.note); put("result", t.result.take(RESULT_MAX + 1)); put("chars", t.resultChars); put("adopted", t.adopted)
+                put("progress", t.progressAt); put("seen", t.seenRunning); put("reported", t.reported)
+                put("follow", t.followUps); put("note", t.note); put("result", t.result.take(RESULT_MAX + 1)); put("chars", t.resultChars); put("adopted", t.adopted)
                 put("owner", t.owner); put("team", t.team)
+                t.workspace?.let { workspace -> put("workspace", JSONObject().apply {
+                    put("repository_root", workspace.repositoryRoot); put("checkout_root", workspace.checkoutRoot)
+                    put("working_directory", workspace.workingDirectory); put("branch", workspace.branch); put("base_commit", workspace.baseCommit)
+                }) }
+                put("queued_follow_ups", JSONArray().apply { t.queuedFollowUps.forEach { put(JSONObject().put("id", it.id).put("message", it.message).put("interrupt", it.interrupt)) } })
+                put("queued_retry_at", t.queuedRetryAt); put("queued_attempts", t.queuedAttempts)
+                put("follow_up_in_flight_id", t.followUpInFlightId); put("follow_up_in_flight_at", t.followUpInFlightAt)
+                put("archived", t.archived)
             })
         }
-        prefs?.edit()?.putString("list", arr.toString())?.apply()
+        val editor = prefs?.edit()?.putString("list", arr.toString()) ?: return
+        if (durable) check(editor.commit()) { "Could not durably save Jarvis task state." } else editor.apply()
     }
 
     private fun load() {
@@ -721,11 +916,28 @@ object JarvisTasks {
                     project = o.optString("project"),
                     // a task that was working when the app closed is checked again (the chat may still be running)
                     state = if (state.active) State.STARTING else state,
-                    createdAt = o.optLong("created", now), turnAt = if (state.active) now else o.optLong("turn", now),
-                    updatedAt = o.optLong("updated", now), progressAt = now, seenRunning = false,
+                    createdAt = o.optLong("created", now), turnAt = o.optLong("turn", now),
+                    updatedAt = o.optLong("updated", now), progressAt = now, seenRunning = if (state.active) false else o.optBoolean("seen"),
                     followUps = o.optInt("follow"), note = o.optString("note"), result = o.optString("result"), resultChars = o.optInt("chars"),
-                    reported = true, adopted = o.optBoolean("adopted"),
-                    owner = o.optString("owner").ifBlank { JarvisManagers.VOICE }, team = o.optString("team")
+                    reported = o.optBoolean("reported", true), adopted = o.optBoolean("adopted"),
+                    owner = o.optString("owner").ifBlank { JarvisManagers.VOICE }, team = o.optString("team"),
+                    workspace = o.optJSONObject("workspace")?.let { w -> JarvisWorktreeManager.Workspace(
+                        w.optString("repository_root"), w.optString("checkout_root"), w.optString("working_directory"),
+                        w.optString("branch"), w.optString("base_commit")
+                    ) },
+                    queuedFollowUps = o.optJSONArray("queued_follow_ups")?.let { a ->
+                        (0 until a.length()).mapNotNull { index ->
+                            when (val item = a.opt(index)) {
+                                is JSONObject -> item.optString("message").takeIf { it.isNotBlank() }?.let {
+                                    QueuedFollowUp(item.optString("id").ifBlank { UUID.randomUUID().toString() }, it, item.optBoolean("interrupt"))
+                                }
+                                is String -> item.takeIf { it.isNotBlank() }?.let { QueuedFollowUp(message = it) }
+                                else -> null
+                            }
+                        }.take(20)
+                    }.orEmpty(), queuedRetryAt = o.optLong("queued_retry_at"), queuedAttempts = o.optInt("queued_attempts"),
+                    followUpInFlightId = o.optString("follow_up_in_flight_id"), followUpInFlightAt = o.optLong("follow_up_in_flight_at"),
+                    archived = o.optBoolean("archived")
                 )
             }
         }.getOrDefault(emptyList())

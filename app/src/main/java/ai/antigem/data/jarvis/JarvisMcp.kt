@@ -32,23 +32,12 @@ object JarvisMcp {
     const val INSTRUCTIONS = "Jarvis controls the AntiGem app and leads teams of sub-agents. The first message of a Jarvis chat " +
         "has the full guide and tool list; jarvis_help repeats it. Call these tools directly by name (no searching, no config reading). " +
         "In the voice chat everything the user should hear goes through jarvis_speak; in a Jarvis text chat you write normal replies. " +
-        "Big jobs go to jarvis_task_start (its own watched chat, optionally a team); pass your manager_id. Never wait or poll for tasks: " +
+        "Big jobs go to jarvis_task_start (its own watched chat, optionally a team); pass manager_id and manager_token from your AntiGem note. Never wait or poll for tasks: " +
         "end your turn, the app reports back with a <jarvis_events> message. Keep multi-step work in jarvis_mission_set / jarvis_mission_update. " +
         "App help: jarvis_app_guide, jarvis_get_config, jarvis_open_settings. Ask before deleting anything."
 
     private const val POLL_STOP = "Stop polling. The task is still working, and checking again will not make it faster. END YOUR TURN now " +
         "(start any other independent task first): the app sends you a <jarvis_events> message the moment it finishes, fails or needs you."
-
-    private const val NEED_ID = "Pass manager_id: it is in the [Jarvis] note at the top of your latest message (\"voice\" in the voice chat). " +
-        "Several Jarvis chats are working right now, so I can't tell which one is calling."
-
-    /** Tools that act for one Jarvis chat (start, steer or stop its work): they must know for certain which chat calls. */
-    private val ACTING = setOf(
-        "jarvis_task_start", "jarvis_task_reply", "jarvis_task_answer", "jarvis_task_stop", "jarvis_task_close",
-        "jarvis_mission_set", "jarvis_mission_update", "jarvis_team_create", "jarvis_team_delete", "jarvis_resolve_permission",
-        "jarvis_send_to_chat", "jarvis_new_chat", "jarvis_stop_all", "jarvis_stop_chat", "jarvis_new_session", "jarvis_delete_chat",
-        "jarvis_set_model"
-    )
 
     // Delegated managers get only orchestration tools, never global app-control tools.
     private val DELEGATED_TOOLS = setOf(
@@ -77,12 +66,10 @@ object JarvisMcp {
             put("type", "object")
             put("properties", JSONObject().apply {
                 props.forEach { (k, v) -> put(k, v) }
-                if (name in DELEGATED_TOOLS) {
-                    if (!has("manager_id")) put("manager_id", prop("string", "Exact manager ID from your manager note"))
-                    put("manager_token", prop("string", "Required for delegated managers; use the private capability from your manager note"))
-                }
+                if (!has("manager_id")) put("manager_id", prop("string", "Your exact manager ID from the AntiGem manager note"))
+                put("manager_token", prop("string", "App-issued private manager capability from the AntiGem manager note; required on every call"))
             })
-            if (required.isNotEmpty()) put("required", JSONArray(required))
+            put("required", JSONArray((required + listOf("manager_id", "manager_token")).distinct()))
         })
     }
 
@@ -134,6 +121,7 @@ object JarvisMcp {
             "model" to prop("string", "Model id or part of its name (default: the team's, else the agent's default)"),
             "effort" to prop("string", "Reasoning effort / thinking level for claude (low, medium, high, xhigh, max) or codex (e.g. low, medium, high, xhigh); default: the model's default. AGY has a model per thinking level: choose it with model instead"),
             "project" to prop("string", "Project name or path to work in (default: the team's, else the active project)"),
+            "isolation" to prop("string", "Workspace mode: auto creates a separate Git worktree when the project is a local Git repository; shared is for read-only/shared work; worktree requires a local Git project", listOf("auto", "shared", "worktree")),
             "open" to prop("boolean", "Also show the chat on screen (default false)"), managerId))
         put(tool("jarvis_task_list", "Your tasks: state (starting, running, waiting for approval, asking a question, no progress, done, failed, stopped), team, age and last note. Not for polling: the news comes to you by itself.",
             emptyList(), "include_finished" to prop("boolean", "Also list finished tasks (default true)"),
@@ -393,21 +381,13 @@ object JarvisMcp {
         val claimedManager = args.optString("manager_id").trim()
         val capability = args.optString("manager_token")
         args.remove("manager_token")
-        val claimed = JarvisManagers.get(claimedManager)
-        val delegatedClaim = claimed?.parentKey?.isNotBlank() == true
-        if (capability.isNotBlank() || delegatedClaim) {
-            if (!delegatedClaim || capability.isBlank() || claimed?.delegationToken != capability) return error("Invalid delegated manager capability.")
+        args.remove("manager_id")
+        val who = JarvisManagers.authenticateCaller(claimedManager, capability, session)
+            ?: return error("Invalid manager identity or capability. Use the identity in your current AntiGem manager note.")
+        val delegatedClaim = JarvisManagers.isDelegated(who.key)
+        if (delegatedClaim) {
             if (name !in DELEGATED_TOOLS) return error("This tool is outside your delegated manager scope.")
-            if (JarvisTasks.find(claimedManager)?.active != true) return error("This manager task is not active.")
-        }
-        var who = if (delegatedClaim) JarvisManagers.Caller(claimedManager, true)
-            else JarvisManagers.resolveCaller(claimedManager.ifBlank { null }, session)
-        if (JarvisManagers.isDelegated(who.key) && !delegatedClaim) return error("A delegated manager must send its exact ID and capability.")
-        // never act for the wrong Jarvis chat: when it is not certain who calls, ask for the manager_id
-        if (!who.sure && name in ACTING) return error(NEED_ID)
-        if (!who.sure && (name == "jarvis_speak" || name == "jarvis_ask")) {
-            // speaking belongs to the voice chat while it works; otherwise the caller must say who it is
-            if (JarvisController.isVoiceChatBusy()) who = JarvisManagers.Caller(JarvisManagers.VOICE, true) else return error(NEED_ID)
+            if (JarvisTasks.find(who.key)?.active != true) return error("This manager task is not active.")
         }
         val caller = who.key
         val textChat = caller != JarvisManagers.VOICE
@@ -863,9 +843,15 @@ object JarvisMcp {
         }
         val agent = agentArg(args.optString("agent").ifBlank { team?.agent?.name?.lowercase().orEmpty() })
         if (agent !in vm.enabledAgents.value) return error("${agentName(agent)} is turned off (Settings → Agents).")
+        val inheritedWorkspace = if (delegated) JarvisTasks.find(caller)?.workspace?.workingDirectory.orEmpty() else ""
         val projectArg = args.optString("project").trim().ifBlank { team?.project.orEmpty() }
-            .ifBlank { if (delegated) JarvisTasks.find(caller)?.project.orEmpty() else "" }
-        val project = if (projectArg.isBlank()) null else findProject(projectArg) ?: return error("No project matches \"$projectArg\". Use jarvis_ide_list_projects.")
+            .ifBlank { if (delegated) inheritedWorkspace.ifBlank { JarvisTasks.find(caller)?.project.orEmpty() } else "" }
+        val project = when {
+            projectArg.isBlank() -> IdeDaemonManager.activeProject.value
+            delegated && inheritedWorkspace.isNotBlank() && projectArg == inheritedWorkspace ->
+                ProjectItem(java.io.File(inheritedWorkspace).name.ifBlank { "Task workspace" }, inheritedWorkspace)
+            else -> findProject(projectArg) ?: return error("No project matches \"$projectArg\". Use jarvis_ide_list_projects.")
+        }
         val modelArg = args.optString("model").trim().ifBlank { if (team != null && team.agent == agent) team.model else "" }
         val model = modelArg.takeIf { it.isNotEmpty() }?.let { findModel(it, modelsFor(agent))?.id ?: return error("No ${agent.name.lowercase()} model matches \"$it\".") }
         val launchArgs = JSONObject(args.toString())
@@ -875,7 +861,7 @@ object JarvisMcp {
         val t = JarvisTasks.start(
             agent, goal, args.optString("title").ifBlank { null }, model, project?.path,
             owner = caller, team = team?.name.orEmpty(), brief = subAgentBrief(team), effort = effort,
-            childProfiles = childProfiles
+            childProfiles = childProfiles, workspaceIsolation = args.optString("isolation", "auto")
         )
         // work started: the autopilot's patience starts over
         JarvisManagers.resetNudges(caller)
@@ -886,6 +872,7 @@ object JarvisMcp {
         }
         return json(JSONObject().put("task_id", t.id).put("title", t.title).put("agent", agent.name.lowercase()).put("status", "started")
             .apply { if (team != null) put("team", team.name) }
+            .apply { if (t.workspace != null) put("workspace_branch", t.workspace.branch).put("workspace_path", t.workspace.workingDirectory) }
             .put("note", NO_WAIT_NOTE))
     }
 
@@ -985,9 +972,12 @@ object JarvisMcp {
         put("id", t.id); put("title", t.title); put("agent", t.agent.name.lowercase()); put("state", t.state.label)
         if (t.team.isNotBlank()) put("team", t.team)
         put("parent_manager_id", t.owner); put("is_manager", JarvisManagers.isDelegated(t.id))
+        if (t.archived) put("archived", true)
         put("started", ago(t.createdAt)); put("last_change", ago(t.updatedAt))
         if (t.note.isNotBlank()) put("note", t.note)
         if (t.project.isNotBlank()) put("project", t.project.substringAfterLast('/'))
+        t.workspace?.let { put("workspace", JSONObject().put("branch", it.branch).put("path", it.workingDirectory).put("base_commit", it.baseCommit)) }
+        if (t.queuedFollowUps.isNotEmpty()) put("queued_follow_ups", t.queuedFollowUps.size)
         if (t.followUps > 0) put("follow_ups", t.followUps)
         if (vm.currentConversation.value?.id == t.id) put("on_screen", true)
     }

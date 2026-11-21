@@ -256,7 +256,7 @@ object JarvisController {
         scope.launch { permissionLoop() }
         scope.launch { questionLoop() }
         scope.launch { ChatCompletionMonitor.events.collect { c -> runCatching { onChatDone(c) } } }
-        JarvisEvents.start(scope)
+        JarvisEvents.start(app, scope)
     }
 
     /** Turns Jarvis on or off (Settings). */
@@ -668,7 +668,7 @@ object JarvisController {
                 if (task != null && owner != null && (JarvisPreferences.eventRouting.value == "model" || owner != JarvisManagers.VOICE)) {
                     JarvisEvents.post(owner, JarvisEvents.Event(
                         kind = "task_question", taskId = task.id, title = task.title, agent = task.agent.name.lowercase(),
-                        team = task.team, goal = task.goal, body = questionBody(qn)
+                        team = task.team, goal = task.goal, body = questionBody(qn), id = "task:${task.id}:question:${q.key}"
                     ))
                     continue
                 }
@@ -758,7 +758,8 @@ object JarvisController {
             // the manager that started it gets the news, batched with whatever else came in meanwhile
             JarvisEvents.post(owner, JarvisEvents.Event(
                 kind = "task_$kind", taskId = t.id, title = t.title, agent = t.agent.name.lowercase(), team = t.team,
-                goal = t.goal, body = detail, replyChars = if (kind == "done") t.resultChars else 0
+                goal = t.goal, body = detail, replyChars = if (kind == "done") t.resultChars else 0,
+                id = "task:${t.id}:${t.turnAt}:$kind"
             ))
             return
         }
@@ -1408,14 +1409,17 @@ object JarvisController {
                     if (!JarvisPreferences.enabled.value) continue
                     if (m.text.isNotBlank()) { sendToJarvis(m); continue }
                     // everything that came in meanwhile goes out together, in one message
-                    val batch = JarvisEvents.drain(JarvisManagers.VOICE)
-                    if (batch.isEmpty()) continue
+                    val before = JarvisPreferences.currentChatMessages.value
+                    val delivery = JarvisEvents.beginDelivery(JarvisManagers.VOICE, before) ?: continue
                     try {
-                        sendToJarvis(m.copy(text = JarvisEvents.format(JarvisManagers.VOICE, batch, JarvisEvents.takeGuardNote(JarvisManagers.VOICE))))
+                        sendToJarvis(m.copy(text = JarvisEvents.format(
+                            JarvisManagers.VOICE, delivery.events, JarvisEvents.takeGuardNote(JarvisManagers.VOICE), delivery.batchId
+                        )))
+                        JarvisEvents.markDeliveryAccepted(JarvisManagers.VOICE, delivery.batchId)
                         eventFailures = 0
                     } catch (e: Exception) {
                         // keep the news and try again later, waiting longer each time; one notice, never spoken
-                        batch.forEach { JarvisEvents.post(JarvisManagers.VOICE, it) }
+                        JarvisEvents.retryDelivery(JarvisManagers.VOICE, delivery.batchId, e.message.orEmpty())
                         eventFailures++
                         val wait = (15_000L shl (eventFailures - 1).coerceAtMost(5)).coerceAtMost(300_000L)
                         JarvisEvents.holdVoiceUntil = System.currentTimeMillis() + wait
@@ -2308,7 +2312,8 @@ object JarvisController {
                         (JarvisPreferences.taskApprovals.value == "jarvis" && JarvisPreferences.eventRouting.value == "model"))) {
                     JarvisEvents.post(owner, JarvisEvents.Event(
                         kind = "task_approval", taskId = task.id, title = task.title, agent = task.agent.name.lowercase(),
-                        team = task.team, goal = task.goal, body = p.summary, key = p.key, risk = p.risk.name.lowercase()
+                        team = task.team, goal = task.goal, body = p.summary, key = p.key, risk = p.risk.name.lowercase(),
+                        id = "task:${task.id}:approval:${p.key}"
                     ))
                     continue
                 }

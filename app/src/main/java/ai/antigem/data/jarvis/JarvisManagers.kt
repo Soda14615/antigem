@@ -165,58 +165,37 @@ object JarvisManagers {
     /** Who is calling a tool, and whether that is certain (not a guess between several Jarvis chats at work). */
     data class Caller(val key: String, val sure: Boolean)
 
-    /** MCP connection (session id) → the manager it belongs to, learned from calls that named their manager_id. */
+    /** MCP connection (session id) → the manager it first authenticated. */
     private val sessionOwner = java.util.concurrent.ConcurrentHashMap<String, String>()
     /** Connections shared by several managers (an agent that uses one connection for all its chats): never used to tell them apart. */
     private val sharedSessions: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
-    /** The agent a manager's chat runs on. */
-    private fun agentOfKey(key: String): AgentKind? =
-        if (key == VOICE) runCatching { AgentKind.valueOf(JarvisPreferences.currentChatAgent.value) }.getOrNull() else of(key).agent
-
-    private fun learnSession(session: String?, key: String) {
-        if (session.isNullOrBlank() || session in sharedSessions) return
-        // only Claude Code connects once per chat (one process each); OpenCode and Antigravity share one connection
-        // between all their chats, so their connection says nothing about who is calling
-        if (agentOfKey(key) != AgentKind.CLAUDE) return
-        val prev = sessionOwner.putIfAbsent(session, key)
-        if (prev != null && prev != key) { sessionOwner.remove(session); sharedSessions += session }
+    /**
+     * App-generated capability bound to the manager's tool scope. The model may name a manager, but cannot select it
+     * without the matching capability. A provider MCP connection is bound on first use; shared provider connections
+     * require the capability on every call.
+     */
+    @Synchronized
+    fun capabilityFor(key: String): String {
+        require(key == VOICE || isTextManager(key)) { "Unknown Jarvis manager." }
+        val current = _managers.value[key] ?: Manager(key)
+        if (current.delegationToken.isNotBlank()) return current.delegationToken
+        val token = java.util.UUID.randomUUID().toString()
+        update(key) { it.copy(delegationToken = token) }
+        return token
     }
 
-    private fun known(key: String) = key == VOICE || isTextManager(key)
-
-    /**
-     * Which Jarvis chat is calling a tool: the manager_id it passed (every message tells it its id), else the one its MCP
-     * connection belongs to, else, when exactly one Jarvis chat is working, that one. Anything else is a guess
-     * ([Caller.sure] = false): tools that act for a manager then ask for the manager_id instead of guessing.
-     */
-    fun resolveCaller(arg: String?, session: String? = null): Caller {
-        val a = arg?.trim().orEmpty()
-        if (a.isNotEmpty()) {
-            val key = when {
-                a.equals(VOICE, ignoreCase = true) -> VOICE
-                isTextManager(a) -> a
-                a.length >= 6 -> textKeys().firstOrNull { it.startsWith(a) }
-                else -> null
-            }
-            if (key != null) { learnSession(session, key); return Caller(key, true) }
-        }
-        if (!session.isNullOrBlank() && session !in sharedSessions) {
-            sessionOwner[session]?.takeIf { known(it) }?.let { return Caller(it, true) }
-        }
-        // only one Jarvis chat exists: it is the caller
-        val texts = textKeys()
-        val voiceExists = JarvisPreferences.currentChatId.value.isNotBlank()
-        val all = texts + listOfNotNull(VOICE.takeIf { voiceExists || texts.isEmpty() })
-        if (all.size == 1) return Caller(all[0], true)
-        // several: a guess only (busy states can lag behind, e.g. Antigravity's), never certain
-        val busyText = texts.filter { runCatching { JarvisDriver.isBusy(it) }.getOrDefault(false) }
-        val voiceBusy = runCatching { JarvisController.isVoiceChatBusy() }.getOrDefault(false)
-        val busy = busyText + listOfNotNull(VOICE.takeIf { voiceBusy })
-        if (busy.size == 1) return Caller(busy[0], false)
-        val pool = busy.ifEmpty { all }
-        val recent = pool.maxByOrNull { if (it == VOICE) JarvisPreferences.lastActivityAt.value else of(it).lastSentAt } ?: VOICE
-        return Caller(recent, false)
+    @Synchronized
+    fun authenticateCaller(managerId: String?, capability: String?, session: String?): Caller? {
+        val key = managerId?.trim()?.takeIf { it == VOICE || isTextManager(it) } ?: return null
+        val manager = _managers.value[key] ?: if (key == VOICE) Manager(key) else return null
+        if (!JarvisOrchestrationRules.capabilityMatches(manager.delegationToken, capability.orEmpty())) return null
+        val sessionId = session?.trim().orEmpty()
+        if (!JarvisOrchestrationRules.hasMcpSession(sessionId)) return null
+        val bound = sessionOwner.putIfAbsent(sessionId, key)
+        if (bound != null && bound != key) sharedSessions += sessionId
+        if (!JarvisOrchestrationRules.sessionBindingAllows(bound, key, sessionId in sharedSessions)) return null
+        return Caller(key, true)
     }
 
     /** A Jarvis chat's name for messages ("the voice chat", or its title). */
@@ -240,7 +219,7 @@ object JarvisManagers {
         if (chatId.isBlank() || chatId == VOICE) return
         JarvisPreferences.addChatId(chatId)
         if (_managers.value.containsKey(chatId)) return
-        update(chatId) { Manager(chatId, agent = agent, speak = speak) }
+        update(chatId) { Manager(chatId, agent = agent, speak = speak, delegationToken = java.util.UUID.randomUUID().toString()) }
     }
 
     @Synchronized
@@ -359,7 +338,7 @@ object JarvisManagers {
         val m = of(key)
         val mine = JarvisTasks.ownedBy(key).filter { it.active || System.currentTimeMillis() - it.updatedAt < 30 * 60_000L }
         return buildString {
-            append("<mission_brief manager_id=\"$key\">\n")
+            append("<mission_brief manager_id=\"$key\" manager_token=\"${capabilityFor(key)}\">\n")
             val mi = m.mission
             if (mi.isEmpty) {
                 append("mission: none yet. For any job with more than one step call jarvis_mission_set first (goal, done_when, steps).\n")

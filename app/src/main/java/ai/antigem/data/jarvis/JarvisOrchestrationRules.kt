@@ -1,5 +1,7 @@
 package ai.antigem.data.jarvis
 
+import java.security.MessageDigest
+
 /** Pure orchestration invariants shared by the runtime and its regression tests. */
 internal object JarvisOrchestrationRules {
     fun validRoleGraph(graph: Map<String, List<String>>): Boolean {
@@ -36,4 +38,15 @@ internal object JarvisOrchestrationRules {
     /** An idle provider without a current-turn result is not evidence of success. */
     fun canCompleteIdle(observedRunning: Boolean, freshReply: Boolean, delegated: Boolean, missionDone: Boolean, awaitingChildren: Boolean): Boolean =
         (observedRunning || freshReply) && (!delegated || missionDone && !awaitingChildren)
+
+    /** A manager id is a selector, not proof of identity; every manager owns an app-generated capability. */
+    fun capabilityMatches(expected: String, supplied: String): Boolean =
+        expected.isNotBlank() && supplied.isNotBlank() &&
+            MessageDigest.isEqual(expected.toByteArray(Charsets.UTF_8), supplied.toByteArray(Charsets.UTF_8))
+
+    fun hasMcpSession(session: String?): Boolean = !session.isNullOrBlank()
+
+    /** MCP connections are normally per chat, but OpenCode/AGY may share one connection across chat sessions. */
+    fun sessionBindingAllows(boundOwner: String?, requestedOwner: String, shared: Boolean): Boolean =
+        boundOwner == null || boundOwner == requestedOwner || shared
 }

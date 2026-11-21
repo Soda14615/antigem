@@ -33,4 +33,21 @@ class JarvisOrchestrationRulesTest {
         assertTrue(JarvisOrchestrationRules.canCompleteIdle(false, true, false, false, false))
         assertTrue(JarvisOrchestrationRules.canCompleteIdle(true, false, false, false, false))
     }
+
+    @Test fun managerIdNeedsAnAppIssuedCapability() {
+        assertTrue(JarvisOrchestrationRules.capabilityMatches("app-issued-secret", "app-issued-secret"))
+        assertFalse(JarvisOrchestrationRules.capabilityMatches("app-issued-secret", "voice"))
+        assertFalse(JarvisOrchestrationRules.capabilityMatches("app-issued-secret", ""))
+        assertFalse(JarvisOrchestrationRules.capabilityMatches("", "app-issued-secret"))
+    }
+
+    @Test fun mcpSessionCannotSwitchManagersUnlessProviderConnectionIsShared() {
+        assertFalse(JarvisOrchestrationRules.hasMcpSession(null))
+        assertFalse(JarvisOrchestrationRules.hasMcpSession("  "))
+        assertTrue(JarvisOrchestrationRules.hasMcpSession("mcp-session-id"))
+        assertTrue(JarvisOrchestrationRules.sessionBindingAllows(null, "manager-a", shared = false))
+        assertTrue(JarvisOrchestrationRules.sessionBindingAllows("manager-a", "manager-a", shared = false))
+        assertFalse(JarvisOrchestrationRules.sessionBindingAllows("manager-a", "manager-b", shared = false))
+        assertTrue(JarvisOrchestrationRules.sessionBindingAllows("manager-a", "manager-b", shared = true))
+    }
 }

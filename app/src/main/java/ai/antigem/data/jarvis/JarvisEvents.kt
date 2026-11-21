@@ -1,5 +1,7 @@
 package ai.antigem.data.jarvis
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import ai.antigem.data.remote.PromptExpansion
 import ai.antigem.domain.model.ToolCall
@@ -7,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -36,8 +40,12 @@ object JarvisEvents {
         val risk: String = "",
         /** Length of the whole reply when [body] is only its end (task_done), else 0. */
         val replyChars: Int = 0,
-        val at: Long = System.currentTimeMillis()
+        val at: Long = System.currentTimeMillis(),
+        /** Stable across replay after process death; task transitions supply a deterministic id. */
+        val id: String = java.util.UUID.randomUUID().toString()
     )
+
+    data class Delivery(val events: List<Event>, val batchId: String)
 
     private val queues = ConcurrentHashMap<String, MutableList<Event>>()
     /** Why the manager's last turn was stopped by the guard (told once, with the next news). */
@@ -55,40 +63,205 @@ object JarvisEvents {
     private val spokeInTurn: MutableSet<String> = java.util.Collections.synchronizedSet(HashSet())
     @Volatile private var voiceFlushPending = false
     /** News sent to a text manager that is not confirmed yet (its chat must start working or show a new message). */
-    private data class InFlight(val batch: List<Event>, val at: Long, val messagesBefore: Int)
+    private data class InFlight(
+        val batch: List<Event>,
+        val at: Long,
+        val messagesBefore: Int,
+        val batchId: String = java.util.UUID.randomUUID().toString(),
+        val accepted: Boolean = false
+    )
     private val inFlight = ConcurrentHashMap<String, InFlight>()
+    /** Recently acknowledged IDs prevent replayed approvals/results from being queued a second time. */
+    private val deliveredEventIds = java.util.Collections.synchronizedSet(LinkedHashSet<String>())
     /** Voice news was dropped because no voice agent is set (told once per streak). */
     @Volatile private var droppedVoiceNotice = false
     @Volatile var holdVoiceUntil = 0L
     private var started = false
+    private var prefs: android.content.SharedPreferences? = null
 
-    fun start(scope: CoroutineScope) {
+    @Synchronized
+    fun start(application: Application, scope: CoroutineScope) {
         if (started) return
         started = true
+        prefs = application.getSharedPreferences("jarvis_event_outbox", Context.MODE_PRIVATE)
+        load()
+        JarvisTasks.replayUnreportedEvents()
         scope.launch { loop() }
     }
 
     // ------------------------------------------------------------------ queue
 
+    @Synchronized
     fun post(owner: String, e: Event) {
         val key = JarvisManagers.ownerOrVoice(owner)
+        if (e.id in deliveredEventIds) return
         val q = queues.getOrPut(key) { java.util.Collections.synchronizedList(ArrayList()) }
+        // A task event can be replayed after a crash between outbox persistence and marking its source task
+        // reported. Check both sides of the queue so replay cannot enqueue the same delivery twice.
+        if (inFlight[key]?.batch?.any { it.id == e.id } == true) return
         synchronized(q) {
             // a newer state of the same task replaces the older news of the same kind (no stale duplicates)
-            q.removeAll { it.taskId.isNotBlank() && it.taskId == e.taskId && it.kind == e.kind && it.key == e.key }
-            q += e
+            if (q.none { it.id == e.id }) {
+                q.removeAll { it.taskId.isNotBlank() && it.taskId == e.taskId && it.kind == e.kind && it.key == e.key }
+                q += e
+            }
         }
+        persist()
         if (e.kind == "task_done" || e.kind == "task_failed") JarvisManagers.resetNudges(key)
     }
 
-    fun pending(owner: String): Int = queues[owner]?.size ?: 0
+    fun pending(owner: String): Int = (queues[JarvisManagers.ownerOrVoice(owner)]?.size ?: 0) +
+        (inFlight[JarvisManagers.ownerOrVoice(owner)]?.batch?.size ?: 0)
 
     /** A delegated manager must not finish before its children\'s result delivery is complete. */
-    fun hasPendingWork(owner: String): Boolean = pending(owner) > 0 || inFlight.containsKey(owner)
+    fun hasPendingWork(owner: String): Boolean = pending(owner) > 0
 
+    @Synchronized
     fun drain(owner: String): List<Event> {
-        val q = queues[owner] ?: return emptyList()
-        return synchronized(q) { val out = q.toList(); q.clear(); out }
+        val key = JarvisManagers.ownerOrVoice(owner)
+        val q = queues[key] ?: return emptyList()
+        val out = synchronized(q) { q.toList().also { q.clear() } }
+        if (out.isNotEmpty()) persist()
+        return out
+    }
+
+    /** Atomically moves a manager's pending events into its durable delivery record before provider dispatch. */
+    @Synchronized
+    fun beginDelivery(owner: String, messagesBefore: Int): Delivery? {
+        val key = JarvisManagers.ownerOrVoice(owner)
+        if (inFlight.containsKey(key)) return null
+        val q = queues[key] ?: return null
+        val batch = synchronized(q) { q.toList().also { q.clear() } }
+        if (batch.isEmpty()) return null
+        val flight = InFlight(batch, System.currentTimeMillis(), messagesBefore)
+        inFlight[key] = flight
+        persist()
+        return Delivery(flight.batch, flight.batchId)
+    }
+
+    @Synchronized
+    fun markDeliveryAccepted(owner: String, batchId: String) {
+        val key = JarvisManagers.ownerOrVoice(owner)
+        val current = inFlight[key] ?: return
+        if (current.batchId != batchId) return
+        inFlight[key] = current.copy(accepted = true)
+        persist()
+    }
+
+    @Synchronized
+    fun acknowledgeDelivery(owner: String, batchId: String) {
+        val key = JarvisManagers.ownerOrVoice(owner)
+        if (inFlight[key]?.batchId != batchId) return
+        val flight = inFlight.remove(key) ?: return
+        synchronized(deliveredEventIds) {
+            flight.batch.forEach { deliveredEventIds += it.id }
+            while (deliveredEventIds.size > 1024) deliveredEventIds.remove(deliveredEventIds.first())
+        }
+        persist()
+    }
+
+    @Synchronized
+    fun retryDelivery(owner: String, batchId: String, reason: String) {
+        val key = JarvisManagers.ownerOrVoice(owner)
+        val flight = inFlight[key]?.takeIf { it.batchId == batchId } ?: return
+        inFlight.remove(key)
+        val q = queues.getOrPut(key) { java.util.Collections.synchronizedList(ArrayList()) }
+        synchronized(q) { q.addAll(0, flight.batch.filterNot { e -> q.any { it.id == e.id } }) }
+        Log.w(TAG, "news to $key will retry after dispatch failure: ${reason.take(160)}")
+        persist()
+    }
+
+    /** Redirects queued and in-flight events to voice as one durable update if their text manager was deleted. */
+    @Synchronized
+    private fun redirectToVoice(owner: String) {
+        val source = owner
+        val moved = buildList {
+            queues[source]?.let { q -> synchronized(q) { addAll(q); q.clear() } }
+            inFlight.remove(source)?.batch?.let(::addAll)
+        }.distinctBy { it.id }
+        queues.remove(source)
+        if (moved.isNotEmpty()) {
+            val target = queues.getOrPut(JarvisManagers.VOICE) { java.util.Collections.synchronizedList(ArrayList()) }
+            synchronized(target) {
+                val ids = target.mapTo(HashSet()) { it.id }
+                target.addAll(moved.filterNot { it.id in ids })
+            }
+        }
+        persist()
+    }
+
+    private fun Event.toJson() = JSONObject().apply {
+        put("id", id); put("kind", kind); put("task_id", taskId); put("title", title); put("agent", agent)
+        put("team", team); put("goal", goal); put("body", body); put("key", key); put("risk", risk)
+        put("reply_chars", replyChars); put("at", at)
+    }
+
+    private fun parseEvent(o: JSONObject) = Event(
+        kind = o.optString("kind"), taskId = o.optString("task_id"), title = o.optString("title"),
+        agent = o.optString("agent"), team = o.optString("team"), goal = o.optString("goal"),
+        body = o.optString("body"), key = o.optString("key"), risk = o.optString("risk"),
+        replyChars = o.optInt("reply_chars"), at = o.optLong("at", System.currentTimeMillis()),
+        id = o.optString("id").ifBlank { java.util.UUID.randomUUID().toString() }
+    )
+
+    @Synchronized
+    private fun persist() {
+        val root = JSONObject()
+        root.put("queues", JSONArray().apply {
+            queues.forEach { (owner, q) ->
+                val events = synchronized(q) { JSONArray().apply { q.forEach { put(it.toJson()) } } }
+                if (events.length() > 0) put(JSONObject().put("owner", owner).put("events", events))
+            }
+        })
+        root.put("in_flight", JSONArray().apply {
+            inFlight.forEach { (owner, f) ->
+                put(JSONObject().put("owner", owner).put("at", f.at).put("messages_before", f.messagesBefore)
+                    .put("batch_id", f.batchId).put("accepted", f.accepted)
+                    .put("events", JSONArray().apply { f.batch.forEach { put(it.toJson()) } }))
+            }
+        })
+        root.put("delivered_ids", JSONArray().apply { synchronized(deliveredEventIds) { deliveredEventIds.forEach { put(it) } } })
+        val store = prefs ?: return
+        check(store.edit().putString("outbox", root.toString()).commit()) {
+            "Could not durably save Jarvis task events."
+        }
+    }
+
+    private fun load() {
+        val raw = prefs?.getString("outbox", null)?.takeIf { it.isNotBlank() } ?: return
+        runCatching {
+            val root = JSONObject(raw)
+            root.optJSONArray("queues")?.let { items ->
+                for (i in 0 until items.length()) {
+                    val item = items.optJSONObject(i) ?: continue
+                    val owner = item.optString("owner")
+                    if (owner.isBlank()) continue
+                    val events = item.optJSONArray("events") ?: JSONArray()
+                    val q = ArrayList<Event>(events.length())
+                    for (j in 0 until events.length()) events.optJSONObject(j)?.let { q += parseEvent(it) }
+                    if (q.isNotEmpty()) queues[owner] = java.util.Collections.synchronizedList(q)
+                }
+            }
+            root.optJSONArray("in_flight")?.let { items ->
+                for (i in 0 until items.length()) {
+                    val item = items.optJSONObject(i) ?: continue
+                    val owner = item.optString("owner")
+                    if (owner.isBlank()) continue
+                    val events = item.optJSONArray("events") ?: JSONArray()
+                    val batch = (0 until events.length()).mapNotNull { events.optJSONObject(it)?.let(::parseEvent) }
+                    if (batch.isNotEmpty()) inFlight[owner] = InFlight(
+                        batch, item.optLong("at", System.currentTimeMillis()), item.optInt("messages_before", -1),
+                        item.optString("batch_id").ifBlank { java.util.UUID.randomUUID().toString() }, item.optBoolean("accepted")
+                    )
+                }
+            }
+            root.optJSONArray("delivered_ids")?.let { ids ->
+                synchronized(deliveredEventIds) {
+                    for (i in 0 until ids.length()) ids.optString(i).takeIf { it.isNotBlank() }?.let { deliveredEventIds += it }
+                    while (deliveredEventIds.size > 1024) deliveredEventIds.remove(deliveredEventIds.first())
+                }
+            }
+        }.onFailure { Log.e(TAG, "Could not restore event outbox: ${it.message}") }
     }
 
     fun takeGuardNote(owner: String): String? = guardNotes.remove(owner)
@@ -170,9 +343,14 @@ object JarvisEvents {
     }
 
     /** The whole message for a batch: label for the chat, structured events, the manager's brief, how to handle it. */
-    fun format(owner: String, events: List<Event>, guardNote: String?): String {
+    fun format(
+        owner: String,
+        events: List<Event>,
+        guardNote: String?,
+        batchId: String = java.util.UUID.randomUUID().toString()
+    ): String {
         val body = buildString {
-            append(OPEN).append("${events.size}\" from=\"AntiGem app (automatic, not typed by the user)\">\n")
+            append(OPEN).append("${events.size}\" batch_id=\"${attr(batchId)}\" from=\"AntiGem app (automatic, not typed by the user)\">\n")
             events.forEachIndexed { i, e -> append(e.toXml(i + 1)) }
             append("</jarvis_events>\n\n")
             if (!guardNote.isNullOrBlank()) append("<app_note>\n$guardNote\n</app_note>\n\n")
@@ -258,15 +436,13 @@ object JarvisEvents {
         val voice = owner == JarvisManagers.VOICE
         if (!voice && !JarvisManagers.isTextManager(owner)) {
             // that Jarvis chat is gone: its news (and its tasks) belong to the voice chat now
-            drain(owner).forEach { post(JarvisManagers.VOICE, it) }
-            queues.remove(owner)
-            inFlight.remove(owner)?.batch?.forEach { post(JarvisManagers.VOICE, it) }
+            redirectToVoice(owner)
             return
         }
         val chatOnly = !JarvisPreferences.voiceAssistant.value
         if (voice && (JarvisPreferences.agentKind == null || chatOnly) && pending(owner) > 0) {
-            // no voice chat can be set up (no voice agent), or the voice side is off ("chat only"): nobody could receive it
-            val n = drain(owner).size
+            // Keep events durable until a manager session can receive them.
+            val n = pending(owner)
             if (!droppedVoiceNotice) {
                 droppedVoiceNotice = true
                 val why = if (chatOnly) "Jarvis is set to chat only (Settings → Jarvis → Floating button & voice)"
@@ -281,7 +457,7 @@ object JarvisEvents {
         val active = ownsActive(owner)
         var busy = if (voice) JarvisController.isVoiceChatBusy() else JarvisDriver.isBusy(owner)
         // a Jarvis text chat with something going on keeps a live backend (its state, messages and approvals stay current)
-        if (!voice && (queued.isNotEmpty() || active || busy)) {
+        if (!voice && (queued.isNotEmpty() || active || busy || inFlight.containsKey(owner))) {
             JarvisDriver.ensure(owner)
             busy = busy || JarvisDriver.isBusy(owner)
             val offScreen = JarvisController.vm.currentConversation.value?.id != owner
@@ -295,14 +471,13 @@ object JarvisEvents {
         // news sent to a text chat counts as delivered once the chat works on it (or shows a new message); a send that
         // silently did nothing (the agent offline, the chat not loaded) puts it back in the queue
         inFlight[owner]?.let { f ->
-            val grew = (JarvisDriver.liveMessages(owner)?.size ?: -1) > f.messagesBefore && f.messagesBefore >= 0
+            val grew = if (voice) JarvisPreferences.currentChatMessages.value != f.messagesBefore
+                else (JarvisDriver.liveMessages(owner)?.size ?: -1) > f.messagesBefore && f.messagesBefore >= 0
             when {
-                busy || grew -> inFlight.remove(owner)
+                busy || grew -> acknowledgeDelivery(owner, f.batchId)
                 now - f.at > 30_000 -> {
-                    inFlight.remove(owner)
                     Log.w(TAG, "news to $owner was not taken up: queued again")
-                    val q = queues.getOrPut(owner) { java.util.Collections.synchronizedList(ArrayList()) }
-                    synchronized(q) { q.addAll(0, f.batch) }
+                    retryDelivery(owner, f.batchId, "manager turn did not start within 30 seconds")
                     sentAt[owner] = now
                 }
             }
@@ -317,20 +492,16 @@ object JarvisEvents {
             if (voice) {
                 if (now >= holdVoiceUntil && !voiceFlushPending) { voiceFlushPending = true; JarvisController.requestEventFlush() }
             } else if (!busy && inFlight[owner] == null && now - (sentAt[owner] ?: 0L) > 25_000) {
-                val batch = drain(owner)
-                if (batch.isNotEmpty()) {
+                val before = JarvisDriver.liveMessages(owner)?.size ?: -1
+                val delivery = beginDelivery(owner, before)
+                if (delivery != null) {
                     sentAt[owner] = now
                     JarvisManagers.markSent(owner)
                     spokeInTurn -= owner
-                    val before = JarvisDriver.liveMessages(owner)?.size ?: -1
-                    JarvisDriver.send(owner, format(owner, batch, takeGuardNote(owner))).onSuccess {
-                        // a chat whose messages can be watched is checked; an off-screen Antigravity send fails loudly instead
-                        if (before >= 0) inFlight[owner] = InFlight(batch, now, before)
+                    JarvisDriver.send(owner, format(owner, delivery.events, takeGuardNote(owner), delivery.batchId)).onSuccess {
+                        markDeliveryAccepted(owner, delivery.batchId)
                     }.onFailure { e ->
-                        Log.w(TAG, "send to $owner failed: ${e.message}")
-                        // put it back and try again later
-                        val q = queues.getOrPut(owner) { java.util.Collections.synchronizedList(ArrayList()) }
-                        synchronized(q) { q.addAll(0, batch) }
+                        retryDelivery(owner, delivery.batchId, e.message.orEmpty())
                         sentAt[owner] = now
                     }
                 }
