@@ -62,9 +62,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("release.jks")
-            storePassword = "123456"
+            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
             keyAlias = "antigem"
-            keyPassword = "123456"
+            keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "UNCONFIGURED"
         }
     }
 
